@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Teamfight Manager 2 Data Champion",
+  "type": "object",
+  "required": ["id", "attack", "skill", "skill2"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "category": {
+      "enum": ["Melee", "Range", "Magician", "Util", "Assassin"]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "enum": ["AD", "AP", "Heal", "Shield", "Dot", "CC", "Range", "Melee", "Tank", "Magic"]
+      }
+    },
+    "sprite": { "type": "string" },
+    "anim_prefix": { "type": ["string", "null"] },
+    "skill_icons": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "string" }
+    },
+    "stat": { "$ref": "#/$defs/entity_stat" },
+    "growth": { "$ref": "#/$defs/entity_stat" },
+    "attack": { "$ref": "#/$defs/action" },
+    "skill": { "$ref": "#/$defs/action" },
+    "skill2": { "$ref": "#/$defs/action" },
+    "ult": { "$ref": "#/$defs/action" }
+  },
+  "$defs": {
+    "entity_stat": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "attack": { "type": "number" },
+        "magic_power": { "type": "number" },
+        "hp": { "type": "number" },
+        "defence": { "type": "number" },
+        "magic_resistance": { "type": "number" },
+        "move_speed": { "type": "number" },
+        "hp_regen": { "type": "number" },
+        "stack": { "type": "number" },
+        "crit_chance": { "type": "number" }
+      }
+    },
+    "action": {
+      "type": "object",
+      "required": ["action_name"],
+      "additionalProperties": true,
+      "properties": {
+        "action_name": { "type": "string" },
+        "description": { "type": "string" },
+        "duration": { "type": "integer", "minimum": 0 },
+        "cooltime": { "type": "integer", "minimum": 0 },
+        "start_timing": { "type": "integer", "minimum": 0 },
+        "cancelable": { "type": "boolean" },
+        "range": { "type": "integer", "minimum": 0 },
+        "growth_range": { "type": "integer" },
+        "casting_type": { "enum": ["Targeting", "Position", "Direction", "None"] },
+        "casting_target": {
+          "enum": [
+            "Ally",
+            "AllyChampion",
+            "AllyChampionInCC",
+            "AllyNotSelf",
+            "AllyOnlySelf",
+            "Enemy",
+            "EnemyWithoutTower",
+            "EnemyChampion",
+            "EnemyChampionInCC",
+            "EnemyChampionRecentlyAttacked",
+            "Both",
+            "BothWithoutTower",
+            "BothChampion",
+            "None"
+          ]
+        },
+        "attack_type": { "enum": ["BaseAttack", "Skill", "Dot", "DotIgnoreShield", "Item", "Well"] },
+        "can_use_with_move": { "type": "boolean" },
+        "effect": { "type": ["object", "null"] }
+      }
+    }
+  }
+}
+

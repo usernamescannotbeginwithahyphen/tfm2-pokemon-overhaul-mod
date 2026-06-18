@@ -1,0 +1,774 @@
+{
+  "en": {
+    "description": {
+      "pokemon_moba_pikachu": {
+        "name": "Pikachu",
+        "attack": "Spark: Fires a short-ranged electric projectile for light special damage. Deals much more damage to Paralyzed enemies.",
+        "skill": "Volt Tackle: Dashes through the target, dealing light physical Electric damage that scales with AP.",
+        "skill2": "Thunder Wave: Hits an enemy with a weak Electric blast and applies Paralysis for 30 seconds. Each second, Paralysis has a 33% chance to stun for 1 second.",
+        "ult": "Thunder: Calls down a powerful Electric strike on a distant target, dealing heavy special damage.",
+        "passive": "Static Shock: Pikachu's attacks against Paralyzed enemies deal substantially increased damage."
+      },
+      "pokemon_moba_charizard": {
+        "name": "Charizard",
+        "attack": "Flamethrower: Continuously breathes a short cone of fire while moving, dealing low special damage to enemies in front of Charizard.",
+        "skill": "Dragon Breath: Breathes a stronger Dragon-type cone while moving, dealing repeated special damage in front of Charizard.",
+        "skill2": "Fire Blast: Launches a long-range fire projectile that stops on the first enemy hit, dealing heavy special damage.",
+        "ult": "Inferno: After a long windup, erupts a small target area in flame, dealing massive special damage.",
+        "passive": "Blaze: Enemies hit repeatedly by Flamethrower or Dragon Breath are Burned. Burn deals stacking damage over time for 15 seconds. Fire, Ground, and Water types cannot be Burned."
+      },
+      "pokemon_moba_blastoise": {
+        "name": "Blastoise",
+        "attack": "Hydro Pump: Fires two cannon shots in immediate succession, dealing Water damage that scales with attack damage.",
+        "skill": "Rapid Spin: Withdraws into the shell, gaining movement speed, heavy damage reduction, and CC immunity while damaging nearby enemies.",
+        "skill2": "Aqua Tail: Spins into a close-range tail strike, dealing light Water damage and knocking the target away.",
+        "ult": "Hydro Cannon: Fires a narrow long-range cannon beam, dealing heavy Water damage to all enemies in the line.",
+        "passive": "Mega Launcher: Consecutive Hydro Pump hits against the same enemy build crit chance. Crit chance above 100% becomes bonus crit damage."
+      },
+      "pokemon_moba_venusaur": {
+        "name": "Venusaur",
+        "attack": "Tackle: Slams into a nearby enemy for light physical damage.",
+        "skill": "Vine Whip: Sends vines in a line. The first enemy hit is bound in place with Venusaur for a moderate duration.",
+        "skill2": "Leech Seed: Sends roots along the ground. The first enemy hit is tethered, taking damage over time while healing Venusaur. The tether breaks if they move too far apart and can spread to enemies crossing the roots.",
+        "ult": "Sludge Wave: Sends a slow Poison wave through a line. Enemies hit are heavily slowed and receive 5 stacks of Poison. Poison, Grass, and Steel types cannot be Poisoned.",
+        "passive": "Tangling Vines: When a crowd controlled enemy is near Venusaur, nearby allies gain attack speed and attack damage. Venusaur's nearby allies also deal increased damage to crowd controlled enemies."
+      },
+      "pokemon_moba_eevee": {
+        "name": "Eevee",
+        "attack": "Tackle: Slams into a nearby enemy for very light physical damage.",
+        "skill": "Baby-Doll Eyes: Lowers the target's attack, then protects Eevee and the closest nearby ally from incoming damage.",
+        "skill2": "Wish: Eevee channels a heal into a targeted ally. Moving ends the channel early and heals for the time channeled.",
+        "ult": "Baton Pass: Transfers most of Eevee's current combat stats to a targeted ally for 30 seconds, heavily weakening Eevee for the same duration.",
+        "passive": "Helping Hand: Nearby allied champions gain increased stats and reduced skill cooldowns."
+      },
+      "pokemon_moba_jolteon": {
+        "name": "Jolteon",
+        "attack": "Pin Missile: Fires three fast Bug-type needles at a short-ranged target, dealing physical damage.",
+        "skill": "Sand Attack: Lowers a target's attack damage and attack speed for 10 seconds.",
+        "skill2": "Thunder Shock: Shocks a single enemy for Electric damage that scales with attack damage and ability power.",
+        "ult": "Thunder Fang: Jolteon leaps to a target and bites for heavy physical Electric damage. Surviving targets have a 30% chance to be Paralyzed.",
+        "passive": "Eeveelution: If at least one other allied or enemy Pokemon has the Eeveelution passive, gains +2% combat stats for each other Eeveelution passive carrier."
+      },
+      "pokemon_moba_flareon": {
+        "name": "Flareon",
+        "attack": "Ember: Fires a short-range Fire attack for light special damage. Has a 10% chance to Burn for 3 seconds.",
+        "skill": "Fire Spin: Spins in place, damaging and knocking back nearby enemies. Has a 10% chance to Burn for 5 seconds.",
+        "skill2": "Flame Wheel: Sends a spinning Fire wheel forward through enemies, dealing special damage. Has a 10% chance to Burn for 10 seconds.",
+        "ult": "Fire Fang: Flareon leaps to a target and bites for heavy special Fire damage. Surviving targets have a 30% chance to be Burned.",
+        "passive": "Eeveelution: If at least one other allied or enemy Pokemon has the Eeveelution passive, gains +2% combat stats for each other Eeveelution passive carrier."
+      },
+      "pokemon_moba_vaporeon": {
+        "name": "Vaporeon",
+        "attack": "Water Gun: Fires a thin long-range Water line, dealing light special damage to enemies in the path.",
+        "skill": "Growl: Lowers a target's attack for 5 seconds. The attack reduction scales with Vaporeon's defense.",
+        "skill2": "Water Pulse: Fires a medium-range Water projectile that stops on the first enemy hit, dealing moderate special damage.",
+        "ult": "Aqua Ring: Creates a short-range water ring around Vaporeon, rapidly healing nearby allies while lowering nearby enemies' attack.",
+        "passive": "Eeveelution: If at least one other allied or enemy Pokemon has the Eeveelution passive, gains +2% combat stats for each other Eeveelution passive carrier."
+      },
+      "pokemon_moba_leafeon": {
+        "name": "Leafeon",
+        "attack": "Razor Leaf: Throws twin sharp leaves at a target for physical Grass damage. Has a 15% chance to Bleed, increased to 50% against jungle camps.",
+        "skill": "Magical Leaf: Throws a sure-striking leaf for physical Grass damage that bypasses Pokemon type damage modifiers.",
+        "skill2": "Leaf Blade: Slashes a nearby enemy for heavy physical Grass damage and applies Bleed.",
+        "ult": "Leaf Storm: Calls down a small storm of razor leaves for massive physical Grass damage. Leafeon is slowed afterward.",
+        "passive": "Eeveelution: If at least one other allied or enemy Pokemon has the Eeveelution passive, gains +2% combat stats for each other Eeveelution passive carrier."
+      },
+      "pokemon_moba_glaceon": {
+        "name": "Glaceon",
+        "attack": "Ice Shard: Fires a damaging Ice projectile at a target, dealing physical damage.",
+        "skill": "Snowscape: Covers a target area in snow for 5 seconds. Enemies inside take light physical damage over time, are disarmed and slowed, and have a 25% chance each second to be Frozen.",
+        "skill2": "Ice Fang: Glaceon leaps to a target and bites for physical Ice damage. Surviving targets have a 25% chance to be Frozen.",
+        "ult": "Blizzard: Calls down a larger storm that deals heavy physical damage over time and continuously Freezes enemies inside.",
+        "passive": "Eeveelution: If at least one other allied or enemy Pokemon has the Eeveelution passive, gains +2% combat stats for each other Eeveelution passive carrier."
+      },
+      "pokemon_moba_umbreon": {
+        "name": "Umbreon",
+        "attack": "Bite: Bites a nearby enemy for moderate physical Dark damage.",
+        "skill": "Snarl: Damages nearby enemies very lightly and lowers their defense. The defense reduction scales with Umbreon's attack damage.",
+        "skill2": "Dark Pulse: Fires a medium-range Dark projectile that stops on the first enemy hit, dealing physical damage. If it lands, Umbreon gains Shadow Veil for 3 seconds.",
+        "ult": "Crunch: Umbreon leaps to a target and bites for heavy physical Dark damage. Surviving targets have a 30% chance to be disarmed for 3 seconds.",
+        "passive": "Eeveelution: If at least one other allied or enemy Pokemon has the Eeveelution passive, gains +2% combat stats for each other Eeveelution passive carrier."
+      },
+      "pokemon_moba_feraligatr": {
+        "name": "Feraligatr"
+      },
+      "pokemon_moba_emboar": {
+        "name": "Emboar"
+      },
+      "pokemon_moba_blaziken": {
+        "name": "Blaziken"
+      },
+      "pokemon_moba_greninja": {
+        "name": "Greninja"
+      },
+      "pokemon_moba_decidueye": {
+        "name": "Decidueye"
+      },
+      "pokemon_moba_inteleon": {
+        "name": "Inteleon"
+      },
+      "pokemon_moba_skeledirge": {
+        "name": "Skeledirge"
+      },
+      "pokemon_moba_porygonz": {
+        "name": "Porygon-Z"
+      },
+      "pokemon_moba_blissey": {
+        "name": "Blissey"
+      },
+      "pokemon_moba_kleavor": {
+        "name": "Kleavor"
+      },
+      "pokemon_moba_scizor": {
+        "name": "Scizor"
+      },
+      "pokemon_moba_ursaluna": {
+        "name": "Ursaluna"
+      },
+      "pokemon_moba_sawk_throh": {
+        "name": "Sawk & Throh"
+      },
+      "pokemon_moba_hitmonchan": {
+        "name": "Hitmonchan"
+      },
+      "pokemon_moba_hitmonlee": {
+        "name": "Hitmonlee"
+      },
+      "pokemon_moba_hitmontop": {
+        "name": "Hitmontop"
+      },
+      "pokemon_moba_kilowattrel": {
+        "name": "Kilowattrel"
+      },
+      "pokemon_moba_beeheeyem": {
+        "name": "Beeheeyem"
+      },
+      "pokemon_moba_gyarados": {
+        "name": "Gyarados"
+      },
+      "pokemon_moba_noivern": {
+        "name": "Noivern"
+      },
+      "pokemon_moba_mantine": {
+        "name": "Mantine"
+      },
+      "pokemon_moba_cryogonal": {
+        "name": "Cryogonal",
+        "attack": "Ice Shard: Fires an Ice projectile at an enemy, dealing special damage.",
+        "skill": "Icy Wind: Sends an icy line across the battlefield, damaging enemies it passes through and carrying a chance to Freeze.",
+        "skill2": "Freeze-Dry: Chills a single enemy for special damage. This move is additionally super effective against Water-type Pokemon.",
+        "ult": "Ice Beam: Fires a long Ice beam that damages enemies in its path and has a high chance to Freeze.",
+        "passive": "Immunity: Cryogonal cannot be Burned or Poisoned."
+      },
+      "pokemon_moba_vanilluxe": {
+        "name": "Vanilluxe",
+        "attack": "Icicle Spear: Launches a long-range Ice projectile at an enemy, dealing special damage.",
+        "skill": "Chilling Water: Sends a Water line across the battlefield, damaging enemies it passes through and carrying a chance to Freeze.",
+        "skill2": "Frost Breath: Blasts a far-reaching Ice cone, damaging and Freezing enemies caught in it.",
+        "ult": "Sheer Cold: Emits a freezing blast around Vanilluxe, heavily damaging enemies and Freezing enemies and allies caught in the area.",
+        "passive": "Snow Patrol: Vanilluxe's attacks critically strike Frozen enemies."
+      },
+      "pokemon_moba_skarmory": {
+        "name": "Skarmory",
+        "attack": "Peck: Pecks a nearby enemy, dealing physical Flying damage.",
+        "skill": "Roost: Temporarily becomes pure Steel-type and rapidly heals.",
+        "skill2": "Dual Wingbeat: Slashes an enemy twice with its wings, dealing physical Flying damage on each hit.",
+        "ult": "Fly: Flies to an allied Pokemon anywhere on the map, dealing physical Flying splash damage to enemies near the landing point.",
+        "passive": "Sturdy: Once every 5 minutes, direct damage that would reduce Skarmory to 0 HP leaves it at 1 HP instead. Damage-over-time does not trigger Sturdy."
+      },
+      "pokemon_moba_houndoom": {
+        "name": "Houndoom",
+        "attack": "Ember: Fires a small Fire projectile, dealing special damage.",
+        "skill": "Foul Play: Deals Dark special damage, increased if Houndoom has avoided damage recently.",
+        "skill2": "Howl: Stuns an enemy briefly and lowers their defense.",
+        "ult": "Inferno: Erupts a target area in flames, dealing Fire special damage and Burning enemies.",
+        "passive": "Intimidate: Nearby enemies have reduced attack."
+      },
+      "pokemon_moba_arbok": {
+        "name": "Arbok",
+        "attack": "Poison Sting: Strikes a nearby enemy for physical Poison damage. Every second hit applies Miasma.",
+        "skill": "Coil: Dashes through enemies, applying Miasma. The primary target is stunned, damaged, and shoved away while Arbok becomes briefly untargetable.",
+        "skill2": "Spit Up: Covers an area in bile, applying Miasma and slowing enemies.",
+        "ult": "Venoshock: Detonates all Miasma stacks around Arbok for physical Poison damage and applies Poison.",
+        "passive": "Dripping Fangs: Every 10 Miasma stacks applies Poison. Enemies that die with Miasma spread their stacks nearby."
+      },
+      "pokemon_moba_clawitzer": {
+        "name": "Clawitzer",
+        "attack": "Aqua Jet: Fires a jet stream of water at an enemy, dealing physical Water damage.",
+        "skill": "Water Sport: Drops three water geysers in a triangle, dealing physical Water damage.",
+        "skill2": "Aqua Cutter: Slices an enemy with pressurized water, dealing physical Water damage. This can hit towers.",
+        "ult": "Bubble Beam: Channels a wide line of bubbles, dealing physical Water damage to all enemies and towers hit.",
+        "passive": "Clingy: Attaches to a nearby allied Pokemon, becoming untargetable and movement-rooted while sharing most of Clawitzer's HP and defenses. Detaches if the ally dies or takes a huge hit."
+      },
+      "pokemon_moba_octillery": {
+        "name": "Octillery",
+        "attack": "Bullet Seed: Fires three Bug-type seeds in quick succession, each dealing physical damage and resolving critical hits and lifesteal separately.",
+        "skill": "Lock-On: Marks an enemy for 15 seconds, giving Octillery increased critical chance against that target.",
+        "skill2": "Bouncy Bubble: Fires a Water bubble that lands three times along an aimed path, dealing physical damage at each impact.",
+        "ult": "Octazooka: Fires a massive Water projectile in a line, dealing heavy physical damage to the first enemy hit.",
+        "passive": "Suction Cups: Intended terrain-walking passive. This is pending a lower-level pathing hook."
+      },
+      "pokemon_moba_pyukumuku": {
+        "name": "Pyukumuku",
+        "attack": "Harden: Briefly ignores incoming damage, then gains increased defense.",
+        "skill": "Toxic: Applies two stacks of Poison to the target.",
+        "skill2": "Rest: Falls asleep, becoming unable to act while rapidly healing.",
+        "ult": "Pain Split: Averages Pyukumuku's current HP with the target's current HP, then splits the total evenly between them.",
+        "passive": "Innards Out: Burn and Poison heal Pyukumuku. Melee attacks against Pyukumuku reflect increasing damage from repeat attackers and may poison them. Direct damage that kills Pyukumuku is partly reflected back."
+      },
+      "pokemon_moba_banette": {
+        "name": "Banette",
+        "attack": "Shadow Claw: Slashes an enemy with ghostly claws, dealing physical Ghost damage.",
+        "skill": "Shadow Sneak: Dashes through shadows to the target, dealing physical Ghost damage and forcing the target toward Banette's starting point.",
+        "skill2": "Night Shade: Releases a short shadow cone, dealing physical Ghost damage and briefly blinding enemies.",
+        "ult": "Phantom Force: Teleports to an enemy and deals heavy physical Ghost damage. If the target dies, nearby enemies take splash damage.",
+        "passive": "Cursed Body: Enemy hits against Banette have a chance to disable that enemy's offensive actions."
+      },
+      "pokemon_moba_kricketune": {
+        "name": "Kricketune",
+        "attack": "Lunge: Lunges a short distance toward an enemy, then slashes for physical Bug damage.",
+        "skill": "Sticky Web: Places a permanent web field. Kricketune moves faster in webs and enemies are lightly slowed.",
+        "skill2": "Sing: Sings a lingering song that puts nearby enemies to Sleep while they remain in the aura.",
+        "ult": "Bug Buzz: Emits a damaging buzzing aura that Confuses nearby enemies.",
+        "passive": "Web Walker: Sticky Webs create permanent control zones that speed Kricketune and lightly slow enemies."
+      },
+      "pokemon_moba_ambipom": {
+        "name": "Ambipom",
+        "attack": "Double Hit: Strikes twice with its tail hands, dealing physical Normal damage.",
+        "skill": "Tickle: Confuses a nearby enemy for a short duration.",
+        "skill2": "Thief: Deals physical Dark damage and temporarily steals an item-like stat from the target.",
+        "ult": "Fury Swipes: Greatly increases Ambipom's attack speed and critical chance for a short duration.",
+        "passive": "Technician: Ally-provided Pokemon buffs also grant Ambipom movement speed."
+      },
+      "pokemon_moba_gallade": {
+        "name": "Gallade",
+        "attack": "Sacred Sword: Slashes an enemy for physical Fighting damage.",
+        "skill": "Future Sight: Predicts one enemy, reducing that enemy's Pokemon damage to Gallade for a short duration.",
+        "skill2": "Calm Mind: Cleanses harmful Pokemon statuses and increases Gallade's attack damage.",
+        "ult": "Psycho Cut: Slashes a short cone for heavy physical Psychic damage and can hit towers.",
+        "passive": "Justified: Dark-type Pokemon damage gives Gallade a temporary attack buff."
+      },
+      "pokemon_moba_audino": {
+        "name": "Audino",
+        "attack": "Pound: Flops into an enemy for light physical Normal damage.",
+        "skill": "Protect: Redirects Pokemon damage from an allied Pokemon to Audino and ignores new damaging statuses for a short duration.",
+        "skill2": "Substitute: Rushes to an ally, moves them away from danger, and heals them.",
+        "ult": "Endure: Protects an ally from the next lethal hit, leaving them at half HP.",
+        "passive": "Regenerator: After avoiding damage, Audino heals itself, or a nearby wounded ally if Audino is already healthy."
+      },
+      "pokemon_moba_pangoro": {
+        "name": "Pangoro",
+        "attack": "Night Slash: Slashes an opponent for physical Dark damage.",
+        "skill": "Taunt: Forces an enemy to target Pangoro and basic attack while Pangoro gains defense.",
+        "skill2": "Parting Shot: Strikes an enemy, then leaps away.",
+        "ult": "Brutal Swing: Grabs nearby enemies, controls them briefly, then throws them away.",
+        "passive": "Scrappy: Pangoro's Pokemon damage cannot be reduced below normal damage by type resistance."
+      },
+      "pokemon_moba_passimian": {
+        "name": "Passimian",
+        "attack": "Fling: Throws a coconut at an opponent for physical Dark damage.",
+        "skill": "Coaching: Raises Passimian's attack and defense for a short duration.",
+        "skill2": "Reversal: Ignores the next direct Pokemon hit and retaliates with physical Fighting damage.",
+        "ult": "Focus Blast: Throws a powerful coconut strike for heavy physical Fighting damage.",
+        "passive": "Receiver: When Passimian kills an enemy Pokemon, it copies that Pokemon's passive."
+      },
+      "pokemon_moba_oranguru": {
+        "name": "Oranguru",
+        "attack": "Simple Beam: Fires a short blast of special Normal damage.",
+        "skill": "Nasty Plot: Marks an enemy, then damages wounded targets or stuns full-health targets after a delay.",
+        "skill2": "Stored Power: Stores incoming damage for a short duration, then releases it around Oranguru.",
+        "ult": "Instruct: Causes a targeted ally to fire one random skill after a short delay.",
+        "passive": "Symbiosis: Shares part of Oranguru's positive item-derived stat bonuses with a nearby ally."
+      },
+      "pokemon_moba_dragalge": {
+        "name": "Dragalge",
+        "attack": "Acid Spit: Spits acid for special Poison damage with a chance to Poison.",
+        "skill": "Poison Tail: Spins in place, knocking back nearby enemies and possibly Poisoning them.",
+        "skill2": "Sludge Bomb: Fires three sequential Poison impacts in a triangle.",
+        "ult": "Toxic Chain: Chains an enemy with massive Poison stacks, or executes targets already heavily Poisoned.",
+        "passive": "Poison Sipper: Direct Pokemon attacks heal Dragalge when they hit Poisoned enemies."
+      },
+      "pokemon_moba_heliolisk": {
+        "name": "Heliolisk",
+        "attack": "Scratch: Scratches an enemy for physical Normal damage.",
+        "skill": "Swift: Dashes through an aimed line, damaging enemies crossed.",
+        "skill2": "Shed Tail: Drops a decoy tail that taunts nearby enemies while Heliolisk retreats.",
+        "ult": "Parabolic Charge: Releases Electric energy around Heliolisk, dealing physical damage and Paralyzing enemies.",
+        "passive": "Discharge: After moving enough distance, Heliolisk releases a small Electric pulse around itself."
+      },
+      "pokemon_moba_turtonator": {
+        "name": "Turtonator",
+        "attack": "Ember: Fires a short-ranged physical Fire attack.",
+        "skill": "Shell Trap: Places three persistent Fire traps in a triangle until enemies trigger them.",
+        "skill2": "Sunny Day: Creates a large sunlight field that slows eligible enemies while they remain inside it and empowers Fire, Electric, and Grass effects.",
+        "ult": "Clanging Scales: Slams repeatedly, damaging enemies around Turtonator with physical Dragon damage.",
+        "passive": "Burning Jealousy: Damages nearby enemies when they gain increased combat stats."
+      },
+      "pokemon_moba_ribombee": {
+        "name": "Ribombee",
+        "attack": "Pollen Puff: Damages enemies or heals wounded nearby allies, consuming Honey stacks to amplify the result.",
+        "skill": "Draining Kiss: Sends a piercing Fairy line that damages enemies and heals Ribombee for damage dealt.",
+        "skill2": "U-Turn: Rushes to an ally and carries both Pokemon away from nearby danger.",
+        "ult": "Alluring Voice: Sings an aura that taunts enemies in the outer radius and Confuses enemies in the inner radius.",
+        "passive": "Honey Gatherer: Periodically gathers Honey stacks that empower Pollen Puff."
+      },
+      "pokemon_moba_drampa": {
+        "name": "Drampa",
+        "attack": "Twister: Sends a piercing Dragon tornado in a line, dealing special damage and briefly knocking up enemies it passes through.",
+        "skill": "Outrage: Temporarily increases Drampa's attack, defense, and magic resistance.",
+        "skill2": "Dragon Energy: Sacrifices current HP to deal Dragon special damage to an enemy. This cannot reduce Drampa below 1 HP.",
+        "ult": "Draco Meteor: Drops a huge Dragon meteor in a large area, dealing heavy special damage.",
+        "passive": "Berserk: Below half HP, Drampa gains attack, ability power, and basic critical chance, but loses some defense and magic resistance."
+      },
+      "pokemon_moba_kommoo": {
+        "name": "Kommo-o",
+        "attack": "Dragon Claw: Slashes a nearby enemy for physical Dragon damage plus target max HP damage that scales with Kommo-o's attack.",
+        "skill": "Noble Roar: Roars around Kommo-o, lowering nearby enemies' attack and defense.",
+        "skill2": "Clangorous Soul: Sacrifices max HP to gain attack, attack speed, and movement speed.",
+        "ult": "Close Combat: Challenges an enemy to a forced melee duel, rooting and silencing both Pokemon while weakening the target and increasing Kommo-o's attack speed.",
+        "passive": "Overcoat: Kommo-o cannot be Burned or Poisoned."
+      },
+      "pokemon_moba_thievul": {
+        "name": "Thievul",
+        "attack": "Feint Attack: Tricks and strikes a nearby enemy for physical Dark damage.",
+        "skill": "Baddy Bad: Damages an enemy and blocks its healing and lifesteal.",
+        "skill2": "Hone Claws: Briefly makes Thievul's basic attacks critically strike and apply Baddy Bad's heal block.",
+        "ult": "Stakeout: Creates a long-lasting Dark field that roots enemies and empowers Thievul's attacks against enemies inside it.",
+        "passive": "Heal Block: Enemies near Thievul have reduced healing and lifesteal."
+      },
+      "pokemon_moba_archaludon": {
+        "name": "Archaludon",
+        "attack": "Breaking Swipe: Swipes a nearby enemy for physical Dragon damage.",
+        "skill": "Iron Defense: Greatly reduces incoming damage and prevents critical hits for a short time.",
+        "skill2": "Autotomize: Sheds armor, lowering defenses to gain a large movement speed burst.",
+        "ult": "Electro Shot: Channels in place, then releases a large Electric blast around Archaludon.",
+        "passive": "Stalwart: Archaludon cannot be moved by hostile Pokemon-layer forced movement effects."
+      },
+      "pokemon_moba_appletun": {
+        "name": "Appletun",
+        "attack": "Headbutt: Crashes into a nearby enemy for physical Normal damage.",
+        "skill": "Apple Acid: Lowers an enemy's defense and magic resistance.",
+        "skill2": "Sweet Scent: Emits an aura that increases allied health while lowering nearby enemy attack and defenses.",
+        "ult": "Fickle Beam: Fires a piercing Dragon beam that can critically hit and can ignore type resistance.",
+        "passive": "Ripen: Appletun receives doubled healing from Pokemon-layer healing effects."
+      },
+      "pokemon_moba_goodra": {
+        "name": "Goodra",
+        "attack": "Dizzy Punch: Winds up and strikes a nearby enemy for physical Normal damage, with a chance to Confuse.",
+        "skill": "Rain Dance: Creates a persistent rain field that strengthens Water and Electric Pokemon damage, weakens Fire Pokemon damage, and speeds Water/Electric cooldown recovery inside the field.",
+        "skill2": "Dragon Cheer: Cheers nearby allies, granting critical chance. Dragon-type allies receive a stronger critical chance buff.",
+        "ult": "Life Dew: Scatters healing bubbles around Goodra. Allied Pokemon that touch a bubble are healed and consume it.",
+        "passive": "Sap Sipper: Goodra takes reduced damage from Grass-type Pokemon moves."
+      },
+      "pokemon_moba_dedenne": {
+        "name": "Dedenne",
+        "attack": "Nuzzle: Nuzzles a nearby enemy for physical Electric damage with a chance to Paralyze.",
+        "skill": "Play Rough: Dashes through enemies for physical Fairy damage. Static charges can empower the dash and Silence enemies hit.",
+        "skill2": "Double Shock: Channels briefly, then releases an Electric ring that damages enemies, restores Static charges, and heals Dedenne when it hits champions or large monsters.",
+        "ult": "Electric Terrain: Creates a Spark Grid of Electric nodes. Dedenne can consume nodes for Static charges and healing, or recast to overload remaining nodes.",
+        "passive": "Static: Dedenne gains Static charges while moving. Basic attacks spend charges for missing-health bonus damage, and high charge gives out-of-combat movement speed."
+      },
+      "pokemon_moba_hawlucha": {
+        "name": "Hawlucha",
+        "attack": "Wing Attack: Strikes a nearby enemy for physical Flying damage.",
+        "skill": "Air Slash: Slashes a short cone for physical Flying damage.",
+        "skill2": "Counter: Briefly parries incoming direct damage, then retaliates around Hawlucha, slowing enemies and gaining vamp if a champion triggered it.",
+        "ult": "Flying Press: Becomes briefly untargetable, dashes to an enemy champion, crashes down with Fighting/Flying damage, stuns the target, and knocks back nearby enemies.",
+        "passive": "Momentum: Applying crowd control briefly increases attack speed and movement speed. Each unique enemy champion hit by Flying Press permanently increases attack."
+      },
+      "pokemon_moba_bouffalant": {
+        "name": "Bouffalant",
+        "attack": "Stomp: Stomps a nearby enemy for physical Normal damage.",
+        "skill": "Retaliate: Roots Bouffalant, reduces incoming damage, then strikes back against enemies that damaged it during the stance.",
+        "skill2": "Stomping Tantrum: Stomps the ground for physical Ground damage and slows enemies. Deals more damage if Bouffalant was recently crowd controlled.",
+        "ult": "Head Charge: Becomes unstoppable and charges through enemies to reach a champion, stunning and marking the target.",
+        "passive": "Afro: Bouffalant takes reduced Pokemon damage from frontal attacks and suffers shorter hard crowd control durations."
+      },
+      "pokemon_moba_starmie": {
+        "name": "Starmie",
+        "attack": "Water Spout: Fires a weak Water projectile for magic damage.",
+        "skill": "Flip Turn: Dashes through an enemy for Water magic damage, then flips away. Illuminated targets take more damage and are stunned.",
+        "skill2": "Heart Swap: Gives Starmie's transferable debuffs and DOTs to the target, steals the target's transferable buffs and protections, then weakens the target. Illuminated targets also bleed and release a Psychic shockwave.",
+        "ult": "Psybeam: Channels with damage reduction, then fires a long true-damage Psychic beam. Illuminated targets hit by the beam emit radial damage spokes.",
+        "passive": "Illuminate: Periodically charges. The next enemy damaged by Starmie is marked, revealed, and vulnerable to Starmie's enhanced skill effects."
+      },
+      "pokemon_moba_drednaw": {
+        "name": "Drednaw",
+        "attack": "Head Smash: Slams a nearby enemy for physical Rock damage.",
+        "skill": "Rock Tomb: Damages an enemy and roots them with rising rocks.",
+        "skill2": "Rock Polish: Sharply increases Drednaw's defensive stats for a short time.",
+        "ult": "Razor Shell: Spins to damage nearby enemies, then dashes away and damages enemies crossed by the dash.",
+        "passive": "Wide Guard: Drednaw takes reduced damage from attacks that hit it from behind."
+      },
+      "pokemon_moba_orbeetle": {
+        "name": "Orbeetle",
+        "attack": "Struggle Bug: Thrashes against a nearby enemy for physical Bug damage.",
+        "skill": "Agility: Darts through several nearby enemy Pokemon, damaging each target once.",
+        "skill2": "Infestation: Sends a moving Bug wave forward, damaging enemies and applying a fast-ticking Infestation damage-over-time effect.",
+        "ult": "Psyshock: Releases a Psychic cone that deals heavy physical damage and inflicts Confusion.",
+        "passive": "Telepathy: Orbeetle ignores allied Pokemon-layer damage and harmful statuses."
+      },
+      "pokemon_moba_coalossal": {
+        "name": "Coalossal",
+        "attack": "Rock Blast: Fires a rock at an enemy for physical Rock damage.",
+        "skill": "Tar Shot: Sends a steaming tar wave forward, damaging and slowing enemies with a chance to Burn.",
+        "skill2": "Smokescreen: Places a smoke wall that blocks Pokemon-layer attacks and dashes that cross it.",
+        "ult": "Magma Storm: Unleashes paired volcanic lines followed by a center eruption, dealing physical Fire damage with a chance to Burn.",
+        "passive": "Steam Engine: Taking Fire or Water Pokemon damage briefly grants a large movement speed increase."
+      },
+      "pokemon_moba_magmortar": {
+        "name": "Magmortar",
+        "attack": "Lava Plume: Fires a heavy burst of molten Fire damage. Its cadence is fixed by Overheat rather than attack speed.",
+        "skill": "Temper Flare: Lobs an explosive Fire shot that splashes harder and farther if the primary target is Burned.",
+        "skill2": "Heat Wave: Channels briefly, then creates a moving Fire ring that burns enemies who leave it and empowers Lava Plume while active.",
+        "ult": "Eruption: Roots Magmortar and fires repeated cannonballs at low-health visible enemy champions, gaining temporary defenses during the salvo.",
+        "passive": "Overheat: Lava Plume is fixed at 0.75 attacks per second. Bonus attack speed becomes armor penetration at 1% per 4% bonus attack speed. Every fourth Lava Plume overheats its target for max-HP damage plus burning ground."
+      },
+      "pokemon_moba_grapploct": {
+        "name": "Grapploct",
+        "attack": "Comet Punch: Strikes four times in quick succession, with each hit able to crit independently.",
+        "skill": "Detect: Guards against the next hostile Pokemon-layer attack or skill that would affect Grapploct.",
+        "skill2": "Submission: Grapples an enemy, rooting both fighters and dealing repeated Fighting damage.",
+        "ult": "Octolock: Grapples an enemy for longer and executes them if they fall below 10% HP during the hold.",
+        "passive": "Boxer: Grapploct hits Fighting Pokemon harder, takes less damage from Fighting and punching moves, and takes extra damage from kicking moves."
+      },
+      "pokemon_moba_sirfetchd": {
+        "name": "Sirfetch'd",
+        "attack": "Skull Bash: Strikes an enemy with Sirfetch'd's leek sword for physical Normal damage.",
+        "skill": "Solar Blade: Winds up briefly, then strikes with Grass physical damage that can critically hit.",
+        "skill2": "Vacuum Wave: Sends a Fighting wind projectile at an enemy. This skill cannot critically hit.",
+        "ult": "Brave Bird: Dashes into an enemy for Fighting physical damage and briefly roots on contact. This strike can critically hit.",
+        "passive": "Leek: Skull Bash, Solar Blade, and Brave Bird gain bonus critical chance. Critical chance above 100% becomes both extra critical damage and Pokemon-layer damage reduction."
+      },
+      "pokemon_moba_arboliva": {
+        "name": "Arboliva",
+        "attack": "Seed Bomb: Fires an explosive Grass seed for physical damage, then splashes additional damage in a tight radius.",
+        "skill": "Energy Ball: Fires a Grass energy ball that deals physical damage on contact.",
+        "skill2": "Trailblaze: Ignites nearby Grassy Terrain, destroying it and damaging enemies standing inside with a chance to Burn.",
+        "ult": "Solar Beam: Charges briefly, then fires a long Grass beam that deals heavy physical damage and can Burn enemies.",
+        "passive": "Seed Sower: Taking damage creates persistent Grassy Terrain under Arboliva. Arboliva gains attack speed and stronger Grass moves while standing in its Grassy Terrain."
+      },
+      "pokemon_moba_armarouge": {
+        "name": "Armarouge",
+        "attack": "Fire Lash: Lashes a nearby enemy for physical Fire damage.",
+        "skill": "Mystical Fire: Conjures a close Fire aura that deals physical damage and can inflict Burn and Confusion.",
+        "skill2": "Heart Stamp: Kicks an enemy with Psychic force, dealing physical damage and briefly stunning them.",
+        "ult": "Armor Cannon: Fires a long Fire line for heavy physical damage. Clears Weak Armor stacks, then lowers Armarouge's defenses while the move cools down.",
+        "passive": "Weak Armor: Armarouge starts with very high defenses. Each landed attack lowers those defenses until Armarouge dies or fires Armor Cannon."
+      },
+      "pokemon_moba_ceruledge": {
+        "name": "Ceruledge",
+        "attack": "Astonish: Strikes with Ghost force, dealing physical damage with a chance to stun.",
+        "skill": "Flame Charge: Dashes into the first enemy hit, dealing Fire physical damage and leaving a damaging flame trail that can Burn.",
+        "skill2": "Poltergeist: Turns one positive item-like stat on the target against them, dealing Ghost damage based on that stat.",
+        "ult": "Bitter Blade: Slashes an enemy for heavy Fire physical damage and executes low-health targets.",
+        "passive": "Flash Fire: Taking Fire damage increases Ceruledge's damage stats for a short time."
+      },
+      "pokemon_moba_gholdengo": {
+        "name": "Gholdengo",
+        "attack": "Flash Cannon: Fires a stream of Steel light at an enemy, dealing physical damage.",
+        "skill": "Ominous Wind: Sends a Ghost wave forward, dealing physical damage and briefly increasing Gholdengo's movement speed.",
+        "skill2": "Metal Sound: Emits a screeching Steel sound wave that lowers nearby enemy defenses.",
+        "ult": "Make It Rain: Calls down coins in an octagonal target area, dealing heavy Steel physical damage.",
+        "passive": "Good as Gold: Observed gold gains gradually increase Gholdengo's Pokemon-layer damage."
+      },
+      "pokemon_moba_frosmoth": {
+        "name": "Frosmoth",
+        "attack": "Powder Snow: Creates a small Ice flurry that deals special damage and can briefly Freeze enemies.",
+        "skill": "Avalanche: Sends a snow wave forward, dealing special Ice damage, rooting enemies, and carrying a chance to Freeze.",
+        "skill2": "Sleep Powder: Frosmoth flies a circle, filling the enclosed area with powder that puts enemies inside to Sleep.",
+        "ult": "Silver Wind: Sends a Bug wave forward, dealing special damage. Each enemy hit improves Frosmoth's chance to gain temporary stat boosts.",
+        "passive": "Ice Scales: Frosmoth takes half damage from Pokemon-layer AP damage."
+      },
+      "pokemon_moba_shedinja": {
+        "name": "Shedinja",
+        "attack": "Shadow Force: Casts a Ghost force at an enemy, dealing special damage.",
+        "skill": "Skitter Smack: Dashes forward, strikes enemies in a small Bug cone, and gains movement speed.",
+        "skill2": "Grudge: Damages an enemy. Deals much more damage if that enemy has killed Shedinja this game.",
+        "ult": "Astral Barrage: Sends a wave of Ghost apparitions forward, damaging and Terrifying enemies hit.",
+        "passive": "Wonder Guard: Shedinja has 1 HP. Its shell blocks basic attacks and non-super-effective abilities; repeated super-effective hits knock it into a vulnerable shell-chit state."
+      },
+      "pokemon_moba_ludicolo": {
+        "name": "Ludicolo",
+        "attack": "Facade: Strikes a nearby enemy with a playful feint, dealing special damage.",
+        "skill": "Teeter Dance: Dances in a cone, Taunting enemies, then applying Confusion when the dance ends.",
+        "skill2": "Grass Whistle: Sings in an aura around Ludicolo, briefly putting nearby enemies to Sleep.",
+        "ult": "Ivy Cudgel: Strikes a nearby enemy with a Water or Grass cudgel blow, dealing special damage and stunning.",
+        "passive": "Rain Dish: Ludicolo creates a rain aura, empowering Water moves, weakening Fire moves, reducing Fire damage taken, and slowly healing itself."
+      },
+      "pokemon_moba_kingdra": {
+        "name": "Kingdra",
+        "attack": "Scale Shot: Fires a sharp Dragon scale, dealing physical damage and building Focus on repeated hits.",
+        "skill": "Waterfall: Summons a Water AoE that deals physical damage and can critically strike when Kingdra has enough critical chance.",
+        "skill2": "Dragon Dance: Passively increases attack speed. Dashes in a target direction and primes the next Scale Shot to fire an extra Water bullet.",
+        "ult": "Dragon Energy: Fires a targeted Dragon attack that deals magic damage from bonus attack damage. If it would critically strike, it deals true damage instead.",
+        "passive": "King's Rock: Critical strikes deal bonus magic damage. Repeated Scale Shots against the same enemy add Focus, increasing Kingdra's critical chance against that target."
+      },
+      "pokemon_moba_delibird": {
+        "name": "Delibird",
+        "attack": "Present: Flings a gift box that deals physical damage with variable damage rolls. Every fourth Present unlocks Present (Healing).",
+        "skill": "Present (Healing): Consumes four Present attacks to heal an allied Pokemon or Delibird for a percentage of max HP.",
+        "skill2": "None: Delibird has no second skill.",
+        "ult": "Drill Peck: Strikes a nearby enemy for heavy physical damage with a chance to execute.",
+        "passive": "Hustle: Present gains critical chance while Delibird is moving."
+      },
+      "pokemon_moba_cloyster": {
+        "name": "Cloyster",
+        "attack": "Glaciate: Fires a short-range Ice projectile that deals physical damage and has a small chance to Freeze.",
+        "skill": "Icicle Crash: Fires a rapid volley of Ice projectiles. Each icicle can critically strike and trigger lifesteal.",
+        "skill2": "Clamp: Passively adds missing-health damage to Glaciate against low-health enemies. Active: grapples an enemy, damaging and rooting both Pokemon.",
+        "ult": "Aurora Beam: Fires a chilling Ice beam that deals heavy physical damage and has a high chance to Freeze.",
+        "passive": "Overcoat: Converts critical chance into bonus armor and reduces incoming critical strike damage."
+      },
+      "pokemon_moba_electrode": {
+        "name": "Electrode",
+        "attack": "Rollout: Rolls into a nearby enemy for fast, low-damage physical Ground hits.",
+        "skill": "Magnet Rise: Cleanses harmful statuses and hard control, increases movement speed and attack, and pulls nearby enemies toward Electrode.",
+        "skill2": "Magnetic Flux: Greatly increases movement speed and converts bonus movement speed into attack damage.",
+        "ult": "Self-Destruct: Channels briefly, then explodes for lethal true damage to all non-structure units in a large area, including allies and Electrode.",
+        "passive": "Aftermath: If Electrode is killed by a contact attack, it retaliates with physical damage and Paralysis."
+      },
+      "pokemon_moba_snorlax": {
+        "name": "Snorlax",
+        "attack": "Strength: Swings its bulk into a nearby enemy for heavy physical Normal damage.",
+        "skill": "Swallow: Consumes stored Berries to heal Snorlax, increasing with the number of Berries consumed.",
+        "skill2": "Belly Drum: Spends current HP and Berries to increase attack, movement speed, and the next Strength hit.",
+        "ult": "Snore: While asleep, damages and terrifies nearby enemies.",
+        "passive": "Gluttony: Gathers Berries while moving and from kills. Berries heal Snorlax over time, improve slow and knockback resistance, and at full stacks increase Strength damage while slowing Snorlax."
+      },
+      "pokemon_moba_zeraora": {
+        "name": "Zeraora",
+        "attack": "Plasma Fists: Strikes twice with Electric punches, dealing magic damage. Each hit can critically strike and trigger lifesteal.",
+        "skill": "Thunder Cage: Creates an Electric field that slows enemies inside, shocks them each second, and deals extra damage if they leave.",
+        "skill2": "Zing Zap: Enters a brief parry stance. The next enemy ability that hits Zeraora is negated, then Zeraora blinks toward the caster and retaliates.",
+        "ult": "Wild Charge: Fires lightning bolts at low-health enemies nearby, then grants movement speed and empowers Plasma Fists against enemies struck.",
+        "passive": "Merciless: Hitting an enemy Pokemon with two different non-basic abilities in quick succession triggers an Electric burst and grants cooldown recovery."
+      },
+      "pokemon_moba_comfey": {
+        "name": "Comfey",
+        "attack": "Growth: Temporarily increases Comfey's combat stats.",
+        "skill": "Floral Healing: Heals Comfey's attached ally for a percentage of that ally's max HP.",
+        "skill2": "Petal Dance: Creates an aura that empowers allied Grass moves cast from inside it.",
+        "ult": "Encore: Briefly accelerates the cooldown recovery of Comfey's attached ally.",
+        "passive": "Flower Veil: Attaches Comfey to an ally, sharing Comfey's stats and protecting nearby allied Grass Pokemon from harmful statuses."
+      },
+      "pokemon_moba_smeargle": {
+        "name": "Smeargle",
+        "attack": "Sketch: Copies the last valid move that affected Smeargle into the next empty slot.",
+        "skill": "Sketch: Copies the last valid move that affected Smeargle into the next empty slot.",
+        "skill2": "Sketch: Copies the last valid move that affected Smeargle into the next empty slot.",
+        "ult": "Sketch: Copies the last valid move that affected Smeargle into the next empty slot.",
+        "passive": "Sketch: Smeargle can learn up to four unique moves over the course of a match. Duplicate moves cannot be learned."
+      },
+      "pokemon_moba_torterra": {
+        "name": "Torterra"
+      },
+      "pokemon_moba_espeon": {
+        "name": "Espeon"
+      },
+      "pokemon_moba_sylveon": {
+        "name": "Sylveon"
+      },
+      "android": {
+        "name": "Android"
+      },
+      "archer": {
+        "name": "Archer"
+      },
+      "bard": {
+        "name": "Bard"
+      },
+      "barrier_magician": {
+        "name": "Barrier Magician"
+      },
+      "berserker": {
+        "name": "Berserker"
+      },
+      "bomber": {
+        "name": "Bomber"
+      },
+      "boomerang_hunter": {
+        "name": "Boomerang Hunter"
+      },
+      "cavalry_knight": {
+        "name": "Cavalry Knight"
+      },
+      "chef": {
+        "name": "Chef"
+      },
+      "circus_blade": {
+        "name": "Circus Blade"
+      },
+      "clown": {
+        "name": "Clown"
+      },
+      "dancer": {
+        "name": "Dancer"
+      },
+      "dark_mage": {
+        "name": "Dark Mage"
+      },
+      "demon": {
+        "name": "Demon"
+      },
+      "dokkaebi": {
+        "name": "Dokkaebi"
+      },
+      "druid": {
+        "name": "Druid"
+      },
+      "dual_blader": {
+        "name": "Dual Blader"
+      },
+      "enchanter": {
+        "name": "Enchanter"
+      },
+      "executioner": {
+        "name": "Executioner"
+      },
+      "exorcist": {
+        "name": "Exorcist"
+      },
+      "fighter": {
+        "name": "Fighter"
+      },
+      "gambler": {
+        "name": "Gambler"
+      },
+      "ghost": {
+        "name": "Ghost"
+      },
+      "guardian_spirit": {
+        "name": "Guardian Spirit"
+      },
+      "gunner": {
+        "name": "Gunner"
+      },
+      "hammerer": {
+        "name": "Hammerer"
+      },
+      "hitman": {
+        "name": "Hitman"
+      },
+      "hunter": {
+        "name": "Hunter"
+      },
+      "ice_mage": {
+        "name": "Ice Mage"
+      },
+      "illusionist": {
+        "name": "Illusionist"
+      },
+      "inquisitor": {
+        "name": "Inquisitor"
+      },
+      "jiangshi": {
+        "name": "Jiangshi"
+      },
+      "knight": {
+        "name": "Knight"
+      },
+      "lancer": {
+        "name": "Lancer"
+      },
+      "lightning_mage": {
+        "name": "Lightning Mage"
+      },
+      "magic_knight": {
+        "name": "Magic Knight"
+      },
+      "monk": {
+        "name": "Monk"
+      },
+      "necromancer": {
+        "name": "Necromancer"
+      },
+      "ninja": {
+        "name": "Ninja"
+      },
+      "ogre": {
+        "name": "Ogre"
+      },
+      "plague_doctor": {
+        "name": "Plague Doctor"
+      },
+      "poison_dart_hunter": {
+        "name": "Poison Dart Hunter"
+      },
+      "pole_warrior": {
+        "name": "Pole Warrior"
+      },
+      "priest": {
+        "name": "Priest"
+      },
+      "prisoner": {
+        "name": "Prisoner"
+      },
+      "pyromancer": {
+        "name": "Pyromancer"
+      },
+      "pythoness": {
+        "name": "Pythoness"
+      },
+      "shadowmancer": {
+        "name": "Shadowmancer"
+      },
+      "shield_bearer": {
+        "name": "Shield Bearer"
+      },
+      "siege_breaker": {
+        "name": "Siege Breaker"
+      },
+      "soldier": {
+        "name": "Soldier"
+      },
+      "spirit_caller": {
+        "name": "Spirit Caller"
+      },
+      "swordman": {
+        "name": "Swordman"
+      },
+      "taoist": {
+        "name": "Taoist"
+      },
+      "vampire": {
+        "name": "Vampire"
+      },
+      "voodoo_shaman": {
+        "name": "Voodoo Shaman"
+      },
+      "werewolf": {
+        "name": "Werewolf"
+      },
+      "whip_master": {
+        "name": "Whip Master"
+      },
+      "white_mage": {
+        "name": "White Mage"
+      },
+      "wind_mage": {
+        "name": "Wind Mage"
+      }
+    },
+    "category": {
+      "melee": "Melee",
+      "range": "Ranged",
+      "magic": "Mage",
+      "util": "Support",
+      "assassin": "Assassin",
+      "all": "All"
+    },
+    "stat": {
+      "attack": "Attack",
+      "attack_speed": "Attack Speed",
+      "ability_power": "Ability Power",
+      "hp": "Health",
+      "defence": "Defense",
+      "magic_resistance": "Magic Resist",
+      "range": "Range",
+      "move_speed": "Move Speed",
+      "cooltime": "{Time}s",
+      "cooldown": "Cooldown"
+    }
+  }
+}

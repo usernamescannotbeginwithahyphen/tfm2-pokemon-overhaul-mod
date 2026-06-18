@@ -1,0 +1,13 @@
+{
+  "name": "Pokemon MOBA Overhaul",
+  "author": "James",
+  "version": "0.1.0",
+  "description": "Pokemon-only MOBA overhaul. Gameplay is forced to use the native Pokemon roster and base champions are removed from active match availability.",
+  "last_updated": "2026-06-18",
+  "dependencies": [
+    {
+      "mod_id": "base",
+      "version": ">=0.4.13"
+    }
+  ]
+}

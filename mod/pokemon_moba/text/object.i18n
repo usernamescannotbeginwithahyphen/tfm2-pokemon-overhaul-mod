@@ -1,0 +1,20 @@
+{
+  "en": {
+    "epic": {
+      "name": "Mew",
+      "buff_desc": "Applied to allied minions near Mew while the Mew buff is active",
+      "buff_timer": "{Name} Buff {Time}"
+    },
+    "serpen": {
+      "name": "Eternatus",
+      "buff_desc": "Eternal Buff: permanently applied to the entire slaying team"
+    },
+    "rhino": {
+      "name": "Rhyperior"
+    },
+    "section": {
+      "epic_buff": "Mew Minion Buff",
+      "serpen_buff": "Eternal Buff"
+    }
+  }
+}

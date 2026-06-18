@@ -1,0 +1,27 @@
+{
+  "mod_id": "pokemon_moba",
+  "champions": [
+    {
+      "id": "pokemon_moba_pikachu",
+      "short_id": "pikachu",
+      "display_name": "Pikachu",
+      "status": "planned",
+      "category": "Range",
+      "tags": ["AP", "Range"],
+      "sprite": "asset/base/aseprite_resources/champions/pyromancer",
+      "skills": {
+        "attack": { "name": "Basic Attack", "notes": "" },
+        "skill": { "name": "", "notes": "" },
+        "skill2": { "name": "", "notes": "" },
+        "ult": { "name": "", "notes": "" }
+      },
+      "assets": {
+        "skill_icon": "mod/pokemon_moba/icons/skills/pikachu_skill.png",
+        "skill2_icon": "mod/pokemon_moba/icons/skills/pikachu_skill2.png",
+        "ult_icon": "mod/pokemon_moba/icons/skills/pikachu_ult.png",
+        "sprite": "mod/pokemon_moba/champions/pikachu.png"
+      }
+    }
+  ]
+}
+

@@ -1,0 +1,24 @@
+{
+  "en": {
+    "notice": {
+      "ingame": {
+        "red_epic": "<#f7b1b8ff>Red Team<> has slain Mew!",
+        "blue_epic": "<#adb9ffff>Blue Team<> has slain Mew!",
+        "red_serpen": "<#f7b1b8ff>Red Team<> has slain Eternatus and gained the Eternal Buff!",
+        "blue_serpen": "<#adb9ffff>Blue Team<> has slain Eternatus and gained the Eternal Buff!"
+      }
+    },
+    "ingame": {
+      "epic": "Mew Slain",
+      "serpen": "Eternatus Slain"
+    },
+    "set_result": {
+      "epic": "Mew",
+      "serpen": "Eternatus",
+      "graph_blue_epic": "Blue Team Mew Kill",
+      "graph_red_epic": "Red Team Mew Kill",
+      "graph_blue_serpen": "Blue Team Eternatus Kill",
+      "graph_red_serpen": "Red Team Eternatus Kill"
+    }
+  }
+}

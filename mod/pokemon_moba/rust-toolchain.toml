@@ -1,0 +1,2 @@
+[toolchain]
+channel = "nightly-2026-06-16-x86_64-pc-windows-msvc"
