@@ -23,7 +23,8 @@ function Write-WorkshopIdFile {
   "published_file_id": $PublishedFileId
 }
 "@
-  Set-Content -LiteralPath $workshopIdPath -Value $content -Encoding UTF8
+  $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+  [System.IO.File]::WriteAllText($workshopIdPath, $content, $utf8NoBom)
 }
 
 $root = (Resolve-Path "$PSScriptRoot\..").Path
