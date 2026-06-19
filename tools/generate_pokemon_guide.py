@@ -12,6 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "scratch" / "pokemon_guide_data.json"
 OUT_DIR = ROOT / "guide"
 HTML_PATH = OUT_DIR / "pokemon_moba_guide.html"
+MOD_GUIDE_DIR = ROOT / "mod" / "pokemon_moba" / "guide"
+MOD_HTML_PATH = MOD_GUIDE_DIR / "pokemon_moba_guide.html"
 ICON_DIR = ROOT / "mod" / "pokemon_moba" / "icons" / "champions"
 
 TYPE_COLORS = {
@@ -195,9 +197,13 @@ TRAIT_NOTES = [
 def main() -> None:
     data = json.loads(DATA_PATH.read_text(encoding="utf-8"))
     champions = sorted(data["champions"], key=lambda item: item["name"])
+    html_text = render_html(champions, data["type_chart"])
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    HTML_PATH.write_text(render_html(champions, data["type_chart"]), encoding="utf-8")
+    HTML_PATH.write_text(html_text, encoding="utf-8")
+    MOD_GUIDE_DIR.mkdir(parents=True, exist_ok=True)
+    MOD_HTML_PATH.write_text(html_text, encoding="utf-8")
     print(f"wrote {HTML_PATH}")
+    print(f"wrote {MOD_HTML_PATH}")
     print(f"champions={len(champions)} type_chart_cells={len(data['type_chart'])}")
 
 

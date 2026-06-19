@@ -16890,6 +16890,15 @@ struct AiEntitySnapshotState {
 }
 
 #[derive(Clone, Copy, Debug)]
+struct AiAttackTargetSnapshotState {
+    entity_id: usize,
+    team: usize,
+    pos: EntityPos,
+    hp_current: usize,
+    tick: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
 struct DedenneStaticState {
     entity_id: usize,
     last_pos: EntityPos,
@@ -17014,6 +17023,8 @@ static DRAGON_CHEER_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
 static LIFE_DEW_PICKUPS: OnceLock<Mutex<Vec<LifeDewPickupState>>> = OnceLock::new();
 static LIFE_DEW_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
 static AI_ENTITY_SNAPSHOTS: OnceLock<Mutex<Vec<AiEntitySnapshotState>>> = OnceLock::new();
+static AI_ATTACK_TARGET_SNAPSHOTS: OnceLock<Mutex<Vec<AiAttackTargetSnapshotState>>> =
+    OnceLock::new();
 static DEDENNE_STATICS: OnceLock<Mutex<Vec<DedenneStaticState>>> = OnceLock::new();
 static DEDENNE_GRIDS: OnceLock<Mutex<Vec<DedenneGridState>>> = OnceLock::new();
 static DEDENNE_GRID_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
@@ -17057,6 +17068,7 @@ fn reset_pokemon_content_runtime_state_for_new_match() {
     clear_vec_store(&DRAGON_CHEERS);
     clear_vec_store(&LIFE_DEW_PICKUPS);
     clear_vec_store(&AI_ENTITY_SNAPSHOTS);
+    clear_vec_store(&AI_ATTACK_TARGET_SNAPSHOTS);
     clear_vec_store(&DEDENNE_STATICS);
     clear_vec_store(&DEDENNE_GRIDS);
     clear_vec_store(&DEDENNE_TERRAIN_COOLDOWNS);
@@ -18700,6 +18712,46 @@ fn update_ai_entity_snapshot(ctx: &GameCtx, player_id: usize, entity_id: usize) 
     snapshots.push(snapshot);
 }
 
+fn update_ai_attack_target_snapshots(ctx: &GameCtx) {
+    let tick = ctx.tick();
+    let snapshots = AI_ATTACK_TARGET_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut snapshots = snapshots
+        .lock()
+        .expect("ai attack target snapshot state poisoned");
+    snapshots.retain(|state| {
+        tick.saturating_sub(state.tick) <= 30
+            && ctx
+                .get_entity(state.entity_id)
+                .map(|entity| entity.is_alive() && !entity.is_tower())
+                .unwrap_or(false)
+    });
+
+    for index in 0..ctx.entity_count() {
+        let Some(entity) = ctx.entity_at(index) else {
+            continue;
+        };
+        if !entity.is_alive() || entity.is_champion() || entity.is_tower() {
+            continue;
+        }
+        let hp = entity.hp();
+        let snapshot = AiAttackTargetSnapshotState {
+            entity_id: entity.id(),
+            team: entity.team(),
+            pos: entity.pos(),
+            hp_current: hp.current,
+            tick,
+        };
+        if let Some(existing) = snapshots
+            .iter_mut()
+            .find(|state| state.entity_id == snapshot.entity_id)
+        {
+            *existing = snapshot;
+        } else {
+            snapshots.push(snapshot);
+        }
+    }
+}
+
 fn life_dew_move_input_for_player(
     player_id: usize,
     tick: usize,
@@ -18889,6 +18941,89 @@ fn attach_partner_move_input_for_player(
     }
 
     best.map(|(_, pos)| Input::Move { x: pos.x, y: pos.y })
+}
+
+fn nearest_enemy_target_for_player(
+    player_id: usize,
+    tick: usize,
+    search_radius: u64,
+) -> Option<InputTarget> {
+    let snapshot = {
+        let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+        snapshots
+            .lock()
+            .expect("ai entity snapshot state poisoned")
+            .iter()
+            .copied()
+            .find(|state| state.player_id == player_id)
+    }?;
+    if tick.saturating_sub(snapshot.tick) > 30 {
+        return None;
+    }
+
+    let search_radius_sq = search_radius.saturating_mul(search_radius);
+    let mut best: Option<(u64, usize)> = None;
+    {
+        let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+        for enemy in snapshots
+            .lock()
+            .expect("ai entity snapshot state poisoned")
+            .iter()
+            .copied()
+        {
+            if enemy.team == snapshot.team
+                || enemy.hp_current == 0
+                || tick.saturating_sub(enemy.tick) > 30
+            {
+                continue;
+            }
+            let dist = distance_sq(snapshot.pos, enemy.pos);
+            if dist > search_radius_sq {
+                continue;
+            }
+            if best
+                .map(|(best_dist, _)| dist < best_dist)
+                .unwrap_or(true)
+            {
+                best = Some((dist, enemy.entity_id));
+            }
+        }
+    }
+    {
+        let snapshots = AI_ATTACK_TARGET_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+        for enemy in snapshots
+            .lock()
+            .expect("ai attack target snapshot state poisoned")
+            .iter()
+            .copied()
+        {
+            if enemy.team == snapshot.team
+                || enemy.hp_current == 0
+                || tick.saturating_sub(enemy.tick) > 30
+            {
+                continue;
+            }
+            let dist = distance_sq(snapshot.pos, enemy.pos);
+            if dist > search_radius_sq {
+                continue;
+            }
+            if best
+                .map(|(best_dist, _)| dist < best_dist)
+                .unwrap_or(true)
+            {
+                best = Some((dist, enemy.entity_id));
+            }
+        }
+    }
+
+    best.map(|(_, target_id)| InputTarget::Target { target_id })
+}
+
+fn delibird_basic_input_for_player(player_id: usize, tick: usize) -> Option<Input> {
+    const DELIBIRD_ATTACK_OVERRIDE_RADIUS: u64 = 180_000;
+
+    nearest_enemy_target_for_player(player_id, tick, DELIBIRD_ATTACK_OVERRIDE_RADIUS)
+        .map(|target| Input::Attack { target })
 }
 
 fn first_ally_champion_in_radius(
@@ -19681,6 +19816,7 @@ impl ModPassive for PokemonPassive {
                 crate::pokemon_status::register_entity_types(_entity, self.champion.types);
                 crate::pokemon_status::register_entity_champion(ctx, _entity, self.champion.id);
                 update_ai_entity_snapshot(ctx, _player, _entity);
+                update_ai_attack_target_snapshots(ctx);
                 crate::pokemon_status::update_statuses(ctx, rng_seed);
                 update_instructs(ctx, rng_seed);
                 update_delayed_poison_areas(ctx);
@@ -20493,6 +20629,19 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                     return Self::release_channel_input(ctx);
                 }
 
+                if Self::champion_is(ctx, "Delibird")
+                    && matches!(
+                        base_input,
+                        Some(Input::Skill { .. } | Input::Skill2 { .. })
+                    )
+                    && !crate::pokemon_status::delibird_present_heal_ready_for_player(player_id, 4)
+                {
+                    if let Some(input) = delibird_basic_input_for_player(player_id, tick) {
+                        return Self::replace_if_valid(ctx, Some(input));
+                    }
+                    return Self::release_channel_input(ctx);
+                }
+
                 if Self::champion_is(ctx, "Sawk & Throh") {
                     let should_switch = crate::pokemon_status::should_sawk_throh_switch_for_player(
                         player_id, hp_ratio,
@@ -20544,22 +20693,26 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                                 if !crate::pokemon_status::smeargle_has_valid_candidate_for_active_slot_for_player(
                                     player_id, tick, slot,
                                 ) {
-                                    if let Some(target) = base_target {
+                                    if learned_count == 0 {
+                                        return PlayerInputDecision::Pass;
+                                    }
+                                    if let Some(target) = base_target.or_else(|| {
+                                        nearest_enemy_target_for_player(player_id, tick, 180_000)
+                                    }) {
                                         if let Some(input) = Self::smeargle_ready_copied_input(
                                             ctx, player_id, tick, target,
                                         ) {
                                             return Self::replace_if_valid(ctx, Some(input));
                                         }
                                     }
-                                    if learned_count == 0 {
-                                        return PlayerInputDecision::Pass;
-                                    }
                                     return Self::release_channel_input(ctx);
                                 }
                             } else if !crate::pokemon_status::smeargle_copied_slot_ready_for_player(
                                 player_id, tick, slot,
                             ) {
-                                if let Some(target) = base_target {
+                                if let Some(target) = base_target.or_else(|| {
+                                    nearest_enemy_target_for_player(player_id, tick, 180_000)
+                                }) {
                                     if let Some(input) = Self::smeargle_ready_copied_input(
                                         ctx, player_id, tick, target,
                                     ) {
@@ -20567,6 +20720,18 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                                     }
                                 }
                                 return Self::release_channel_input(ctx);
+                            }
+                        }
+                    }
+
+                    if learned_count > 0 && !matches!(base_input, Some(Input::Attack { .. })) {
+                        if let Some(target) = base_target.or_else(|| {
+                            nearest_enemy_target_for_player(player_id, tick, 180_000)
+                        }) {
+                            if let Some(input) =
+                                Self::smeargle_ready_copied_input(ctx, player_id, tick, target)
+                            {
+                                return Self::replace_if_valid(ctx, Some(input));
                             }
                         }
                     }
@@ -30600,7 +30765,7 @@ const COMFEY: PokemonChampion = PokemonChampion {
     }),
 };
 
-const SMEARGLE_FIRST_MOVE_FALLBACK_TICKS: usize = 45 * 60;
+const SMEARGLE_FIRST_MOVE_FALLBACK_TICKS: usize = 30 * 60;
 
 const SMEARGLE_MINION_ATTACK: PokemonMove = PokemonMove {
     slot: ActionSlot::Attack,

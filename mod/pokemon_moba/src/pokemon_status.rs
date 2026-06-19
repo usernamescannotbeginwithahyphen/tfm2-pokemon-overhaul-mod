@@ -3195,6 +3195,23 @@ pub fn note_delibird_present_basic(ctx: &GameCtx, entity_id: usize) {
     }
 }
 
+pub fn delibird_present_heal_ready_for_player(
+    player_id: usize,
+    required_basic_casts: usize,
+) -> bool {
+    let Some(entity_id) = entity_for_player(player_id) else {
+        return false;
+    };
+    DELIBIRD_PRESENTS
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("delibird present state poisoned")
+        .iter()
+        .find(|state| state.entity_id == entity_id)
+        .map(|state| state.basic_casts >= required_basic_casts)
+        .unwrap_or(false)
+}
+
 pub fn consume_delibird_present_heal_charge(
     ctx: &GameCtx,
     entity_id: usize,
@@ -6671,14 +6688,19 @@ fn nearest_ally_champion(
     pos: EntityPos,
     radius: u64,
 ) -> Option<usize> {
+    let tick = ctx.tick();
     let mut best = None;
     for index in 0..ctx.entity_count() {
         let Some(entity) = ctx.entity_at(index) else {
             continue;
         };
+        let candidate_id = entity.id();
+        let is_player_pokemon = entity.is_champion()
+            || player_life_for_entity_at_tick_on_team(ctx, candidate_id, tick, team).is_some()
+            || owner_for_entity_at_tick_on_team(ctx, candidate_id, tick, team).is_some();
         if entity.id() == entity_id
             || entity.team() != team
-            || !entity.is_champion()
+            || !is_player_pokemon
             || !entity.is_alive()
         {
             continue;
@@ -6691,7 +6713,7 @@ fn nearest_ally_champion(
             .map(|(best_distance, _)| distance < best_distance)
             .unwrap_or(true)
         {
-            best = Some((distance, entity.id()));
+            best = Some((distance, candidate_id));
         }
     }
     best.map(|(_, id)| id)
