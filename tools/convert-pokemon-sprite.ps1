@@ -14,6 +14,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+throw "Deprecated: Pokemon champion sprites now come from assets\\custom_spritework\\champions and sync to mod\\pokemon_moba\\champions_custom. See docs\\asset-pipeline.md and run tools\\sync-custom-champion-sprites.py instead."
+
 $root = (Resolve-Path "$PSScriptRoot\..").Path
 $python = Join-Path $root ".venv\Scripts\python.exe"
 

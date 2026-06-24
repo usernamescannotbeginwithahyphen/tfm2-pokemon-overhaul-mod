@@ -2228,6 +2228,10 @@ fn move_display_name(champion_id: &str, action_name: &str) -> String {
         ("pokemon_moba_appletun", "skill") => "Apple Acid",
         ("pokemon_moba_appletun", "skill2") => "Sweet Scent",
         ("pokemon_moba_appletun", "ult") => "Fickle Beam",
+        ("pokemon_moba_goodra", "attack") => "Dizzy Punch",
+        ("pokemon_moba_goodra", "skill") => "Rain Dance",
+        ("pokemon_moba_goodra", "skill2") => "Dragon Cheer",
+        ("pokemon_moba_goodra", "ult") => "Life Dew",
         ("pokemon_moba_dedenne", "attack") => "Nuzzle",
         ("pokemon_moba_dedenne", "skill") => "Play Rough",
         ("pokemon_moba_dedenne", "skill2") => "Double Shock",
@@ -18981,10 +18985,7 @@ fn nearest_enemy_target_for_player(
             if dist > search_radius_sq {
                 continue;
             }
-            if best
-                .map(|(best_dist, _)| dist < best_dist)
-                .unwrap_or(true)
-            {
+            if best.map(|(best_dist, _)| dist < best_dist).unwrap_or(true) {
                 best = Some((dist, enemy.entity_id));
             }
         }
@@ -19007,10 +19008,7 @@ fn nearest_enemy_target_for_player(
             if dist > search_radius_sq {
                 continue;
             }
-            if best
-                .map(|(best_dist, _)| dist < best_dist)
-                .unwrap_or(true)
-            {
+            if best.map(|(best_dist, _)| dist < best_dist).unwrap_or(true) {
                 best = Some((dist, enemy.entity_id));
             }
         }
@@ -20630,10 +20628,7 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                 }
 
                 if Self::champion_is(ctx, "Delibird")
-                    && matches!(
-                        base_input,
-                        Some(Input::Skill { .. } | Input::Skill2 { .. })
-                    )
+                    && matches!(base_input, Some(Input::Skill { .. } | Input::Skill2 { .. }))
                     && !crate::pokemon_status::delibird_present_heal_ready_for_player(player_id, 4)
                 {
                     if let Some(input) = delibird_basic_input_for_player(player_id, tick) {
@@ -20725,9 +20720,9 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                     }
 
                     if learned_count > 0 && !matches!(base_input, Some(Input::Attack { .. })) {
-                        if let Some(target) = base_target.or_else(|| {
-                            nearest_enemy_target_for_player(player_id, tick, 180_000)
-                        }) {
+                        if let Some(target) = base_target
+                            .or_else(|| nearest_enemy_target_for_player(player_id, tick, 180_000))
+                        {
                             if let Some(input) =
                                 Self::smeargle_ready_copied_input(ctx, player_id, tick, target)
                             {

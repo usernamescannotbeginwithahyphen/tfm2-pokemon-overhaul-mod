@@ -1,0 +1,626 @@
+[
+  {
+    "name": "0000",
+    "path": "sprite/0826/0000",
+    "sha": "c792706ae176a2953ff4ee70aabe142ff1d3e68e",
+    "size": 0,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/0000?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/tree/master/sprite/0826/0000",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/trees/c792706ae176a2953ff4ee70aabe142ff1d3e68e",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/0000?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/trees/c792706ae176a2953ff4ee70aabe142ff1d3e68e",
+      "html": "https://github.com/PMDCollab/SpriteCollab/tree/master/sprite/0826/0000"
+    }
+  },
+  {
+    "name": "AnimData.xml",
+    "path": "sprite/0826/AnimData.xml",
+    "sha": "61605d2345d1964caadae6797b0b75d6fca2165c",
+    "size": 6858,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/AnimData.xml?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/AnimData.xml",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/61605d2345d1964caadae6797b0b75d6fca2165c",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/AnimData.xml",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/AnimData.xml?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/61605d2345d1964caadae6797b0b75d6fca2165c",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/AnimData.xml"
+    }
+  },
+  {
+    "name": "Attack-Anim.png",
+    "path": "sprite/0826/Attack-Anim.png",
+    "sha": "d5333b704b830a3524b4204de9a3a7799ec6406b",
+    "size": 28302,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Attack-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Attack-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/d5333b704b830a3524b4204de9a3a7799ec6406b",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Attack-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Attack-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/d5333b704b830a3524b4204de9a3a7799ec6406b",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Attack-Anim.png"
+    }
+  },
+  {
+    "name": "Attack-Offsets.png",
+    "path": "sprite/0826/Attack-Offsets.png",
+    "sha": "2181d9900fa5d9bdb0e5be6b4809d3064e66a689",
+    "size": 3342,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Attack-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Attack-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/2181d9900fa5d9bdb0e5be6b4809d3064e66a689",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Attack-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Attack-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/2181d9900fa5d9bdb0e5be6b4809d3064e66a689",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Attack-Offsets.png"
+    }
+  },
+  {
+    "name": "Attack-Shadow.png",
+    "path": "sprite/0826/Attack-Shadow.png",
+    "sha": "df27e01acd16565b1683ce6c0a7778d5081e30de",
+    "size": 5888,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Attack-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Attack-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/df27e01acd16565b1683ce6c0a7778d5081e30de",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Attack-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Attack-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/df27e01acd16565b1683ce6c0a7778d5081e30de",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Attack-Shadow.png"
+    }
+  },
+  {
+    "name": "Charge-Anim.png",
+    "path": "sprite/0826/Charge-Anim.png",
+    "sha": "41a8b3c0a1424efacd9521802605a74a074c9edf",
+    "size": 9653,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Charge-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Charge-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/41a8b3c0a1424efacd9521802605a74a074c9edf",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Charge-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Charge-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/41a8b3c0a1424efacd9521802605a74a074c9edf",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Charge-Anim.png"
+    }
+  },
+  {
+    "name": "Charge-Offsets.png",
+    "path": "sprite/0826/Charge-Offsets.png",
+    "sha": "37f10e5275051670b2b80ee1adf871de7c9d82a7",
+    "size": 1148,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Charge-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Charge-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/37f10e5275051670b2b80ee1adf871de7c9d82a7",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Charge-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Charge-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/37f10e5275051670b2b80ee1adf871de7c9d82a7",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Charge-Offsets.png"
+    }
+  },
+  {
+    "name": "Charge-Shadow.png",
+    "path": "sprite/0826/Charge-Shadow.png",
+    "sha": "74d1aa39b96ef8a757195de979e019ca800cf018",
+    "size": 2201,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Charge-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Charge-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/74d1aa39b96ef8a757195de979e019ca800cf018",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Charge-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Charge-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/74d1aa39b96ef8a757195de979e019ca800cf018",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Charge-Shadow.png"
+    }
+  },
+  {
+    "name": "Double-Anim.png",
+    "path": "sprite/0826/Double-Anim.png",
+    "sha": "74208070c7c73adf9c9bc9dd362d7a2e574440cd",
+    "size": 26195,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Double-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Double-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/74208070c7c73adf9c9bc9dd362d7a2e574440cd",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Double-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Double-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/74208070c7c73adf9c9bc9dd362d7a2e574440cd",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Double-Anim.png"
+    }
+  },
+  {
+    "name": "Double-Offsets.png",
+    "path": "sprite/0826/Double-Offsets.png",
+    "sha": "6101623aa449bf615ab64994ac5ac74245e5d4a2",
+    "size": 3361,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Double-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Double-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/6101623aa449bf615ab64994ac5ac74245e5d4a2",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Double-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Double-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/6101623aa449bf615ab64994ac5ac74245e5d4a2",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Double-Offsets.png"
+    }
+  },
+  {
+    "name": "Double-Shadow.png",
+    "path": "sprite/0826/Double-Shadow.png",
+    "sha": "ad52328acbb6ec159d1d80e9732302c66140c36c",
+    "size": 6895,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Double-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Double-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/ad52328acbb6ec159d1d80e9732302c66140c36c",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Double-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Double-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/ad52328acbb6ec159d1d80e9732302c66140c36c",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Double-Shadow.png"
+    }
+  },
+  {
+    "name": "Emit-Anim.png",
+    "path": "sprite/0826/Emit-Anim.png",
+    "sha": "7e9d0ce6cdc7feba201d96cbf8534aff2f0ba23d",
+    "size": 21319,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Emit-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Emit-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/7e9d0ce6cdc7feba201d96cbf8534aff2f0ba23d",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Emit-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Emit-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/7e9d0ce6cdc7feba201d96cbf8534aff2f0ba23d",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Emit-Anim.png"
+    }
+  },
+  {
+    "name": "Emit-Offsets.png",
+    "path": "sprite/0826/Emit-Offsets.png",
+    "sha": "68c6e58bc16d6167339507eb3506208491ffa069",
+    "size": 2135,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Emit-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Emit-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/68c6e58bc16d6167339507eb3506208491ffa069",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Emit-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Emit-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/68c6e58bc16d6167339507eb3506208491ffa069",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Emit-Offsets.png"
+    }
+  },
+  {
+    "name": "Emit-Shadow.png",
+    "path": "sprite/0826/Emit-Shadow.png",
+    "sha": "3ffd97f73ce1977b68b41954f0bd5db7ce0742ee",
+    "size": 3009,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Emit-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Emit-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/3ffd97f73ce1977b68b41954f0bd5db7ce0742ee",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Emit-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Emit-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/3ffd97f73ce1977b68b41954f0bd5db7ce0742ee",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Emit-Shadow.png"
+    }
+  },
+  {
+    "name": "Hop-Anim.png",
+    "path": "sprite/0826/Hop-Anim.png",
+    "sha": "d150c1d9f22ef6b6d79ad3c662c4c9749cfb6f8d",
+    "size": 29336,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hop-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hop-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/d150c1d9f22ef6b6d79ad3c662c4c9749cfb6f8d",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Hop-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hop-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/d150c1d9f22ef6b6d79ad3c662c4c9749cfb6f8d",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hop-Anim.png"
+    }
+  },
+  {
+    "name": "Hop-Offsets.png",
+    "path": "sprite/0826/Hop-Offsets.png",
+    "sha": "9a162f25dd6d1eecd719bbbf4feb54491987c701",
+    "size": 2141,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hop-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hop-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/9a162f25dd6d1eecd719bbbf4feb54491987c701",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Hop-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hop-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/9a162f25dd6d1eecd719bbbf4feb54491987c701",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hop-Offsets.png"
+    }
+  },
+  {
+    "name": "Hop-Shadow.png",
+    "path": "sprite/0826/Hop-Shadow.png",
+    "sha": "81ce24c59fe554cd0ebb1a0cb46d243c60cd6fa8",
+    "size": 2081,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hop-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hop-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/81ce24c59fe554cd0ebb1a0cb46d243c60cd6fa8",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Hop-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hop-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/81ce24c59fe554cd0ebb1a0cb46d243c60cd6fa8",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hop-Shadow.png"
+    }
+  },
+  {
+    "name": "Hurt-Anim.png",
+    "path": "sprite/0826/Hurt-Anim.png",
+    "sha": "0016c84c1ecaae5b6bde1d8af254fc212a7d5f1a",
+    "size": 5768,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hurt-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hurt-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/0016c84c1ecaae5b6bde1d8af254fc212a7d5f1a",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Hurt-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hurt-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/0016c84c1ecaae5b6bde1d8af254fc212a7d5f1a",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hurt-Anim.png"
+    }
+  },
+  {
+    "name": "Hurt-Offsets.png",
+    "path": "sprite/0826/Hurt-Offsets.png",
+    "sha": "f1fadd391a6724eb77cbb1176a7071df0b0c8b6b",
+    "size": 401,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hurt-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hurt-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/f1fadd391a6724eb77cbb1176a7071df0b0c8b6b",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Hurt-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hurt-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/f1fadd391a6724eb77cbb1176a7071df0b0c8b6b",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hurt-Offsets.png"
+    }
+  },
+  {
+    "name": "Hurt-Shadow.png",
+    "path": "sprite/0826/Hurt-Shadow.png",
+    "sha": "0570f730c8241d98f276569756b2ffdf0238775e",
+    "size": 816,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hurt-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hurt-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/0570f730c8241d98f276569756b2ffdf0238775e",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Hurt-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Hurt-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/0570f730c8241d98f276569756b2ffdf0238775e",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Hurt-Shadow.png"
+    }
+  },
+  {
+    "name": "Idle-Anim.png",
+    "path": "sprite/0826/Idle-Anim.png",
+    "sha": "81a8b90264b369ba91726d8998bf94be448f8b5a",
+    "size": 15639,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Idle-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Idle-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/81a8b90264b369ba91726d8998bf94be448f8b5a",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Idle-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Idle-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/81a8b90264b369ba91726d8998bf94be448f8b5a",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Idle-Anim.png"
+    }
+  },
+  {
+    "name": "Idle-Offsets.png",
+    "path": "sprite/0826/Idle-Offsets.png",
+    "sha": "80230ed93120d3c9690ada34531548fe7c6892fb",
+    "size": 1252,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Idle-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Idle-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/80230ed93120d3c9690ada34531548fe7c6892fb",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Idle-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Idle-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/80230ed93120d3c9690ada34531548fe7c6892fb",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Idle-Offsets.png"
+    }
+  },
+  {
+    "name": "Idle-Shadow.png",
+    "path": "sprite/0826/Idle-Shadow.png",
+    "sha": "dd9d48815f4fbd4a95f335d78be2e087f481e409",
+    "size": 1372,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Idle-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Idle-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/dd9d48815f4fbd4a95f335d78be2e087f481e409",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Idle-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Idle-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/dd9d48815f4fbd4a95f335d78be2e087f481e409",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Idle-Shadow.png"
+    }
+  },
+  {
+    "name": "Rotate-Anim.png",
+    "path": "sprite/0826/Rotate-Anim.png",
+    "sha": "14d67bc4c9dacb70e53dd165f2967e21c3738985",
+    "size": 27450,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Rotate-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Rotate-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/14d67bc4c9dacb70e53dd165f2967e21c3738985",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Rotate-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Rotate-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/14d67bc4c9dacb70e53dd165f2967e21c3738985",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Rotate-Anim.png"
+    }
+  },
+  {
+    "name": "Rotate-Offsets.png",
+    "path": "sprite/0826/Rotate-Offsets.png",
+    "sha": "c9c9136886f2a853018b5cfaa907b50bdf88feaa",
+    "size": 1211,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Rotate-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Rotate-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/c9c9136886f2a853018b5cfaa907b50bdf88feaa",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Rotate-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Rotate-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/c9c9136886f2a853018b5cfaa907b50bdf88feaa",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Rotate-Offsets.png"
+    }
+  },
+  {
+    "name": "Rotate-Shadow.png",
+    "path": "sprite/0826/Rotate-Shadow.png",
+    "sha": "0a42acc5d453113a4bc89af44942bfc8e0dc78ec",
+    "size": 1315,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Rotate-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Rotate-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/0a42acc5d453113a4bc89af44942bfc8e0dc78ec",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Rotate-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Rotate-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/0a42acc5d453113a4bc89af44942bfc8e0dc78ec",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Rotate-Shadow.png"
+    }
+  },
+  {
+    "name": "Shoot-Anim.png",
+    "path": "sprite/0826/Shoot-Anim.png",
+    "sha": "28333b4424d1017661cec4dd811afdd5e9dc535c",
+    "size": 21743,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Shoot-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Shoot-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/28333b4424d1017661cec4dd811afdd5e9dc535c",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Shoot-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Shoot-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/28333b4424d1017661cec4dd811afdd5e9dc535c",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Shoot-Anim.png"
+    }
+  },
+  {
+    "name": "Shoot-Offsets.png",
+    "path": "sprite/0826/Shoot-Offsets.png",
+    "sha": "fe426833b95bae6fb3e4bfe2c82f7b856d03792c",
+    "size": 2210,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Shoot-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Shoot-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/fe426833b95bae6fb3e4bfe2c82f7b856d03792c",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Shoot-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Shoot-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/fe426833b95bae6fb3e4bfe2c82f7b856d03792c",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Shoot-Offsets.png"
+    }
+  },
+  {
+    "name": "Shoot-Shadow.png",
+    "path": "sprite/0826/Shoot-Shadow.png",
+    "sha": "2d7b54160376dae583ba53d4aaa7e6513e408cda",
+    "size": 4319,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Shoot-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Shoot-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/2d7b54160376dae583ba53d4aaa7e6513e408cda",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Shoot-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Shoot-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/2d7b54160376dae583ba53d4aaa7e6513e408cda",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Shoot-Shadow.png"
+    }
+  },
+  {
+    "name": "Sleep-Anim.png",
+    "path": "sprite/0826/Sleep-Anim.png",
+    "sha": "91c033e10b0bb1fddbd1811471f4b3f0c688a62a",
+    "size": 1936,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Sleep-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Sleep-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/91c033e10b0bb1fddbd1811471f4b3f0c688a62a",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Sleep-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Sleep-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/91c033e10b0bb1fddbd1811471f4b3f0c688a62a",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Sleep-Anim.png"
+    }
+  },
+  {
+    "name": "Sleep-Offsets.png",
+    "path": "sprite/0826/Sleep-Offsets.png",
+    "sha": "404dfd7db3b4140eb393ff57bfde5cc6a8eee4ce",
+    "size": 192,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Sleep-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Sleep-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/404dfd7db3b4140eb393ff57bfde5cc6a8eee4ce",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Sleep-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Sleep-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/404dfd7db3b4140eb393ff57bfde5cc6a8eee4ce",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Sleep-Offsets.png"
+    }
+  },
+  {
+    "name": "Sleep-Shadow.png",
+    "path": "sprite/0826/Sleep-Shadow.png",
+    "sha": "e30e3397b507defb6d88111402cb635fa10e5338",
+    "size": 217,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Sleep-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Sleep-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/e30e3397b507defb6d88111402cb635fa10e5338",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Sleep-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Sleep-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/e30e3397b507defb6d88111402cb635fa10e5338",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Sleep-Shadow.png"
+    }
+  },
+  {
+    "name": "Swing-Anim.png",
+    "path": "sprite/0826/Swing-Anim.png",
+    "sha": "e56dd629f68926fc7baeb49bd4fef8d02205c8ea",
+    "size": 35762,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Swing-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Swing-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/e56dd629f68926fc7baeb49bd4fef8d02205c8ea",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Swing-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Swing-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/e56dd629f68926fc7baeb49bd4fef8d02205c8ea",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Swing-Anim.png"
+    }
+  },
+  {
+    "name": "Swing-Offsets.png",
+    "path": "sprite/0826/Swing-Offsets.png",
+    "sha": "7068675a79532b4f8473642094855c61b6bc77f6",
+    "size": 2706,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Swing-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Swing-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/7068675a79532b4f8473642094855c61b6bc77f6",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Swing-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Swing-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/7068675a79532b4f8473642094855c61b6bc77f6",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Swing-Offsets.png"
+    }
+  },
+  {
+    "name": "Swing-Shadow.png",
+    "path": "sprite/0826/Swing-Shadow.png",
+    "sha": "89896929db8182e5cc82d70c160be708c9c518b6",
+    "size": 4931,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Swing-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Swing-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/89896929db8182e5cc82d70c160be708c9c518b6",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Swing-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Swing-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/89896929db8182e5cc82d70c160be708c9c518b6",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Swing-Shadow.png"
+    }
+  },
+  {
+    "name": "Walk-Anim.png",
+    "path": "sprite/0826/Walk-Anim.png",
+    "sha": "4c9ae940ee2f8ba226e717c16ae6590b1625079b",
+    "size": 12556,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Walk-Anim.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Walk-Anim.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/4c9ae940ee2f8ba226e717c16ae6590b1625079b",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Walk-Anim.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Walk-Anim.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/4c9ae940ee2f8ba226e717c16ae6590b1625079b",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Walk-Anim.png"
+    }
+  },
+  {
+    "name": "Walk-Offsets.png",
+    "path": "sprite/0826/Walk-Offsets.png",
+    "sha": "a956ea276865f8efd4d10e3ad43d607cdc7241b8",
+    "size": 1245,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Walk-Offsets.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Walk-Offsets.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/a956ea276865f8efd4d10e3ad43d607cdc7241b8",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Walk-Offsets.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Walk-Offsets.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/a956ea276865f8efd4d10e3ad43d607cdc7241b8",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Walk-Offsets.png"
+    }
+  },
+  {
+    "name": "Walk-Shadow.png",
+    "path": "sprite/0826/Walk-Shadow.png",
+    "sha": "dd9d48815f4fbd4a95f335d78be2e087f481e409",
+    "size": 1372,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Walk-Shadow.png?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Walk-Shadow.png",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/dd9d48815f4fbd4a95f335d78be2e087f481e409",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/Walk-Shadow.png",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/Walk-Shadow.png?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/dd9d48815f4fbd4a95f335d78be2e087f481e409",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/Walk-Shadow.png"
+    }
+  },
+  {
+    "name": "credits.txt",
+    "path": "sprite/0826/credits.txt",
+    "sha": "ebceef159f4feca550f83c9ecb61bf2c211c3855",
+    "size": 289,
+    "url": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/credits.txt?ref=master",
+    "html_url": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/credits.txt",
+    "git_url": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/ebceef159f4feca550f83c9ecb61bf2c211c3855",
+    "download_url": "https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/sprite/0826/credits.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/PMDCollab/SpriteCollab/contents/sprite/0826/credits.txt?ref=master",
+      "git": "https://api.github.com/repos/PMDCollab/SpriteCollab/git/blobs/ebceef159f4feca550f83c9ecb61bf2c211c3855",
+      "html": "https://github.com/PMDCollab/SpriteCollab/blob/master/sprite/0826/credits.txt"
+    }
+  }
+]

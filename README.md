@@ -17,7 +17,7 @@ Read `docs/project-reference.md` first when resuming work, especially after cont
 
 1. Add or update native champion code under `mod/pokemon_moba/src/pokemon_content.rs`.
 2. Add or update custom status/persistent effect code under `mod/pokemon_moba/src/pokemon_status.rs`.
-3. Convert sprites into `mod/pokemon_moba/champions/`.
+3. Stage supplied custom sprites in `assets/custom_spritework/champions/`, then sync them into `mod/pokemon_moba/champions_custom/` with `tools/sync-custom-champion-sprites.py`.
 4. Run `tools/validate-json.ps1` if JSON assets changed.
 5. Run `tools/build-native.ps1` after Rust/native code changes.
 6. Run `tools/deploy.ps1` to copy the mod into the installed game's `mods/pokemon_moba` folder.
