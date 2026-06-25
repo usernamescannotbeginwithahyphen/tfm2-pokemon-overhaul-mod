@@ -1,8 +1,8 @@
 {
   "en": {
     "epic": {
-      "name": "Mew",
-      "buff_desc": "Applied to allied minions near Mew while the Mew buff is active",
+      "name": "Xerneas",
+      "buff_desc": "Applied to allied minions near Xerneas while the Xerneas buff is active",
       "buff_timer": "{Name} Buff {Time}"
     },
     "serpen": {
@@ -13,7 +13,7 @@
       "name": "Rhyperior"
     },
     "section": {
-      "epic_buff": "Mew Minion Buff",
+      "epic_buff": "Xerneas Minion Buff",
       "serpen_buff": "Eternal Buff"
     }
   }

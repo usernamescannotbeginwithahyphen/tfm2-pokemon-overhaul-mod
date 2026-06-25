@@ -331,11 +331,11 @@ SDK limitation: the API exposes applying CC and buffs, but not hard removal of a
 ## Neutral Objectives And Minions
 
 - Serpen replacement: Eternatus, grants Eternal Buff.
-- Epic/Morgard boss replacement: Mew. Arceus random-type boss idea was dropped for now because presentation/outgoing type behavior could not be made clean enough with current hooks.
+- Epic/Morgard boss replacement: Xerneas. This replaces the prior Mew visual/text pass while keeping the base epic objective mechanics unless native objective hooks are updated separately.
 - Rhino replacement: Rhyperior.
 - Minion waves: Falinks single-unit sprite workaround. Original Falinks full-chain sprite looked too crowded when multiplied across a wave.
 - Champion sprite scale is governed by the custom sprite workflow and preview QC. Keep future Pokemon close to comparable `champions_custom` silhouettes, then verify framing in transparent 288x288 preview GIFs before syncing.
-- Some neutral sprites have separate profiles in `tools/convert-neutral-sprites.ps1`; Eternatus is intentionally larger for the Serpen pit.
+- Current jungle/objective sprite pass uses PMDCollab sources where available: Beedrill, Trevenant, Rhyperior, Eternatus, and Xerneas. Amoonguss has no usable PMDCollab source and is imagegen-created from the previous in-mod Amoonguss reference. Falinks lane minions are intentionally unchanged for now.
 
 ## Visuals
 

@@ -4,11 +4,11 @@
     "type": "override"
   },
   "asset/base/aseprite_resources/ingame/epic#sheet": {
-    "remapping": "asset/pokemon_moba/ingame/mew#sheet",
+    "remapping": "asset/pokemon_moba/ingame/xerneas#sheet",
     "type": "override"
   },
   "asset/base/aseprite_resources/ingame/epic#anim": {
-    "remapping": "asset/pokemon_moba/ingame/mew#anim",
+    "remapping": "asset/pokemon_moba/ingame/xerneas#anim",
     "type": "override"
   },
   "asset/base/aseprite_resources/ingame/bee#sheet": {
@@ -57,6 +57,94 @@
   },
   "asset/base/aseprite_resources/UI_aseprite/minion#anim": {
     "remapping": "asset/pokemon_moba/ingame/falinks_minion#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_tower#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/blue_tower#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_tower#anim": {
+    "remapping": "asset/pokemon_moba/ingame/blue_tower#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_tower#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/red_tower#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_tower#anim": {
+    "remapping": "asset/pokemon_moba/ingame/red_tower#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_tower_orb#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/blue_tower_orb#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_tower_orb#anim": {
+    "remapping": "asset/pokemon_moba/ingame/blue_tower_orb#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_tower_orb#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/red_tower_orb#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_tower_orb#anim": {
+    "remapping": "asset/pokemon_moba/ingame/red_tower_orb#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_nexus#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/blue_nexus#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_nexus#anim": {
+    "remapping": "asset/pokemon_moba/ingame/blue_nexus#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_nexus#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/red_nexus#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_nexus#anim": {
+    "remapping": "asset/pokemon_moba/ingame/red_nexus#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_nexus_orb#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/blue_nexus_orb#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_nexus_orb#anim": {
+    "remapping": "asset/pokemon_moba/ingame/blue_nexus_orb#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_nexus_orb#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/red_nexus_orb#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_nexus_orb#anim": {
+    "remapping": "asset/pokemon_moba/ingame/red_nexus_orb#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_nexus_destroy_effect#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/blue_nexus_destroy_effect#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/blue_nexus_destroy_effect#anim": {
+    "remapping": "asset/pokemon_moba/ingame/blue_nexus_destroy_effect#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_nexus_destroy_effect#sheet": {
+    "remapping": "asset/pokemon_moba/ingame/red_nexus_destroy_effect#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/ingame/red_nexus_destroy_effect#anim": {
+    "remapping": "asset/pokemon_moba/ingame/red_nexus_destroy_effect#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/skill_effect/blue_tower_projectile": {
+    "remapping": "asset/pokemon_moba/ingame/blue_tower_projectile",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/skill_effect/red_tower_projectile": {
+    "remapping": "asset/pokemon_moba/ingame/red_tower_projectile",
     "type": "override"
   },
   "asset/base/aseprite_resources/champions/pokemon_moba_pikachu#sheet": {
