@@ -51,6 +51,25 @@ For each Pokemon:
 11. Treat the preview GIFs as the framing check before in-game testing. Existing live Showdown-converted sprites usually put idle bottoms around y=66-70 inside the 96x96 frame, so PMDCollab conversions should usually use a ground line in that range. If the Pokemon sits too low in-game, raise it by increasing `--bottom-padding`; if it sits too high, lower that value. Do not align to the full transparent PMD source cell.
 12. When a Pokemon's staged files are accepted, run `.\.venv\Scripts\python.exe .\tools\sync-custom-champion-sprites.py` to copy staged assets into `mod\pokemon_moba\champions_custom` and normalize `mod.override_info`.
 
+## Size QA rules
+
+Use `assets\custom_spritework\size_audit\champion_size_audit_full_pass.png` as the current roster comparison sheet. Generate a fresh sheet after any broad sizing pass so Pokemon are judged against each other, not in isolation.
+
+Champion size buckets are visual guidelines, measured by the first idle frame's visible height inside the fixed 96x96 frame:
+
+- Extra Small: about 28-30 px idle height for tiny Pokemon such as Shedinja, Comfey, Porygon-Z, Pikachu, Ribombee, Dedenne, and Kilowattrel.
+- Small: about 32-34 px idle height for compact Pokemon such as Eevee-line bodies, Delibird, Electrode, Clawitzer, Octillery, Orbeetle, and small flyers.
+- Normal: about 36-40 px idle height for humanoid or mid-sized Pokemon such as Hitmonlee, Smeargle, Gallade, Greninja, Scizor, Zeraora, and Starmie.
+- Large: about 40-44 px idle height for bulky or tall Pokemon such as Drednaw, Kleavor, Decidueye, Dragalge, Magmortar, and Skarmory.
+- Extra Large: about 46-50 px idle height for deliberately huge silhouettes such as Snorlax, Torterra, Gyarados, Turtonator, Venusaur, Feraligatr, Goodra, and Ursaluna.
+- Extra Large Pair: about 50 px idle height for paired bodies such as Sawk/Throh; judge width separately because two characters share the frame.
+
+Do not enlarge already accepted Pokemon as part of a size pass; enlargement blurs source pixels and makes the roster drift upward in scale. Only downscale clear outliers, preserving the frame rectangle and bottom anchor unless the specific issue is vertical placement.
+
+Use `tools\scale-sprite-sheet-content.py` for conservative downscales or tiny placement nudges. It scales visible pixels inside existing `.fanim` rectangles and leaves frame coordinates unchanged.
+
+The full roster size plan lives at `assets\custom_spritework\size_audit\champion_size_plan.md`. It records every Pokemon's bucket, target idle height, original visible size for the pass, scale factor, and vertical shift.
+
 Ambipom conversion command:
 
 ```powershell

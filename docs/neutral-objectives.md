@@ -29,6 +29,8 @@ The staged sheets are packed with center/bottom-anchored profiles. Current neutr
 - Eternatus: 160x160 canvas so Serpen's pit reads as a major objective.
 - Xerneas: 136x136 canvas, replacing the previous Mew epic-objective visual.
 
+The June 25 sizing pass moved Beedrill, Amoonguss, Trevenant, Rhyperior, Eternatus, and Xerneas up 10 px inside their existing fixed canvases. This adds roughly 19-22 px of bottom padding so in-game healthbars no longer cut through the sprite bodies.
+
 Ordinary jungle camps use a transparent or short `dead` animation tag. Their base-game healthbars and combat state despawn correctly, but visible idle-style dead frames can leave the Pokemon sprite on the map after death. Xerneas and Eternatus keep visible death frames because their objective lifecycle already clears correctly in game.
 
 Lane minions use `asset/base/aseprite_resources/UI_aseprite/minion`. The mod still overrides its `#sheet` and `#anim` with `asset/pokemon_moba/ingame/falinks_minion`, generated from a single body cropped out of the Falinks train and scaled to a 44x44 canvas with 24px max visible content. The current jungle/objective pass intentionally leaves Falinks and lane minions untouched.
@@ -84,6 +86,14 @@ The 5v5 map is not a single editable image. It is a stack of static PNG layers a
 
 For tower, nexus, and animated objective swaps, override both `#sheet` and `#anim` entries in `mod.override_info`. For static map layer swaps, override the base PNG asset path directly, without `#sheet` or `#anim`.
 
+The local SDK/docs do not expose a supported map geometry API for adding new permanent bushes, walls, collision, pathing, spawn points, or static interactables. Treat the 5v5 map assets above as visual layers unless a later SDK update exposes map-object registration. Custom Pokemon combat fields can still create gameplay at runtime through Rust champion logic, but drawing a new feature onto the static map will not make it functional by itself.
+
+Pokemon map background work-in-progress:
+
+- The current water/fire map files are reference and mask material only, not a live replacement.
+- The current mask follows James's guide: red owns the upper/right triangle, blue owns the lower/left triangle, and a thin neutral diagonal strip covers the river and the Morgard/Serpen objective pits. Use this mask as ImageGen reference when generating the actual full-detail `background_5v5` replacement.
+- Do not remap `asset/base/aseprite_resources/ingame/5v5/background_5v5` until a full generated background is accepted. Any final replacement must stay exactly 1280x1280 and preserve the base map's lane, tower pad, objective pit, jungle camp, wall, bush, and base geometry.
+
 Live Pokemon tower replacement pass:
 
 - Red-side tower body: Stakataka, remapped from `asset/base/aseprite_resources/ingame/red_tower` to `asset/pokemon_moba/ingame/red_tower`.
@@ -97,6 +107,7 @@ Live Pokemon nexus replacement pass:
 
 - Blue-side nexus body: Kyogre, remapped from `asset/base/aseprite_resources/ingame/blue_nexus` to `asset/pokemon_moba/ingame/blue_nexus`.
 - Red-side nexus body: Groudon, remapped from `asset/base/aseprite_resources/ingame/red_nexus` to `asset/pokemon_moba/ingame/red_nexus`.
+- The June 25 follow-up pass reduced both live nexus body sheets by an additional 6% inside their existing 220x150 frames so Kyogre/Groudon overlap the forward towers less.
 - Destroy effects are remapped separately as `blue_nexus_destroy_effect#sheet.png` / `#anim.fanim` and `red_nexus_destroy_effect#sheet.png` / `#anim.fanim`, each with a `destroy` tag.
 - The live `blue_nexus_orb` and `red_nexus_orb` assets are intentionally transparent, matching the tower strategy. The main nexus body sheet carries the visible idle/attack read, while the `attack_projectile` and `hit_effect` tags remain present as transparent placeholders for compatibility.
 - QC previews live under `assets/custom_spritework/previews` as `blue_nexus_contact.png`, `red_nexus_contact.png`, `*_nexus_attack_preview.gif`, `*_nexus_destroy_preview.gif`, and `*_nexus_cell_debug.png`.

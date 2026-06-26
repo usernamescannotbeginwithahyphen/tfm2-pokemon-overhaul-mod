@@ -48,22 +48,32 @@ def sync_files(ids: list[str]) -> None:
 
 def normalize_overrides(ids: list[str]) -> None:
     data = json.loads(OVERRIDE_INFO.read_text(encoding="utf-8"))
-    remap = data.setdefault("remap", {})
 
     for short_id in ids:
         base = f"asset/base/aseprite_resources/champions/pokemon_moba_{short_id}"
         custom = f"asset/pokemon_moba/champions_custom/{short_id}"
-        remap[f"{base}#sheet"] = f"{custom}#sheet"
-        remap[f"{base}#anim"] = f"{custom}#anim"
+        data[f"{base}#sheet"] = {
+            "remapping": f"{custom}#sheet",
+            "type": "override",
+        }
+        data[f"{base}#anim"] = {
+            "remapping": f"{custom}#anim",
+            "type": "override",
+        }
 
     stale = [
         key
-        for key, value in remap.items()
-        if isinstance(value, str) and value.startswith("asset/pokemon_moba/champions/")
+        for key, value in data.items()
+        if isinstance(value, dict)
+        and isinstance(value.get("remapping"), str)
+        and value["remapping"].startswith("asset/pokemon_moba/champions/")
     ]
     if stale:
-        details = "\n".join(f"- {key} -> {remap[key]}" for key in stale)
+        details = "\n".join(f"- {key} -> {data[key]['remapping']}" for key in stale)
         raise SystemExit(f"Refusing to leave stale Smogon champion remaps:\n{details}")
+
+    if "remap" in data:
+        raise SystemExit("Refusing to write deprecated top-level remap block in mod.override_info.")
 
     OVERRIDE_INFO.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
