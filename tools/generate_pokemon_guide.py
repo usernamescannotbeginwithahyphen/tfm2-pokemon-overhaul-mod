@@ -15,6 +15,7 @@ HTML_PATH = OUT_DIR / "pokemon_moba_guide.html"
 MOD_GUIDE_DIR = ROOT / "mod" / "pokemon_moba" / "guide"
 MOD_HTML_PATH = MOD_GUIDE_DIR / "pokemon_moba_guide.html"
 ICON_DIR = ROOT / "mod" / "pokemon_moba" / "icons" / "champions"
+CUSTOM_SPRITE_DIR = ROOT / "mod" / "pokemon_moba" / "champions_custom"
 
 TYPE_COLORS = {
     "Normal": "#b7b7a8",
@@ -35,6 +36,7 @@ TYPE_COLORS = {
     "Dark": "#5c5268",
     "Steel": "#9ca7b7",
     "Fairy": "#e78fbd",
+    "Bird": "#d8c46f",
 }
 
 TYPE_ABBR = {
@@ -56,6 +58,7 @@ TYPE_ABBR = {
     "Dark": "Dark",
     "Steel": "Steel",
     "Fairy": "Fairy",
+    "Bird": "Bird",
 }
 
 SPECIAL_NOTES = {
@@ -67,7 +70,7 @@ SPECIAL_NOTES = {
     ],
     "pokemon_moba_passimian": [
         "Receiver exclusions: Passimian cannot copy Receiver, Clingy, Flower Veil, or Sketch, so kills on Passimian, Clawitzer, Comfey, and Smeargle do not replace Passimian's current copied passive.",
-        "Receiver implementation note: Noivern's Infiltrator and Octillery's Suction Cups are copyable, but their copied effects are pending lower-level SDK hooks.",
+        "Receiver note: Noivern's Infiltrator and Octillery's Suction Cups are waiting for future game developer support before their copied effects can fully function.",
     ],
 }
 
@@ -149,7 +152,7 @@ STATUS_GLOSSARY = [
     ),
     (
         "Illuminate",
-        "Starmie mark mechanic. Illuminate marks targets for Starmie's follow-up damage pattern.",
+        "Starmie mark mechanic. Illuminated enemies take stronger follow-up effects from Starmie's abilities and are revealed to Starmie's allies.",
     ),
     (
         "Grassy Terrain",
@@ -197,6 +200,7 @@ TRAIT_NOTES = [
 def main() -> None:
     data = json.loads(DATA_PATH.read_text(encoding="utf-8"))
     champions = sorted(data["champions"], key=lambda item: item["name"])
+    validate_guide_data(champions, data["type_chart"])
     html_text = render_html(champions, data["type_chart"])
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     HTML_PATH.write_text(html_text, encoding="utf-8")
@@ -205,6 +209,44 @@ def main() -> None:
     print(f"wrote {HTML_PATH}")
     print(f"wrote {MOD_HTML_PATH}")
     print(f"champions={len(champions)} type_chart_cells={len(data['type_chart'])}")
+
+
+def validate_guide_data(champions: list[dict], type_chart: list[dict]) -> None:
+    issues: list[str] = []
+    generic_names = {"attack", "skill", "skill2", "ult", "passive"}
+
+    for champion in champions:
+        moves = champion.get("moves", [])
+        if len(moves) != 5:
+            issues.append(f"{champion['name']} has {len(moves)} moves, expected 5")
+        for move in moves:
+            name = clean_text(move.get("name", ""))
+            desc = clean_text(move.get("description", ""))
+            clean_name = name.lower()
+            clean_desc = desc.lower()
+            if clean_name in generic_names or clean_name.startswith(("skill", "ult")):
+                issues.append(f"{champion['name']} {move.get('role')} uses generic name {name!r}")
+            if "-skill-" in clean_name or "-skill-" in clean_desc:
+                issues.append(f"{champion['name']} {move.get('role')} contains -skill- fallback text")
+            if move.get("role") == "Passive" and (
+                "no passive effect" in clean_desc or "passive - passive" in clean_desc
+            ):
+                issues.append(f"{champion['name']} passive uses fallback text")
+
+    types = type_chart_types(type_chart)
+    missing_colors = [type_name for type_name in types if type_name not in TYPE_COLORS]
+    missing_abbr = [type_name for type_name in types if type_name not in TYPE_ABBR]
+    if missing_colors:
+        issues.append(f"type colors missing for: {', '.join(missing_colors)}")
+    if missing_abbr:
+        issues.append(f"type abbreviations missing for: {', '.join(missing_abbr)}")
+
+    expected_cells = len(types) * len(types)
+    if len(type_chart) != expected_cells:
+        issues.append(f"type chart has {len(type_chart)} cells, expected {expected_cells}")
+
+    if issues:
+        raise SystemExit("Guide data validation failed:\n- " + "\n- ".join(issues))
 
 
 def render_html(champions: list[dict], type_chart: list[dict]) -> str:
@@ -479,7 +521,7 @@ def render_status_section() -> str:
 
 
 def render_type_chart(type_chart: list[dict]) -> str:
-    types = list(TYPE_COLORS)
+    types = type_chart_types(type_chart)
     lookup = {(cell["attack"], cell["defense"]): cell for cell in type_chart}
     header = "".join(
         f'<th><span class="chart-type-label" title="{esc(type_name)}">{esc(TYPE_ABBR[type_name])}</span></th>'
@@ -515,6 +557,17 @@ def render_type_chart(type_chart: list[dict]) -> str:
   </div>
 </section>
 """
+
+
+def type_chart_types(type_chart: list[dict]) -> list[str]:
+    types: list[str] = []
+    seen: set[str] = set()
+    for cell in type_chart:
+        attack = cell["attack"]
+        if attack not in seen:
+            types.append(attack)
+            seen.add(attack)
+    return types
 
 
 def render_trait_section() -> str:
@@ -560,6 +613,10 @@ def clean_text(value: str) -> str:
 
 
 def portrait_data_uri(champ: dict) -> str:
+    custom = custom_sprite_portrait_data_uri(champ)
+    if custom:
+        return custom
+
     candidates = [
         ICON_DIR / f"{champ['short_id']}.png",
         ICON_DIR / f"{champ['id'].replace('pokemon_moba_', '')}.png",
@@ -577,6 +634,52 @@ def portrait_data_uri(champ: dict) -> str:
     )
     data = base64.b64encode(svg.encode("utf-8")).decode("ascii")
     return f"data:image/svg+xml;base64,{data}"
+
+
+def custom_sprite_portrait_data_uri(champ: dict) -> str | None:
+    short_id = champ["id"].replace("pokemon_moba_", "")
+    sheet_path = CUSTOM_SPRITE_DIR / f"{short_id}#sheet.png"
+    anim_path = CUSTOM_SPRITE_DIR / f"{short_id}#anim.fanim"
+    if not sheet_path.exists() or not anim_path.exists():
+        return None
+
+    frame = first_idle_frame(anim_path)
+    if frame is None:
+        return None
+
+    png = sheet_path.read_bytes()
+    width, height = png_dimensions(png)
+    image_data = base64.b64encode(png).decode("ascii")
+    x = -int(frame.get("x", 0))
+    y = -int(frame.get("y", 0))
+    w = int(frame.get("w", 96))
+    h = int(frame.get("h", 96))
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}">'
+        f'<image href="data:image/png;base64,{image_data}" '
+        f'x="{x}" y="{y}" width="{width}" height="{height}" '
+        'image-rendering="pixelated"/>'
+        "</svg>"
+    )
+    data = base64.b64encode(svg.encode("utf-8")).decode("ascii")
+    return f"data:image/svg+xml;base64,{data}"
+
+
+def first_idle_frame(anim_path: Path) -> dict | None:
+    try:
+        anim = json.loads(anim_path.read_text(encoding="utf-8"))
+        frames = anim.get("anims", {}).get("idle", {}).get("frames", [])
+        if not frames:
+            return None
+        return frames[0].get("data")
+    except (OSError, json.JSONDecodeError, TypeError, KeyError):
+        return None
+
+
+def png_dimensions(data: bytes) -> tuple[int, int]:
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        return (96, 96)
+    return (int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big"))
 
 
 def type_badge(type_name_value: str) -> str:

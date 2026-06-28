@@ -2593,6 +2593,10 @@ fn move_display_name(champion_id: &str, action_name: &str) -> String {
         ("pokemon_moba_garganacl", "skill") => "Land Crush",
         ("pokemon_moba_garganacl", "skill2") => "Purifying Salt",
         ("pokemon_moba_garganacl", "ult") => "Blessed Salt",
+        ("pokemon_moba_ampharos", "attack") => "Thunder Shock",
+        ("pokemon_moba_ampharos", "skill") => "Flash",
+        ("pokemon_moba_ampharos", "skill2") => "Searchlight Tail",
+        ("pokemon_moba_ampharos", "ult") => "Gigavolt Havoc",
         ("pokemon_moba_xatu", "attack") => "Energy Singe",
         ("pokemon_moba_xatu", "skill") => "Mind Bend",
         ("pokemon_moba_xatu", "skill2") => "Pain Amplifier",
@@ -2613,6 +2617,10 @@ fn move_display_name(champion_id: &str, action_name: &str) -> String {
         ("pokemon_moba_yanmega", "skill") => "Buzzing Boost",
         ("pokemon_moba_yanmega", "skill2") => "Tinted Lens",
         ("pokemon_moba_yanmega", "ult") => "Giga Drain",
+        ("pokemon_moba_wishiwashi", "attack") => "Water Gun",
+        ("pokemon_moba_wishiwashi", "skill") => "Wave Splash",
+        ("pokemon_moba_wishiwashi", "skill2") => "Cowardice",
+        ("pokemon_moba_wishiwashi", "ult") => "Massive Catch",
         ("pokemon_moba_comfey", "attack") => "Growth",
         ("pokemon_moba_comfey", "skill") => "Floral Healing",
         ("pokemon_moba_comfey", "skill2") => "Petal Dance",
@@ -2895,7 +2903,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
         } = action.effect
         {
             return format!(
-                "Cleanse Electrode of harmful statuses and hard control, then levitate for {} with {SPEED_ICON}{BUFF}+{move_speed_mult}% move speed{END} and {AD_ICON}{BUFF}+{attack_mult}% attack{END}. Pull nearby enemies in a {} radius toward Electrode.",
+                "Cleanse Electrode of harmful statuses and hard control, then levitate for {} with {SPEED_ICON}{BUFF}+{move_speed_mult}% move speed{END} and {AD_ICON}{BUFF}+{attack_mult}% attack{END}. Pull enemies in a {} radius around Electrode toward it.",
                 seconds_text(ticks),
                 range_text(pull_radius)
             );
@@ -2909,7 +2917,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
         } = action.effect
         {
             return format!(
-                "Surge with magnetic energy for {}, gaining {SPEED_ICON}{BUFF}+{move_speed_mult}% move speed{END}. While active, convert {AD_ICON}{BUFF}{bonus_move_speed_to_attack_percent}% of bonus move speed from Pokemon-layer buffs{END} into bonus attack.",
+                "Surge with magnetic energy for {}, gaining {SPEED_ICON}{BUFF}+{move_speed_mult}% move speed{END}. While active, convert {AD_ICON}{BUFF}{bonus_move_speed_to_attack_percent}% of bonus move speed from Pokemon buffs{END} into bonus attack.",
                 seconds_text(ticks)
             );
         }
@@ -2926,7 +2934,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
         } = action.effect
         {
             return format!(
-                "Channel for {}, then explode in a {} radius for {CONTROL}{damage} true damage{END} to all units, including Electrode and allies. Protect-style damage prevention can block the blast. If an enemy champion is caught, Electrode respawns with {SPEED_ICON}{BUFF}+{success_move_speed_mult}% move speed{END} for {}; otherwise it respawns with {SPEED_ICON}{CONTROL}{failure_move_speed_mult}% move speed{END} for {}.",
+                "Channel for {}, then explode in a {} radius around Electrode for {CONTROL}{damage} true damage{END} to all units, including Electrode and allies. Protect-style damage prevention can block the blast. If an enemy champion is caught, Electrode respawns with {SPEED_ICON}{BUFF}+{success_move_speed_mult}% move speed{END} for {}; otherwise it respawns with {SPEED_ICON}{CONTROL}{failure_move_speed_mult}% move speed{END} for {}.",
                 seconds_text(charge_ticks),
                 range_text(radius),
                 seconds_text(success_ticks),
@@ -2972,7 +2980,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
         } = action.effect
         {
             return format!(
-                "Only usable while Snorlax is asleep. Snore hits enemies in a {} radius for {} and terrifies them for {}.",
+                "Only usable while Snorlax is asleep. Snore hits enemies in a {} radius around Snorlax for {} and terrifies them for {}.",
                 range_text(radius),
                 damage_text(base_ad, ad_ratio, 0, 0, type_name),
                 seconds_text(terrify_ticks)
@@ -2992,7 +3000,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
         } = action.effect
         {
             return format!(
-                "Create an Electric cage at the target for {}. Enemies inside the {} radius are slowed by {CONTROL}{}%{END} and take {} every {}; leaving the cage deals {}.",
+                "Create an Electric cage at the target for {}. Enemies inside the cage's {} radius are slowed by {CONTROL}{}%{END} and take {} every {}; leaving the cage deals {}.",
                 seconds_text(duration_ticks),
                 range_text(radius),
                 slow_percent.unsigned_abs(),
@@ -3304,7 +3312,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             pull_radius,
             ..
         } => format!(
-            "Cleanse hard control and harmful statuses, then gain {SPEED_ICON}{BUFF}+{move_speed_mult}% move speed{END} and {AD_ICON}{BUFF}+{attack_mult}% attack{END} for {}. Pull enemies within {} toward Electrode.",
+            "Cleanse hard control and harmful statuses, then gain {SPEED_ICON}{BUFF}+{move_speed_mult}% move speed{END} and {AD_ICON}{BUFF}+{attack_mult}% attack{END} for {}. Pull enemies in a {} radius around Electrode toward it.",
             seconds_text(ticks),
             range_text(pull_radius)
         ),
@@ -3322,7 +3330,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             damage,
             ..
         } => format!(
-            "Channel for {}, then deal {CONTROL}{damage} true damage{END} to all units in a {} radius, including Electrode and allies.",
+            "Channel for {}, then deal {CONTROL}{damage} true damage{END} to all units in a {} radius around Electrode, including Electrode and allies.",
             seconds_text(charge_ticks),
             range_text(radius)
         ),
@@ -3351,7 +3359,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             terrify_ticks,
             ..
         } => format!(
-            "While asleep, deal {} in a {} radius and terrify enemies for {}.",
+            "While asleep, deal {} in a {} radius around Snorlax and terrify enemies for {}.",
             damage_text(base_ad, ad_ratio, 0, 0, type_name),
             range_text(radius),
             seconds_text(terrify_ticks)
@@ -3549,9 +3557,9 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             radius,
             damage_bonus_percent,
         } => format!(
-            "Create a Petal Dance aura for {} around Comfey in a {} radius. Allied Grass-type moves cast from inside the aura deal {BUFF}+{damage_bonus_percent}% damage{END}.",
-            seconds_text(duration_ticks),
-            range_text(radius)
+            "Create a {} radius Petal Dance aura around Comfey for {}. Allied Grass-type moves cast from inside the aura deal {BUFF}+{damage_bonus_percent}% damage{END}.",
+            range_text(radius),
+            seconds_text(duration_ticks)
         ),
         PokemonMoveEffect::RillaboomDrumBeating {
             duration_ticks,
@@ -4019,7 +4027,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             ally_speed_mult,
             ally_attack_speed_mult,
         } => format!(
-            "Create a warped {} by {} arena for {}. Enemies inside have attack/AP and armor/MR distorted, HP randomly shifted from {CONTROL}{enemy_hp_random_min}% to +{enemy_hp_random_max}%{END}, cooldown recovery shifted from {CONTROL}{enemy_cooldown_random_min}% to +{enemy_cooldown_random_max}%{END}, and are slowed by {CONTROL}{enemy_speed_slow}% move speed{END} and {CONTROL}{enemy_attack_speed_slow}% attack speed{END}. MissingNo. gains {SPEED_ICON}{BUFF}+{missingno_speed_mult}% move speed{END}, {ATTACK_SPEED_ICON}{BUFF}+{missingno_attack_speed_mult}% attack speed{END}, and {BUFF}+{missingno_cooldown_mult}% cooldown recovery{END}; allies gain {SPEED_ICON}{BUFF}+{ally_speed_mult}% move speed{END} and {ATTACK_SPEED_ICON}{BUFF}+{ally_attack_speed_mult}% attack speed{END}. Pokemon-layer allied buffs and heals received by enemies inside are inverted.",
+            "Create a warped {} by {} arena for {}. Enemies inside have attack/AP and armor/MR distorted, HP randomly shifted from {CONTROL}{enemy_hp_random_min}% to +{enemy_hp_random_max}%{END}, cooldown recovery shifted from {CONTROL}{enemy_cooldown_random_min}% to +{enemy_cooldown_random_max}%{END}, and are slowed by {CONTROL}{enemy_speed_slow}% move speed{END} and {CONTROL}{enemy_attack_speed_slow}% attack speed{END}. MissingNo. gains {SPEED_ICON}{BUFF}+{missingno_speed_mult}% move speed{END}, {ATTACK_SPEED_ICON}{BUFF}+{missingno_attack_speed_mult}% attack speed{END}, and {BUFF}+{missingno_cooldown_mult}% cooldown recovery{END}; allies gain {SPEED_ICON}{BUFF}+{ally_speed_mult}% move speed{END} and {ATTACK_SPEED_ICON}{BUFF}+{ally_attack_speed_mult}% attack speed{END}. Allied Pokemon buffs and heals received by enemies inside are inverted.",
             range_text(length),
             range_text(width.saturating_mul(2)),
             seconds_text(duration_ticks)
@@ -4411,13 +4419,13 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             if champion.id == "pokemon_moba_frosmoth" && matches!(action.slot, ActionSlot::Attack)
             {
                 format!(
-                    "Deal {} to enemies in a {} radius. Has a {CONTROL}10% chance{END} to Freeze for {CONTROL}1s{END}.",
+                    "Deal {} to enemies in a targeted {} radius area. Has a {CONTROL}10% chance{END} to Freeze for {CONTROL}1s{END}.",
                     damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
                     range_text(radius)
                 )
             } else {
                 format!(
-                    "Deal {} to enemies in a {} radius.",
+                    "Deal {} to enemies in a targeted {} radius area.",
                     damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
                     range_text(radius)
                 )
@@ -4433,7 +4441,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             burn_base_ap,
             burn_ap_ratio,
         } => format!(
-            "Deal {} to enemies in a {} radius and apply <#ef5350ff>Burn for {}<>, dealing {} per second.",
+            "Deal {} to enemies in a targeted {} radius area and apply <#ef5350ff>Burn for {}<>, dealing {} per second.",
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
             range_text(radius),
             seconds_text(burn_ticks),
@@ -4525,7 +4533,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             slow_ticks,
             slow_percent,
         } => format!(
-            "Deal {} in a {} radius. After casting, this Pokemon is slowed by {}% for {}.",
+            "Deal {} in a targeted {} radius area. After casting, this Pokemon is slowed by {}% for {}.",
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
             range_text(radius),
             slow_percent.unsigned_abs(),
@@ -4541,7 +4549,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             defence_mult_ad_ratio,
             defence_ticks,
         } => format!(
-            "Deal {} in a {} radius and reduce enemy {ARMOR_ICON}{CONTROL}armor by {}% + {AD_ICON}{CONTROL}{}% AD<> for {}.",
+            "Deal {} in a targeted {} radius area and reduce enemy {ARMOR_ICON}{CONTROL}armor by {}% + {AD_ICON}{CONTROL}{}% AD<> for {}.",
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
             range_text(radius),
             defence_mult_base.unsigned_abs(),
@@ -4557,7 +4565,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             attack_mult,
             attack_ticks,
         } => format!(
-            "Deal {} in a {} radius and reduce enemy {AD_ICON}{CONTROL}attack by {}%<> for {}.",
+            "Deal {} in a targeted {} radius area and reduce enemy {AD_ICON}{CONTROL}attack by {}%<> for {}.",
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
             range_text(radius),
             attack_mult.unsigned_abs(),
@@ -4569,7 +4577,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             defence_mult,
             ticks,
         } => format!(
-            "Roar in a {} radius, lowering enemy {AD_ICON}{CONTROL}attack by {}%{END} and {ARMOR_ICON}{CONTROL}defense by {}%{END} for {}.",
+            "Roar in a {} radius around this Pokemon, lowering enemy {AD_ICON}{CONTROL}attack by {}%{END} and {ARMOR_ICON}{CONTROL}defense by {}%{END} for {}.",
             range_text(radius),
             attack_mult.unsigned_abs(),
             defence_mult.unsigned_abs(),
@@ -4803,7 +4811,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             damaged_reduce,
             cc_immune,
         } => format!(
-            "For {}, gain {SPEED_ICON}{WHITE}{}% move speed<> and {SHIELD}{}% damage reduction<>{}. Enemies within {} take {}.",
+            "For {}, gain {SPEED_ICON}{WHITE}{}% move speed<> and {SHIELD}{}% damage reduction<>{}. Enemies in a {} radius around this Pokemon take {}.",
             seconds_text(buff_ticks),
             move_speed_mult,
             damaged_reduce,
@@ -4823,7 +4831,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             burn_ap_ratio,
             ..
         } => format!(
-            "Strike enemies within {}, dealing {} and knocking them back. Has a {burn_chance_percent}% chance to apply <#ef5350ff>Burn for {}<>, dealing {} per second.",
+            "Strike enemies in a {} radius around this Pokemon, dealing {} and knocking them back. Has a {burn_chance_percent}% chance to apply <#ef5350ff>Burn for {}<>, dealing {} per second.",
             range_text(radius),
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
             seconds_text(burn_ticks),
@@ -4840,7 +4848,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             poison_damage,
             ..
         } => format!(
-            "Spin and strike enemies within {}, dealing {} and knocking them back. Has a {CONTROL}{poison_chance_percent}% chance{END} to apply {CONTROL}{poison_stacks} Poison stack{END}, dealing {MAGIC}{poison_damage}{END} damage per second.",
+            "Spin and strike enemies in a {} radius around this Pokemon, dealing {} and knocking them back. Has a {CONTROL}{poison_chance_percent}% chance{END} to apply {CONTROL}{poison_stacks} Poison stack{END}, dealing {MAGIC}{poison_damage}{END} damage per second.",
             range_text(radius),
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name)
         ),
@@ -4854,7 +4862,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             burn_base_ap,
             burn_ap_ratio,
         } => format!(
-            "Deal {} to enemies within {} and apply <#ef5350ff>Burn for {}<>, dealing {} per second.",
+            "Deal {} to enemies in a {} radius around this Pokemon and apply <#ef5350ff>Burn for {}<>, dealing {} per second.",
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
             range_text(radius),
             seconds_text(burn_ticks),
@@ -4876,7 +4884,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             confusion_stacks,
             confusion_ticks,
         } => format!(
-            "Conjure a moving aura of mystical fire within {} for {}. Every {}, enemies in the aura take {}. Each hit has a {burn_chance_percent}% chance to Burn for {}, taking {} per second, and a {confusion_chance_percent}% chance to receive {confusion_stacks} Confusion stack for {}.",
+            "Conjure a moving {} radius aura of mystical fire around this Pokemon for {}. Every {}, enemies in the aura take {}. Each hit has a {burn_chance_percent}% chance to Burn for {}, taking {} per second, and a {confusion_chance_percent}% chance to receive {confusion_stacks} Confusion stack for {}.",
             range_text(radius),
             seconds_text(duration_ticks),
             seconds_text(tick_interval),
@@ -4894,7 +4902,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             slow_percent,
             slow_ticks,
         } => format!(
-            "Shake the ground in a {} radius for {}. Every {}, enemies take {} and are slowed by {}% for {}.",
+            "Shake the ground in a {} radius around this Pokemon for {}. Every {}, enemies take {} and are slowed by {}% for {}.",
             range_text(radius),
             seconds_text(duration_ticks),
             seconds_text(tick_interval),
@@ -5119,7 +5127,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             throw_speed,
             throw_ticks,
         } => format!(
-            "Grab enemies within {}, dealing {} while rooting and disarming them for {}. Then hurl them away at {SPEED_ICON}{BUFF}{throw_speed}{END} speed for {}.",
+            "Grab enemies in a {} radius around this Pokemon, dealing {} while rooting and disarming them for {}. Then hurl them away at {SPEED_ICON}{BUFF}{throw_speed}{END} speed for {}.",
             range_text(radius),
             damage_text(base_ad, ad_ratio, 0, 0, type_name),
             seconds_text(cc_ticks),
@@ -5175,12 +5183,12 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             duration_ticks,
             length,
         } => format!(
-            "Place a {} smoke wall for {}. Pokemon-layer attacks and dashes that cross the wall are blocked.",
+            "Place a {} smoke wall for {}. Pokemon attacks and dashes that cross the wall are blocked.",
             range_text(length),
             seconds_text(duration_ticks)
         ),
         PokemonMoveEffect::SelfDetectGuard { duration_ticks } => format!(
-            "Guard for up to {}. The next hostile Pokemon-layer attack or skill that would affect Grapploct is ignored.",
+            "Guard for up to {}. The next hostile Pokemon attack or skill that would affect Grapploct is ignored.",
             seconds_text(duration_ticks)
         ),
         PokemonMoveEffect::SubmissionBindDot {
@@ -5452,7 +5460,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             poison_stacks,
             poison_damage,
         } => format!(
-            "Detonate all Miasma stacks in a {} radius, dealing {} plus {AD_ICON}{PHYSICAL}{ad_per_stack}% AD{END} per stack consumed. Also applies {poison_stacks} Poison stacks, each dealing {MAGIC}{poison_damage}{END} damage per second.",
+            "Detonate all Miasma stacks in a {} radius around Arbok, dealing {} plus {AD_ICON}{PHYSICAL}{ad_per_stack}% AD{END} per stack consumed. Also applies {poison_stacks} Poison stacks, each dealing {MAGIC}{poison_damage}{END} damage per second.",
             range_text(radius),
             damage_text(base_ad, ad_ratio, 0, 0, type_name)
         ),
@@ -5566,7 +5574,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             width,
             ..
         } => format!(
-            "Charge along an aimed line {} wide to the first enemy hit, dealing {PHYSICAL}{base_ad}{END} + {AD_ICON}{PHYSICAL}{ad_ratio}% AD{END} + {SPEED_ICON}{PHYSICAL}{move_speed_ratio}% move speed{END} + {PHYSICAL}{distance_damage_per_10000} per 10 range traveled{END} as {PHYSICAL}physical {type_name} damage{END}. On hit, take {self_current_hp_percent}% current HP as recoil.",
+            "Charge along an aimed line {} wide to the first enemy hit, dealing {PHYSICAL}{base_ad}{END} + {AD_ICON}{PHYSICAL}{ad_ratio}% AD{END} + {SPEED_ICON}{PHYSICAL}{move_speed_ratio}% move speed{END} as {PHYSICAL}physical {type_name} damage{END}. Longer charges add {PHYSICAL}{distance_damage_per_10000} damage per short distance traveled{END}. On hit, take {self_current_hp_percent}% current HP as recoil.",
             range_text(width)
         ),
         PokemonMoveEffect::LineDashPierceDamage {
@@ -5623,7 +5631,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             force_move_speed,
             force_move_ticks,
         } => format!(
-            "Spin in a {} radius, dealing {}. Then dash away up to {}, dealing {} to enemies crossed within a {} width at {SPEED_ICON}{BUFF}{force_move_speed}{END} speed for {}.",
+            "Spin in a {} radius around this Pokemon, dealing {}. Then dash away up to {}, dealing {} to enemies crossed within a {} width at {SPEED_ICON}{BUFF}{force_move_speed}{END} speed for {}.",
             range_text(radius),
             damage_text(spin_base_ad, spin_ad_ratio, 0, 0, type_name),
             range_text(dash_range),
@@ -5637,7 +5645,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             retreat_speed,
             retreat_ticks,
         } => format!(
-            "Drop a decoy tail, <#ef5350ff>Taunting<> enemies within a {} radius for {} while Heliolisk scurries away at {SPEED_ICON}{BUFF}{retreat_speed}{END} speed for {}.",
+            "Drop a decoy tail, <#ef5350ff>Taunting<> enemies in a {} radius around Heliolisk for {} while Heliolisk scurries away at {SPEED_ICON}{BUFF}{retreat_speed}{END} speed for {}.",
             range_text(radius),
             seconds_text(taunt_ticks),
             seconds_text(retreat_ticks as usize)
@@ -5682,7 +5690,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             restore_charges,
             heal_amount,
         } => format!(
-            "After a short channel, release electricity in a {} radius, dealing {}. If cast with 0 Static charges, damage is increased by {zero_charge_damage_bonus_percent}%. Each enemy champion or large monster hit restores {restore_charges} Static charges and {HEAL}heals {heal_amount}{END}.",
+            "After a short channel, release electricity in a {} radius around Dedenne, dealing {}. If cast with 0 Static charges, damage is increased by {zero_charge_damage_bonus_percent}%. Each enemy champion or large monster hit restores {restore_charges} Static charges and {HEAL}heals {heal_amount}{END}.",
             range_text(radius),
             damage_text(base_ad, ad_ratio, 0, 0, type_name)
         ),
@@ -5745,7 +5753,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             status_bonus_percent,
             ..
         } => format!(
-            "Create a Sunny Day field for {}. The field is {} long and {} wide. Non-Fire, non-Electric, and non-Grass Pokemon are slowed by {}% while inside the field. Fire, Electric, and Grass Pokemon-layer damage against targets inside the field is increased by {}%, and chance-based Burn/Paralysis effects gain +{}% chance.",
+            "Create a Sunny Day field for {}. The field is {} long and {} wide. Non-Fire, non-Electric, and non-Grass Pokemon are slowed by {}% while inside the field. Fire, Electric, and Grass Pokemon damage against targets inside the field is increased by {}%, and chance-based Burn/Paralysis effects gain +{}% chance.",
             seconds_text(duration_ticks),
             range_text(length),
             range_text(width),
@@ -5761,7 +5769,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             fire_damage_reduce_percent,
             cooldown_mult,
         } => format!(
-            "Create a Rain Dance field for {}. The field is {} long and {} wide. Water and Electric Pokemon-layer damage against targets inside the field is increased by {}%, Fire Pokemon-layer damage against targets inside is reduced by {}%, and Water/Electric allies inside gain {BUFF}{cooldown_mult}% cooldown speed{END}.",
+            "Create a Rain Dance field for {}. The field is {} long and {} wide. Water and Electric Pokemon damage against targets inside the field is increased by {}%, Fire Pokemon damage against targets inside is reduced by {}%, and Water/Electric allies inside gain {BUFF}{cooldown_mult}% cooldown speed{END}.",
             seconds_text(duration_ticks),
             range_text(length),
             range_text(width),
@@ -5774,7 +5782,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             crit_chance,
             dragon_crit_chance,
         } => format!(
-            "Cheer allies in a {} radius for {}, granting {BUFF}+{crit_chance}% crit chance{END}. Dragon-type allies instead gain {BUFF}+{dragon_crit_chance}% crit chance{END}.",
+            "Cheer allies in a {} radius around this Pokemon for {}, granting {BUFF}+{crit_chance}% crit chance{END}. Dragon-type allies instead gain {BUFF}+{dragon_crit_chance}% crit chance{END}.",
             range_text(radius),
             seconds_text(duration_ticks)
         ),
@@ -5805,7 +5813,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             burn_base_ap,
             burn_ap_ratio,
         } => format!(
-            "Unleash paired volcanic lines up to {}. Each side line is {} wide and {} from center, pulsing every {}, dealing {} with a {burn_chance_percent}% Burn chance for {}. Afterward, the center erupts in a {} radius for {}. Burns take {} per second.",
+            "Unleash two parallel volcanic lines up to {} from Coalossal. Each line is {} wide and offset {} from the center path, pulsing every {} for {} with a {burn_chance_percent}% Burn chance for {}. After the lines finish, the center path erupts in a targeted {} radius area for {}. Burns deal {} per second.",
             range_text(travel_range),
             range_text(line_width),
             range_text(side_offset),
@@ -5974,7 +5982,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             lifesteal_percent,
             lifesteal_ticks,
         } => format!(
-            "Parry for {}. The first direct basic or skill hit is reduced by {SHIELD}{reduce_percent}%{END}; Hawlucha retaliates in a {} radius for {} and slows enemies by {}% for {}. If a champion triggers Counter, gain {BUFF}{lifesteal_percent}% vamp{END} for {}.",
+            "Parry for {}. The first direct basic or skill hit is reduced by {SHIELD}{reduce_percent}%{END}; Hawlucha retaliates in a {} radius around itself for {} and slows enemies by {}% for {}. If a champion triggers Counter, gain {BUFF}{lifesteal_percent}% vamp{END} for {}.",
             seconds_text(duration_ticks),
             range_text(radius),
             damage_text(base_ad, bonus_ad_ratio, 0, 0, type_name),
@@ -6071,7 +6079,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             bleed_ticks,
             ..
         } => format!(
-            "Give Starmie's transferable debuffs and DOTs to the target, then steal the target's transferable stat buffs and protective effects. Also cleanse Starmie's remaining Pokemon-layer debuffs, gain {BUFF}+{}% ability power{END} for {}, and weaken the target by {CONTROL}{}% attack{END} and {CONTROL}{}% armor{END} for {}. If the target is Illuminated, apply Bleed for {} and radiate a {} Psychic shockwave for {}.",
+            "Give Starmie's transferable debuffs and DOTs to the target, then steal the target's transferable stat buffs and protective effects. Also cleanse Starmie's remaining Pokemon debuffs, gain {BUFF}+{}% ability power{END} for {}, and weaken the target by {CONTROL}{}% attack{END} and {CONTROL}{}% armor{END} for {}. If the target is Illuminated, apply Bleed for {} and radiate a {} Psychic shockwave around the target for {}.",
             self_ability_power_mult,
             seconds_text(self_buff_ticks),
             enemy_attack_mult.unsigned_abs(),
@@ -6093,7 +6101,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             illuminated_spoke_ap_ratio,
             spoke_count,
         } => format!(
-            "Root and channel for {}, taking {SHIELD}{}% reduced damage{END}, then fire a map-length {} true-damage beam up to {} for {}. Illuminated enemies hit burst into {spoke_count} light spokes in a {} radius, each dealing {}.",
+            "Root and channel for {}, taking {SHIELD}{}% reduced damage{END}, then fire a map-length beam {} wide up to {} for {}. Illuminated enemies hit burst into {spoke_count} light spokes in a {} radius around themselves, each dealing {}.",
             seconds_text(charge_ticks),
             self_damage_reduce_percent,
             range_text(width),
@@ -6170,7 +6178,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             radius,
             duration_ticks,
         } => format!(
-            "Drench enemies in a {} radius for {}. Water moves are super effective against Soaked targets.",
+            "Drench enemies in a targeted {} radius area for {}. Water moves are super effective against Soaked targets.",
             range_text(radius),
             seconds_text(duration_ticks)
         ),
@@ -6305,7 +6313,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             radius,
             ..
         } => format!(
-            "Sing for {}, repeatedly putting enemies in a {} radius to {CONTROL}Sleep{END}. Enemies wake shortly after leaving the song.",
+            "Sing for {}, repeatedly putting enemies in a {} radius around Wigglytuff to {CONTROL}Sleep{END}. Enemies wake shortly after leaving the song.",
             seconds_text(duration_ticks),
             range_text(radius)
         ),
@@ -6328,7 +6336,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             confusion_stacks,
             confusion_ticks,
         } => format!(
-            "Buzz for {}, dealing {} every 0.5s to enemies in a {} radius and applying {confusion_stacks} Confusion stack for {}.",
+            "Buzz for {}, dealing {} every 0.5s to enemies in a {} radius around this Pokemon and applying {confusion_stacks} Confusion stack for {}.",
             seconds_text(duration_ticks),
             damage_text(base_ad, ad_ratio, 0, 0, type_name),
             range_text(radius),
@@ -6526,34 +6534,34 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Sharpness: Consecutive damaging hits within {CONTROL}5s{END} grant {PHYSICAL}+5% critical chance{END} per hit after the first, up to {PHYSICAL}+50%{END}. Fury Cutter hits count individually."
         ),
         "pokemon_moba_scizor" => format!(
-            "Light Metal: After moving {SPEED_ICON}{BUFF}120 range{END} without taking or dealing damage, Scizor gains {SHIELD}temporary HP equal to 20% move speed{END} for {CONTROL}6s{END}."
+            "Light Metal: After traveling a long distance without taking or dealing damage, Scizor gains {SHIELD}temporary HP equal to 20% move speed{END} for {CONTROL}6s{END}."
         ),
         "pokemon_moba_ursaluna" => format!(
             "Guts: While below {HP_ICON}{CONTROL}50% HP{END}, Ursaluna deals {BUFF}35% increased damage{END}."
         ),
         "pokemon_moba_sawk_throh" => format!(
-            "Inner Focus: Sawk & Throh suffer {CONTROL}50% shorter Pokemon-layer crowd control durations{END}. Self-root effects from Throh's throw moves are not reduced."
+            "Inner Focus: Sawk & Throh suffer {CONTROL}50% shorter Pokemon crowd control durations{END}. Self-root effects from Throh's throw moves are not reduced."
         ),
         "pokemon_moba_hitmonchan" => format!(
             "Iron Fist: Hitmonchan deals {BUFF}25% increased damage{END} to enemies suffering from Pokemon statuses or crowd control."
         ),
         "pokemon_moba_hitmonlee" => format!(
-            "Limber: Hitmonlee is {BUFF}immune to roots, stuns, Frozen, Paralysis, and Terrify{END} from Pokemon-layer effects."
+            "Limber: Hitmonlee is {BUFF}immune to roots, stuns, Frozen, Paralysis, and Terrify{END} from Pokemon effects."
         ),
         "pokemon_moba_hitmontop" => format!(
-            "Steadfast: Each time Hitmontop suffers Pokemon-layer hard crowd control, it gains {SPEED_ICON}{BUFF}+4% permanent move speed{END}."
+            "Steadfast: Each time Hitmontop suffers Pokemon hard crowd control, it gains {SPEED_ICON}{BUFF}+4% permanent move speed{END}."
         ),
         "pokemon_moba_kilowattrel" => format!(
             "Volt Absorb: Electric-type Pokemon damage {HEAL}heals Kilowattrel instead of damaging it{END}. This passive is disabled while Kilowattrel is crowd controlled."
         ),
         "pokemon_moba_beeheeyem" => format!(
-            "Synchronize: When Beeheeyem receives Burn, Poison, Paralysis, Frozen, or Confusion from a Pokemon-layer status, it applies the same status back to the source, bypassing Protect and type immunity."
+            "Synchronize: When Beeheeyem receives Burn, Poison, Paralysis, Frozen, or Confusion from a Pokemon status, it applies the same status back to the source, bypassing Protect and type immunity."
         ),
         "pokemon_moba_gyarados" => format!(
             "Lake of Rage: While standing in its own Whirlpool, Gyarados heals every 0.5s and gains {AD_ICON}{BUFF}+20% attack{END}."
         ),
         "pokemon_moba_noivern" => format!(
-            "Infiltrator: Intended to delay tower targeting until Noivern attacks or casts inside tower range. Current native SDK hooks do not expose tower aggro control, so this passive is pending a lower-level hook."
+            "Infiltrator: Intended to delay tower targeting until Noivern attacks or casts inside tower range. This passive is waiting for future game developer support before it can fully function."
         ),
         "pokemon_moba_mantine" => format!(
             "Swift Swim: While standing inside any Water field, Mantine gains {SPEED_ICON}{BUFF}+35% move speed{END}."
@@ -6562,13 +6570,13 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Immunity: Cryogonal is {BUFF}immune to Burn and Poison damage-over-time statuses{END}."
         ),
         "pokemon_moba_vanilluxe" => format!(
-            "Snow Patrol: Vanilluxe's Pokemon-layer attacks are {PHYSICAL}critical hits{END} against Frozen enemies."
+            "Snow Patrol: Vanilluxe's Pokemon attacks are {PHYSICAL}critical hits{END} against Frozen enemies."
         ),
         "pokemon_moba_skarmory" => format!(
-            "Sturdy: Once every {CONTROL}5 minutes{END}, direct Pokemon-layer damage that would reduce Skarmory to 0 HP instead leaves it at {HP_ICON}{BUFF}1 HP{END}. Damage-over-time does not trigger Sturdy."
+            "Sturdy: Once every {CONTROL}5 minutes{END}, direct Pokemon damage that would reduce Skarmory to 0 HP instead leaves it at {HP_ICON}{BUFF}1 HP{END}. Damage-over-time does not trigger Sturdy."
         ),
         "pokemon_moba_houndoom" => format!(
-            "Intimidate: Enemies within {BUFF}42 range{END} have {AD_ICON}{CONTROL}15% reduced attack{END} while they stay near Houndoom."
+            "Intimidate: Nearby enemies have {AD_ICON}{CONTROL}15% reduced attack{END} while they stay near Houndoom."
         ),
         "pokemon_moba_arbok" => format!(
             "Dripping Fangs: Miasma lasts {CONTROL}15s{END}. Every {CONTROL}10 Miasma stacks{END} applies Poison without consuming Miasma. Enemies that die with Miasma spread their stacks to nearby enemies. Miasma is removed by cleanses."
@@ -6577,28 +6585,28 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Clingy: After 1.5s, Clawitzer attaches to a nearby allied Pokemon, becoming untargetable and movement-rooted while granting that ally {HP_ICON}{BUFF}99% of Clawitzer's HP{END}, armor, and magic resistance. If the ally dies or takes over one-third max HP in one hit, Clawitzer detaches for {CONTROL}15s{END}, gains move speed, and deals extra damage to towers and jungle camps."
         ),
         "pokemon_moba_octillery" => format!(
-            "Suction Cups: Intended to let Octillery move through terrain with reduced move speed. Current native SDK hooks do not expose wall/pathing collision control, so this passive is pending a lower-level hook."
+            "Suction Cups: Intended to let Octillery move through terrain with reduced move speed. This passive is waiting for future game developer support before it can fully function."
         ),
         "pokemon_moba_pyukumuku" => format!(
-            "Innards Out: Burn and Poison {HEAL}heal Pyukumuku instead of damaging it{END}. Melee basic attacks against Pyukumuku reflect increasing damage from repeat attackers and can apply Poison. If direct Pokemon-layer damage kills Pyukumuku, the attacker takes {PHYSICAL}75% of that hit's damage{END} back."
+            "Innards Out: Burn and Poison {HEAL}heal Pyukumuku instead of damaging it{END}. Melee basic attacks against Pyukumuku reflect increasing damage from repeat attackers and can apply Poison. If direct Pokemon damage kills Pyukumuku, the attacker takes {PHYSICAL}75% of that hit's damage{END} back."
         ),
         "pokemon_moba_banette" => format!(
-            "Cursed Body: Enemy hits against Banette have a {CONTROL}10% chance{END} to disable that enemy's offensive actions for {CONTROL}5s{END}. Current native damage hooks expose the attacker but not the exact move slot, so this disables attacks and skills instead of only the triggering move."
+            "Cursed Body: Enemy hits against Banette have a {CONTROL}10% chance{END} to disable that enemy's attacks and skills for {CONTROL}5s{END}."
         ),
         "pokemon_moba_kricketune" => format!(
             "Web Walker: Kricketune's Sticky Webs are permanent and boost only Kricketune's movement while lightly slowing enemies. Enemies entering a web chain connected back to Kricketune are briefly spotted for Kricketune's team AI."
         ),
         "pokemon_moba_armarouge" => format!(
-            "Weak Armor: Armarouge starts with extremely high defenses. Each landed Pokemon-layer attack adds a {ARMOR_ICON}{CONTROL}-5% armor{END} and {MR_ICON}{CONTROL}-5% magic resistance{END} stack, up to {CONTROL}16 stacks{END}. Death or Armor Cannon clears these stacks. While Armor Cannon cools down, Armarouge instead suffers its Armor Cannon defense penalty."
+            "Weak Armor: Armarouge starts with extremely high defenses. Each landed Pokemon attack adds a {ARMOR_ICON}{CONTROL}-5% armor{END} and {MR_ICON}{CONTROL}-5% magic resistance{END} stack, up to {CONTROL}16 stacks{END}. Death or Armor Cannon clears these stacks. While Armor Cannon cools down, Armarouge instead suffers its Armor Cannon defense penalty."
         ),
         "pokemon_moba_ambipom" => format!(
-            "Technician: When Ambipom receives Pokemon-layer buffs from an allied Pokemon, it gains {BUFF}+18% movement speed{END} for the same short buff window."
+            "Technician: When Ambipom receives buffs from an allied Pokemon, it gains {BUFF}+18% movement speed{END} for the same short buff window."
         ),
         "pokemon_moba_gallade" => format!(
             "Justified: Taking direct Dark-type Pokemon damage grants {AD_ICON}{BUFF}+15% attack{END} for {CONTROL}5s{END}."
         ),
         "pokemon_moba_audino" => format!(
-            "Regenerator: After avoiding damage for {CONTROL}2s{END}, Audino {HEAL}heals 18 + 2% max HP{END} each second. At full HP, Audino instead heals the nearest wounded ally within {BUFF}50 range{END}."
+            "Regenerator: After avoiding damage for {CONTROL}2s{END}, Audino {HEAL}heals 18 + 2% max HP{END} each second. At full HP, Audino instead heals the nearest wounded ally in range."
         ),
         "pokemon_moba_pangoro" => format!(
             "Scrappy: Pangoro's Pokemon damage cannot be reduced below {PHYSICAL}100%{END} by type resistance. Super-effective hits still deal bonus damage."
@@ -6607,16 +6615,16 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Receiver: When Passimian kills an enemy Pokemon, it copies that Pokemon's passive. Copies last until Passimian kills a different enemy Pokemon."
         ),
         "pokemon_moba_oranguru" => format!(
-            "Symbiosis: The nearest allied Pokemon within {BUFF}70 range{END} receives {BUFF}50% of Oranguru's positive item-derived stat bonuses{END}, refreshed repeatedly."
+            "Symbiosis: The nearest allied Pokemon in range receives {BUFF}50% of Oranguru's positive item-derived stat bonuses{END}, refreshed repeatedly."
         ),
         "pokemon_moba_dragalge" => format!(
             "Poison Sipper: Direct Pokemon attacks and skills {HEAL}heal Dragalge for 20% of their damage{END} when they hit an enemy already affected by Poison."
         ),
         "pokemon_moba_heliolisk" => format!(
-            "Discharge: After moving {SPEED_ICON}{BUFF}90 range{END}, Heliolisk releases a small Electric pulse around itself, dealing {PHYSICAL}28 + 35% AD physical Electric damage{END}."
+            "Discharge: After moving a moderate distance, Heliolisk releases a small Electric pulse around itself, dealing {PHYSICAL}28 + 35% AD physical Electric damage{END}."
         ),
         "pokemon_moba_turtonator" => format!(
-            "Burning Jealousy: When a nearby enemy Pokemon gains increased combat stats, Turtonator lashes out for {PHYSICAL}24 + 25% AD Fire damage{END}. This detection watches Pokemon-layer stat increases while enemies are near Turtonator."
+            "Burning Jealousy: When a nearby enemy Pokemon gains increased combat stats, Turtonator lashes out for {PHYSICAL}24 + 25% AD Fire damage{END}. This triggers from Pokemon stat buffs while enemies are near Turtonator."
         ),
         "pokemon_moba_drampa" => format!(
             "Berserk: While below {HP_ICON}{CONTROL}50% HP{END}, Drampa gains {AD_ICON}{BUFF}+35% attack{END}, {AP_ICON}{BUFF}+35% ability power{END}, and {PHYSICAL}+35% basic critical chance{END}, but loses {ARMOR_ICON}{CONTROL}15% defense{END} and {MR_ICON}{CONTROL}15% magic resistance{END}."
@@ -6625,37 +6633,37 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Overcoat: Kommo-o is {BUFF}immune to Burn and Poison damage-over-time statuses{END}."
         ),
         "pokemon_moba_thievul" => format!(
-            "Heal Block: Enemies within {BUFF}42 range{END} have healing and lifesteal reduced by {CONTROL}35%{END} while they stay near Thievul."
+            "Heal Block: Nearby enemies have healing and lifesteal reduced by {CONTROL}35%{END} while they stay near Thievul."
         ),
         "pokemon_moba_archaludon" => format!(
-            "Stalwart: Archaludon is {SHIELD}immune to hostile Pokemon-layer forced movement{END}. Throws, knockbacks, swaps, pulls, and movement-based fear or taunt effects cannot move it, though their damage still applies."
+            "Stalwart: Archaludon is {SHIELD}immune to hostile Pokemon forced movement{END}. Throws, knockbacks, swaps, pulls, and movement-based fear or taunt effects cannot move it, though their damage still applies."
         ),
         "pokemon_moba_appletun" => format!(
-            "Ripen: Appletun receives {HEAL}double healing{END} from Pokemon-layer healing effects after anti-heal is applied."
+            "Ripen: Appletun receives {HEAL}double healing{END} from Pokemon healing effects after anti-heal is applied."
         ),
         "pokemon_moba_goodra" => format!(
-            "Sap Sipper: Goodra takes {SHIELD}35% reduced damage{END} from Grass-type Pokemon moves. This passive is Receiver-compatible."
+            "Sap Sipper: Goodra takes {SHIELD}35% reduced damage{END} from Grass-type Pokemon moves."
         ),
         "pokemon_moba_drednaw" => format!(
             "Wide Guard: Drednaw takes {SHIELD}30% reduced Pokemon damage{END} from attacks that strike from behind, hitting its shell."
         ),
         "pokemon_moba_dedenne" => format!(
-            "Static: Dedenne gains 1 Static charge for every {SPEED_ICON}{BUFF}15 range traveled{END}, up to {BUFF}20 charges{END}. Basic attacks spend up to {CONTROL}5 charges{END}, dealing {MAGIC}missing-HP Electric magic damage equal to 2% + 1% per 100 AP per charge spent{END}. Above {BUFF}10 charges{END}, Dedenne gains {SPEED_ICON}{BUFF}+15% out-of-combat move speed{END}."
+            "Static: Dedenne gains Static charges as it moves, up to {BUFF}20 charges{END}. Basic attacks spend up to {CONTROL}5 charges{END}, dealing {MAGIC}missing-HP Electric magic damage equal to 2% + 1% per 100 AP per charge spent{END}. Above {BUFF}10 charges{END}, Dedenne gains {SPEED_ICON}{BUFF}+15% out-of-combat move speed{END}."
         ),
         "pokemon_moba_hawlucha" => format!(
             "Momentum: When Hawlucha applies crowd control with Counter or Flying Press, it gains {ATTACK_SPEED_ICON}{BUFF}+30% attack speed{END} and {SPEED_ICON}{BUFF}+15% move speed{END} for {CONTROL}3s{END}. The first Flying Press hit against each unique enemy champion permanently grants {AD_ICON}{BUFF}+6 attack{END}."
         ),
         "pokemon_moba_bouffalant" => format!(
-            "Afro: Bouffalant takes {SHIELD}30% reduced Pokemon damage{END} from attacks that strike from the front and suffers {CONTROL}33% shorter Pokemon-layer hard CC durations{END}."
+            "Afro: Bouffalant takes {SHIELD}30% reduced Pokemon damage{END} from attacks that strike from the front and suffers {CONTROL}33% shorter Pokemon hard CC durations{END}."
         ),
         "pokemon_moba_starmie" => format!(
-            "Illuminate: Every {CONTROL}5s{END}, Starmie gains 1 Illuminate charge. The next enemy damaged by Starmie is marked for {CONTROL}8s{END}, empowering Flip Turn, Heart Swap, and Psybeam and revealing that target through the Pokemon-layer mark."
+            "Illuminate: Every {CONTROL}5s{END}, Starmie gains 1 Illuminate charge. Enemies hit by Starmie while Starmie has an Illuminate charge become Illuminated for {CONTROL}8s{END}. Illuminated enemies suffer more damage and additional effects from Starmie's abilities. Illuminated enemies are also revealed to Starmie's allies."
         ),
         "pokemon_moba_orbeetle" => format!(
-            "Telepathy: Orbeetle ignores allied Pokemon-layer damage and harmful allied Pokemon statuses, including allied crowd control, debuffs, and damage-over-time effects."
+            "Telepathy: Orbeetle ignores allied Pokemon damage and harmful allied Pokemon statuses, including allied crowd control, debuffs, and damage-over-time effects."
         ),
         "pokemon_moba_coalossal" => format!(
-            "Steam Engine: Taking direct Fire or Water Pokemon damage grants {SPEED_ICON}{BUFF}+160% move speed{END} for {CONTROL}4s{END}."
+            "Steam Engine: Taking direct Fire- or Water-type Pokemon damage grants {SPEED_ICON}{BUFF}+160% move speed{END} for {CONTROL}4s{END}."
         ),
         "pokemon_moba_magmortar" => format!(
             "Overheat: Lava Plume is fixed at {ATTACK_SPEED_ICON}{BUFF}0.75 attacks per second{END}. Bonus attack speed becomes {PHYSICAL}armor penetration{END} at {BUFF}1% per 4% bonus attack speed{END}. Every {CONTROL}4th Lava Plume within 6s{END} deals target max-HP bonus damage and leaves burning ground."
@@ -6664,19 +6672,19 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Boxer: Grapploct deals {PHYSICAL}+25% Pokemon damage{END} to Fighting Pokemon and takes {SHIELD}25% reduced Fighting-type Pokemon damage{END}. Punching moves against Grapploct deal {SHIELD}25% less damage{END}; kicking moves deal {CONTROL}15% more damage{END}."
         ),
         "pokemon_moba_sirfetchd" => format!(
-            "Leek: Skull Bash, Solar Blade, and Brave Bird gain {PHYSICAL}+50% critical chance{END}. Critical chance above 100% is split between extra critical damage and {SHIELD}Pokemon-layer damage reduction{END}."
+            "Leek: Skull Bash, Solar Blade, and Brave Bird gain {PHYSICAL}+50% critical chance{END}. Critical chance above 100% is split between extra critical damage and {SHIELD}Pokemon damage reduction{END}."
         ),
         "pokemon_moba_arboliva" => format!(
             "Seed Sower: When damaged, create a permanent Grassy Terrain under Arboliva, up to {BUFF}3 fields{END}, no more than once every {CONTROL}5s{END}. While standing in its Grassy Terrain, Arboliva gains {ATTACK_SPEED_ICON}{BUFF}+18% attack speed{END} and Grass moves deal {BUFF}+12% damage{END}; overlapping fields stack. Trailblaze, Fire AoE, and Ice AoE destroy Grassy Terrain."
         ),
         "pokemon_moba_ceruledge" => format!(
-            "Flash Fire: Taking direct Fire-type Pokemon damage grants {AD_ICON}{BUFF}+12% attack{END} and {AP_ICON}{BUFF}+12% ability power{END} for {CONTROL}6s{END}. This passive is Receiver-compatible."
+            "Flash Fire: Taking direct Fire-type Pokemon damage grants {AD_ICON}{BUFF}+12% attack{END} and {AP_ICON}{BUFF}+12% ability power{END} for {CONTROL}6s{END}."
         ),
         "pokemon_moba_gholdengo" => format!(
-            "Good as Gold: Observed gold gains increase Gholdengo's Pokemon-layer damage by {BUFF}+1% per 250 gold earned{END}, up to {BUFF}+20%{END}."
+            "Good as Gold: Observed gold gains increase Gholdengo's Pokemon damage by {BUFF}+1% per 250 gold earned{END}, up to {BUFF}+20%{END}."
         ),
         "pokemon_moba_frosmoth" => format!(
-            "Ice Scales: Frosmoth takes {SHIELD}50% reduced Pokemon-layer AP damage{END}."
+            "Ice Scales: Frosmoth takes {SHIELD}50% reduced Pokemon AP damage{END}."
         ),
         "pokemon_moba_shedinja" => format!(
             "Wonder Guard: Shedinja has {HP_ICON}{CONTROL}1 HP{END} and cannot gain HP. Basic attacks and non-super-effective abilities deal no damage while its shell is intact. A super-effective ability breaks the shell for {CONTROL}5s{END}; another super-effective ability during that window knocks Shedinja down for {CONTROL}7s{END}. While knocked down, Shedinja has {CONTROL}5 shell chits{END}; any hit or damage-over-time tick removes 1 chit, and losing all chits kills Shedinja. Burn can affect the intact shell; Poison and Bleed only count while Shedinja is knocked down."
@@ -6688,79 +6696,82 @@ fn passive_description(champion: PokemonChampion) -> String {
             "King's Rock: Critical strikes deal bonus {MAGIC}Dragon magic damage equal to 10/14/18% of the critical strike's damage{END}. While Dragon Energy is ready, this bonus becomes {MAGIC}13/20/27%{END}. Every third consecutive Scale Shot hit on the same enemy champion adds {PHYSICAL}+10% critical chance{END} against that target for {CONTROL}3s{END}, stacking up to {PHYSICAL}+30%{END}; at max stacks the target is slowed by {CONTROL}20%{END}."
         ),
         "pokemon_moba_delibird" => format!(
-            "Hustle: Present gains {PHYSICAL}+20% critical chance{END} while Delibird is moving or has moved very recently. This bonus also applies if Passimian copies Hustle."
+            "Hustle: Present gains {PHYSICAL}+20% critical chance{END} while Delibird is moving or has moved very recently."
         ),
         "pokemon_moba_cloyster" => format!(
-            "Overcoat: Cloyster gains {ARMOR_ICON}{BUFF}bonus armor equal to 20% of its critical chance{END}. Incoming Pokemon-layer critical strikes against Cloyster deal {SHIELD}15/20/25% reduced critical damage{END} at levels 1/5/10. This passive is Receiver-compatible."
+            "Overcoat: Cloyster gains {ARMOR_ICON}{BUFF}bonus armor equal to 20% of its critical chance{END}. Incoming Pokemon critical strikes against Cloyster deal {SHIELD}15/20/25% reduced critical damage{END} at levels 1/5/10."
         ),
         "pokemon_moba_electrode" => format!(
             "Aftermath: If Electrode is killed by a contact attack, it retaliates for {PHYSICAL}40 + 75% AD physical damage{END} and inflicts Paralysis for {CONTROL}4s{END}. Contact is detected from nearby lethal hits and recent physical basic attacks."
         ),
         "pokemon_moba_snorlax" => format!(
-            "Gluttony: While moving or defeating units, Snorlax gathers Berries, up to {BUFF}15{END}. Each Berry heals {HP_ICON}{HEAL}0.5% max HP every second{END}. At {BUFF}10 Berries{END}, Snorlax ignores Pokemon-layer slows and knockbacks are reduced by {SHIELD}50%{END}. At {BUFF}15 Berries{END}, Full Belly slows Snorlax by {CONTROL}15%{END} but increases Strength's damage."
+            "Gluttony: While moving or defeating units, Snorlax gathers Berries, up to {BUFF}15{END}. Each Berry heals {HP_ICON}{HEAL}0.5% max HP every second{END}. At {BUFF}10 Berries{END}, Snorlax ignores Pokemon slows and knockbacks are reduced by {SHIELD}50%{END}. At {BUFF}15 Berries{END}, Full Belly slows Snorlax by {CONTROL}15%{END} but increases Strength's damage."
         ),
         "pokemon_moba_zeraora" => format!(
             "Merciless: Hitting an enemy Pokemon with two different non-basic abilities within {CONTROL}2s{END} triggers an Electric burst around them for {MAGIC}35 + 35% AP magic damage{END} and grants cooldown recovery for up to {CONTROL}3s{END}. Each enemy can trigger Merciless once every {CONTROL}5s{END}."
         ),
         "pokemon_moba_ribombee" => format!(
-            "Honey Gatherer: Ribombee gathers {BUFF}1 Honey stack every 5s{END}, up to {BUFF}5 stacks{END}. Pollen Puff consumes all Honey to increase ally healing or enemy damage and slow. If Passimian copies this passive, Honey improves Passimian's basic attack damage."
+            "Honey Gatherer: Ribombee gathers {BUFF}1 Honey stack every 5s{END}, up to {BUFF}5 stacks{END}. Pollen Puff consumes all Honey to increase ally healing or enemy damage and slow."
         ),
         "pokemon_moba_rillaboom" => format!(
-            "Drum Solo: Casting {CONTROL}2 non-basic skills within 5s{END} heals Rillaboom for {HEAL}45 HP{END} and gives nearby allies {SPEED_ICON}{BUFF}+12% move speed{END} for {CONTROL}2s{END}. This passive is Receiver-compatible."
+            "Drum Solo: Casting {CONTROL}2 non-basic skills within 5s{END} heals Rillaboom for {HEAL}45 HP{END} and gives nearby allies {SPEED_ICON}{BUFF}+12% move speed{END} for {CONTROL}2s{END}."
         ),
         "pokemon_moba_dragapult" => format!(
-            "Dragon Launcher: Shred, Dragon Darts, and Spooky Shot each launch a following ghastly Dreepy for {MAGIC}14 + 12% AD + 12% AP Ghost magic damage{END}. Dragon Launcher heals Dragapult for {HEAL}35% of damage dealt{END}. This passive is Receiver-compatible."
+            "Dragon Launcher: Shred, Dragon Darts, and Spooky Shot each launch a following ghastly Dreepy for {MAGIC}14 + 12% AD + 12% AP Ghost magic damage{END}. Dragon Launcher heals Dragapult for {HEAL}35% of damage dealt{END}."
         ),
         "pokemon_moba_shiftry" => format!(
             "Forest Camouflage: Shiftry gains {SPEED_ICON}{BUFF}+15% move speed{END} while hidden from nearby enemies by bush visibility, lingering for {CONTROL}2s{END} after leaving if it stayed hidden for {CONTROL}1.5s{END}. While Shiftry has any movement-speed buff, Thwack deals {PHYSICAL}10 + 20% AD bonus physical damage{END}."
         ),
         "pokemon_moba_sigilyph" => format!(
-            "Glypher: Psychic Sphere marks targets with a glyph for {CONTROL}5s{END}. Sigilyph's non-basic abilities deal {MAGIC}+24% damage{END} to glyph-marked targets. If two enemy glyph targets get close, both glyphs explode for {MAGIC}24 + 30% AP Psychic damage{END}, splashing nearby non-tower enemies for {MAGIC}50% damage{END}. This passive is Receiver-compatible."
+            "Glypher: Psychic Sphere marks targets with a glyph for {CONTROL}5s{END}. Sigilyph's non-basic abilities deal {MAGIC}+24% damage{END} to glyph-marked targets. If two enemy glyph targets get close, both glyphs explode for {MAGIC}24 + 30% AP Psychic damage{END}, splashing nearby non-tower enemies for {MAGIC}50% damage{END}."
         ),
         "pokemon_moba_weavile" => format!(
-            "Lone Predator: Weavile deals {PHYSICAL}+20% damage{END} to enemy Pokemon with no allied Pokemon within {CONTROL}65 range{END}. Basic attacking an isolated enemy grants {SPEED_ICON}{BUFF}+20% move speed{END} for {CONTROL}1.5s{END}. This passive is Receiver-compatible."
+            "Lone Predator: Weavile deals {PHYSICAL}+20% damage{END} to isolated enemy Pokemon with no allied Pokemon nearby. Basic attacking an isolated enemy grants {SPEED_ICON}{BUFF}+20% move speed{END} for {CONTROL}1.5s{END}."
         ),
         "pokemon_moba_swanna" => format!(
-            "Tailwind: Moving about {SPEED_ICON}{BUFF}55 range{END} in one direction grants {SPEED_ICON}{BUFF}+25% move speed{END}, {BUFF}+18% cooldown recovery{END}, and empowers Swanna's next damaging ability by {MAGIC}+10% damage and +10% AP as bonus damage{END}. This passive is Receiver-compatible."
+            "Tailwind: Moving steadily in one direction grants {SPEED_ICON}{BUFF}+25% move speed{END}, {BUFF}+18% cooldown recovery{END}, and empowers Swanna's next damaging ability by {MAGIC}+10% damage and +10% AP as bonus damage{END}."
         ),
         "pokemon_moba_marowak" => format!(
             "Rhythm: Attack-speed items and normal attack-speed buffs do not directly improve Marowak's damage pattern. When Bonemerang hits at least one enemy, catching it grants {ATTACK_SPEED_ICON}{BUFF}+25% Bonemerang speed and cooldown recovery{END} for {CONTROL}1.5s{END}. Rhythm refreshes but does not stack."
         ),
         "pokemon_moba_garganacl" => format!(
-            "Salt Cure: When Garganacl is hit by Pokemon-layer physical damage or monster/minion hits, it drops a salt patch for {CONTROL}5s{END}. Enemies entering a patch take {PHYSICAL}22 + 25% AD Rock damage{END} and are slowed; Water and Steel types take {PHYSICAL}+50% damage{END}. Garganacl can have {CONTROL}6{END} temporary patches at once. Blessed Salt terrain is permanent and does not count toward this limit. This passive is Receiver-compatible."
+            "Salt Cure: When Garganacl is hit by Pokemon physical damage or monster/minion hits, it drops a salt patch for {CONTROL}5s{END}. Enemies entering a patch take {PHYSICAL}22 + 25% AD Rock damage{END} and are slowed; Water and Steel types take {PHYSICAL}+50% damage{END}. Garganacl can have {CONTROL}6{END} temporary patches at once. Blessed Salt terrain is permanent and does not count toward this limit."
         ),
         "pokemon_moba_ampharos" => format!(
-            "Luminous Pulse: Ampharos provides True Sight in a {BUFF}42 range aura{END}, revealing Weavile stealth and nearby bush-hidden enemies to Pokemon AI. Every {CONTROL}5s{END}, the aura pulses for {MAGIC}50 + 10% AP Electric magic damage{END} and slows enemies for {CONTROL}1s{END}. Searchlight Tail empowers these pulses. This passive is Receiver-compatible."
+            "Luminous Pulse: Ampharos provides True Sight in an aura around itself, revealing Weavile stealth and nearby bush-hidden enemies. Every {CONTROL}5s{END}, the aura pulses for {MAGIC}50 + 10% AP Electric magic damage{END} and slows enemies for {CONTROL}1s{END}. Searchlight Tail empowers these pulses."
+        ),
+        "pokemon_moba_wishiwashi" => format!(
+            "Schooling: Wishiwashi enters School Form while an allied Pokemon is nearby or after casting Massive Catch. While Schooling, Wishiwashi gains {BUFF}+12% defence and magic resistance{END} and {BUFF}+5% skill and ultimate cooldown recovery{END} per nearby ally, counting at least one ally and up to four. While alone, Wishiwashi has {CONTROL}-8% max HP{END} and gains {SPEED_ICON}{BUFF}+15% move speed{END}."
         ),
         "pokemon_moba_xatu" => format!(
-            "Prophecy: Enemy Pokemon casting non-basic skills within {BUFF}180 range{END} are briefly revealed to Xatu's team and lose {MAGIC}10% magic resistance{END} for {CONTROL}3s{END}. This passive is Receiver-compatible."
+            "Prophecy: Enemy Pokemon casting non-basic skills within very long range are briefly revealed to Xatu's team and lose {MAGIC}10% magic resistance{END} for {CONTROL}3s{END}."
         ),
         "pokemon_moba_quaquaval" => format!(
-            "Aqua Step: While moving, Quaquaval leaves up to {BUFF}8 watery trail segments{END}. Allied Pokemon standing in the trail gain {SPEED_ICON}{BUFF}+14% move speed{END}, Water moves cast from the trail deal {BUFF}+12% damage{END}, and enemies standing in the trail are slowed by {CONTROL}10%{END}. Trails created during Exciting Dance are empowered. This passive is Receiver-compatible."
+            "Aqua Step: While moving, Quaquaval leaves up to {BUFF}8 watery trail segments{END}. Allied Pokemon standing in the trail gain {SPEED_ICON}{BUFF}+14% move speed{END}, Water moves cast from the trail deal {BUFF}+12% damage{END}, and enemies standing in the trail are slowed by {CONTROL}10%{END}. Trails created during Exciting Dance are empowered."
         ),
         "pokemon_moba_arcanine" => format!(
-            "Blazing Mane: Enemy champions that damage Arcanine lose {AD_ICON}{CONTROL}7% attack{END} and {AP_ICON}{CONTROL}7% AP{END} for {CONTROL}3s{END}, stacking up to {CONTROL}3 times{END} per enemy. Melee attackers have a {CONTROL}20% chance{END} to be Burned for {CONTROL}5s{END}. Arcanine heals for {HEAL}2% of ability damage dealt{END}. This passive is Receiver-compatible."
+            "Blazing Mane: Enemy champions that damage Arcanine lose {AD_ICON}{CONTROL}7% attack{END} and {AP_ICON}{CONTROL}7% AP{END} for {CONTROL}3s{END}, stacking up to {CONTROL}3 times{END} per enemy. Melee attackers have a {CONTROL}20% chance{END} to be Burned for {CONTROL}5s{END}. Arcanine heals for {HEAL}2% of ability damage dealt{END}."
         ),
         "pokemon_moba_missingno" => format!(
             "Old man glitch: When MissingNo. damages an enemy with -- or 'M (00), it has a {CONTROL}25% chance{END} to gain {SPEED_ICON}{BUFF}+20% move speed{END} and {BUFF}+18% cooldown recovery{END} for {CONTROL}2s{END}. Enemies that damage MissingNo. with non-basic abilities have a {CONTROL}25% chance{END} to suffer the opposite debuffs for {CONTROL}2s{END}."
         ),
         "pokemon_moba_yanmega" => format!(
-            "Ogre Darner's Bug Blood: Yanmega is immune to Bleed. Pokemon-layer lifesteal and drain effects against Yanmega do not heal the attacker; instead, the attacker is Poisoned for {CONTROL}5s{END}."
+            "Ogre Darner's Bug Blood: Yanmega is immune to Bleed. Pokemon lifesteal and drain effects against Yanmega do not heal the attacker; instead, the attacker is Poisoned for {CONTROL}5s{END}."
         ),
         "pokemon_moba_comfey" => format!(
             "Flower Veil: After 1.5s, Comfey attaches to a nearby allied Pokemon, becoming untargetable and movement-rooted while granting that ally {BUFF}99% of Comfey's base stats{END}. If the ally dies, Comfey detaches for {CONTROL}5s{END}. Allied Grass Pokemon near Comfey are immune to non-self-inflicted harmful Pokemon statuses."
         ),
         "pokemon_moba_smeargle" => format!(
-            "Sketch: Smeargle remembers the last valid move that affected it for {CONTROL}20s{END}. Casting Sketch learns that move into the next empty slot, and Sketch moves onward. Duplicate moves are ignored; AI deprioritizes extra basic attacks after learning one."
+            "Sketch: Smeargle remembers the last valid move that affected it for {CONTROL}20s{END}. Casting Sketch permanently learns that move in the next empty Sketch slot. Smeargle cannot learn Sketch itself or learn the same move twice."
         ),
         "pokemon_moba_torterra" => format!(
-            "Shell Armor: Torterra cannot be critically hit by Pokemon-layer critical effects. Critical hits against Torterra become normal hits."
+            "Shell Armor: Torterra cannot be critically hit by Pokemon critical effects. Critical hits against Torterra become normal hits."
         ),
         "pokemon_moba_venusaur" => format!(
-            "Tangling Vines: While a crowd-controlled enemy is near Venusaur, allied Pokemon within {BUFF}70 range{END} gain {AD_ICON}{BUFF}+15% attack damage{END} and {ATTACK_SPEED_ICON}{BUFF}+25% attack speed{END}."
+            "Tangling Vines: While a crowd-controlled enemy is near Venusaur, nearby allied Pokemon gain {AD_ICON}{BUFF}+15% attack damage{END} and {ATTACK_SPEED_ICON}{BUFF}+25% attack speed{END}."
         ),
         "pokemon_moba_eevee" => format!(
-            "Helping Hand: Allied Pokemon within {BUFF}65 range{END} gain {BUFF}+10% attack, AP, defence, magic resistance, HP, skill cooldown reduction, and ultimate cooldown reduction{END}."
+            "Helping Hand: Nearby allied Pokemon gain {BUFF}+10% attack, AP, defence, magic resistance, HP, skill cooldown reduction, and ultimate cooldown reduction{END}."
         ),
         "pokemon_moba_jolteon"
         | "pokemon_moba_flareon"
@@ -12971,8 +12982,18 @@ impl ModEffectType for PokemonEffect {
                             tick: sleep_ticks as u64,
                         },
                     );
-                    crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockSkill { tick: sleep_ticks });
-                    crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockAttack { tick: sleep_ticks });
+                    crate::pokemon_status::apply_pokemon_cc(
+                        ctx,
+                        caster_id,
+                        caster_id,
+                        CCState::BlockSkill { tick: sleep_ticks },
+                    );
+                    crate::pokemon_status::apply_pokemon_cc(
+                        ctx,
+                        caster_id,
+                        caster_id,
+                        CCState::BlockAttack { tick: sleep_ticks },
+                    );
                     crate::pokemon_status::begin_charm_heal(
                         ctx,
                         caster_id,
@@ -13795,8 +13816,8 @@ impl ModEffectType for PokemonEffect {
                         );
                         return;
                     };
-                    let damage = base_ad
-                        .saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
+                    let damage =
+                        base_ad.saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
                     crate::pokemon_status::apply_quaquaval_spiral_shot(
                         ctx,
                         caster_id,
@@ -13879,8 +13900,8 @@ impl ModEffectType for PokemonEffect {
                     else {
                         return;
                     };
-                    let damage = base_ad
-                        .saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
+                    let damage =
+                        base_ad.saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
                     crate::pokemon_status::apply_arcanine_extremespeed(
                         ctx,
                         caster_id,
@@ -13918,8 +13939,9 @@ impl ModEffectType for PokemonEffect {
                     };
                     let damage = base_ap
                         .saturating_add(caster_stat.magic_power.saturating_mul(ap_ratio) / 100);
-                    let burn_damage = burn_base_ap
-                        .saturating_add(caster_stat.magic_power.saturating_mul(burn_ap_ratio) / 100);
+                    let burn_damage = burn_base_ap.saturating_add(
+                        caster_stat.magic_power.saturating_mul(burn_ap_ratio) / 100,
+                    );
                     crate::pokemon_status::apply_arcanine_white_flames(
                         ctx,
                         caster_id,
@@ -14100,8 +14122,9 @@ impl ModEffectType for PokemonEffect {
                     };
                     let damage = base_ap
                         .saturating_add(caster_stat.magic_power.saturating_mul(ap_ratio) / 100);
-                    let infestation_damage = infestation_base_ap
-                        .saturating_add(caster_stat.magic_power.saturating_mul(infestation_ap_ratio) / 100);
+                    let infestation_damage = infestation_base_ap.saturating_add(
+                        caster_stat.magic_power.saturating_mul(infestation_ap_ratio) / 100,
+                    );
                     let targets = collect_enemy_targets(ctx, caster_team, |pos| {
                         distance_to_segment_sq(pos, caster_pos, target_pos)
                             <= width.saturating_mul(width)
@@ -14142,7 +14165,13 @@ impl ModEffectType for PokemonEffect {
                             ..Default::default()
                         },
                     );
-                    draw_line_band(ctx, caster_pos, target_pos, width, type_debug_color(active_move_type));
+                    draw_line_band(
+                        ctx,
+                        caster_pos,
+                        target_pos,
+                        width,
+                        type_debug_color(active_move_type),
+                    );
                     return;
                 }
                 if let PokemonMoveEffect::YanmegaTintedLens { ticks, .. } = self.action.effect {
@@ -14162,8 +14191,9 @@ impl ModEffectType for PokemonEffect {
                     let InputTarget::Target { target_id } = input else {
                         return;
                     };
-                    let damage = tick_base_ap
-                        .saturating_add(caster_stat.magic_power.saturating_mul(tick_ap_ratio) / 100);
+                    let damage = tick_base_ap.saturating_add(
+                        caster_stat.magic_power.saturating_mul(tick_ap_ratio) / 100,
+                    );
                     crate::pokemon_status::begin_yanmega_giga_drain(
                         ctx,
                         caster_id,
@@ -14191,15 +14221,17 @@ impl ModEffectType for PokemonEffect {
                 {
                     let damage = base_ap
                         .saturating_add(caster_stat.magic_power.saturating_mul(ap_ratio) / 100);
-                    let heal = heal_base
-                        .saturating_add(caster_stat.magic_power.saturating_mul(heal_ap_ratio) / 100);
+                    let heal = heal_base.saturating_add(
+                        caster_stat.magic_power.saturating_mul(heal_ap_ratio) / 100,
+                    );
                     let schooling = crate::pokemon_status::wishiwashi_is_schooling(ctx, caster_id);
                     let range = travel_range.saturating_add(if schooling {
                         schooling_travel_bonus
                     } else {
                         0
                     });
-                    let end_pos = traveling_wave_end(ctx, input, caster_pos, range).unwrap_or(caster_pos);
+                    let end_pos =
+                        traveling_wave_end(ctx, input, caster_pos, range).unwrap_or(caster_pos);
                     crate::pokemon_status::apply_wishiwashi_wave_splash(
                         ctx,
                         caster_id,
@@ -14256,8 +14288,8 @@ impl ModEffectType for PokemonEffect {
                     let InputTarget::Target { target_id } = input else {
                         return;
                     };
-                    let damage = base_ad
-                        .saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
+                    let damage =
+                        base_ad.saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
                     let chew_damage = chew_base_ad
                         .saturating_add(caster_stat.attack.saturating_mul(chew_ad_ratio) / 100);
                     crate::pokemon_status::begin_wishiwashi_massive_catch(
@@ -15289,18 +15321,17 @@ impl ModEffectType for PokemonEffect {
                                         adjusted_ad,
                                         adjusted_ap,
                                     );
-                                primary_applied_damage =
-                                    deal_move_tracked_damage(
-                                        ctx,
-                                        self.champion,
-                                        self.action,
-                                        caster_id,
-                                        target_id,
-                                        adjusted_ad,
-                                        adjusted_ap,
-                                        self.action.attack_type,
-                                    )
-                                    .applied_damage;
+                                primary_applied_damage = deal_move_tracked_damage(
+                                    ctx,
+                                    self.champion,
+                                    self.action,
+                                    caster_id,
+                                    target_id,
+                                    adjusted_ad,
+                                    adjusted_ap,
+                                    self.action.attack_type,
+                                )
+                                .applied_damage;
                             } else if matches!(
                                 self.action.effect,
                                 PokemonMoveEffect::DirectDamageIgnoreType { .. }
@@ -15311,18 +15342,17 @@ impl ModEffectType for PokemonEffect {
                                         ctx, caster_id, target_id,
                                     );
                                 }
-                                primary_applied_damage =
-                                    deal_move_tracked_damage(
-                                        ctx,
-                                        self.champion,
-                                        self.action,
-                                        caster_id,
-                                        target_id,
-                                        hit_ad_damage,
-                                        hit_ap_damage,
-                                        self.action.attack_type,
-                                    )
-                                    .applied_damage;
+                                primary_applied_damage = deal_move_tracked_damage(
+                                    ctx,
+                                    self.champion,
+                                    self.action,
+                                    caster_id,
+                                    target_id,
+                                    hit_ad_damage,
+                                    hit_ap_damage,
+                                    self.action.attack_type,
+                                )
+                                .applied_damage;
                             } else {
                                 if is_physical_basic_action(self.action) && hit_ad_damage > 0 {
                                     crate::pokemon_status::note_physical_basic_hit(
@@ -15545,10 +15575,7 @@ impl ModEffectType for PokemonEffect {
                             };
                             if drain_heal > 0 {
                                 crate::pokemon_status::heal_from_damage_or_poison_yanmega(
-                                    ctx,
-                                    caster_id,
-                                    target_id,
-                                    drain_heal,
+                                    ctx, caster_id, target_id, drain_heal,
                                 );
                             }
                             if crate::pokemon_status::has_dragon_launcher(caster_id)
@@ -16435,7 +16462,12 @@ impl ModEffectType for PokemonEffect {
                                 bind_ticks as usize,
                             ) as u64;
                             apply_limber_aware_bind(ctx, caster_id, target_id, adjusted);
-                            crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: bind_ticks });
+                            crate::pokemon_status::apply_pokemon_cc(
+                                ctx,
+                                caster_id,
+                                caster_id,
+                                CCState::Bind { tick: bind_ticks },
+                            );
                             crate::pokemon_status::add_beneficial_buff(
                                 ctx,
                                 caster_id,
@@ -16487,7 +16519,12 @@ impl ModEffectType for PokemonEffect {
                             ..
                         } => {
                             apply_limber_aware_bind(ctx, caster_id, target_id, bind_ticks);
-                            crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: bind_ticks });
+                            crate::pokemon_status::apply_pokemon_cc(
+                                ctx,
+                                caster_id,
+                                caster_id,
+                                CCState::Bind { tick: bind_ticks },
+                            );
                             if kleavor_recoil_crit {
                                 let recoil = caster_hp
                                     .max
@@ -16549,11 +16586,21 @@ impl ModEffectType for PokemonEffect {
                         }
                         PokemonMoveEffect::DirectBindBoth { bind_ticks } => {
                             apply_limber_aware_bind(ctx, caster_id, target_id, bind_ticks);
-                            crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: bind_ticks });
+                            crate::pokemon_status::apply_pokemon_cc(
+                                ctx,
+                                caster_id,
+                                caster_id,
+                                CCState::Bind { tick: bind_ticks },
+                            );
                         }
                         PokemonMoveEffect::LineFirstBindBoth { bind_ticks, .. } => {
                             apply_limber_aware_bind(ctx, caster_id, target_id, bind_ticks);
-                            crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: bind_ticks });
+                            crate::pokemon_status::apply_pokemon_cc(
+                                ctx,
+                                caster_id,
+                                caster_id,
+                                CCState::Bind { tick: bind_ticks },
+                            );
                         }
                         PokemonMoveEffect::LineFirstLeechSeed {
                             duration_ticks,
@@ -17016,7 +17063,12 @@ impl ModEffectType for PokemonEffect {
                                         tick: grab_ticks as u64,
                                     },
                                 );
-                                crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockSkill { tick: grab_ticks });
+                                crate::pokemon_status::apply_pokemon_cc(
+                                    ctx,
+                                    caster_id,
+                                    caster_id,
+                                    CCState::BlockSkill { tick: grab_ticks },
+                                );
                                 apply_force_move_away(
                                     ctx,
                                     caster_id,
@@ -17075,7 +17127,12 @@ impl ModEffectType for PokemonEffect {
                                         tick: grab_ticks as u64,
                                     },
                                 );
-                                crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockSkill { tick: grab_ticks });
+                                crate::pokemon_status::apply_pokemon_cc(
+                                    ctx,
+                                    caster_id,
+                                    caster_id,
+                                    CCState::BlockSkill { tick: grab_ticks },
+                                );
                                 apply_force_move_away(
                                     ctx,
                                     caster_id,
@@ -17548,7 +17605,12 @@ impl ModEffectType for PokemonEffect {
                 if self.champion.id == "pokemon_moba_gyarados"
                     && matches!(self.action.slot, ActionSlot::Ult)
                 {
-                    crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: 2 * 60 });
+                    crate::pokemon_status::apply_pokemon_cc(
+                        ctx,
+                        caster_id,
+                        caster_id,
+                        CCState::Bind { tick: 2 * 60 },
+                    );
                 }
             },
         );
@@ -18339,12 +18401,12 @@ fn deals_direct_damage(effect: PokemonMoveEffect) -> bool {
             | PokemonMoveEffect::BouffalantHeadCharge { .. }
             | PokemonMoveEffect::StarmieFlipTurn { .. }
             | PokemonMoveEffect::StarmieHeartSwap { .. }
-        | PokemonMoveEffect::StarmiePsybeam { .. }
-        | PokemonMoveEffect::WishiwashiWaveSplash { .. }
-        | PokemonMoveEffect::WishiwashiMassiveCatch { .. }
-        | PokemonMoveEffect::ShellTrap { .. }
-        | PokemonMoveEffect::SunnyDay { .. }
-        | PokemonMoveEffect::RainDance { .. }
+            | PokemonMoveEffect::StarmiePsybeam { .. }
+            | PokemonMoveEffect::WishiwashiWaveSplash { .. }
+            | PokemonMoveEffect::WishiwashiMassiveCatch { .. }
+            | PokemonMoveEffect::ShellTrap { .. }
+            | PokemonMoveEffect::SunnyDay { .. }
+            | PokemonMoveEffect::RainDance { .. }
             | PokemonMoveEffect::DragonCheerAura { .. }
             | PokemonMoveEffect::LifeDewPickups { .. }
             | PokemonMoveEffect::TrailblazeGrassyTerrain { .. }
@@ -21690,12 +21752,7 @@ fn apply_dragapult_dragon_launcher(
     );
     let heal = result.applied_damage.saturating_mul(35) / 100;
     if heal > 0 {
-        crate::pokemon_status::heal_from_damage_or_poison_yanmega(
-            ctx,
-            caster_id,
-            target_id,
-            heal,
-        );
+        crate::pokemon_status::heal_from_damage_or_poison_yanmega(ctx, caster_id, target_id, heal);
     }
     draw_line_band(
         ctx,
@@ -22781,6 +22838,176 @@ fn nearest_enemy_target_for_player(
     best.map(|(_, target_id)| InputTarget::Target { target_id })
 }
 
+fn nearest_enemy_champion_target_for_player(
+    player_id: usize,
+    tick: usize,
+    search_radius: u64,
+) -> Option<InputTarget> {
+    let snapshot = {
+        let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+        snapshots
+            .lock()
+            .expect("ai entity snapshot state poisoned")
+            .iter()
+            .copied()
+            .find(|state| state.player_id == player_id)
+    }?;
+    if tick.saturating_sub(snapshot.tick) > 30 {
+        return None;
+    }
+
+    let search_radius_sq = search_radius.saturating_mul(search_radius);
+    let mut best: Option<(u64, usize)> = None;
+    let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+    for enemy in snapshots
+        .lock()
+        .expect("ai entity snapshot state poisoned")
+        .iter()
+        .copied()
+    {
+        if enemy.team == snapshot.team
+            || enemy.hp_current == 0
+            || tick.saturating_sub(enemy.tick) > 30
+            || crate::pokemon_status::is_weavile_hidden_from_pokemon_ai_at(enemy.entity_id, tick)
+        {
+            continue;
+        }
+        let dist = distance_sq(snapshot.pos, enemy.pos);
+        if dist > search_radius_sq {
+            continue;
+        }
+        if best.map(|(best_dist, _)| dist < best_dist).unwrap_or(true) {
+            best = Some((dist, enemy.entity_id));
+        }
+    }
+
+    best.map(|(_, target_id)| InputTarget::Target { target_id })
+}
+
+fn nearest_ally_champion_target_for_player(
+    player_id: usize,
+    tick: usize,
+    search_radius: u64,
+) -> Option<InputTarget> {
+    let snapshot = {
+        let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+        snapshots
+            .lock()
+            .expect("ai entity snapshot state poisoned")
+            .iter()
+            .copied()
+            .find(|state| state.player_id == player_id)
+    }?;
+    if tick.saturating_sub(snapshot.tick) > 30 {
+        return None;
+    }
+
+    let search_radius_sq = search_radius.saturating_mul(search_radius);
+    let mut best: Option<(u64, usize)> = None;
+    let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+    for ally in snapshots
+        .lock()
+        .expect("ai entity snapshot state poisoned")
+        .iter()
+        .copied()
+    {
+        if ally.entity_id == snapshot.entity_id
+            || ally.team != snapshot.team
+            || ally.hp_current == 0
+            || tick.saturating_sub(ally.tick) > 30
+        {
+            continue;
+        }
+        let dist = distance_sq(snapshot.pos, ally.pos);
+        if dist > search_radius_sq {
+            continue;
+        }
+        if best.map(|(best_dist, _)| dist < best_dist).unwrap_or(true) {
+            best = Some((dist, ally.entity_id));
+        }
+    }
+
+    best.map(|(_, target_id)| InputTarget::Target { target_id })
+}
+
+fn nearest_enemy_move_for_player(
+    player_id: usize,
+    tick: usize,
+    search_radius: u64,
+) -> Option<Input> {
+    let snapshot = {
+        let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+        snapshots
+            .lock()
+            .expect("ai entity snapshot state poisoned")
+            .iter()
+            .copied()
+            .find(|state| state.player_id == player_id)
+    }?;
+    if tick.saturating_sub(snapshot.tick) > 30 {
+        return None;
+    }
+
+    let search_radius_sq = search_radius.saturating_mul(search_radius);
+    let mut best: Option<(u64, EntityPos)> = None;
+    {
+        let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+        for enemy in snapshots
+            .lock()
+            .expect("ai entity snapshot state poisoned")
+            .iter()
+            .copied()
+        {
+            if enemy.team == snapshot.team
+                || enemy.hp_current == 0
+                || tick.saturating_sub(enemy.tick) > 30
+                || crate::pokemon_status::is_weavile_hidden_from_pokemon_ai_at(
+                    enemy.entity_id,
+                    tick,
+                )
+            {
+                continue;
+            }
+            let dist = distance_sq(snapshot.pos, enemy.pos);
+            if dist > search_radius_sq {
+                continue;
+            }
+            if best.map(|(best_dist, _)| dist < best_dist).unwrap_or(true) {
+                best = Some((dist, enemy.pos));
+            }
+        }
+    }
+    {
+        let snapshots = AI_ATTACK_TARGET_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+        for enemy in snapshots
+            .lock()
+            .expect("ai attack target snapshot state poisoned")
+            .iter()
+            .copied()
+        {
+            if enemy.team == snapshot.team
+                || enemy.hp_current == 0
+                || tick.saturating_sub(enemy.tick) > 30
+                || crate::pokemon_status::is_weavile_hidden_from_pokemon_ai_at(
+                    enemy.entity_id,
+                    tick,
+                )
+            {
+                continue;
+            }
+            let dist = distance_sq(snapshot.pos, enemy.pos);
+            if dist > search_radius_sq {
+                continue;
+            }
+            if best.map(|(best_dist, _)| dist < best_dist).unwrap_or(true) {
+                best = Some((dist, enemy.pos));
+            }
+        }
+    }
+
+    best.map(|(_, pos)| Input::Move { x: pos.x, y: pos.y })
+}
+
 fn delibird_basic_input_for_player(player_id: usize, tick: usize) -> Option<Input> {
     const DELIBIRD_ATTACK_OVERRIDE_RADIUS: u64 = 180_000;
 
@@ -23712,10 +23939,8 @@ impl ModPassive for PokemonPassive {
                     if crate::pokemon_status::receiver_has_copied(_entity, "pokemon_moba_dedenne") {
                         update_dedenne_static(ctx, _entity);
                     }
-                    if crate::pokemon_status::receiver_has_copied(
-                        _entity,
-                        "pokemon_moba_quaquaval",
-                    ) {
+                    if crate::pokemon_status::receiver_has_copied(_entity, "pokemon_moba_quaquaval")
+                    {
                         crate::pokemon_status::update_quaquaval_aqua_step(ctx, _entity);
                     }
                 }
@@ -24299,33 +24524,91 @@ impl PokemonMobaInputAi {
         }
     }
 
+    fn smeargle_copied_action_score(
+        slot: ActionSlot,
+        copied: crate::pokemon_status::SmeargleCopiedMove,
+    ) -> usize {
+        let action_score = match copied.action.slot {
+            ActionSlot::Ult => 400,
+            ActionSlot::Skill2 => 300,
+            ActionSlot::Skill => 240,
+            ActionSlot::Attack => 120,
+        };
+        let storage_score = match slot {
+            ActionSlot::Ult => 4,
+            ActionSlot::Skill2 => 3,
+            ActionSlot::Skill => 2,
+            ActionSlot::Attack => 1,
+        };
+        action_score + storage_score
+    }
+
+    fn smeargle_target_for_copied_action(
+        player_id: usize,
+        tick: usize,
+        copied: crate::pokemon_status::SmeargleCopiedMove,
+        preferred_target: Option<InputTarget>,
+    ) -> Option<InputTarget> {
+        match copied.action.target {
+            CastingTarget::None | CastingTarget::AllyOnlySelf => Some(InputTarget::None),
+            CastingTarget::Ally
+            | CastingTarget::AllyChampion
+            | CastingTarget::AllyChampionInCC
+            | CastingTarget::AllyNotSelf => {
+                nearest_ally_champion_target_for_player(player_id, tick, 220_000)
+            }
+            CastingTarget::EnemyChampion | CastingTarget::EnemyChampionInCC => {
+                nearest_enemy_champion_target_for_player(player_id, tick, 220_000)
+            }
+            _ => preferred_target
+                .or_else(|| nearest_enemy_target_for_player(player_id, tick, 220_000)),
+        }
+    }
+
     fn smeargle_ready_copied_input(
         ctx: &PlayerAiContext<'_, '_, '_>,
         player_id: usize,
         tick: usize,
-        target: InputTarget,
+        preferred_target: Option<InputTarget>,
     ) -> Option<Input> {
-        [
+        let mut best: Option<(usize, Input)> = None;
+        for slot in [
             ActionSlot::Attack,
             ActionSlot::Skill,
             ActionSlot::Skill2,
             ActionSlot::Ult,
-        ]
-        .into_iter()
-        .find_map(|slot| {
+        ] {
             if crate::pokemon_status::smeargle_slot_is_active_sketch_for_player(
                 player_id, tick, slot,
-            ) || !crate::pokemon_status::smeargle_slot_has_copied_action_for_player(
-                player_id, slot,
             ) || !crate::pokemon_status::smeargle_copied_slot_ready_for_player(
                 player_id, tick, slot,
             ) {
-                return None;
+                continue;
             }
-
+            let Some(copied) =
+                crate::pokemon_status::smeargle_learned_action_for_player(player_id, slot)
+            else {
+                continue;
+            };
+            let Some(target) =
+                Self::smeargle_target_for_copied_action(player_id, tick, copied, preferred_target)
+            else {
+                continue;
+            };
             let input = Self::input_for_slot(slot, target);
-            ctx.is_valid_input(&input).then_some(input)
-        })
+            if !ctx.is_valid_input(&input) {
+                continue;
+            }
+            let score = Self::smeargle_copied_action_score(slot, copied);
+            if best
+                .as_ref()
+                .map(|(best_score, _)| score > *best_score)
+                .unwrap_or(true)
+            {
+                best = Some((score, input));
+            }
+        }
+        best.map(|(_, input)| input)
     }
 }
 
@@ -24470,6 +24753,8 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
 
                 if Self::champion_is(ctx, "Smeargle") {
                     let base_target = base_input.as_ref().and_then(Self::target_for_input);
+                    let preferred_target = base_target
+                        .or_else(|| nearest_enemy_target_for_player(player_id, tick, 220_000));
                     let mut learned_count =
                         crate::pokemon_status::smeargle_learned_count_for_player(player_id);
                     if learned_count == 0
@@ -24483,16 +24768,39 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                         learned_count = 1;
                     }
 
-                    if let Some(target) = base_target {
-                        if let Some(slot) =
-                            crate::pokemon_status::smeargle_active_sketch_slot_with_valid_candidate_for_player(
-                                player_id, tick,
-                            )
+                    if let Some(slot) =
+                        crate::pokemon_status::smeargle_active_sketch_slot_with_valid_candidate_for_player(
+                            player_id, tick,
+                        )
+                    {
+                        let close_target = preferred_target
+                            .filter(|target| {
+                                ctx.is_valid_input(&Self::input_for_slot(slot, *target))
+                            })
+                            .or_else(|| {
+                                nearest_enemy_target_for_player(player_id, tick, 42_000).filter(
+                                    |target| {
+                                        ctx.is_valid_input(&Self::input_for_slot(slot, *target))
+                                    },
+                                )
+                            });
+                        if let Some(target) = close_target {
+                            return PlayerInputDecision::Replace(Self::input_for_slot(slot, target));
+                        }
+                        if let Some(input) = nearest_enemy_move_for_player(player_id, tick, 260_000)
                         {
-                            return Self::replace_if_valid(
-                                ctx,
-                                Some(Self::input_for_slot(slot, target)),
-                            );
+                            return Self::replace_if_valid(ctx, Some(input));
+                        }
+                    }
+
+                    if learned_count > 0 {
+                        if let Some(input) = Self::smeargle_ready_copied_input(
+                            ctx,
+                            player_id,
+                            tick,
+                            preferred_target,
+                        ) {
+                            return Self::replace_if_valid(ctx, Some(input));
                         }
                     }
 
@@ -24505,45 +24813,37 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                                     player_id, tick, slot,
                                 ) {
                                     if learned_count == 0 {
-                                        return PlayerInputDecision::Pass;
-                                    }
-                                    if let Some(target) = base_target.or_else(|| {
-                                        nearest_enemy_target_for_player(player_id, tick, 180_000)
-                                    }) {
-                                        if let Some(input) = Self::smeargle_ready_copied_input(
-                                            ctx, player_id, tick, target,
-                                        ) {
+                                        if let Some(input) =
+                                            nearest_enemy_move_for_player(player_id, tick, 260_000)
+                                        {
                                             return Self::replace_if_valid(ctx, Some(input));
                                         }
+                                        return Self::release_channel_input(ctx);
+                                    }
+                                    if let Some(input) =
+                                        nearest_enemy_move_for_player(player_id, tick, 220_000)
+                                    {
+                                        return Self::replace_if_valid(ctx, Some(input));
                                     }
                                     return Self::release_channel_input(ctx);
                                 }
                             } else if !crate::pokemon_status::smeargle_copied_slot_ready_for_player(
                                 player_id, tick, slot,
                             ) {
-                                if let Some(target) = base_target.or_else(|| {
-                                    nearest_enemy_target_for_player(player_id, tick, 180_000)
-                                }) {
-                                    if let Some(input) = Self::smeargle_ready_copied_input(
-                                        ctx, player_id, tick, target,
-                                    ) {
-                                        return Self::replace_if_valid(ctx, Some(input));
-                                    }
+                                if let Some(input) =
+                                    nearest_enemy_move_for_player(player_id, tick, 220_000)
+                                {
+                                    return Self::replace_if_valid(ctx, Some(input));
                                 }
                                 return Self::release_channel_input(ctx);
                             }
                         }
                     }
 
-                    if learned_count > 0 && !matches!(base_input, Some(Input::Attack { .. })) {
-                        if let Some(target) = base_target
-                            .or_else(|| nearest_enemy_target_for_player(player_id, tick, 180_000))
+                    if learned_count == 0 {
+                        if let Some(input) = nearest_enemy_move_for_player(player_id, tick, 260_000)
                         {
-                            if let Some(input) =
-                                Self::smeargle_ready_copied_input(ctx, player_id, tick, target)
-                            {
-                                return Self::replace_if_valid(ctx, Some(input));
-                            }
+                            return Self::replace_if_valid(ctx, Some(input));
                         }
                     }
                 }
@@ -24851,7 +25151,12 @@ fn apply_limber_aware_fear_away(
         dx = 1;
     }
     crate::pokemon_status::break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
-    crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, target_id, CCState::Fear { tick, dx, dy });
+    crate::pokemon_status::apply_pokemon_cc(
+        ctx,
+        caster_id,
+        target_id,
+        CCState::Fear { tick, dx, dy },
+    );
     crate::pokemon_status::note_steadfast_cc(ctx, target_id);
 }
 
@@ -25048,8 +25353,18 @@ fn apply_ribombee_rescue(
             tick: block_ticks as u64,
         },
     );
-    crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockSkill { tick: block_ticks });
-    crate::pokemon_status::apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockAttack { tick: block_ticks });
+    crate::pokemon_status::apply_pokemon_cc(
+        ctx,
+        caster_id,
+        target_id,
+        CCState::BlockSkill { tick: block_ticks },
+    );
+    crate::pokemon_status::apply_pokemon_cc(
+        ctx,
+        caster_id,
+        target_id,
+        CCState::BlockAttack { tick: block_ticks },
+    );
     draw_line_band(
         ctx,
         caster_pos,
@@ -26022,7 +26337,10 @@ fn apply_yanmega_tinted_lens_modifier(
         if damage == 0 {
             0
         } else {
-            damage.saturating_mul(numerator).saturating_add(denominator / 2) / denominator
+            damage
+                .saturating_mul(numerator)
+                .saturating_add(denominator / 2)
+                / denominator
         }
     };
     (boost(ad_damage), boost(ap_damage))
@@ -26473,13 +26791,33 @@ fn is_target_at_or_below_hp_percent(
 }
 
 fn apply_disarm(ctx: &mut GameCtx, source_id: usize, target_id: usize, ticks: usize) {
-    crate::pokemon_status::apply_pokemon_cc(ctx, source_id, target_id, CCState::BlockAttack { tick: ticks });
-    crate::pokemon_status::apply_pokemon_cc(ctx, source_id, target_id, CCState::BlockSkill { tick: ticks });
+    crate::pokemon_status::apply_pokemon_cc(
+        ctx,
+        source_id,
+        target_id,
+        CCState::BlockAttack { tick: ticks },
+    );
+    crate::pokemon_status::apply_pokemon_cc(
+        ctx,
+        source_id,
+        target_id,
+        CCState::BlockSkill { tick: ticks },
+    );
 }
 
 fn apply_blind(ctx: &mut GameCtx, source_id: usize, target_id: usize, ticks: usize) {
-    crate::pokemon_status::apply_pokemon_cc(ctx, source_id, target_id, CCState::BlockAttack { tick: ticks });
-    crate::pokemon_status::apply_pokemon_cc(ctx, source_id, target_id, CCState::BlockSkill { tick: ticks });
+    crate::pokemon_status::apply_pokemon_cc(
+        ctx,
+        source_id,
+        target_id,
+        CCState::BlockAttack { tick: ticks },
+    );
+    crate::pokemon_status::apply_pokemon_cc(
+        ctx,
+        source_id,
+        target_id,
+        CCState::BlockSkill { tick: ticks },
+    );
 }
 
 fn apply_forced_self_crit(ctx: &mut GameCtx, target_id: usize, crit_damage_percent: usize) {
@@ -36980,6 +37318,46 @@ mod guide_export_tests {
         let _ = fs::create_dir_all(r"C:\Users\james\Documents\TFT Pokemon Mod\scratch");
         fs::write(GUIDE_EXPORT_PATH, guide_json()).expect("write pokemon guide data");
         eprintln!("wrote {GUIDE_EXPORT_PATH}");
+    }
+
+    #[test]
+    fn guide_moves_have_player_facing_text() {
+        for champion in POKEMON_CHAMPIONS {
+            let moves = moveset_summary_for_champion_id(champion.id)
+                .unwrap_or_else(|| panic!("missing moveset summary for {}", champion.id));
+            assert_eq!(moves.len(), 5, "{} should export five moves", champion.id);
+            for move_info in moves {
+                let name = move_info.name.trim().to_ascii_lowercase();
+                assert!(
+                    !matches!(
+                        name.as_str(),
+                        "attack" | "skill" | "skill2" | "ult" | "passive"
+                    ),
+                    "{} {} uses generic move name {}",
+                    champion.id,
+                    move_info.role,
+                    move_info.name
+                );
+                assert!(
+                    !name.contains("-skill-")
+                        && !move_info
+                            .description
+                            .to_ascii_lowercase()
+                            .contains("-skill-"),
+                    "{} {} contains fallback skill text",
+                    champion.id,
+                    move_info.role
+                );
+                if move_info.role == "Passive" {
+                    let desc = move_info.description.to_ascii_lowercase();
+                    assert!(
+                        !desc.contains("no passive effect") && !desc.contains("passive - passive"),
+                        "{} passive uses fallback text",
+                        champion.id
+                    );
+                }
+            }
+        }
     }
 
     fn guide_json() -> String {
