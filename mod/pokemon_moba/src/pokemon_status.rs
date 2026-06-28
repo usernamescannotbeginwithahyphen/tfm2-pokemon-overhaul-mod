@@ -16728,6 +16728,8 @@ struct CombatPlayerDeathSnapshot {
     champion_id: Option<&'static str>,
 }
 
+const POKEMON_TOWER_DAMAGE_PERCENT: usize = 60;
+
 pub fn deal_tracked_damage(
     ctx: &mut GameCtx,
     attacker_id: usize,
@@ -16736,6 +16738,8 @@ pub fn deal_tracked_damage(
     ap_damage: usize,
     attack_type: AttackType,
 ) -> PokemonDamageResult {
+    let (ad_damage, ap_damage) =
+        apply_pokemon_tower_damage_gate(ctx, target_id, ad_damage, ap_damage);
     let before = combat_stat_damage_snapshot(ctx, target_id);
     let attacker_info = combat_stat_source_entity_info(ctx, attacker_id);
     let target_info = combat_stat_target_entity_info(ctx, target_id);
@@ -16783,6 +16787,37 @@ pub fn deal_tracked_damage(
         after,
         applied_damage,
     }
+}
+
+fn apply_pokemon_tower_damage_gate(
+    ctx: &GameCtx,
+    target_id: usize,
+    ad_damage: usize,
+    ap_damage: usize,
+) -> (usize, usize) {
+    let target_is_tower = ctx
+        .get_entity(target_id)
+        .map(|entity| entity.is_tower())
+        .unwrap_or(false);
+    if !target_is_tower {
+        return (ad_damage, ap_damage);
+    }
+
+    (
+        percent_damage_rounded(ad_damage, POKEMON_TOWER_DAMAGE_PERCENT),
+        percent_damage_rounded(ap_damage, POKEMON_TOWER_DAMAGE_PERCENT),
+    )
+}
+
+fn percent_damage_rounded(damage: usize, percent: usize) -> usize {
+    if damage == 0 {
+        return 0;
+    }
+    damage
+        .saturating_mul(percent)
+        .saturating_add(50)
+        .saturating_div(100)
+        .max(1)
 }
 
 #[allow(dead_code)]

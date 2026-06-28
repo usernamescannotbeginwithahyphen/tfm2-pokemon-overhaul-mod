@@ -34,13 +34,8 @@ struct ClientAppliedStatState {
 pub struct PokemonStatisticsServerExtension;
 
 impl ModServerExtension for PokemonStatisticsServerExtension {
-    fn on_server_start(&self, ctx: &mut ServerModContext<'_>) {
-        patch_tower_health(ctx);
+    fn on_server_start(&self, _ctx: &mut ServerModContext<'_>) {
         write_stat_merge_log("event=stat_merge_server_start");
-    }
-
-    fn before_management_tick(&self, ctx: &mut ServerModContext<'_>) {
-        patch_tower_health(ctx);
     }
 
     fn after_management_tick(&self, ctx: &mut ServerModContext<'_>) {
@@ -52,37 +47,6 @@ impl ModServerExtension for PokemonStatisticsServerExtension {
                 summarize_custom_combat_stats(ctx);
             },
         );
-    }
-}
-
-fn patch_tower_health(ctx: &mut ServerModContext<'_>) {
-    let setting = &mut ctx.database.game_setting;
-    let old = (
-        setting.tower.stat.hp,
-        setting.tower_2v2.stat.hp,
-        setting.tower_3v3.stat.hp,
-        setting.twin_tower.stat.hp,
-        setting.nexus.stat.hp,
-    );
-
-    setting.tower.stat.hp = 7000;
-    setting.tower_2v2.stat.hp = 3500;
-    setting.tower_3v3.stat.hp = 4200;
-    setting.twin_tower.stat.hp = 8600;
-    setting.nexus.stat.hp = 13750;
-
-    let new = (
-        setting.tower.stat.hp,
-        setting.tower_2v2.stat.hp,
-        setting.tower_3v3.stat.hp,
-        setting.twin_tower.stat.hp,
-        setting.nexus.stat.hp,
-    );
-    if old != new {
-        write_stat_merge_log(&format!(
-            "event=tower_health_patch tower={}->{} tower_2v2={}->{} tower_3v3={}->{} twin_tower={}->{} nexus={}->{}",
-            old.0, new.0, old.1, new.1, old.2, new.2, old.3, new.3, old.4, new.4,
-        ));
     }
 }
 
