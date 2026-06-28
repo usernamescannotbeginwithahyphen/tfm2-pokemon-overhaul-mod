@@ -67,6 +67,70 @@ const BRINE_FIELD_INTERVAL_TICKS: usize = 30;
 const STICKY_WEB_INTERVAL_TICKS: usize = 30;
 const WEB_WALKER_SPOT_TICKS: usize = 2 * 60;
 const GRASSY_TERRAIN_INTERVAL_TICKS: usize = 30;
+const SHIFTRY_BUSH_PROBE_RADIUS: u64 = 42000;
+const SHIFTRY_BUSH_REQUIRED_TICKS: usize = 90;
+const SHIFTRY_BUSH_LINGER_TICKS: usize = 2 * 60;
+const SHIFTRY_BUSH_BUFF_REFRESH_TICKS: usize = 10;
+const SHIFTRY_BUSH_BUFF_TICKS: usize = 20;
+const AMPHAROS_LUMINOUS_RADIUS: u64 = 42000;
+const AMPHAROS_LUMINOUS_INTERVAL_TICKS: usize = 5 * 60;
+const AMPHAROS_LUMINOUS_BASE_AP: usize = 50;
+const AMPHAROS_LUMINOUS_AP_RATIO: usize = 10;
+const AMPHAROS_LUMINOUS_SLOW_PERCENT: i32 = 10;
+const AMPHAROS_LUMINOUS_SLOW_TICKS: usize = 60;
+const AMPHAROS_TRUE_SIGHT_REFRESH_TICKS: usize = 8;
+const XATU_STILL_MOVE_THRESHOLD_SQ: u64 = SNORLAX_MOVE_THRESHOLD_SQ;
+const XATU_PROPHECY_RADIUS: u64 = 180000;
+const XATU_PROPHECY_REVEAL_TICKS: usize = 18;
+const XATU_PROPHECY_DEBUFF_TICKS: usize = 3 * 60;
+const XATU_PROPHECY_MAGIC_RESIST_MULT: i32 = -10;
+const QUAQUAVAL_AQUA_STEP_DROP_DISTANCE: u64 = 9500;
+const QUAQUAVAL_AQUA_STEP_DROP_INTERVAL_TICKS: usize = 8;
+const QUAQUAVAL_AQUA_STEP_SEGMENT_TICKS: usize = 8 * 60;
+const QUAQUAVAL_AQUA_STEP_MAX_SEGMENTS: usize = 8;
+const QUAQUAVAL_AQUA_STEP_WIDTH: u64 = 9500;
+const QUAQUAVAL_AQUA_STEP_INTERVAL_TICKS: usize = 15;
+const QUAQUAVAL_AQUA_STEP_ALLY_SPEED_MULT: i32 = 14;
+const QUAQUAVAL_AQUA_STEP_EMPOWERED_ALLY_SPEED_MULT: i32 = 26;
+const QUAQUAVAL_AQUA_STEP_ENEMY_SLOW_MULT: i32 = 10;
+const QUAQUAVAL_AQUA_STEP_EMPOWERED_ENEMY_SLOW_MULT: i32 = 22;
+const QUAQUAVAL_AQUA_STEP_WATER_DAMAGE_BONUS: usize = 12;
+const QUAQUAVAL_AQUA_STEP_EMPOWERED_WATER_DAMAGE_BONUS: usize = 24;
+const QUAQUAVAL_EXCITING_DANCE_TRAIL_GRACE_TICKS: usize = 8;
+const ARCANINE_BLAZING_MANE_ATTACK_AP_REDUCE: i32 = 7;
+const ARCANINE_BLAZING_MANE_TICKS: usize = 3 * 60;
+const ARCANINE_BLAZING_MANE_MAX_STACKS: usize = 3;
+const ARCANINE_BLAZING_MANE_MELEE_BURN_CHANCE: usize = 20;
+const ARCANINE_BLAZING_MANE_BURN_TICKS: usize = 5 * 60;
+const ARCANINE_BLAZING_MANE_BURN_DAMAGE: usize = 12;
+const ARCANINE_BLAZING_MANE_ABILITY_HEAL_PERCENT: usize = 2;
+const ARCANINE_MELEE_CONTACT_RANGE: u64 = 18000;
+const WISHIWASHI_SCHOOLING_RADIUS: u64 = 56000;
+const WISHIWASHI_SCHOOLING_BUFF_TICKS: usize = 35;
+const WISHIWASHI_SCHOOLING_DEFENCE_PER_ALLY: i32 = 12;
+const WISHIWASHI_SCHOOLING_COOLDOWN_PER_ALLY: i32 = 5;
+const WISHIWASHI_SCHOOLING_MAX_ALLIES: usize = 4;
+const WISHIWASHI_ALONE_HP_MULT: i32 = -8;
+const WISHIWASHI_ALONE_MOVE_SPEED_MULT: i32 = 15;
+const MISSINGNO_PASSIVE_BUFF_TICKS: usize = 2 * 60;
+const MISSINGNO_PASSIVE_MOVE_SPEED_MULT: i32 = 20;
+const MISSINGNO_PASSIVE_COOLDOWN_MULT: i32 = 18;
+const MISSINGNO_PASSIVE_CHANCE_PERCENT: usize = 25;
+const SIGILYPH_GLYPH_DURATION_TICKS: usize = 5 * 60;
+const SIGILYPH_GLYPH_PROXIMITY_RADIUS: u64 = 22000;
+const SIGILYPH_GLYPH_EXPLOSION_RADIUS: u64 = 17000;
+const SIGILYPH_GLYPH_DAMAGE_BONUS_PERCENT: usize = 24;
+const SIGILYPH_GLYPH_EXPLOSION_BASE_AP: usize = 24;
+const SIGILYPH_GLYPH_EXPLOSION_AP_RATIO: usize = 30;
+const SIGILYPH_GLYPH_SPLASH_PERCENT: usize = 50;
+pub const WEAVILE_LONE_PREDATOR_RADIUS: u64 = 65000;
+pub const WEAVILE_LONE_PREDATOR_DAMAGE_BONUS_PERCENT: usize = 20;
+const SWANNA_TAILWIND_TRIGGER_DISTANCE: u64 = 55000;
+const SWANNA_TAILWIND_BUFF_TICKS: usize = 4 * 60;
+const SWANNA_TAILWIND_COOLDOWN_TICKS: usize = 5 * 60;
+const SWANNA_TAILWIND_REFRESH_TICKS: usize = 25;
+const SWANNA_TAILWIND_DIRECTION_DOT_MIN: i128 = 0;
+const SWANNA_SKY_CIRCUS_HIT_RADIUS: u64 = 13500;
 const KRICKETUNE_AURA_INTERVAL_TICKS: usize = 30;
 const FROSMOTH_SLEEP_INTERVAL_TICKS: usize = 30;
 const FROSMOTH_SLEEP_MOVE_INTERVAL_TICKS: usize = 12;
@@ -142,6 +206,7 @@ const VFX_STEEL: u32 = 0xffb8c0d0;
 const VFX_BUG: u32 = 0xffa8c94a;
 const VFX_DARK: u32 = 0xff5a4a70;
 const VFX_DRAGON: u32 = 0xff8a5cff;
+const VFX_FLYING: u32 = 0xff9ad7ff;
 
 #[derive(Clone, Copy, Debug)]
 struct ParalysisState {
@@ -238,6 +303,38 @@ struct InfestationState {
     next_tick_at: usize,
     damage_per_tick: usize,
     attacker_types: TypeSet,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct YanmegaTintedLensState {
+    entity_id: usize,
+    expires_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct YanmegaGigaDrainState {
+    caster_id: usize,
+    target_id: usize,
+    started_at: usize,
+    expires_at: usize,
+    next_tick_at: usize,
+    tick_interval: usize,
+    damage_per_tick: usize,
+    poison_health_unit: usize,
+    poison_damage_per_tick: usize,
+    poison_ticks: usize,
+    total_drained: usize,
+    last_caster_hp: usize,
+    attacker_types: TypeSet,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct PokemonCcEvent {
+    source_id: usize,
+    target_id: usize,
+    applied_at: usize,
+    expires_at: usize,
+    disruptive: bool,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -628,10 +725,410 @@ struct GrassyTerrainState {
     center: EntityPos,
     radius: u64,
     created_at: usize,
+    expires_at: usize,
     next_tick_at: usize,
     damage_bonus_percent: usize,
     attack_speed_mult: i32,
     buff_ticks: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct RillaboomDrumAuraState {
+    caster_id: usize,
+    caster_team: usize,
+    expires_at: usize,
+    next_tick_at: usize,
+    radius: u64,
+    heal_per_tick: usize,
+    ally_move_speed_mult: i32,
+    ally_buff_ticks: usize,
+    enemy_slow_percent: i32,
+    enemy_slow_ticks: usize,
+    final_stun_ticks: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct RillaboomGrassySurgeState {
+    caster_id: usize,
+    caster_team: usize,
+    start: EntityPos,
+    end: EntityPos,
+    expires_at: usize,
+    next_tick_at: usize,
+    width: u64,
+    tick_interval: usize,
+    damage_per_tick: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct ShiftryTornadoState {
+    caster_id: usize,
+    caster_team: usize,
+    center: EntityPos,
+    expires_at: usize,
+    next_tick_at: usize,
+    radius: u64,
+    tick_interval: usize,
+    damage_per_tick: usize,
+    damage_growth_percent: usize,
+    ticks_done: usize,
+    lift_ticks: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct ShiftryForestCamouflageState {
+    entity_id: usize,
+    entered_bush_at: usize,
+    in_bush: bool,
+    linger_until: usize,
+    last_buff_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct RillaboomDrumSoloState {
+    entity_id: usize,
+    window_start: usize,
+    casts: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct SigilyphGlyphState {
+    caster_id: usize,
+    caster_team: usize,
+    target_id: usize,
+    target_team: usize,
+    expires_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct SigilyphGravityState {
+    entity_id: usize,
+    original_types: TypeSet,
+    expires_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct WeavileHuntState {
+    entity_id: usize,
+    stealth_expires_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct AmpharosSearchlightTailState {
+    entity_id: usize,
+    expires_at: usize,
+    move_speed_mult: i32,
+    damage_bonus_percent: usize,
+    extend_per_champion_ticks: usize,
+    paralysis_chance_percent: usize,
+    paralysis_ticks: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct AmpharosLuminousPulseState {
+    entity_id: usize,
+    next_pulse_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct AmpharosTrueSightState {
+    source_id: usize,
+    team: usize,
+    radius: u64,
+    expires_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct AmpharosGigavoltState {
+    caster_id: usize,
+    caster_team: usize,
+    center: EntityPos,
+    trigger_at: usize,
+    expires_at: usize,
+    next_tick_at: usize,
+    damage: usize,
+    radius: u64,
+    zone_tick_interval: usize,
+    zone_slow_percent: i32,
+    zone_slow_ticks: usize,
+    attack_speed_mult: i32,
+    attack_speed_buff_ticks: usize,
+    attacker_types: TypeSet,
+    triggered: bool,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct XatuStillnessState {
+    entity_id: usize,
+    last_pos: Option<EntityPos>,
+    still_ticks: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct XatuPainAmplifierState {
+    target_id: usize,
+    expires_at: usize,
+    damage_taken_percent: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct XatuSuperPsyState {
+    caster_id: usize,
+    caster_team: usize,
+    end: EntityPos,
+    expires_at: usize,
+    next_tick_at: usize,
+    tick_interval: usize,
+    width: u64,
+    travel_range: u64,
+    damage: usize,
+    close_bonus_percent: usize,
+    attacker_types: TypeSet,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct QuaquavalAquaStepEmitterState {
+    entity_id: usize,
+    last_pos: Option<EntityPos>,
+    last_drop_pos: Option<EntityPos>,
+    last_drop_tick: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct QuaquavalAquaStepSegmentState {
+    caster_id: usize,
+    caster_team: usize,
+    start: EntityPos,
+    end: EntityPos,
+    width: u64,
+    expires_at: usize,
+    next_tick_at: usize,
+    empowered: bool,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct QuaquavalSpiralShotState {
+    target_id: usize,
+    expires_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct QuaquavalExcitingDanceState {
+    entity_id: usize,
+    expires_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct ArcanineExtremespeedShieldState {
+    entity_id: usize,
+    expires_at: usize,
+    broken_move_speed_mult: i32,
+    broken_move_speed_ticks: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct ArcanineBlazingManeState {
+    arcanine_id: usize,
+    attacker_id: usize,
+    stacks: usize,
+    expires_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct WishiwashiSchoolingState {
+    entity_id: usize,
+    force_school_until: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct WishiwashiMassiveCatchState {
+    caster_id: usize,
+    target_id: usize,
+    caster_team: usize,
+    start_pos: EntityPos,
+    target_pos: EntityPos,
+    spit_pos: EntityPos,
+    trigger_at: usize,
+    catch_at: usize,
+    spit_at: usize,
+    next_chew_at: usize,
+    line_width: u64,
+    damage: usize,
+    chew_damage: usize,
+    outbound_ticks: usize,
+    return_ticks: usize,
+    chew_interval_ticks: usize,
+    throw_ticks: usize,
+    force_move_speed: u64,
+    attacker_types: TypeSet,
+    outbound_started: bool,
+    caught: bool,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct MissingNoGlitchStormState {
+    caster_id: usize,
+    caster_team: usize,
+    radius: u64,
+    chain_radius: u64,
+    damage: usize,
+    chain_jumps: usize,
+    tick_interval_min: usize,
+    tick_interval_max: usize,
+    next_tick_at: usize,
+    expires_at: usize,
+    attacker_types: TypeSet,
+    seed: u64,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct MissingNoTrickRoomState {
+    caster_id: usize,
+    caster_team: usize,
+    start: EntityPos,
+    end: EntityPos,
+    length: u64,
+    width: u64,
+    expires_at: usize,
+    next_tick_at: usize,
+    tick_interval: usize,
+    enemy_speed_slow: i32,
+    enemy_attack_speed_slow: i32,
+    enemy_hp_random_min: i32,
+    enemy_hp_random_max: i32,
+    enemy_cooldown_random_min: i32,
+    enemy_cooldown_random_max: i32,
+    missingno_speed_mult: i32,
+    missingno_attack_speed_mult: i32,
+    missingno_cooldown_mult: i32,
+    ally_speed_mult: i32,
+    ally_attack_speed_mult: i32,
+    buff_ticks: usize,
+    seed: u64,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct MissingNoPendingDebuffState {
+    source_id: usize,
+    target_id: usize,
+    trigger_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct SwannaTailwindState {
+    entity_id: usize,
+    last_pos: EntityPos,
+    segment_dx: i64,
+    segment_dy: i64,
+    segment_distance: u64,
+    buff_until: usize,
+    cooldown_until: usize,
+    last_buff_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct SwannaCycloneState {
+    caster_id: usize,
+    caster_team: usize,
+    expires_at: usize,
+    next_tick_at: usize,
+    radius: u64,
+    tick_interval: usize,
+    damage_per_tick: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+    attacker_types: TypeSet,
+}
+
+#[derive(Clone, Debug)]
+struct SwannaSkyCircusState {
+    caster_id: usize,
+    start_pos: EntityPos,
+    center: EntityPos,
+    radius: u64,
+    waypoints: Vec<EntityPos>,
+    waypoint_index: usize,
+    next_waypoint_at: usize,
+    waypoint_ticks: usize,
+    force_move_speed: u64,
+    next_hit_at: usize,
+    hit_interval_ticks: usize,
+    hits_remaining: usize,
+    hit_damage: usize,
+    landing_damage: usize,
+    target_damage_percent: usize,
+    targets: Vec<usize>,
+    expires_at: usize,
+    attacker_types: TypeSet,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct MarowakBoneWindmillState {
+    caster_id: usize,
+    caster_team: usize,
+    expires_at: usize,
+    next_tick_at: usize,
+    radius: u64,
+    tick_interval: usize,
+    damage: usize,
+    knockback_speed: u64,
+    knockback_ticks: u64,
+    empowered_ticks: usize,
+    attacker_types: TypeSet,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct MarowakWindmillBonemerangState {
+    entity_id: usize,
+    expires_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct GarganaclSaltPatchState {
+    caster_id: usize,
+    caster_team: usize,
+    center: EntityPos,
+    radius: u64,
+    created_at: usize,
+    expires_at: usize,
+    next_tick_at: usize,
+    damage: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+    water_steel_bonus_percent: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct GarganaclBlessedSaltState {
+    caster_id: usize,
+    caster_team: usize,
+    center: EntityPos,
+    outer_radius: u64,
+    expires_at: usize,
+    next_tick_at: usize,
+    tick_interval: usize,
+    damage: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+    anti_heal_percent: i32,
+    anti_heal_ticks: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct GarganaclPermanentSaltState {
+    caster_id: usize,
+    caster_team: usize,
+    center: EntityPos,
+    outer_radius: u64,
+    inner_radius: u64,
+    next_tick_at: usize,
+    tick_interval: usize,
+    damage: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+    water_steel_bonus_percent: usize,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -1312,6 +1809,9 @@ static MIASMAS: OnceLock<Mutex<Vec<MiasmaState>>> = OnceLock::new();
 static BLEEDS: OnceLock<Mutex<Vec<BleedState>>> = OnceLock::new();
 static ARMAROUGE_WEAK_ARMORS: OnceLock<Mutex<Vec<ArmarougeWeakArmorState>>> = OnceLock::new();
 static INFESTATIONS: OnceLock<Mutex<Vec<InfestationState>>> = OnceLock::new();
+static YANMEGA_TINTED_LENSES: OnceLock<Mutex<Vec<YanmegaTintedLensState>>> = OnceLock::new();
+static YANMEGA_GIGA_DRAINS: OnceLock<Mutex<Vec<YanmegaGigaDrainState>>> = OnceLock::new();
+static POKEMON_CC_EVENTS: OnceLock<Mutex<Vec<PokemonCcEvent>>> = OnceLock::new();
 static FROZENS: OnceLock<Mutex<Vec<FrozenState>>> = OnceLock::new();
 static ICE_FIELDS: OnceLock<Mutex<Vec<IceFieldState>>> = OnceLock::new();
 static LEECH_SEEDS: OnceLock<Mutex<Vec<LeechSeedState>>> = OnceLock::new();
@@ -1348,6 +1848,50 @@ static AQUA_RINGS: OnceLock<Mutex<Vec<AquaRingState>>> = OnceLock::new();
 static MISTY_TERRAINS: OnceLock<Mutex<Vec<MistyTerrainState>>> = OnceLock::new();
 static BRINE_FIELDS: OnceLock<Mutex<Vec<BrineFieldState>>> = OnceLock::new();
 static GRASSY_TERRAINS: OnceLock<Mutex<Vec<GrassyTerrainState>>> = OnceLock::new();
+static RILLABOOM_DRUM_AURAS: OnceLock<Mutex<Vec<RillaboomDrumAuraState>>> = OnceLock::new();
+static RILLABOOM_GRASSY_SURGES: OnceLock<Mutex<Vec<RillaboomGrassySurgeState>>> = OnceLock::new();
+static SHIFTRY_TORNADOES: OnceLock<Mutex<Vec<ShiftryTornadoState>>> = OnceLock::new();
+static SHIFTRY_FOREST_CAMOUFLAGES: OnceLock<Mutex<Vec<ShiftryForestCamouflageState>>> =
+    OnceLock::new();
+static RILLABOOM_DRUM_SOLOS: OnceLock<Mutex<Vec<RillaboomDrumSoloState>>> = OnceLock::new();
+static SIGILYPH_GLYPHS: OnceLock<Mutex<Vec<SigilyphGlyphState>>> = OnceLock::new();
+static SIGILYPH_GRAVITIES: OnceLock<Mutex<Vec<SigilyphGravityState>>> = OnceLock::new();
+static WEAVILE_HUNTS: OnceLock<Mutex<Vec<WeavileHuntState>>> = OnceLock::new();
+static AMPHAROS_SEARCHLIGHT_TAILS: OnceLock<Mutex<Vec<AmpharosSearchlightTailState>>> =
+    OnceLock::new();
+static AMPHAROS_LUMINOUS_PULSES: OnceLock<Mutex<Vec<AmpharosLuminousPulseState>>> = OnceLock::new();
+static AMPHAROS_TRUE_SIGHTS: OnceLock<Mutex<Vec<AmpharosTrueSightState>>> = OnceLock::new();
+static AMPHAROS_GIGAVOLTS: OnceLock<Mutex<Vec<AmpharosGigavoltState>>> = OnceLock::new();
+static XATU_STILLNESSES: OnceLock<Mutex<Vec<XatuStillnessState>>> = OnceLock::new();
+static XATU_PAIN_AMPLIFIERS: OnceLock<Mutex<Vec<XatuPainAmplifierState>>> = OnceLock::new();
+static XATU_SUPER_PSYS: OnceLock<Mutex<Vec<XatuSuperPsyState>>> = OnceLock::new();
+static QUAQUAVAL_AQUA_STEP_EMITTERS: OnceLock<Mutex<Vec<QuaquavalAquaStepEmitterState>>> =
+    OnceLock::new();
+static QUAQUAVAL_AQUA_STEP_SEGMENTS: OnceLock<Mutex<Vec<QuaquavalAquaStepSegmentState>>> =
+    OnceLock::new();
+static QUAQUAVAL_SPIRAL_SHOTS: OnceLock<Mutex<Vec<QuaquavalSpiralShotState>>> = OnceLock::new();
+static QUAQUAVAL_EXCITING_DANCES: OnceLock<Mutex<Vec<QuaquavalExcitingDanceState>>> =
+    OnceLock::new();
+static ARCANINE_EXTREMESPEED_SHIELDS: OnceLock<Mutex<Vec<ArcanineExtremespeedShieldState>>> =
+    OnceLock::new();
+static ARCANINE_BLAZING_MANES: OnceLock<Mutex<Vec<ArcanineBlazingManeState>>> = OnceLock::new();
+static WISHIWASHI_SCHOOLINGS: OnceLock<Mutex<Vec<WishiwashiSchoolingState>>> = OnceLock::new();
+static WISHIWASHI_MASSIVE_CATCHES: OnceLock<Mutex<Vec<WishiwashiMassiveCatchState>>> =
+    OnceLock::new();
+static MISSINGNO_GLITCH_STORMS: OnceLock<Mutex<Vec<MissingNoGlitchStormState>>> = OnceLock::new();
+static MISSINGNO_TRICK_ROOMS: OnceLock<Mutex<Vec<MissingNoTrickRoomState>>> = OnceLock::new();
+static MISSINGNO_PENDING_DEBUFFS: OnceLock<Mutex<Vec<MissingNoPendingDebuffState>>> =
+    OnceLock::new();
+static SWANNA_TAILWINDS: OnceLock<Mutex<Vec<SwannaTailwindState>>> = OnceLock::new();
+static SWANNA_CYCLONES: OnceLock<Mutex<Vec<SwannaCycloneState>>> = OnceLock::new();
+static SWANNA_SKY_CIRCUSES: OnceLock<Mutex<Vec<SwannaSkyCircusState>>> = OnceLock::new();
+static MAROWAK_BONE_WINDMILLS: OnceLock<Mutex<Vec<MarowakBoneWindmillState>>> = OnceLock::new();
+static MAROWAK_WINDMILL_BONEMERANGS: OnceLock<Mutex<Vec<MarowakWindmillBonemerangState>>> =
+    OnceLock::new();
+static GARGANACL_SALT_PATCHES: OnceLock<Mutex<Vec<GarganaclSaltPatchState>>> = OnceLock::new();
+static GARGANACL_BLESSED_SALTS: OnceLock<Mutex<Vec<GarganaclBlessedSaltState>>> = OnceLock::new();
+static GARGANACL_PERMANENT_SALTS: OnceLock<Mutex<Vec<GarganaclPermanentSaltState>>> =
+    OnceLock::new();
 static STICKY_WEBS: OnceLock<Mutex<Vec<StickyWebState>>> = OnceLock::new();
 static WEB_WALKER_SPOTS: OnceLock<Mutex<Vec<WebWalkerSpot>>> = OnceLock::new();
 static WHIRLPOOLS: OnceLock<Mutex<Vec<WhirlpoolState>>> = OnceLock::new();
@@ -1514,6 +2058,43 @@ pub fn reset_pokemon_status_runtime_state_for_new_match() {
         MISTY_TERRAINS,
         BRINE_FIELDS,
         GRASSY_TERRAINS,
+        RILLABOOM_DRUM_AURAS,
+        RILLABOOM_GRASSY_SURGES,
+        SHIFTRY_TORNADOES,
+        SHIFTRY_FOREST_CAMOUFLAGES,
+        RILLABOOM_DRUM_SOLOS,
+        SIGILYPH_GLYPHS,
+        SIGILYPH_GRAVITIES,
+        WEAVILE_HUNTS,
+        AMPHAROS_SEARCHLIGHT_TAILS,
+        AMPHAROS_LUMINOUS_PULSES,
+        AMPHAROS_TRUE_SIGHTS,
+        AMPHAROS_GIGAVOLTS,
+        XATU_STILLNESSES,
+        XATU_PAIN_AMPLIFIERS,
+        XATU_SUPER_PSYS,
+        QUAQUAVAL_AQUA_STEP_EMITTERS,
+        QUAQUAVAL_AQUA_STEP_SEGMENTS,
+        QUAQUAVAL_SPIRAL_SHOTS,
+        QUAQUAVAL_EXCITING_DANCES,
+        ARCANINE_EXTREMESPEED_SHIELDS,
+        ARCANINE_BLAZING_MANES,
+        WISHIWASHI_SCHOOLINGS,
+        WISHIWASHI_MASSIVE_CATCHES,
+        MISSINGNO_GLITCH_STORMS,
+        MISSINGNO_TRICK_ROOMS,
+        MISSINGNO_PENDING_DEBUFFS,
+        YANMEGA_TINTED_LENSES,
+        YANMEGA_GIGA_DRAINS,
+        POKEMON_CC_EVENTS,
+        SWANNA_TAILWINDS,
+        SWANNA_CYCLONES,
+        SWANNA_SKY_CIRCUSES,
+        MAROWAK_BONE_WINDMILLS,
+        MAROWAK_WINDMILL_BONEMERANGS,
+        GARGANACL_SALT_PATCHES,
+        GARGANACL_BLESSED_SALTS,
+        GARGANACL_PERMANENT_SALTS,
         STICKY_WEBS,
         WEB_WALKER_SPOTS,
         WHIRLPOOLS,
@@ -1611,14 +2192,23 @@ pub fn reset_pokemon_status_runtime_state_for_new_match() {
 
 pub fn add_tracked_buff(
     ctx: &mut GameCtx,
-    source_id: usize,
+    mut source_id: usize,
     target_id: usize,
     mut buff: BuffState,
-    polarity: PokemonBuffPolarity,
+    mut polarity: PokemonBuffPolarity,
 ) {
     if is_shedinja_entity(target_id) {
         buff.hp = 0;
         buff.hp_mult = 0;
+    }
+    if polarity == PokemonBuffPolarity::Beneficial {
+        if let Some(missingno_id) = trick_room_inverts_allied_effect(ctx, source_id, target_id) {
+            invert_buff_state(&mut buff);
+            polarity = PokemonBuffPolarity::Harmful;
+            source_id = missingno_id;
+        } else if source_id != target_id && trick_room_doubles_missingno_buffs(ctx, target_id) {
+            double_positive_buff_state(&mut buff);
+        }
     }
     let duration_ticks = buff_duration_ticks(&buff);
     let transferable = can_transfer_buff(&buff);
@@ -1940,13 +2530,17 @@ fn transfer_frozen(ctx: &mut GameCtx, from_id: usize, to_id: usize, tick: usize)
     }
     drop(states);
     if max_remaining > 0 {
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            to_id,
             to_id,
             CCState::Stun {
                 tick: max_remaining as u64,
             },
         );
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            to_id,
             to_id,
             CCState::BlockSkill {
                 tick: max_remaining,
@@ -2572,9 +3166,9 @@ pub fn try_wonder_guard_damage(
     if state.shell_broken_until > tick {
         state.knocked_until = tick.saturating_add(7 * 60);
         state.chits = 5;
-        ctx.apply_cc(target_id, CCState::Bind { tick: 7 * 60 });
-        ctx.apply_cc(target_id, CCState::BlockSkill { tick: 7 * 60 });
-        ctx.apply_cc(target_id, CCState::BlockAttack { tick: 7 * 60 });
+        apply_pokemon_cc(ctx, target_id, target_id, CCState::Bind { tick: 7 * 60 });
+        apply_pokemon_cc(ctx, target_id, target_id, CCState::BlockSkill { tick: 7 * 60 });
+        apply_pokemon_cc(ctx, target_id, target_id, CCState::BlockAttack { tick: 7 * 60 });
     } else {
         state.shell_broken_until = tick.saturating_add(5 * 60);
     }
@@ -2818,6 +3412,13 @@ pub fn has_kings_rock(entity_id: usize) -> bool {
         .map(|champion_id| champion_id == "pokemon_moba_kingdra")
         .unwrap_or(false)
         || receiver_has_copied(entity_id, "pokemon_moba_kingdra")
+}
+
+pub fn has_dragon_launcher(entity_id: usize) -> bool {
+    champion_id_for_entity(entity_id)
+        .map(|champion_id| champion_id == "pokemon_moba_dragapult")
+        .unwrap_or(false)
+        || receiver_has_copied(entity_id, "pokemon_moba_dragapult")
 }
 
 pub fn kingdra_focus_crit_bonus(ctx: &GameCtx, caster_id: usize, target_id: usize) -> usize {
@@ -4294,18 +4895,22 @@ fn apply_kommoo_duel_pulse(ctx: &mut GameCtx, state: KommooDuelState) {
     }
 
     let ticks = state.refresh_ticks.saturating_add(5);
-    ctx.apply_cc(state.caster_id, CCState::Bind { tick: ticks as u64 });
-    ctx.apply_cc(state.caster_id, CCState::BlockSkill { tick: ticks });
-    ctx.apply_cc(
+    apply_pokemon_cc(ctx, state.caster_id, state.caster_id, CCState::Bind { tick: ticks as u64 });
+    apply_pokemon_cc(ctx, state.caster_id, state.caster_id, CCState::BlockSkill { tick: ticks });
+    apply_pokemon_cc(
+        ctx,
+        state.target_id,
         state.caster_id,
         CCState::Taunt {
             tick: ticks as u64,
             target: state.target_id,
         },
     );
-    ctx.apply_cc(state.target_id, CCState::Bind { tick: ticks as u64 });
-    ctx.apply_cc(state.target_id, CCState::BlockSkill { tick: ticks });
-    ctx.apply_cc(
+    apply_pokemon_cc(ctx, state.caster_id, state.target_id, CCState::Bind { tick: ticks as u64 });
+    apply_pokemon_cc(ctx, state.caster_id, state.target_id, CCState::BlockSkill { tick: ticks });
+    apply_pokemon_cc(
+        ctx,
+        state.caster_id,
         state.target_id,
         CCState::Taunt {
             tick: ticks as u64,
@@ -5201,6 +5806,64 @@ pub fn has_scrappy(ctx: &GameCtx, entity_id: usize) -> bool {
     explicit || receiver_has_copied(entity_id, "pokemon_moba_pangoro")
 }
 
+fn cc_duration_ticks(cc: &CCState) -> usize {
+    match cc {
+        CCState::Stun { tick }
+        | CCState::Airborne { tick }
+        | CCState::Fear { tick, .. }
+        | CCState::Taunt { tick, .. }
+        | CCState::Bind { tick }
+        | CCState::ForceMove { tick, .. } => (*tick).try_into().unwrap_or(usize::MAX),
+        CCState::BlockSkill { tick } | CCState::BlockAttack { tick } => *tick,
+        _ => 1,
+    }
+}
+
+fn cc_is_disruptive(cc: &CCState) -> bool {
+    matches!(
+        cc,
+        CCState::Stun { .. }
+            | CCState::Airborne { .. }
+            | CCState::Fear { .. }
+            | CCState::Taunt { .. }
+            | CCState::Bind { .. }
+            | CCState::BlockSkill { .. }
+            | CCState::BlockAttack { .. }
+            | CCState::ForceMove { .. }
+    )
+}
+
+pub fn apply_pokemon_cc(ctx: &mut GameCtx, source_id: usize, target_id: usize, cc: CCState) {
+    let tick = ctx.tick();
+    let duration = cc_duration_ticks(&cc).max(1);
+    let disruptive = cc_is_disruptive(&cc);
+    let events = POKEMON_CC_EVENTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut events = events.lock().expect("pokemon cc event state poisoned");
+    events.retain(|event| event.expires_at > tick);
+    events.push(PokemonCcEvent {
+        source_id,
+        target_id,
+        applied_at: tick,
+        expires_at: tick.saturating_add(duration).saturating_add(2),
+        disruptive,
+    });
+    drop(events);
+    ctx.apply_cc(target_id, cc);
+}
+
+pub fn had_external_disruptive_cc_since(ctx: &GameCtx, target_id: usize, since_tick: usize) -> bool {
+    let tick = ctx.tick();
+    let events = POKEMON_CC_EVENTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut events = events.lock().expect("pokemon cc event state poisoned");
+    events.retain(|event| event.expires_at > tick);
+    events.iter().any(|event| {
+        event.target_id == target_id
+            && event.source_id != target_id
+            && event.disruptive
+            && event.applied_at >= since_tick
+    })
+}
+
 pub fn entity_types(entity_id: usize) -> Option<TypeSet> {
     ENTITY_TYPES
         .get_or_init(|| Mutex::new(Vec::new()))
@@ -5283,6 +5946,17 @@ pub fn heal_with_antiheal(
 ) -> usize {
     if amount == 0 {
         return 0;
+    }
+    if let Some(missingno_id) = trick_room_inverts_allied_effect(ctx, caster_id, target_id) {
+        deal_tracked_damage(
+            ctx,
+            missingno_id,
+            target_id,
+            0,
+            amount.max(1),
+            AttackType::Skill,
+        );
+        return amount;
     }
     let target_is_champion = ctx
         .get_entity(target_id)
@@ -6016,6 +6690,14 @@ pub fn apply_soft_untargetable(ctx: &GameCtx, entity_id: usize, ticks: usize) {
     });
 }
 
+pub fn clear_soft_untargetable(entity_id: usize) {
+    let states = SOFT_UNTARGETABLES.get_or_init(|| Mutex::new(Vec::new()));
+    states
+        .lock()
+        .expect("soft untargetable state poisoned")
+        .retain(|state| state.entity_id != entity_id);
+}
+
 pub fn is_soft_untargetable(ctx: &GameCtx, entity_id: usize) -> bool {
     let Some(entity) = ctx.get_entity(entity_id) else {
         return false;
@@ -6025,12 +6707,507 @@ pub fn is_soft_untargetable(ctx: &GameCtx, entity_id: usize) -> bool {
     }
 
     let tick = ctx.tick();
+    let hidden_by_weavile = is_weavile_hidden_from_pokemon_ai_at(entity_id, tick);
     SOFT_UNTARGETABLES
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("soft untargetable state poisoned")
         .iter()
-        .any(|state| state.entity_id == entity_id && state.expires_at > tick)
+        .any(|state| {
+            state.entity_id == entity_id
+                && state.expires_at > tick
+                && !(hidden_by_weavile && ampharos_true_sight_reveals(ctx, entity_id))
+        })
+}
+
+pub fn begin_weavile_hunt_stealth(ctx: &GameCtx, entity_id: usize, stealth_ticks: usize) {
+    if stealth_ticks == 0 {
+        return;
+    }
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() {
+        return;
+    }
+
+    let expires_at = ctx.tick().saturating_add(stealth_ticks);
+    let states = WEAVILE_HUNTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("weavile hunt state poisoned");
+    states.retain(|state| state.stealth_expires_at > ctx.tick());
+    if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
+        existing.stealth_expires_at = existing.stealth_expires_at.max(expires_at);
+    } else {
+        states.push(WeavileHuntState {
+            entity_id,
+            stealth_expires_at: expires_at,
+        });
+    }
+    drop(states);
+
+    apply_soft_untargetable(ctx, entity_id, stealth_ticks);
+}
+
+pub fn break_weavile_hunt_stealth(entity_id: usize) {
+    WEAVILE_HUNTS
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("weavile hunt state poisoned")
+        .retain(|state| state.entity_id != entity_id);
+    clear_soft_untargetable(entity_id);
+}
+
+pub fn is_weavile_hidden_from_pokemon_ai_at(entity_id: usize, tick: usize) -> bool {
+    WEAVILE_HUNTS
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("weavile hunt state poisoned")
+        .iter()
+        .any(|state| state.entity_id == entity_id && state.stealth_expires_at > tick)
+}
+
+pub fn is_weavile_hidden_from_pokemon_ai(ctx: &GameCtx, entity_id: usize) -> bool {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return false;
+    };
+    entity.is_alive()
+        && is_weavile_hidden_from_pokemon_ai_at(entity_id, ctx.tick())
+        && !ampharos_true_sight_reveals(ctx, entity_id)
+}
+
+fn has_ampharos_luminous_pulse(entity_id: usize) -> bool {
+    entity_is_champion_id(entity_id, "pokemon_moba_ampharos")
+        || receiver_has_copied(entity_id, "pokemon_moba_ampharos")
+}
+
+pub fn ampharos_true_sight_reveals(ctx: &GameCtx, target_id: usize) -> bool {
+    let Some(target) = ctx.get_entity(target_id) else {
+        return false;
+    };
+    if !target.is_alive() {
+        return false;
+    }
+    let target_team = target.team();
+    let target_pos = target.pos();
+    drop(target);
+
+    let tick = ctx.tick();
+    let states = AMPHAROS_TRUE_SIGHTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("ampharos true sight state poisoned");
+    states.retain(|state| state.expires_at > tick);
+    states.iter().any(|state| {
+        if state.team == target_team {
+            return false;
+        }
+        let Some(source) = ctx.get_entity(state.source_id) else {
+            return false;
+        };
+        source.is_alive()
+            && distance_sq(source.pos(), target_pos) <= state.radius.saturating_mul(state.radius)
+    })
+}
+
+fn refresh_ampharos_true_sight(ctx: &GameCtx, entity_id: usize) {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() {
+        return;
+    }
+    let team = entity.team();
+    drop(entity);
+
+    let tick = ctx.tick();
+    let states = AMPHAROS_TRUE_SIGHTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("ampharos true sight state poisoned");
+    states.retain(|state| state.expires_at > tick && state.source_id != entity_id);
+    states.push(AmpharosTrueSightState {
+        source_id: entity_id,
+        team,
+        radius: AMPHAROS_LUMINOUS_RADIUS,
+        expires_at: tick.saturating_add(AMPHAROS_TRUE_SIGHT_REFRESH_TICKS),
+    });
+}
+
+fn active_searchlight_tail(entity_id: usize, tick: usize) -> Option<AmpharosSearchlightTailState> {
+    let states = AMPHAROS_SEARCHLIGHT_TAILS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("ampharos searchlight tail state poisoned");
+    states.retain(|state| state.expires_at > tick);
+    states
+        .iter()
+        .find(|state| state.entity_id == entity_id)
+        .copied()
+}
+
+fn extend_searchlight_tail(
+    ctx: &mut GameCtx,
+    entity_id: usize,
+    tick: usize,
+    extend_ticks: usize,
+    hits: usize,
+) {
+    if hits == 0 || extend_ticks == 0 {
+        return;
+    }
+    let mut move_speed_mult = 0;
+    let states = AMPHAROS_SEARCHLIGHT_TAILS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("ampharos searchlight tail state poisoned");
+    if let Some(state) = states
+        .iter_mut()
+        .find(|state| state.entity_id == entity_id && state.expires_at > tick)
+    {
+        move_speed_mult = state.move_speed_mult;
+        state.expires_at = state
+            .expires_at
+            .saturating_add(extend_ticks.saturating_mul(hits));
+    }
+    drop(states);
+
+    if move_speed_mult != 0 {
+        add_beneficial_buff(
+            ctx,
+            entity_id,
+            entity_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: extend_ticks.saturating_mul(hits),
+                },
+                move_speed_mult,
+                ..Default::default()
+            },
+        );
+    }
+}
+
+pub fn begin_ampharos_searchlight_tail(
+    ctx: &mut GameCtx,
+    entity_id: usize,
+    duration_ticks: usize,
+    move_speed_mult: i32,
+    damage_bonus_percent: usize,
+    extend_per_champion_ticks: usize,
+    paralysis_chance_percent: usize,
+    paralysis_ticks: usize,
+) {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() {
+        return;
+    }
+    drop(entity);
+
+    let tick = ctx.tick();
+    let expires_at = tick.saturating_add(duration_ticks);
+    let states = AMPHAROS_SEARCHLIGHT_TAILS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("ampharos searchlight tail state poisoned");
+    states.retain(|state| state.entity_id != entity_id && state.expires_at > tick);
+    states.push(AmpharosSearchlightTailState {
+        entity_id,
+        expires_at,
+        move_speed_mult,
+        damage_bonus_percent,
+        extend_per_champion_ticks,
+        paralysis_chance_percent,
+        paralysis_ticks,
+    });
+    drop(states);
+
+    add_beneficial_buff(
+        ctx,
+        entity_id,
+        entity_id,
+        BuffState {
+            duration: BuffType::Time {
+                tick: duration_ticks,
+            },
+            move_speed_mult,
+            ..Default::default()
+        },
+    );
+}
+
+pub fn apply_ampharos_flash(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    caster_pos: EntityPos,
+    damage: usize,
+    radius: u64,
+    slow_percent: i32,
+    slow_ticks: usize,
+    silence_ticks: usize,
+    attacker_types: TypeSet,
+) {
+    let radius_sq = radius.saturating_mul(radius);
+    let targets: Vec<usize> = (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .filter(|entity| {
+            entity.team() != caster_team
+                && entity.is_alive()
+                && !entity.is_tower()
+                && distance_sq(entity.pos(), caster_pos) <= radius_sq
+        })
+        .map(|entity| entity.id())
+        .collect();
+
+    for target_id in targets {
+        let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            target_id,
+            0,
+            damage.max(1),
+            AttackType::Skill,
+            PokemonType::Electric,
+            attacker_types,
+            defender_types,
+        );
+        add_harmful_buff(
+            ctx,
+            caster_id,
+            target_id,
+            BuffState {
+                duration: BuffType::Time { tick: slow_ticks },
+                move_speed_mult: -slow_percent.abs(),
+                ..Default::default()
+            },
+        );
+        apply_pokemon_cc(
+            ctx,
+            caster_id,
+            target_id,
+            CCState::BlockSkill {
+                tick: silence_ticks,
+            },
+        );
+    }
+    draw_status_marker(ctx, caster_pos, radius, VFX_ELECTRIC);
+}
+
+pub fn update_ampharos_luminous_pulse(ctx: &mut GameCtx, entity_id: usize) {
+    if !has_ampharos_luminous_pulse(entity_id) {
+        return;
+    }
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() {
+        return;
+    }
+    let team = entity.team();
+    let pos = entity.pos();
+    let magic_power = entity.stat().magic_power;
+    drop(entity);
+
+    refresh_ampharos_true_sight(ctx, entity_id);
+
+    let tick = ctx.tick();
+    let states = AMPHAROS_LUMINOUS_PULSES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("ampharos luminous pulse state poisoned");
+    states.retain(|state| {
+        state.entity_id == entity_id
+            || ctx
+                .get_entity(state.entity_id)
+                .map(|entity| entity.is_alive())
+                .unwrap_or(false)
+    });
+    let state = if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id)
+    {
+        existing
+    } else {
+        states.push(AmpharosLuminousPulseState {
+            entity_id,
+            next_pulse_at: tick.saturating_add(AMPHAROS_LUMINOUS_INTERVAL_TICKS),
+        });
+        states
+            .last_mut()
+            .expect("inserted ampharos luminous pulse state")
+    };
+    if state.next_pulse_at > tick {
+        return;
+    }
+    state.next_pulse_at = tick.saturating_add(AMPHAROS_LUMINOUS_INTERVAL_TICKS);
+    drop(states);
+
+    let searchlight = active_searchlight_tail(entity_id, tick);
+    let mut damage = AMPHAROS_LUMINOUS_BASE_AP
+        .saturating_add(magic_power.saturating_mul(AMPHAROS_LUMINOUS_AP_RATIO) / 100);
+    if let Some(state) = searchlight {
+        damage = damage.saturating_mul(100 + state.damage_bonus_percent) / 100;
+    }
+
+    let radius_sq = AMPHAROS_LUMINOUS_RADIUS.saturating_mul(AMPHAROS_LUMINOUS_RADIUS);
+    let targets: Vec<usize> = (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .filter(|entity| {
+            entity.team() != team
+                && entity.is_alive()
+                && !entity.is_tower()
+                && distance_sq(entity.pos(), pos) <= radius_sq
+        })
+        .map(|entity| entity.id())
+        .collect();
+
+    let mut champion_hits = 0usize;
+    for target_id in targets {
+        let target_is_champion = ctx
+            .get_entity(target_id)
+            .map(|target| target.is_champion())
+            .unwrap_or(false);
+        if target_is_champion {
+            champion_hits = champion_hits.saturating_add(1);
+        }
+        note_web_walker_spot(
+            tick,
+            entity_id,
+            team,
+            target_id,
+            ctx.get_entity(target_id)
+                .map(|target| target.pos())
+                .unwrap_or(pos),
+        );
+        let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            entity_id,
+            target_id,
+            0,
+            damage.max(1),
+            AttackType::Skill,
+            PokemonType::Electric,
+            TypeSet::single(PokemonType::Electric),
+            defender_types,
+        );
+        add_harmful_buff(
+            ctx,
+            entity_id,
+            target_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: AMPHAROS_LUMINOUS_SLOW_TICKS,
+                },
+                move_speed_mult: -AMPHAROS_LUMINOUS_SLOW_PERCENT.abs(),
+                ..Default::default()
+            },
+        );
+        if let Some(state) = searchlight {
+            if chance_percent(
+                ctx.seed(),
+                entity_id,
+                target_id,
+                tick,
+                state.paralysis_chance_percent,
+            ) {
+                apply_paralysis_from(ctx, entity_id, target_id, state.paralysis_ticks);
+            }
+        }
+    }
+
+    if let Some(state) = searchlight {
+        extend_searchlight_tail(
+            ctx,
+            entity_id,
+            tick,
+            state.extend_per_champion_ticks,
+            champion_hits,
+        );
+    }
+    draw_status_marker(ctx, pos, AMPHAROS_LUMINOUS_RADIUS, VFX_ELECTRIC);
+}
+
+pub fn begin_ampharos_gigavolt(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    center: EntityPos,
+    damage: usize,
+    radius: u64,
+    channel_ticks: usize,
+    zone_duration_ticks: usize,
+    zone_tick_interval: usize,
+    zone_slow_percent: i32,
+    zone_slow_ticks: usize,
+    attack_speed_mult: i32,
+    attack_speed_buff_ticks: usize,
+    attacker_types: TypeSet,
+) {
+    let tick = ctx.tick();
+    let states = AMPHAROS_GIGAVOLTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("ampharos gigavolt state poisoned");
+    states.push(AmpharosGigavoltState {
+        caster_id,
+        caster_team,
+        center,
+        trigger_at: tick.saturating_add(channel_ticks),
+        expires_at: tick
+            .saturating_add(channel_ticks)
+            .saturating_add(zone_duration_ticks),
+        next_tick_at: tick.saturating_add(channel_ticks),
+        damage,
+        radius,
+        zone_tick_interval,
+        zone_slow_percent,
+        zone_slow_ticks,
+        attack_speed_mult,
+        attack_speed_buff_ticks,
+        attacker_types,
+        triggered: false,
+    });
+    drop(states);
+
+    apply_pokemon_cc(
+        ctx,
+        caster_id,
+        caster_id,
+        CCState::BlockSkill {
+            tick: channel_ticks,
+        },
+    );
+}
+
+pub fn has_lone_predator(_ctx: &GameCtx, entity_id: usize) -> bool {
+    entity_is_champion_id(entity_id, "pokemon_moba_weavile")
+        || receiver_has_copied(entity_id, "pokemon_moba_weavile")
+}
+
+pub fn target_is_lone_predator_isolated(ctx: &GameCtx, target_id: usize, radius: u64) -> bool {
+    let Some(target) = ctx.get_entity(target_id) else {
+        return false;
+    };
+    if !target.is_alive() {
+        return false;
+    }
+    let target_team = target.team();
+    let target_pos = target.pos();
+    drop(target);
+
+    let radius_sq = radius.saturating_mul(radius);
+    for index in 0..ctx.entity_count() {
+        let Some(ally) = ctx.entity_at(index) else {
+            continue;
+        };
+        if ally.id() == target_id
+            || ally.team() != target_team
+            || !ally.is_alive()
+            || !ally.is_champion()
+        {
+            continue;
+        }
+        if distance_sq(ally.pos(), target_pos) <= radius_sq {
+            return false;
+        }
+    }
+    true
 }
 
 pub fn apply_confusion(ctx: &GameCtx, entity_id: usize, stacks: usize, ticks: usize) {
@@ -6171,6 +7348,16 @@ pub fn is_crowd_controlled(ctx: &GameCtx, target_id: usize) -> bool {
         return false;
     };
     (0..entity.cc_count()).any(|index| entity.cc_at(index).cc_type != 255)
+}
+
+pub fn apply_airborne_hard_cc(ctx: &mut GameCtx, caster_id: usize, target_id: usize, ticks: usize) {
+    if is_limber(ctx, target_id) {
+        return;
+    }
+    let ticks = adjusted_cc_ticks(ctx, target_id, ticks);
+    break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
+    apply_pokemon_cc(ctx, caster_id, target_id, CCState::Airborne { tick: ticks as u64 });
+    note_steadfast_cc(ctx, target_id);
 }
 
 pub fn update_tangling_vines_aura(ctx: &mut GameCtx, venusaur_id: usize) {
@@ -6546,7 +7733,9 @@ pub fn update_flower_veil_passive(ctx: &mut GameCtx, comfey_id: usize) {
             },
         );
         apply_soft_untargetable(ctx, comfey_id, COMFEY_ATTACH_BUFF_TICKS);
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            comfey_id,
             comfey_id,
             CCState::Bind {
                 tick: COMFEY_ATTACH_BUFF_TICKS as u64,
@@ -6671,7 +7860,9 @@ pub fn update_clingy_passive(ctx: &mut GameCtx, clawitzer_id: usize) {
             },
         );
         apply_soft_untargetable(ctx, clawitzer_id, CLAWITZER_CLING_BUFF_TICKS);
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            clawitzer_id,
             clawitzer_id,
             CCState::Bind {
                 tick: CLAWITZER_CLING_BUFF_TICKS as u64,
@@ -6744,7 +7935,9 @@ fn apply_attach_tether(
 
     let dx = ally_pos.x as i64 - entity_pos.x as i64;
     let dy = ally_pos.y as i64 - entity_pos.y as i64;
-    ctx.apply_cc(
+    apply_pokemon_cc(
+        ctx,
+        entity_id,
         entity_id,
         CCState::ForceMove {
             tick: ATTACH_TETHER_TICKS,
@@ -7111,6 +8304,30 @@ fn synchronize_poison(
     }
 }
 
+fn synchronize_poison_for(
+    ctx: &GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    damage_per_tick: usize,
+    duration_ticks: usize,
+) {
+    let Some(reflect_target) = synchronize_target(ctx, caster_id, target_id) else {
+        return;
+    };
+    let tick = ctx.tick();
+    POISONS
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("poison state poisoned")
+        .push(PoisonState {
+            caster_id: target_id,
+            target_id: reflect_target,
+            expires_at: tick + duration_ticks,
+            next_tick_at: tick + POISON_TICK_INTERVAL,
+            damage_per_tick,
+        });
+}
+
 fn synchronize_paralysis(ctx: &GameCtx, caster_id: usize, target_id: usize, duration_ticks: usize) {
     let Some(reflect_target) = synchronize_target(ctx, caster_id, target_id) else {
         return;
@@ -7192,8 +8409,8 @@ fn synchronize_frozen(ctx: &mut GameCtx, caster_id: usize, target_id: usize, tic
     }
     drop(states);
     break_kommoo_duel_on_hard_cc(ctx, target_id, reflect_target);
-    ctx.apply_cc(reflect_target, CCState::Stun { tick: ticks as u64 });
-    ctx.apply_cc(reflect_target, CCState::BlockSkill { tick: ticks });
+    apply_pokemon_cc(ctx, target_id, reflect_target, CCState::Stun { tick: ticks as u64 });
+    apply_pokemon_cc(ctx, target_id, reflect_target, CCState::BlockSkill { tick: ticks });
     note_steadfast_cc(ctx, reflect_target);
 }
 
@@ -7299,6 +8516,7 @@ fn type_bit(pokemon_type: PokemonType) -> u32 {
         PokemonType::Dark => 15,
         PokemonType::Steel => 16,
         PokemonType::Fairy => 17,
+        PokemonType::Bird => 18,
     }
 }
 
@@ -7676,6 +8894,56 @@ pub fn apply_poison_stacks(
     synchronize_poison(ctx, caster_id, target_id, stacks, damage_per_tick);
 }
 
+pub fn apply_poison_for(
+    ctx: &GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    damage_per_tick: usize,
+    duration_ticks: usize,
+) {
+    if blocks_harmful_status(ctx, caster_id, target_id) {
+        return;
+    }
+
+    if audino_protect_blocks_new_damage_status(ctx, target_id) {
+        return;
+    }
+
+    if has_dot_immunity(ctx, target_id) {
+        return;
+    }
+
+    if !has_dot_absorb(ctx, target_id)
+        && is_status_immune(
+            target_id,
+            &[PokemonType::Poison, PokemonType::Grass, PokemonType::Steel],
+        )
+    {
+        return;
+    }
+
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() || target.is_tower() {
+        return;
+    }
+
+    let tick = ctx.tick();
+    POISONS
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("poison state poisoned")
+        .push(PoisonState {
+            caster_id,
+            target_id,
+            expires_at: tick + duration_ticks,
+            next_tick_at: tick + POISON_TICK_INTERVAL,
+            damage_per_tick,
+        });
+    synchronize_poison_for(ctx, caster_id, target_id, damage_per_tick, duration_ticks);
+}
+
 pub fn poison_stack_count(ctx: &GameCtx, target_id: usize) -> usize {
     let tick = ctx.tick();
     POISONS
@@ -7813,6 +9081,10 @@ pub fn apply_bleed_for(
         return;
     }
 
+    if is_yanmega_blood(ctx, target_id) {
+        return;
+    }
+
     let Some(target) = ctx.get_entity(target_id) else {
         return;
     };
@@ -7881,6 +9153,302 @@ pub fn apply_infestation_for(
     });
 }
 
+pub fn is_infested(ctx: &GameCtx, target_id: usize) -> bool {
+    let tick = ctx.tick();
+    INFESTATIONS
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("infestation state poisoned")
+        .iter()
+        .any(|state| state.target_id == target_id && state.expires_at > tick)
+}
+
+pub fn apply_infestation_stacks_for(
+    ctx: &GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    damage_per_tick: usize,
+    stacks: usize,
+    duration_ticks: usize,
+    attacker_types: TypeSet,
+) {
+    apply_infestation_for(
+        ctx,
+        caster_id,
+        target_id,
+        damage_per_tick.saturating_mul(stacks.max(1)).max(1),
+        duration_ticks,
+        attacker_types,
+    );
+}
+
+pub fn begin_yanmega_tinted_lens(ctx: &mut GameCtx, entity_id: usize, ticks: usize) {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() || !entity.is_champion() {
+        return;
+    }
+    let pos = entity.pos();
+    drop(entity);
+
+    let expires_at = ctx.tick().saturating_add(ticks);
+    let states = YANMEGA_TINTED_LENSES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("yanmega tinted lens state poisoned");
+    if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
+        existing.expires_at = existing.expires_at.max(expires_at);
+    } else {
+        states.push(YanmegaTintedLensState {
+            entity_id,
+            expires_at,
+        });
+    }
+    draw_status_marker(ctx, pos, 10000, VFX_BUG);
+}
+
+pub fn yanmega_tinted_lens_active(ctx: &GameCtx, entity_id: usize) -> bool {
+    let tick = ctx.tick();
+    YANMEGA_TINTED_LENSES
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("yanmega tinted lens state poisoned")
+        .iter()
+        .any(|state| state.entity_id == entity_id && state.expires_at > tick)
+}
+
+fn update_yanmega_tinted_lenses(ctx: &GameCtx, tick: usize) {
+    YANMEGA_TINTED_LENSES
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("yanmega tinted lens state poisoned")
+        .retain(|state| {
+            state.expires_at > tick
+                && ctx
+                    .get_entity(state.entity_id)
+                    .map(|entity| entity.is_alive())
+                    .unwrap_or(false)
+        });
+}
+
+fn is_yanmega_blood(ctx: &GameCtx, entity_id: usize) -> bool {
+    champion_id_for_entity(entity_id) == Some("pokemon_moba_yanmega")
+        || receiver_has_copied(entity_id, "pokemon_moba_yanmega")
+        || champion_id_for_entity_in_ctx(ctx, entity_id) == Some("pokemon_moba_yanmega")
+}
+
+pub fn convert_lifesteal_against_yanmega(
+    ctx: &GameCtx,
+    lifestealer_id: usize,
+    target_id: usize,
+    heal_amount: usize,
+) -> bool {
+    if heal_amount == 0 || !is_yanmega_blood(ctx, target_id) {
+        return false;
+    }
+    let poison_damage = heal_amount.saturating_div(6).max(8);
+    apply_poison_for(
+        ctx,
+        target_id,
+        lifestealer_id,
+        poison_damage,
+        5 * 60,
+    );
+    true
+}
+
+pub fn heal_from_damage_or_poison_yanmega(
+    ctx: &mut GameCtx,
+    healer_id: usize,
+    damaged_target_id: usize,
+    heal_amount: usize,
+) -> usize {
+    if heal_amount == 0 {
+        return 0;
+    }
+    if convert_lifesteal_against_yanmega(ctx, healer_id, damaged_target_id, heal_amount) {
+        return 0;
+    }
+    heal_with_antiheal(ctx, healer_id, healer_id, heal_amount)
+}
+
+pub fn begin_yanmega_giga_drain(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    duration_ticks: usize,
+    tick_interval: usize,
+    damage_per_tick: usize,
+    poison_health_unit: usize,
+    poison_damage_per_tick: usize,
+    poison_ticks: usize,
+    attacker_types: TypeSet,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_hp = caster.hp().current;
+    let caster_pos = caster.pos();
+    drop(caster);
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() || target.is_tower() {
+        return;
+    }
+    let target_pos = target.pos();
+    drop(target);
+
+    let tick = ctx.tick();
+    let states = YANMEGA_GIGA_DRAINS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("yanmega giga drain state poisoned");
+    states.retain(|state| state.caster_id != caster_id);
+    states.push(YanmegaGigaDrainState {
+        caster_id,
+        target_id,
+        started_at: tick,
+        expires_at: tick.saturating_add(duration_ticks),
+        next_tick_at: tick,
+        tick_interval: tick_interval.max(1),
+        damage_per_tick: damage_per_tick.max(1),
+        poison_health_unit: poison_health_unit.max(1),
+        poison_damage_per_tick: poison_damage_per_tick.max(1),
+        poison_ticks,
+        total_drained: 0,
+        last_caster_hp: caster_hp,
+        attacker_types,
+    });
+    drop(states);
+
+    apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: tick_interval as u64 });
+    apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockSkill { tick: tick_interval });
+    apply_pokemon_cc(ctx, caster_id, target_id, CCState::Bind { tick: tick_interval as u64 });
+    apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockSkill { tick: tick_interval });
+    draw_line_band(ctx, caster_pos, target_pos, 5500, VFX_GRASS);
+}
+
+fn finalize_yanmega_giga_drain(ctx: &GameCtx, state: YanmegaGigaDrainState) {
+    let stacks = state.total_drained / state.poison_health_unit;
+    if stacks == 0 {
+        return;
+    }
+    for _ in 0..stacks {
+        apply_poison_for(
+            ctx,
+            state.caster_id,
+            state.target_id,
+            state.poison_damage_per_tick,
+            state.poison_ticks,
+        );
+    }
+}
+
+fn update_yanmega_giga_drains(ctx: &mut GameCtx, tick: usize) {
+    let states = YANMEGA_GIGA_DRAINS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("yanmega giga drain state poisoned");
+    let mut ticks_to_apply = Vec::new();
+    let mut finished = Vec::new();
+
+    states.retain_mut(|state| {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            finished.push(*state);
+            return false;
+        };
+        if !caster.is_alive() || state.expires_at <= tick {
+            finished.push(*state);
+            return false;
+        }
+        let caster_hp = caster.hp();
+        if caster_hp.current < state.last_caster_hp
+            || caster_hp.current >= caster_hp.max
+            || had_external_disruptive_cc_since(ctx, state.caster_id, state.started_at)
+        {
+            finished.push(*state);
+            return false;
+        }
+        drop(caster);
+
+        let Some(target) = ctx.get_entity(state.target_id) else {
+            finished.push(*state);
+            return false;
+        };
+        if !target.is_alive() {
+            finished.push(*state);
+            return false;
+        }
+        drop(target);
+
+        while state.next_tick_at <= tick {
+            ticks_to_apply.push(*state);
+            state.next_tick_at = state.next_tick_at.saturating_add(state.tick_interval.max(1));
+        }
+        true
+    });
+    drop(states);
+
+    for mut state in ticks_to_apply {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            finished.push(state);
+            continue;
+        };
+        let caster_pos = caster.pos();
+        drop(caster);
+        let Some(target) = ctx.get_entity(state.target_id) else {
+            finished.push(state);
+            continue;
+        };
+        let target_pos = target.pos();
+        drop(target);
+
+        let mut damage = state.damage_per_tick;
+        if is_infested(ctx, state.target_id) || is_poisoned(ctx, state.target_id) {
+            damage = damage.saturating_mul(150) / 100;
+        }
+        let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, state.target_id);
+        let result = crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            state.caster_id,
+            state.target_id,
+            0,
+            damage.max(1),
+            AttackType::Dot,
+            PokemonType::Grass,
+            state.attacker_types,
+            defender_types,
+        );
+        let heal = result.applied_damage.max(1);
+        heal_from_damage_or_poison_yanmega(ctx, state.caster_id, state.target_id, heal);
+        draw_line_band(ctx, caster_pos, target_pos, 5500, VFX_GRASS);
+
+        if let Some(caster) = ctx.get_entity(state.caster_id) {
+            state.last_caster_hp = caster.hp().current;
+        }
+        state.total_drained = state.total_drained.saturating_add(heal);
+        apply_pokemon_cc(ctx, state.caster_id, state.caster_id, CCState::Bind { tick: state.tick_interval as u64 + 4 });
+        apply_pokemon_cc(ctx, state.caster_id, state.caster_id, CCState::BlockSkill { tick: state.tick_interval + 4 });
+        apply_pokemon_cc(ctx, state.caster_id, state.target_id, CCState::Bind { tick: state.tick_interval as u64 + 4 });
+        apply_pokemon_cc(ctx, state.caster_id, state.target_id, CCState::BlockSkill { tick: state.tick_interval + 4 });
+
+        let states = YANMEGA_GIGA_DRAINS.get_or_init(|| Mutex::new(Vec::new()));
+        let mut states = states.lock().expect("yanmega giga drain state poisoned");
+        if let Some(existing) = states
+            .iter_mut()
+            .find(|existing| {
+                existing.caster_id == state.caster_id && existing.target_id == state.target_id
+            })
+        {
+            existing.total_drained = state.total_drained;
+            existing.last_caster_hp = state.last_caster_hp;
+        }
+    }
+
+    for state in finished {
+        finalize_yanmega_giga_drain(ctx, state);
+    }
+}
+
 pub fn apply_frozen_for(ctx: &mut GameCtx, target_id: usize, ticks: usize) {
     apply_frozen_from(ctx, target_id, target_id, ticks);
 }
@@ -7921,8 +9489,8 @@ pub fn apply_frozen_from(ctx: &mut GameCtx, caster_id: usize, target_id: usize, 
     }
 
     break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
-    ctx.apply_cc(target_id, CCState::Stun { tick: ticks as u64 });
-    ctx.apply_cc(target_id, CCState::BlockSkill { tick: ticks });
+    apply_pokemon_cc(ctx, caster_id, target_id, CCState::Stun { tick: ticks as u64 });
+    apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockSkill { tick: ticks });
     note_steadfast_cc(ctx, target_id);
     synchronize_frozen(ctx, caster_id, target_id, ticks);
 }
@@ -8497,9 +10065,74 @@ pub fn maybe_spawn_grassy_terrain(
     let center = caster.pos();
     drop(caster);
 
+    let tick = ctx.tick();
+    spawn_grassy_terrain_at_tick(
+        ctx,
+        caster_id,
+        center,
+        max_fields,
+        radius,
+        cooldown_ticks,
+        tick,
+        usize::MAX,
+        damage_bonus_percent,
+        attack_speed_mult,
+        buff_ticks,
+    );
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn spawn_grassy_terrain_at(
+    ctx: &GameCtx,
+    caster_id: usize,
+    center: EntityPos,
+    max_fields: usize,
+    radius: u64,
+    duration_ticks: usize,
+    damage_bonus_percent: usize,
+    attack_speed_mult: i32,
+    buff_ticks: usize,
+) {
+    let tick = ctx.tick();
+    spawn_grassy_terrain_at_tick(
+        ctx,
+        caster_id,
+        center,
+        max_fields,
+        radius,
+        0,
+        tick,
+        tick.saturating_add(duration_ticks),
+        damage_bonus_percent,
+        attack_speed_mult,
+        buff_ticks,
+    );
+}
+
+#[allow(clippy::too_many_arguments)]
+fn spawn_grassy_terrain_at_tick(
+    ctx: &GameCtx,
+    caster_id: usize,
+    center: EntityPos,
+    max_fields: usize,
+    radius: u64,
+    cooldown_ticks: usize,
+    tick: usize,
+    expires_at: usize,
+    damage_bonus_percent: usize,
+    attack_speed_mult: i32,
+    buff_ticks: usize,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    drop(caster);
+
     let fields = GRASSY_TERRAINS.get_or_init(|| Mutex::new(Vec::new()));
     let mut fields = fields.lock().expect("grassy terrain state poisoned");
-    let tick = ctx.tick();
     let latest_for_caster = fields
         .iter()
         .filter(|state| state.caster_id == caster_id)
@@ -8517,6 +10150,7 @@ pub fn maybe_spawn_grassy_terrain(
         center,
         radius,
         created_at: tick,
+        expires_at,
         next_tick_at: tick,
         damage_bonus_percent,
         attack_speed_mult,
@@ -8539,6 +10173,4155 @@ pub fn maybe_spawn_grassy_terrain(
         };
         fields.remove(index);
     }
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn begin_rillaboom_drum_aura(
+    ctx: &GameCtx,
+    caster_id: usize,
+    duration_ticks: usize,
+    radius: u64,
+    heal_per_tick: usize,
+    ally_move_speed_mult: i32,
+    ally_buff_ticks: usize,
+    enemy_slow_percent: i32,
+    enemy_slow_ticks: usize,
+    final_stun_ticks: usize,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let auras = RILLABOOM_DRUM_AURAS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut auras = auras.lock().expect("rillaboom drum aura state poisoned");
+    auras.retain(|state| {
+        !(state.caster_id == caster_id
+            && state.enemy_slow_percent == enemy_slow_percent
+            && state.final_stun_ticks == final_stun_ticks)
+    });
+    let tick = ctx.tick();
+    auras.push(RillaboomDrumAuraState {
+        caster_id,
+        caster_team: caster.team(),
+        expires_at: tick.saturating_add(duration_ticks),
+        next_tick_at: tick,
+        radius,
+        heal_per_tick,
+        ally_move_speed_mult,
+        ally_buff_ticks,
+        enemy_slow_percent,
+        enemy_slow_ticks,
+        final_stun_ticks,
+    });
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn begin_rillaboom_grassy_surge(
+    ctx: &GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    start: EntityPos,
+    end: EntityPos,
+    duration_ticks: usize,
+    width: u64,
+    tick_interval: usize,
+    damage_per_tick: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+    terrain_radius: u64,
+    terrain_count: usize,
+    terrain_damage_bonus_percent: usize,
+    terrain_attack_speed_mult: i32,
+    terrain_buff_ticks: usize,
+) {
+    let tick = ctx.tick();
+    let terrain_count = terrain_count.max(1);
+    for index in 0..terrain_count {
+        let center = segment_point(start, end, index, terrain_count.saturating_sub(1).max(1));
+        spawn_grassy_terrain_at(
+            ctx,
+            caster_id,
+            center,
+            terrain_count,
+            terrain_radius,
+            duration_ticks,
+            terrain_damage_bonus_percent,
+            terrain_attack_speed_mult,
+            terrain_buff_ticks,
+        );
+    }
+
+    let surges = RILLABOOM_GRASSY_SURGES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut surges = surges
+        .lock()
+        .expect("rillaboom grassy surge state poisoned");
+    surges.push(RillaboomGrassySurgeState {
+        caster_id,
+        caster_team,
+        start,
+        end,
+        expires_at: tick.saturating_add(duration_ticks),
+        next_tick_at: tick,
+        width,
+        tick_interval: tick_interval.max(1),
+        damage_per_tick,
+        slow_percent,
+        slow_ticks,
+    });
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn begin_shiftry_tornado(
+    ctx: &GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    center: EntityPos,
+    duration_ticks: usize,
+    radius: u64,
+    tick_interval: usize,
+    damage_per_tick: usize,
+    damage_growth_percent: usize,
+    lift_ticks: usize,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    drop(caster);
+
+    let tick = ctx.tick();
+    let states = SHIFTRY_TORNADOES.get_or_init(|| Mutex::new(Vec::new()));
+    states
+        .lock()
+        .expect("shiftry tornado state poisoned")
+        .push(ShiftryTornadoState {
+            caster_id,
+            caster_team,
+            center,
+            expires_at: tick.saturating_add(duration_ticks),
+            next_tick_at: tick,
+            radius,
+            tick_interval: tick_interval.max(1),
+            damage_per_tick,
+            damage_growth_percent,
+            ticks_done: 0,
+            lift_ticks,
+        });
+}
+
+fn apply_status_force_move_toward_pos(
+    ctx: &mut GameCtx,
+    entity_id: usize,
+    entity_pos: EntityPos,
+    target_pos: EntityPos,
+    speed: u64,
+    tick: u64,
+) {
+    let distance = integer_sqrt(distance_sq(entity_pos, target_pos));
+    let speed = bounded_force_move_speed(speed, tick, distance);
+    if speed == 0 {
+        return;
+    }
+    apply_pokemon_cc(ctx, entity_id, entity_id, CCState::Airborne { tick });
+    apply_pokemon_cc(
+        ctx,
+        entity_id,
+        entity_id,
+        CCState::ForceMove {
+            tick,
+            dx: target_pos.x as i64 - entity_pos.x as i64,
+            dy: target_pos.y as i64 - entity_pos.y as i64,
+            speed,
+        },
+    );
+}
+
+fn bounded_force_move_speed(speed: u64, tick: u64, distance: u64) -> u64 {
+    if speed == 0 || tick == 0 || distance == 0 {
+        return 0;
+    }
+    let speed_to_cover_distance = distance
+        .saturating_add(tick.saturating_sub(1))
+        .saturating_div(tick)
+        .max(1);
+    speed.min(speed_to_cover_distance)
+}
+
+fn sky_circus_waypoints(start: EntityPos, center: EntityPos, radius: u64) -> Vec<EntityPos> {
+    let dx = center.x as f64 - start.x as f64;
+    let dy = center.y as f64 - start.y as f64;
+    let len = (dx * dx + dy * dy).sqrt().max(1.0);
+    let dir_x = dx / len;
+    let dir_y = dy / len;
+    let perp_x = -dir_y;
+    let perp_y = dir_x;
+    let radius = radius as f64;
+    let entry_x = center.x as f64 - dir_x * radius * 0.82;
+    let entry_y = center.y as f64 - dir_y * radius * 0.82;
+    let exit_x = center.x as f64 + dir_x * radius * 0.82;
+    let exit_y = center.y as f64 + dir_y * radius * 0.82;
+    let mut points = Vec::new();
+    for index in 0..6 {
+        let t = index as f64 / 5.0;
+        let base_x = entry_x + (exit_x - entry_x) * t;
+        let base_y = entry_y + (exit_y - entry_y) * t;
+        let wave = (std::f64::consts::PI * t).sin();
+        let sign = if index % 2 == 0 { -1.0 } else { 1.0 };
+        points.push(pos_from_f64(
+            base_x + perp_x * radius * 0.46 * wave * sign,
+            base_y + perp_y * radius * 0.46 * wave * sign,
+        ));
+    }
+    points.push(start);
+    points
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn begin_swanna_cyclone(
+    ctx: &GameCtx,
+    caster_id: usize,
+    duration_ticks: usize,
+    radius: u64,
+    tick_interval: usize,
+    damage_per_tick: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+    attacker_types: TypeSet,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let tick = ctx.tick();
+    let states = SWANNA_CYCLONES.get_or_init(|| Mutex::new(Vec::new()));
+    states
+        .lock()
+        .expect("swanna cyclone state poisoned")
+        .push(SwannaCycloneState {
+            caster_id,
+            caster_team: caster.team(),
+            expires_at: tick.saturating_add(duration_ticks),
+            next_tick_at: tick,
+            radius,
+            tick_interval: tick_interval.max(1),
+            damage_per_tick: damage_per_tick.max(1),
+            slow_percent: slow_percent.abs(),
+            slow_ticks,
+            attacker_types,
+        });
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn begin_swanna_sky_circus(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    start_pos: EntityPos,
+    center: EntityPos,
+    radius: u64,
+    hits: usize,
+    hit_interval_ticks: usize,
+    hit_damage: usize,
+    landing_damage: usize,
+    bonus_damage_per_target_percent: usize,
+    airborne_ticks: usize,
+    waypoint_ticks: usize,
+    force_move_speed: u64,
+    attacker_types: TypeSet,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    drop(caster);
+
+    let mut targets = Vec::new();
+    for index in 0..ctx.entity_count() {
+        let Some(entity) = ctx.entity_at(index) else {
+            continue;
+        };
+        if !entity.is_alive()
+            || entity.team() == caster_team
+            || entity.is_tower()
+            || distance_sq(entity.pos(), center) > radius.saturating_mul(radius)
+        {
+            continue;
+        }
+        targets.push(entity.id());
+    }
+    if targets.is_empty() {
+        return;
+    }
+
+    let target_damage_percent = 100usize.saturating_add(
+        targets
+            .len()
+            .saturating_sub(1)
+            .saturating_mul(bonus_damage_per_target_percent),
+    );
+    for target_id in targets.iter().copied() {
+        apply_airborne_hard_cc(ctx, caster_id, target_id, airborne_ticks);
+    }
+
+    let tick = ctx.tick();
+    let waypoints = sky_circus_waypoints(start_pos, center, radius);
+    let first_waypoint = waypoints.first().copied().unwrap_or(center);
+    apply_soft_untargetable(
+        ctx,
+        caster_id,
+        waypoint_ticks.saturating_mul(waypoints.len() + 1),
+    );
+    ctx.add_buff(
+        caster_id,
+        BuffState {
+            duration: BuffType::Time {
+                tick: waypoint_ticks.saturating_mul(waypoints.len() + 1),
+            },
+            damaged_reduce: 100,
+            ..Default::default()
+        },
+    );
+    apply_status_force_move_toward_pos(
+        ctx,
+        caster_id,
+        start_pos,
+        first_waypoint,
+        force_move_speed,
+        waypoint_ticks as u64,
+    );
+
+    let states = SWANNA_SKY_CIRCUSES.get_or_init(|| Mutex::new(Vec::new()));
+    states
+        .lock()
+        .expect("swanna sky circus state poisoned")
+        .push(SwannaSkyCircusState {
+            caster_id,
+            start_pos,
+            center,
+            radius,
+            waypoints,
+            waypoint_index: 0,
+            next_waypoint_at: tick.saturating_add(waypoint_ticks),
+            waypoint_ticks: waypoint_ticks.max(1),
+            force_move_speed: force_move_speed.max(1),
+            next_hit_at: tick.saturating_add(hit_interval_ticks.max(1) / 2),
+            hit_interval_ticks: hit_interval_ticks.max(1),
+            hits_remaining: hits.max(1),
+            hit_damage: hit_damage.max(1),
+            landing_damage: landing_damage.max(1),
+            target_damage_percent,
+            targets,
+            expires_at: tick.saturating_add(
+                waypoint_ticks
+                    .saturating_mul(8)
+                    .max(airborne_ticks)
+                    .saturating_add(30),
+            ),
+            attacker_types,
+        });
+}
+
+pub fn update_swanna_tailwind(ctx: &mut GameCtx, entity_id: usize) {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() {
+        return;
+    }
+    let pos = entity.pos();
+    drop(entity);
+
+    let tick = ctx.tick();
+    let states = SWANNA_TAILWINDS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("swanna tailwind state poisoned");
+    let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
+        states.push(SwannaTailwindState {
+            entity_id,
+            last_pos: pos,
+            segment_dx: 0,
+            segment_dy: 0,
+            segment_distance: 0,
+            buff_until: 0,
+            cooldown_until: 0,
+            last_buff_at: 0,
+        });
+        return;
+    };
+
+    let dx = pos.x as i64 - state.last_pos.x as i64;
+    let dy = pos.y as i64 - state.last_pos.y as i64;
+    state.last_pos = pos;
+    let moved = squared_len_i128(dx as i128, dy as i128);
+    if moved > 0 {
+        let distance = integer_sqrt(moved.min(u64::MAX as i128) as u64);
+        let dot = state.segment_dx as i128 * dx as i128 + state.segment_dy as i128 * dy as i128;
+        if state.segment_distance == 0 || dot >= SWANNA_TAILWIND_DIRECTION_DOT_MIN {
+            state.segment_dx = state.segment_dx.saturating_add(dx);
+            state.segment_dy = state.segment_dy.saturating_add(dy);
+            state.segment_distance = state.segment_distance.saturating_add(distance);
+        } else {
+            state.segment_dx = dx;
+            state.segment_dy = dy;
+            state.segment_distance = distance;
+        }
+
+        if state.segment_distance >= SWANNA_TAILWIND_TRIGGER_DISTANCE
+            && tick >= state.cooldown_until
+        {
+            state.buff_until = tick.saturating_add(SWANNA_TAILWIND_BUFF_TICKS);
+            state.cooldown_until = tick.saturating_add(SWANNA_TAILWIND_COOLDOWN_TICKS);
+            state.segment_dx = 0;
+            state.segment_dy = 0;
+            state.segment_distance = 0;
+            state.last_buff_at = 0;
+        }
+    }
+
+    let should_refresh = state.buff_until > tick
+        && tick.saturating_sub(state.last_buff_at) >= SWANNA_TAILWIND_REFRESH_TICKS;
+    if should_refresh {
+        state.last_buff_at = tick;
+    }
+    drop(states);
+
+    if should_refresh {
+        add_beneficial_buff(
+            ctx,
+            entity_id,
+            entity_id,
+            BuffState {
+                duration: BuffType::Time { tick: 35 },
+                move_speed_mult: 25,
+                attack_speed_mult: 18,
+                skill_cooldown_mult: 18,
+                ult_cooldown_mult: 18,
+                ..Default::default()
+            },
+        );
+        draw_status_marker(ctx, pos, 14000, VFX_FLYING);
+    }
+}
+
+pub fn consume_swanna_tailwind_damage_amp(
+    ctx: &GameCtx,
+    entity_id: usize,
+    caster_ap: usize,
+) -> Option<(usize, usize)> {
+    let tick = ctx.tick();
+    let states = SWANNA_TAILWINDS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("swanna tailwind state poisoned");
+    let state = states
+        .iter_mut()
+        .find(|state| state.entity_id == entity_id)?;
+    if state.buff_until <= tick {
+        return None;
+    }
+    state.buff_until = tick;
+    Some((10, caster_ap / 10))
+}
+
+fn update_swanna_cyclones(ctx: &mut GameCtx, tick: usize) {
+    let states = SWANNA_CYCLONES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("swanna cyclone state poisoned");
+    let mut ticks = Vec::new();
+    let mut visuals = Vec::new();
+
+    states.retain_mut(|state| {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            return false;
+        };
+        if !caster.is_alive() || state.expires_at <= tick {
+            return false;
+        }
+        let caster_pos = caster.pos();
+        drop(caster);
+        visuals.push((caster_pos, state.radius));
+        if state.next_tick_at > tick {
+            return true;
+        }
+        state.next_tick_at = tick.saturating_add(state.tick_interval);
+        let targets: Vec<usize> = (0..ctx.entity_count())
+            .filter_map(|index| ctx.entity_at(index))
+            .filter(|entity| {
+                entity.team() != state.caster_team
+                    && entity.is_alive()
+                    && !entity.is_tower()
+                    && distance_sq(entity.pos(), caster_pos)
+                        <= state.radius.saturating_mul(state.radius)
+            })
+            .map(|entity| entity.id())
+            .collect();
+        ticks.push((
+            state.caster_id,
+            state.damage_per_tick,
+            state.slow_percent,
+            state.slow_ticks,
+            state.attacker_types,
+            targets,
+        ));
+        true
+    });
+    drop(states);
+
+    for (center, radius) in visuals {
+        draw_field_circle(ctx, center, radius, VFX_WATER);
+    }
+    for (caster_id, damage, slow_percent, slow_ticks, attacker_types, targets) in ticks {
+        for target_id in targets {
+            let defender_types =
+                crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+            crate::pokemon_types::deal_pokemon_damage(
+                ctx,
+                caster_id,
+                target_id,
+                0,
+                damage.max(1),
+                AttackType::Dot,
+                PokemonType::Water,
+                attacker_types,
+                defender_types,
+            );
+            ctx.add_buff(
+                target_id,
+                BuffState {
+                    duration: BuffType::Time { tick: slow_ticks },
+                    move_speed_mult: -slow_percent.abs(),
+                    ..Default::default()
+                },
+            );
+        }
+    }
+}
+
+fn update_swanna_sky_circuses(ctx: &mut GameCtx, tick: usize) {
+    let states = SWANNA_SKY_CIRCUSES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("swanna sky circus state poisoned");
+    let mut protections = Vec::new();
+    let mut force_moves = Vec::new();
+    let mut hit_batches = Vec::new();
+    let mut landing_batches = Vec::new();
+    let mut visuals = Vec::new();
+
+    states.retain_mut(|state| {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            return false;
+        };
+        if !caster.is_alive() {
+            return false;
+        }
+        let caster_pos = caster.pos();
+        drop(caster);
+        protections.push(state.caster_id);
+        visuals.push((state.center, state.radius, caster_pos));
+
+        if tick >= state.next_waypoint_at && state.waypoint_index + 1 < state.waypoints.len() {
+            state.waypoint_index += 1;
+            let target_pos = state.waypoints[state.waypoint_index];
+            state.next_waypoint_at = tick.saturating_add(state.waypoint_ticks);
+            force_moves.push((
+                state.caster_id,
+                caster_pos,
+                target_pos,
+                state.force_move_speed,
+                state.waypoint_ticks as u64,
+            ));
+        }
+
+        if tick >= state.next_hit_at && state.hits_remaining > 0 {
+            let segment_start = if state.waypoint_index == 0 {
+                state.start_pos
+            } else {
+                state.waypoints[state.waypoint_index - 1]
+            };
+            let segment_end = state
+                .waypoints
+                .get(state.waypoint_index)
+                .copied()
+                .unwrap_or(caster_pos);
+            let hit_targets: Vec<usize> = state
+                .targets
+                .iter()
+                .copied()
+                .filter(|target_id| {
+                    ctx.get_entity(*target_id)
+                        .map(|entity| {
+                            entity.is_alive()
+                                && distance_to_segment_sq(entity.pos(), segment_start, segment_end)
+                                    <= SWANNA_SKY_CIRCUS_HIT_RADIUS
+                                        .saturating_mul(SWANNA_SKY_CIRCUS_HIT_RADIUS)
+                        })
+                        .unwrap_or(false)
+                })
+                .collect();
+            if !hit_targets.is_empty() {
+                hit_batches.push((
+                    state.caster_id,
+                    state
+                        .hit_damage
+                        .saturating_mul(state.target_damage_percent)
+                        .saturating_div(100)
+                        .max(1),
+                    state.attacker_types,
+                    hit_targets,
+                ));
+            }
+            state.hits_remaining = state.hits_remaining.saturating_sub(1);
+            state.next_hit_at = tick.saturating_add(state.hit_interval_ticks);
+        }
+
+        if tick >= state.expires_at
+            || (state.hits_remaining == 0 && state.waypoint_index + 1 >= state.waypoints.len())
+        {
+            let live_targets: Vec<usize> = state
+                .targets
+                .iter()
+                .copied()
+                .filter(|target_id| {
+                    ctx.get_entity(*target_id)
+                        .map(|e| e.is_alive())
+                        .unwrap_or(false)
+                })
+                .collect();
+            if !live_targets.is_empty() {
+                landing_batches.push((
+                    state.caster_id,
+                    state
+                        .landing_damage
+                        .saturating_mul(state.target_damage_percent)
+                        .saturating_div(100)
+                        .max(1),
+                    state.attacker_types,
+                    live_targets,
+                ));
+            }
+            if distance_sq(caster_pos, state.start_pos) > 1200_u64.saturating_mul(1200) {
+                force_moves.push((
+                    state.caster_id,
+                    caster_pos,
+                    state.start_pos,
+                    state.force_move_speed,
+                    state.waypoint_ticks as u64,
+                ));
+            }
+            return false;
+        }
+        true
+    });
+    drop(states);
+
+    for caster_id in protections {
+        apply_soft_untargetable(ctx, caster_id, 8);
+        ctx.add_buff(
+            caster_id,
+            BuffState {
+                duration: BuffType::Time { tick: 8 },
+                damaged_reduce: 100,
+                ..Default::default()
+            },
+        );
+    }
+    for (center, radius, caster_pos) in visuals {
+        draw_field_circle(ctx, center, radius, VFX_FLYING);
+        draw_status_marker(ctx, caster_pos, 12000, VFX_FLYING);
+    }
+    for (entity_id, entity_pos, target_pos, speed, ticks) in force_moves {
+        apply_status_force_move_toward_pos(ctx, entity_id, entity_pos, target_pos, speed, ticks);
+    }
+    for (caster_id, damage, attacker_types, targets) in
+        hit_batches.into_iter().chain(landing_batches)
+    {
+        for target_id in targets {
+            let defender_types =
+                crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+            crate::pokemon_types::deal_pokemon_damage(
+                ctx,
+                caster_id,
+                target_id,
+                0,
+                damage.max(1),
+                AttackType::Skill,
+                PokemonType::Flying,
+                attacker_types,
+                defender_types,
+            );
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn begin_marowak_bone_windmill(
+    ctx: &GameCtx,
+    caster_id: usize,
+    duration_ticks: usize,
+    radius: u64,
+    tick_interval: usize,
+    damage: usize,
+    knockback_speed: u64,
+    knockback_ticks: u64,
+    empowered_ticks: usize,
+    attacker_types: TypeSet,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let tick = ctx.tick();
+    let states = MAROWAK_BONE_WINDMILLS.get_or_init(|| Mutex::new(Vec::new()));
+    states
+        .lock()
+        .expect("marowak bone windmill state poisoned")
+        .push(MarowakBoneWindmillState {
+            caster_id,
+            caster_team: caster.team(),
+            expires_at: tick.saturating_add(duration_ticks),
+            next_tick_at: tick,
+            radius,
+            tick_interval: tick_interval.max(1),
+            damage: damage.max(1),
+            knockback_speed,
+            knockback_ticks,
+            empowered_ticks,
+            attacker_types,
+        });
+}
+
+pub fn consume_marowak_windmill_bonemerang(ctx: &GameCtx, entity_id: usize) -> bool {
+    let tick = ctx.tick();
+    let states = MAROWAK_WINDMILL_BONEMERANGS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("marowak windmill bonemerang state poisoned");
+    states.retain(|state| state.expires_at > tick);
+    let Some(index) = states
+        .iter()
+        .position(|state| state.entity_id == entity_id && state.expires_at > tick)
+    else {
+        return false;
+    };
+    states.remove(index);
+    true
+}
+
+fn update_marowak_bone_windmills(ctx: &mut GameCtx, tick: usize) {
+    let states = MAROWAK_BONE_WINDMILLS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("marowak bone windmill state poisoned");
+    let mut protections = Vec::new();
+    let mut ticks = Vec::new();
+    let mut visuals = Vec::new();
+    let mut empowered = Vec::new();
+
+    states.retain_mut(|state| {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            return false;
+        };
+        if !caster.is_alive() {
+            return false;
+        }
+        let caster_pos = caster.pos();
+        drop(caster);
+
+        if state.expires_at <= tick {
+            empowered.push((state.caster_id, state.empowered_ticks));
+            return false;
+        }
+
+        protections.push(state.caster_id);
+        visuals.push((caster_pos, state.radius));
+        if state.next_tick_at > tick {
+            return true;
+        }
+        state.next_tick_at = tick.saturating_add(state.tick_interval);
+        let targets: Vec<(usize, EntityPos)> = (0..ctx.entity_count())
+            .filter_map(|index| ctx.entity_at(index))
+            .filter(|entity| {
+                entity.team() != state.caster_team
+                    && entity.is_alive()
+                    && !entity.is_tower()
+                    && entity.is_targetable()
+                    && distance_sq(entity.pos(), caster_pos)
+                        <= state.radius.saturating_mul(state.radius)
+            })
+            .map(|entity| (entity.id(), entity.pos()))
+            .collect();
+        ticks.push((
+            state.caster_id,
+            caster_pos,
+            state.damage,
+            state.knockback_speed,
+            state.knockback_ticks,
+            state.attacker_types,
+            targets,
+        ));
+        true
+    });
+    drop(states);
+
+    for caster_id in protections {
+        apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: 8 });
+        apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockSkill { tick: 8 });
+        add_beneficial_buff(
+            ctx,
+            caster_id,
+            caster_id,
+            BuffState {
+                duration: BuffType::Time { tick: 8 },
+                damaged_reduce: 100,
+                ..Default::default()
+            },
+        );
+    }
+    for (center, radius) in visuals {
+        draw_field_circle(ctx, center, radius, VFX_GROUND);
+    }
+    for (caster_id, center, damage, knockback_speed, knockback_ticks, attacker_types, targets) in
+        ticks
+    {
+        for (target_id, target_pos) in targets {
+            let actual_target_id = audino_protect_redirect(ctx, target_id).unwrap_or(target_id);
+            let defender_types =
+                crate::neutral_objectives::defender_types_for_target(ctx, actual_target_id);
+            crate::pokemon_types::deal_pokemon_damage(
+                ctx,
+                caster_id,
+                actual_target_id,
+                damage.max(1),
+                0,
+                AttackType::Skill,
+                PokemonType::Ground,
+                attacker_types,
+                defender_types,
+            );
+            if !has_stalwart(ctx, actual_target_id) {
+                let mut dx = target_pos.x as i64 - center.x as i64;
+                let dy = target_pos.y as i64 - center.y as i64;
+                if dx == 0 && dy == 0 {
+                    dx = 1;
+                }
+                apply_pokemon_cc(
+                    ctx,
+                    caster_id,
+                    actual_target_id,
+                    CCState::ForceMove {
+                        tick: knockback_ticks,
+                        dx,
+                        dy,
+                        speed: knockback_speed,
+                    },
+                );
+            }
+        }
+    }
+    if !empowered.is_empty() {
+        let states = MAROWAK_WINDMILL_BONEMERANGS.get_or_init(|| Mutex::new(Vec::new()));
+        let mut states = states
+            .lock()
+            .expect("marowak windmill bonemerang state poisoned");
+        for (entity_id, empowered_ticks) in empowered {
+            states.retain(|state| state.entity_id != entity_id && state.expires_at > tick);
+            states.push(MarowakWindmillBonemerangState {
+                entity_id,
+                expires_at: tick.saturating_add(empowered_ticks),
+            });
+        }
+    }
+}
+
+pub fn garganacl_spawn_passive_salt(
+    ctx: &GameCtx,
+    caster_id: usize,
+    max_patches: usize,
+    radius: u64,
+    duration_ticks: usize,
+    damage: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+    water_steel_bonus_percent: usize,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let center = caster.pos();
+    let caster_team = caster.team();
+    drop(caster);
+
+    let tick = ctx.tick();
+    let patches = GARGANACL_SALT_PATCHES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut patches = patches.lock().expect("garganacl salt patch state poisoned");
+    patches.retain(|state| state.expires_at > tick);
+    patches.push(GarganaclSaltPatchState {
+        caster_id,
+        caster_team,
+        center,
+        radius,
+        created_at: tick,
+        expires_at: tick.saturating_add(duration_ticks),
+        next_tick_at: tick,
+        damage: damage.max(1),
+        slow_percent,
+        slow_ticks,
+        water_steel_bonus_percent,
+    });
+
+    while patches
+        .iter()
+        .filter(|state| state.caster_id == caster_id)
+        .count()
+        > max_patches
+    {
+        let Some((index, _)) = patches
+            .iter()
+            .enumerate()
+            .filter(|(_, state)| state.caster_id == caster_id)
+            .min_by_key(|(_, state)| state.created_at)
+        else {
+            break;
+        };
+        patches.remove(index);
+    }
+}
+
+pub fn trigger_garganacl_salt_cure_from_physical_damage(
+    ctx: &GameCtx,
+    target_id: usize,
+    ad_damage: usize,
+) {
+    if ad_damage == 0 {
+        return;
+    }
+    if !(entity_is_champion_id(target_id, "pokemon_moba_garganacl")
+        || receiver_has_copied(target_id, "pokemon_moba_garganacl"))
+    {
+        return;
+    }
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() {
+        return;
+    }
+    let target_stat = target.stat();
+    drop(target);
+
+    let salt_damage = 22usize.saturating_add(target_stat.attack.saturating_mul(25) / 100);
+    garganacl_spawn_passive_salt(ctx, target_id, 6, 22000, 5 * 60, salt_damage, 20, 90, 50);
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn begin_garganacl_blessed_salt(
+    ctx: &GameCtx,
+    caster_id: usize,
+    center: EntityPos,
+    duration_ticks: usize,
+    outer_radius: u64,
+    inner_radius: u64,
+    tick_interval: usize,
+    damage: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+    anti_heal_percent: i32,
+    anti_heal_ticks: usize,
+    permanent_tick_interval: usize,
+    permanent_damage: usize,
+    water_steel_bonus_percent: usize,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_team = caster.team();
+    drop(caster);
+
+    let tick = ctx.tick();
+    let states = GARGANACL_BLESSED_SALTS.get_or_init(|| Mutex::new(Vec::new()));
+    states
+        .lock()
+        .expect("garganacl blessed salt state poisoned")
+        .push(GarganaclBlessedSaltState {
+            caster_id,
+            caster_team,
+            center,
+            outer_radius,
+            expires_at: tick.saturating_add(duration_ticks),
+            next_tick_at: tick,
+            tick_interval: tick_interval.max(1),
+            damage: damage.max(1),
+            slow_percent,
+            slow_ticks,
+            anti_heal_percent,
+            anti_heal_ticks,
+        });
+
+    let permanent = GARGANACL_PERMANENT_SALTS.get_or_init(|| Mutex::new(Vec::new()));
+    permanent
+        .lock()
+        .expect("garganacl permanent salt state poisoned")
+        .push(GarganaclPermanentSaltState {
+            caster_id,
+            caster_team,
+            center,
+            outer_radius,
+            inner_radius,
+            next_tick_at: tick.saturating_add(duration_ticks),
+            tick_interval: permanent_tick_interval.max(1),
+            damage: permanent_damage.max(1),
+            slow_percent,
+            slow_ticks,
+            water_steel_bonus_percent,
+        });
+}
+
+pub fn garganacl_entity_in_salt(ctx: &GameCtx, entity_id: usize) -> bool {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return false;
+    };
+    let pos = entity.pos();
+    drop(entity);
+
+    let tick = ctx.tick();
+    if GARGANACL_SALT_PATCHES
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("garganacl salt patch state poisoned")
+        .iter()
+        .any(|state| {
+            state.expires_at > tick
+                && distance_sq(pos, state.center) <= state.radius.saturating_mul(state.radius)
+        })
+    {
+        return true;
+    }
+
+    GARGANACL_PERMANENT_SALTS
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("garganacl permanent salt state poisoned")
+        .iter()
+        .any(|state| {
+            let dist = distance_sq(pos, state.center);
+            dist <= state.outer_radius.saturating_mul(state.outer_radius)
+                && dist >= state.inner_radius.saturating_mul(state.inner_radius)
+        })
+}
+
+fn salt_damage_for_target(
+    ctx: &GameCtx,
+    target_id: usize,
+    base_damage: usize,
+    water_steel_bonus_percent: usize,
+) -> usize {
+    let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+    let vulnerable = defender_types
+        .iter()
+        .any(|ty| matches!(ty, PokemonType::Water | PokemonType::Steel));
+    if vulnerable {
+        base_damage.saturating_mul(100usize.saturating_add(water_steel_bonus_percent)) / 100
+    } else {
+        base_damage
+    }
+}
+
+fn update_garganacl_salt(ctx: &mut GameCtx, tick: usize) {
+    let mut patch_hits = Vec::new();
+    let mut patch_visuals = Vec::new();
+    let patches = GARGANACL_SALT_PATCHES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut patches = patches.lock().expect("garganacl salt patch state poisoned");
+    patches.retain_mut(|state| {
+        if state.expires_at <= tick {
+            return false;
+        }
+        patch_visuals.push((state.center, state.radius));
+        if state.next_tick_at > tick {
+            return true;
+        }
+        state.next_tick_at = tick.saturating_add(30);
+
+        for index in 0..ctx.entity_count() {
+            let Some(entity) = ctx.entity_at(index) else {
+                continue;
+            };
+            if !entity.is_alive()
+                || entity.team() == state.caster_team
+                || !entity.is_targetable()
+                || distance_sq(entity.pos(), state.center)
+                    > state.radius.saturating_mul(state.radius)
+            {
+                continue;
+            }
+            patch_hits.push((
+                state.caster_id,
+                entity.id(),
+                state.damage,
+                state.slow_percent,
+                state.slow_ticks,
+                state.water_steel_bonus_percent,
+            ));
+            return false;
+        }
+        true
+    });
+    drop(patches);
+
+    let mut pulse_hits = Vec::new();
+    let blessed = GARGANACL_BLESSED_SALTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut blessed = blessed
+        .lock()
+        .expect("garganacl blessed salt state poisoned");
+    blessed.retain_mut(|state| {
+        if state.expires_at <= tick {
+            return false;
+        }
+        patch_visuals.push((state.center, state.outer_radius));
+        if state.next_tick_at > tick {
+            return true;
+        }
+        state.next_tick_at = tick.saturating_add(state.tick_interval);
+        for index in 0..ctx.entity_count() {
+            let Some(entity) = ctx.entity_at(index) else {
+                continue;
+            };
+            if !entity.is_alive()
+                || entity.team() == state.caster_team
+                || !entity.is_targetable()
+                || distance_sq(entity.pos(), state.center)
+                    > state.outer_radius.saturating_mul(state.outer_radius)
+            {
+                continue;
+            }
+            pulse_hits.push((
+                state.caster_id,
+                entity.id(),
+                state.damage,
+                state.slow_percent,
+                state.slow_ticks,
+                state.anti_heal_percent,
+                state.anti_heal_ticks,
+            ));
+        }
+        true
+    });
+    drop(blessed);
+
+    let mut permanent_hits = Vec::new();
+    let permanent = GARGANACL_PERMANENT_SALTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut permanent = permanent
+        .lock()
+        .expect("garganacl permanent salt state poisoned");
+    permanent.retain_mut(|state| {
+        patch_visuals.push((state.center, state.outer_radius));
+        if state.next_tick_at > tick {
+            return true;
+        }
+        state.next_tick_at = tick.saturating_add(state.tick_interval);
+        for index in 0..ctx.entity_count() {
+            let Some(entity) = ctx.entity_at(index) else {
+                continue;
+            };
+            let dist = distance_sq(entity.pos(), state.center);
+            if !entity.is_alive()
+                || entity.team() == state.caster_team
+                || !entity.is_targetable()
+                || dist > state.outer_radius.saturating_mul(state.outer_radius)
+                || dist < state.inner_radius.saturating_mul(state.inner_radius)
+            {
+                continue;
+            }
+            permanent_hits.push((
+                state.caster_id,
+                entity.id(),
+                state.damage,
+                state.slow_percent,
+                state.slow_ticks,
+                state.water_steel_bonus_percent,
+            ));
+        }
+        true
+    });
+    drop(permanent);
+
+    for (center, radius) in patch_visuals {
+        draw_field_circle(ctx, center, radius, VFX_GROUND);
+    }
+    for (caster_id, target_id, damage, slow_percent, slow_ticks, bonus) in
+        patch_hits.into_iter().chain(permanent_hits.into_iter())
+    {
+        let actual_target_id = audino_protect_redirect(ctx, target_id).unwrap_or(target_id);
+        let damage = salt_damage_for_target(ctx, actual_target_id, damage, bonus);
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            actual_target_id,
+            damage.max(1),
+            0,
+            AttackType::Skill,
+            PokemonType::Rock,
+            TypeSet::single(PokemonType::Rock),
+            crate::neutral_objectives::defender_types_for_target(ctx, actual_target_id),
+        );
+        ctx.add_buff(
+            actual_target_id,
+            BuffState {
+                duration: BuffType::Time { tick: slow_ticks },
+                move_speed_mult: -slow_percent,
+                ..Default::default()
+            },
+        );
+    }
+    for (
+        caster_id,
+        target_id,
+        damage,
+        slow_percent,
+        slow_ticks,
+        anti_heal_percent,
+        anti_heal_ticks,
+    ) in pulse_hits
+    {
+        let actual_target_id = audino_protect_redirect(ctx, target_id).unwrap_or(target_id);
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            actual_target_id,
+            damage.max(1),
+            0,
+            AttackType::Skill,
+            PokemonType::Rock,
+            TypeSet::single(PokemonType::Rock),
+            crate::neutral_objectives::defender_types_for_target(ctx, actual_target_id),
+        );
+        ctx.add_buff(
+            actual_target_id,
+            BuffState {
+                duration: BuffType::Time { tick: slow_ticks },
+                move_speed_mult: -slow_percent,
+                ..Default::default()
+            },
+        );
+        apply_anti_heal(
+            ctx,
+            caster_id,
+            actual_target_id,
+            anti_heal_percent.max(0) as usize,
+            anti_heal_ticks,
+        );
+    }
+}
+
+fn update_ampharos_gigavolts(ctx: &mut GameCtx, tick: usize) {
+    let states = AMPHAROS_GIGAVOLTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("ampharos gigavolt state poisoned");
+    states.retain(|state| {
+        state.expires_at > tick
+            && ctx
+                .get_entity(state.caster_id)
+                .map(|caster| caster.is_alive())
+                .unwrap_or(false)
+    });
+
+    let mut initial_strikes = Vec::new();
+    let mut zone_ticks = Vec::new();
+    for state in states.iter_mut() {
+        if !state.triggered && tick >= state.trigger_at {
+            state.triggered = true;
+            state.next_tick_at = tick;
+            initial_strikes.push(*state);
+        }
+        if state.triggered && tick >= state.next_tick_at {
+            state.next_tick_at = tick.saturating_add(state.zone_tick_interval.max(1));
+            zone_ticks.push(*state);
+        }
+    }
+    drop(states);
+
+    for state in initial_strikes {
+        let radius_sq = state.radius.saturating_mul(state.radius);
+        let targets: Vec<usize> = (0..ctx.entity_count())
+            .filter_map(|index| ctx.entity_at(index))
+            .filter(|entity| {
+                entity.team() != state.caster_team
+                    && entity.is_alive()
+                    && !entity.is_tower()
+                    && distance_sq(entity.pos(), state.center) <= radius_sq
+            })
+            .map(|entity| entity.id())
+            .collect();
+        for target_id in targets {
+            let defender_types =
+                crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+            crate::pokemon_types::deal_pokemon_damage(
+                ctx,
+                state.caster_id,
+                target_id,
+                0,
+                state.damage.max(1),
+                AttackType::Skill,
+                PokemonType::Electric,
+                state.attacker_types,
+                defender_types,
+            );
+        }
+        draw_status_marker(ctx, state.center, state.radius, VFX_ELECTRIC);
+    }
+
+    for state in zone_ticks {
+        let radius_sq = state.radius.saturating_mul(state.radius);
+        let targets: Vec<usize> = (0..ctx.entity_count())
+            .filter_map(|index| ctx.entity_at(index))
+            .filter(|entity| {
+                entity.team() != state.caster_team
+                    && entity.is_alive()
+                    && !entity.is_tower()
+                    && distance_sq(entity.pos(), state.center) <= radius_sq
+            })
+            .map(|entity| entity.id())
+            .collect();
+        for target_id in targets {
+            add_harmful_buff(
+                ctx,
+                state.caster_id,
+                target_id,
+                BuffState {
+                    duration: BuffType::Time {
+                        tick: state.zone_slow_ticks,
+                    },
+                    move_speed_mult: -state.zone_slow_percent.abs(),
+                    ..Default::default()
+                },
+            );
+        }
+
+        if let Some(caster) = ctx.get_entity(state.caster_id) {
+            if caster.is_alive()
+                && distance_sq(caster.pos(), state.center)
+                    <= state.radius.saturating_mul(state.radius)
+            {
+                drop(caster);
+                add_beneficial_buff(
+                    ctx,
+                    state.caster_id,
+                    state.caster_id,
+                    BuffState {
+                        duration: BuffType::Time {
+                            tick: state.attack_speed_buff_ticks,
+                        },
+                        attack_speed_mult: state.attack_speed_mult,
+                        ..Default::default()
+                    },
+                );
+            }
+        }
+        draw_field_circle(ctx, state.center, state.radius, VFX_ELECTRIC);
+    }
+}
+
+pub fn update_xatu_stillness(ctx: &mut GameCtx, entity_id: usize) {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() || !entity.is_champion() {
+        return;
+    }
+    let pos = entity.pos();
+    drop(entity);
+
+    let states = XATU_STILLNESSES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("xatu stillness state poisoned");
+    states.retain(|state| {
+        ctx.get_entity(state.entity_id)
+            .map(|entity| entity.is_alive() && entity.is_champion())
+            .unwrap_or(false)
+    });
+    if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
+        let moved = state
+            .last_pos
+            .map(|last_pos| distance_sq(last_pos, pos) >= XATU_STILL_MOVE_THRESHOLD_SQ)
+            .unwrap_or(false);
+        state.last_pos = Some(pos);
+        if moved {
+            state.still_ticks = 0;
+        } else {
+            state.still_ticks = state.still_ticks.saturating_add(1);
+        }
+        return;
+    }
+    states.push(XatuStillnessState {
+        entity_id,
+        last_pos: Some(pos),
+        still_ticks: 0,
+    });
+}
+
+pub fn xatu_stood_still_for(ctx: &GameCtx, entity_id: usize, ticks: usize) -> bool {
+    let states = XATU_STILLNESSES.get_or_init(|| Mutex::new(Vec::new()));
+    states
+        .lock()
+        .expect("xatu stillness state poisoned")
+        .iter()
+        .any(|state| {
+            state.entity_id == entity_id
+                && state.still_ticks >= ticks
+                && ctx
+                    .get_entity(entity_id)
+                    .map(|entity| entity.is_alive())
+                    .unwrap_or(false)
+        })
+}
+
+pub fn apply_xatu_mind_bend(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    damage: usize,
+    confusion_ticks: usize,
+    still_ticks_required: usize,
+    attacker_types: TypeSet,
+) {
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() || target.is_tower() {
+        return;
+    }
+    drop(target);
+
+    apply_confusion_from(ctx, caster_id, target_id, 1, confusion_ticks);
+    if xatu_stood_still_for(ctx, caster_id, still_ticks_required) {
+        let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            target_id,
+            0,
+            damage.max(1),
+            AttackType::Skill,
+            PokemonType::Psychic,
+            attacker_types,
+            defender_types,
+        );
+    }
+}
+
+pub fn apply_xatu_pain_amplifier(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    damage_taken_percent: usize,
+    duration_ticks: usize,
+    stun_ticks: usize,
+    still_ticks_required: usize,
+) {
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() || target.is_tower() {
+        return;
+    }
+    let target_pos = target.pos();
+    drop(target);
+
+    let tick = ctx.tick();
+    let states = XATU_PAIN_AMPLIFIERS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("xatu pain amplifier state poisoned");
+    states.retain(|state| state.expires_at > tick && state.target_id != target_id);
+    states.push(XatuPainAmplifierState {
+        target_id,
+        expires_at: tick.saturating_add(duration_ticks),
+        damage_taken_percent,
+    });
+    drop(states);
+
+    add_harmful_buff(
+        ctx,
+        caster_id,
+        target_id,
+        BuffState {
+            duration: BuffType::Time {
+                tick: duration_ticks,
+            },
+            magic_resistance_mult: -10,
+            ..Default::default()
+        },
+    );
+
+    if xatu_stood_still_for(ctx, caster_id, still_ticks_required) && !is_limber(ctx, target_id) {
+        let ticks = adjusted_cc_ticks(ctx, target_id, stun_ticks);
+        break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::Stun { tick: ticks as u64 });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockSkill { tick: ticks });
+    }
+    draw_status_marker(ctx, target_pos, 14000, VFX_PSYCHIC);
+}
+
+pub fn xatu_pain_amplifier_bonus_percent(ctx: &GameCtx, target_id: usize) -> usize {
+    let tick = ctx.tick();
+    let states = XATU_PAIN_AMPLIFIERS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("xatu pain amplifier state poisoned");
+    states.retain(|state| {
+        state.expires_at > tick
+            && ctx
+                .get_entity(state.target_id)
+                .map(|entity| entity.is_alive())
+                .unwrap_or(false)
+    });
+    states
+        .iter()
+        .filter(|state| state.target_id == target_id)
+        .map(|state| state.damage_taken_percent)
+        .max()
+        .unwrap_or(0)
+}
+
+pub fn note_xatu_prophecy_skill_cast(ctx: &mut GameCtx, caster_id: usize) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() || !caster.is_champion() {
+        return;
+    }
+    let caster_team = caster.team();
+    let caster_pos = caster.pos();
+    drop(caster);
+
+    let radius_sq = XATU_PROPHECY_RADIUS.saturating_mul(XATU_PROPHECY_RADIUS);
+    let tick = ctx.tick();
+    let xatus: Vec<(usize, usize)> = (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .filter(|entity| {
+            entity.team() != caster_team
+                && entity.is_alive()
+                && entity.is_champion()
+                && (entity_is_champion_id(entity.id(), "pokemon_moba_xatu")
+                    || receiver_has_copied(entity.id(), "pokemon_moba_xatu"))
+                && distance_sq(entity.pos(), caster_pos) <= radius_sq
+        })
+        .map(|entity| (entity.id(), entity.team()))
+        .collect();
+
+    for (xatu_id, xatu_team) in xatus {
+        note_team_spot_for_ticks(
+            tick,
+            xatu_id,
+            xatu_team,
+            caster_id,
+            caster_pos,
+            XATU_PROPHECY_REVEAL_TICKS,
+        );
+        add_harmful_buff(
+            ctx,
+            xatu_id,
+            caster_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: XATU_PROPHECY_DEBUFF_TICKS,
+                },
+                magic_resistance_mult: XATU_PROPHECY_MAGIC_RESIST_MULT,
+                ..Default::default()
+            },
+        );
+        draw_status_marker(ctx, caster_pos, 12000, VFX_PSYCHIC);
+    }
+}
+
+pub fn begin_xatu_super_psy(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    start: EntityPos,
+    end: EntityPos,
+    channel_ticks: usize,
+    tick_interval: usize,
+    width: u64,
+    travel_range: u64,
+    damage: usize,
+    close_bonus_percent: usize,
+    attacker_types: TypeSet,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    drop(caster);
+
+    let tick = ctx.tick();
+    let states = XATU_SUPER_PSYS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("xatu super psy state poisoned");
+    states.retain(|state| state.caster_id != caster_id && state.expires_at > tick);
+    states.push(XatuSuperPsyState {
+        caster_id,
+        caster_team,
+        end,
+        expires_at: tick.saturating_add(channel_ticks),
+        next_tick_at: tick,
+        tick_interval,
+        width,
+        travel_range,
+        damage,
+        close_bonus_percent,
+        attacker_types,
+    });
+    drop(states);
+
+    apply_pokemon_cc(
+        ctx,
+        caster_id,
+        caster_id,
+        CCState::Bind {
+            tick: channel_ticks as u64,
+        },
+    );
+    ctx.add_buff(
+        caster_id,
+        BuffState {
+            duration: BuffType::Time {
+                tick: channel_ticks,
+            },
+            cc_immune: true,
+            ..Default::default()
+        },
+    );
+    draw_line_band(ctx, start, end, width, VFX_PSYCHIC);
+}
+
+fn xatu_super_psy_aim_end(
+    ctx: &GameCtx,
+    state: XatuSuperPsyState,
+    caster_pos: EntityPos,
+) -> EntityPos {
+    let fallback = if distance_sq(caster_pos, state.end) == 0 {
+        EntityPos {
+            x: caster_pos.x.saturating_add(state.travel_range),
+            y: caster_pos.y,
+        }
+    } else {
+        state.end
+    };
+
+    let target_pos = (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .filter(|entity| {
+            entity.team() != state.caster_team
+                && entity.is_alive()
+                && entity.is_champion()
+                && !is_soft_untargetable(ctx, entity.id())
+        })
+        .map(|entity| {
+            let hp = entity.hp();
+            let hp_score = hp.current.saturating_mul(1000) / hp.max.max(1);
+            (hp_score, distance_sq(caster_pos, entity.pos()), entity.pos())
+        })
+        .min_by_key(|(hp_score, distance, _)| (*hp_score, *distance))
+        .map(|(_, _, pos)| pos)
+        .unwrap_or(fallback);
+
+    let dx = target_pos.x as f64 - caster_pos.x as f64;
+    let dy = target_pos.y as f64 - caster_pos.y as f64;
+    let len = (dx * dx + dy * dy).sqrt();
+    if len <= 0.0 {
+        return fallback;
+    }
+
+    pos_from_f64(
+        caster_pos.x as f64 + dx / len * state.travel_range as f64,
+        caster_pos.y as f64 + dy / len * state.travel_range as f64,
+    )
+}
+
+fn update_xatu_super_psys(ctx: &mut GameCtx, tick: usize) {
+    let states = XATU_SUPER_PSYS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("xatu super psy state poisoned");
+    let mut tick_states = Vec::new();
+    let mut active_states = Vec::new();
+    states.retain_mut(|state| {
+        let alive = ctx
+            .get_entity(state.caster_id)
+            .map(|entity| entity.is_alive())
+            .unwrap_or(false);
+        if !alive || state.expires_at <= tick {
+            return false;
+        }
+        active_states.push(*state);
+        if tick >= state.next_tick_at {
+            tick_states.push(*state);
+            state.next_tick_at = tick.saturating_add(state.tick_interval.max(1));
+        }
+        true
+    });
+    drop(states);
+
+    for state in active_states {
+        if let Some(caster) = ctx.get_entity(state.caster_id) {
+            let caster_pos = caster.pos();
+            drop(caster);
+            let aim_end = xatu_super_psy_aim_end(ctx, state, caster_pos);
+            apply_pokemon_cc(ctx, state.caster_id, state.caster_id, CCState::Bind { tick: 8 });
+            ctx.add_buff(
+                state.caster_id,
+                BuffState {
+                    duration: BuffType::Time { tick: 8 },
+                    cc_immune: true,
+                    ..Default::default()
+                },
+            );
+            for index in 0..ctx.entity_count() {
+                let Some(entity) = ctx.entity_at(index) else {
+                    continue;
+                };
+                if entity.team() != state.caster_team && entity.is_alive() && entity.is_champion() {
+                    note_team_spot_for_ticks(
+                        tick,
+                        state.caster_id,
+                        state.caster_team,
+                        entity.id(),
+                        entity.pos(),
+                        XATU_PROPHECY_REVEAL_TICKS,
+                    );
+                }
+            }
+            draw_line_band(ctx, caster_pos, aim_end, state.width, VFX_PSYCHIC);
+        }
+    }
+
+    for state in tick_states {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            continue;
+        };
+        let caster_pos = caster.pos();
+        drop(caster);
+        let aim_end = xatu_super_psy_aim_end(ctx, state, caster_pos);
+        let width_sq = state.width.saturating_mul(state.width);
+        let targets: Vec<(usize, EntityPos)> = (0..ctx.entity_count())
+            .filter_map(|index| ctx.entity_at(index))
+            .filter(|entity| {
+                entity.team() != state.caster_team
+                    && entity.is_alive()
+                    && !entity.is_tower()
+                    && distance_to_segment_sq(entity.pos(), caster_pos, aim_end) <= width_sq
+            })
+            .map(|entity| (entity.id(), entity.pos()))
+            .collect();
+        for (target_id, target_pos) in targets {
+            let distance = integer_sqrt(distance_sq(caster_pos, target_pos));
+            let closeness = state.travel_range.saturating_sub(distance.min(state.travel_range));
+            let bonus = state
+                .close_bonus_percent
+                .saturating_mul(closeness as usize)
+                / state.travel_range.max(1) as usize;
+            let damage = state.damage.saturating_mul(100 + bonus) / 100;
+            let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+            crate::pokemon_types::deal_pokemon_damage(
+                ctx,
+                state.caster_id,
+                target_id,
+                0,
+                damage.max(1),
+                AttackType::Skill,
+                PokemonType::Psychic,
+                state.attacker_types,
+                defender_types,
+            );
+        }
+    }
+}
+
+fn has_quaquaval_aqua_step(entity_id: usize) -> bool {
+    entity_is_champion_id(entity_id, "pokemon_moba_quaquaval")
+        || receiver_has_copied(entity_id, "pokemon_moba_quaquaval")
+}
+
+pub fn begin_quaquaval_exciting_dance(
+    ctx: &mut GameCtx,
+    entity_id: usize,
+    duration_ticks: usize,
+    attack_speed_mult: i32,
+    move_speed_mult: i32,
+) {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() {
+        return;
+    }
+    let pos = entity.pos();
+    drop(entity);
+
+    let tick = ctx.tick();
+    let states = QUAQUAVAL_EXCITING_DANCES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("quaquaval exciting dance state poisoned");
+    states.retain(|state| state.entity_id != entity_id && state.expires_at > tick);
+    states.push(QuaquavalExcitingDanceState {
+        entity_id,
+        expires_at: tick.saturating_add(duration_ticks),
+    });
+    drop(states);
+
+    add_beneficial_buff(
+        ctx,
+        entity_id,
+        entity_id,
+        BuffState {
+            duration: BuffType::Time {
+                tick: duration_ticks,
+            },
+            attack_speed_mult,
+            move_speed_mult,
+            ..Default::default()
+        },
+    );
+    draw_status_marker(ctx, pos, 24000, VFX_WATER);
+}
+
+fn quaquaval_exciting_dance_active(ctx: &GameCtx, entity_id: usize) -> bool {
+    let tick = ctx.tick();
+    let states = QUAQUAVAL_EXCITING_DANCES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("quaquaval exciting dance state poisoned");
+    states.retain(|state| {
+        state.expires_at.saturating_add(QUAQUAVAL_EXCITING_DANCE_TRAIL_GRACE_TICKS) > tick
+            && ctx
+                .get_entity(state.entity_id)
+                .map(|entity| entity.is_alive())
+                .unwrap_or(false)
+    });
+    states
+        .iter()
+        .any(|state| state.entity_id == entity_id && state.expires_at >= tick)
+}
+
+pub fn update_quaquaval_aqua_step(ctx: &mut GameCtx, entity_id: usize) {
+    if !has_quaquaval_aqua_step(entity_id) {
+        return;
+    }
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() || !entity.is_champion() {
+        return;
+    }
+    let pos = entity.pos();
+    let team = entity.team();
+    drop(entity);
+
+    let tick = ctx.tick();
+    let emitters = QUAQUAVAL_AQUA_STEP_EMITTERS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut emitters = emitters.lock().expect("quaquaval aqua step emitter state poisoned");
+    emitters.retain(|state| {
+        ctx.get_entity(state.entity_id)
+            .map(|entity| entity.is_alive() && has_quaquaval_aqua_step(state.entity_id))
+            .unwrap_or(false)
+    });
+    let state = if let Some(existing) = emitters
+        .iter_mut()
+        .find(|state| state.entity_id == entity_id)
+    {
+        existing
+    } else {
+        emitters.push(QuaquavalAquaStepEmitterState {
+            entity_id,
+            last_pos: Some(pos),
+            last_drop_pos: Some(pos),
+            last_drop_tick: tick,
+        });
+        return;
+    };
+
+    let previous_drop = state.last_drop_pos.unwrap_or(pos);
+    let moved_enough =
+        distance_sq(previous_drop, pos) >= QUAQUAVAL_AQUA_STEP_DROP_DISTANCE.saturating_mul(
+            QUAQUAVAL_AQUA_STEP_DROP_DISTANCE,
+        );
+    let interval_ready =
+        tick.saturating_sub(state.last_drop_tick) >= QUAQUAVAL_AQUA_STEP_DROP_INTERVAL_TICKS;
+    state.last_pos = Some(pos);
+    if !moved_enough || !interval_ready {
+        return;
+    }
+    state.last_drop_pos = Some(pos);
+    state.last_drop_tick = tick;
+    drop(emitters);
+
+    let empowered = quaquaval_exciting_dance_active(ctx, entity_id);
+    let segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut segments = segments.lock().expect("quaquaval aqua step segment state poisoned");
+    segments.retain(|segment| {
+        segment.expires_at > tick
+            && ctx
+                .get_entity(segment.caster_id)
+                .map(|entity| entity.is_alive())
+                .unwrap_or(false)
+    });
+    segments.push(QuaquavalAquaStepSegmentState {
+        caster_id: entity_id,
+        caster_team: team,
+        start: previous_drop,
+        end: pos,
+        width: QUAQUAVAL_AQUA_STEP_WIDTH,
+        expires_at: tick.saturating_add(QUAQUAVAL_AQUA_STEP_SEGMENT_TICKS),
+        next_tick_at: tick,
+        empowered,
+    });
+    while segments
+        .iter()
+        .filter(|segment| segment.caster_id == entity_id)
+        .count()
+        > QUAQUAVAL_AQUA_STEP_MAX_SEGMENTS
+    {
+        if let Some((remove_index, _)) = segments
+            .iter()
+            .enumerate()
+            .filter(|(_, segment)| segment.caster_id == entity_id)
+            .min_by_key(|(_, segment)| segment.expires_at)
+        {
+            segments.remove(remove_index);
+        } else {
+            break;
+        }
+    }
+}
+
+fn update_quaquaval_aqua_step_segments(ctx: &mut GameCtx, tick: usize) {
+    let segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut segments = segments.lock().expect("quaquaval aqua step segment state poisoned");
+    let mut visuals = Vec::new();
+    let mut ally_buffs = Vec::new();
+    let mut enemy_slows = Vec::new();
+
+    segments.retain_mut(|state| {
+        if state.expires_at <= tick {
+            return false;
+        }
+        if !ctx
+            .get_entity(state.caster_id)
+            .map(|entity| entity.is_alive())
+            .unwrap_or(false)
+        {
+            return false;
+        }
+        visuals.push((state.start, state.end, state.width, state.empowered));
+        if state.next_tick_at > tick {
+            return true;
+        }
+        while state.next_tick_at <= tick {
+            state.next_tick_at = state
+                .next_tick_at
+                .saturating_add(QUAQUAVAL_AQUA_STEP_INTERVAL_TICKS);
+        }
+        for index in 0..ctx.entity_count() {
+            let Some(entity) = ctx.entity_at(index) else {
+                continue;
+            };
+            if !entity.is_alive()
+                || !entity.is_champion()
+                || distance_to_segment_sq(entity.pos(), state.start, state.end)
+                    > state.width.saturating_mul(state.width)
+            {
+                continue;
+            }
+            if entity.team() == state.caster_team {
+                let speed = if state.empowered {
+                    QUAQUAVAL_AQUA_STEP_EMPOWERED_ALLY_SPEED_MULT
+                } else {
+                    QUAQUAVAL_AQUA_STEP_ALLY_SPEED_MULT
+                };
+                ally_buffs.push((state.caster_id, entity.id(), speed));
+            } else {
+                let slow = if state.empowered {
+                    QUAQUAVAL_AQUA_STEP_EMPOWERED_ENEMY_SLOW_MULT
+                } else {
+                    QUAQUAVAL_AQUA_STEP_ENEMY_SLOW_MULT
+                };
+                enemy_slows.push((state.caster_id, entity.id(), slow));
+            }
+        }
+        true
+    });
+    drop(segments);
+
+    for (start, end, width, empowered) in visuals {
+        draw_line_band(
+            ctx,
+            start,
+            end,
+            if empowered { width.saturating_mul(3) / 2 } else { width },
+            VFX_WATER,
+        );
+    }
+    for (caster_id, target_id, move_speed_mult) in ally_buffs {
+        add_beneficial_buff(
+            ctx,
+            caster_id,
+            target_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: QUAQUAVAL_AQUA_STEP_INTERVAL_TICKS.saturating_mul(2),
+                },
+                move_speed_mult,
+                ..Default::default()
+            },
+        );
+    }
+    for (caster_id, target_id, slow_percent) in enemy_slows {
+        add_harmful_buff(
+            ctx,
+            caster_id,
+            target_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: QUAQUAVAL_AQUA_STEP_INTERVAL_TICKS.saturating_mul(2),
+                },
+                move_speed_mult: -slow_percent,
+                ..Default::default()
+            },
+        );
+    }
+}
+
+pub fn quaquaval_water_damage_bonus_percent(ctx: &GameCtx, caster_id: usize) -> usize {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return 0;
+    };
+    if !caster.is_alive() {
+        return 0;
+    }
+    let team = caster.team();
+    let pos = caster.pos();
+    drop(caster);
+
+    let tick = ctx.tick();
+    let segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.get_or_init(|| Mutex::new(Vec::new()));
+    segments
+        .lock()
+        .expect("quaquaval aqua step segment state poisoned")
+        .iter()
+        .filter(|segment| {
+            segment.expires_at > tick
+                && segment.caster_team == team
+                && distance_to_segment_sq(pos, segment.start, segment.end)
+                    <= segment.width.saturating_mul(segment.width)
+        })
+        .map(|segment| {
+            if segment.empowered {
+                QUAQUAVAL_AQUA_STEP_EMPOWERED_WATER_DAMAGE_BONUS
+            } else {
+                QUAQUAVAL_AQUA_STEP_WATER_DAMAGE_BONUS
+            }
+        })
+        .max()
+        .unwrap_or(0)
+}
+
+pub fn quaquaval_recently_hit_by_spiral_shot(ctx: &GameCtx, target_id: usize) -> bool {
+    let tick = ctx.tick();
+    let states = QUAQUAVAL_SPIRAL_SHOTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("quaquaval spiral shot state poisoned");
+    states.retain(|state| {
+        state.expires_at > tick
+            && ctx
+                .get_entity(state.target_id)
+                .map(|entity| entity.is_alive())
+                .unwrap_or(false)
+    });
+    states.iter().any(|state| state.target_id == target_id)
+}
+
+pub fn apply_quaquaval_spiral_shot(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    damage: usize,
+    slow_percent: i32,
+    slow_ticks: usize,
+    attacker_types: TypeSet,
+) {
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() || target.is_tower() {
+        return;
+    }
+    let target_pos = target.pos();
+    drop(target);
+
+    let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+    crate::pokemon_types::deal_pokemon_damage(
+        ctx,
+        caster_id,
+        target_id,
+        damage.max(1),
+        0,
+        AttackType::Skill,
+        PokemonType::Water,
+        attacker_types,
+        defender_types,
+    );
+    add_harmful_buff(
+        ctx,
+        caster_id,
+        target_id,
+        BuffState {
+            duration: BuffType::Time { tick: slow_ticks },
+            move_speed_mult: -slow_percent.abs(),
+            ..Default::default()
+        },
+    );
+    let states = QUAQUAVAL_SPIRAL_SHOTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("quaquaval spiral shot state poisoned");
+    let expires_at = ctx.tick().saturating_add(slow_ticks);
+    states.retain(|state| state.target_id != target_id && state.expires_at > ctx.tick());
+    states.push(QuaquavalSpiralShotState {
+        target_id,
+        expires_at,
+    });
+    draw_status_marker(ctx, target_pos, 13000, VFX_WATER);
+}
+
+fn quaquaval_path_crosses_own_aqua_step(
+    ctx: &GameCtx,
+    caster_id: usize,
+    start: EntityPos,
+    end: EntityPos,
+    check_width: u64,
+) -> bool {
+    let tick = ctx.tick();
+    let segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.get_or_init(|| Mutex::new(Vec::new()));
+    let segments = segments.lock().expect("quaquaval aqua step segment state poisoned");
+    segments
+        .iter()
+        .filter(|segment| segment.caster_id == caster_id && segment.expires_at > tick)
+        .any(|segment| {
+            (0..=5).any(|step| {
+                let t = step as f64 / 5.0;
+                let sample = pos_from_f64(
+                    start.x as f64 + (end.x as f64 - start.x as f64) * t,
+                    start.y as f64 + (end.y as f64 - start.y as f64) * t,
+                );
+                distance_to_segment_sq(sample, segment.start, segment.end)
+                    <= check_width
+                        .saturating_add(segment.width)
+                        .saturating_mul(check_width.saturating_add(segment.width))
+            })
+        })
+}
+
+pub fn apply_quaquaval_up_tempo(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    base_damage: usize,
+    empowered_bonus_percent: usize,
+    dash_speed: u64,
+    dash_ticks: usize,
+    knockback_speed: u64,
+    knockback_ticks: usize,
+    empowered_knockback_ticks: usize,
+    stun_ticks: usize,
+    trail_check_width: u64,
+    attacker_types: TypeSet,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_pos = caster.pos();
+    drop(caster);
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() || !target.is_champion() {
+        return;
+    }
+    let target_pos = target.pos();
+    drop(target);
+
+    let empowered =
+        quaquaval_path_crosses_own_aqua_step(ctx, caster_id, caster_pos, target_pos, trail_check_width);
+    force_move_toward_pos(ctx, caster_id, caster_pos, target_pos, dash_speed, dash_ticks);
+    let damage = if empowered {
+        base_damage.saturating_mul(100usize.saturating_add(empowered_bonus_percent)) / 100
+    } else {
+        base_damage
+    };
+    let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+    crate::pokemon_types::deal_pokemon_damage(
+        ctx,
+        caster_id,
+        target_id,
+        damage.max(1),
+        0,
+        AttackType::Skill,
+        PokemonType::Fighting,
+        attacker_types,
+        defender_types,
+    );
+    if !has_stalwart(ctx, target_id) {
+        let dx = target_pos.x as f64 - caster_pos.x as f64;
+        let dy = target_pos.y as f64 - caster_pos.y as f64;
+        let len = (dx * dx + dy * dy).sqrt().max(1.0);
+        let distance = if empowered { 32000.0 } else { 17000.0 };
+        let knock_to = pos_from_f64(
+            target_pos.x as f64 + dx / len * distance,
+            target_pos.y as f64 + dy / len * distance,
+        );
+        force_move_toward_pos(
+            ctx,
+            target_id,
+            target_pos,
+            knock_to,
+            knockback_speed,
+            if empowered {
+                empowered_knockback_ticks
+            } else {
+                knockback_ticks
+            },
+        );
+    }
+    if empowered && !is_limber(ctx, target_id) {
+        let ticks = adjusted_cc_ticks(ctx, target_id, stun_ticks);
+        break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::Stun { tick: ticks as u64 });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockSkill { tick: ticks });
+    }
+    draw_line_band(ctx, caster_pos, target_pos, trail_check_width, VFX_WATER);
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn apply_arcanine_extremespeed(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    start: EntityPos,
+    end: EntityPos,
+    damage: usize,
+    attacker_types: TypeSet,
+    line_width: u64,
+    dash_speed: u64,
+    dash_ticks: usize,
+    shield_hp_percent: usize,
+    shield_ticks: usize,
+    broken_move_speed_mult: i32,
+    broken_move_speed_ticks: usize,
+) {
+    force_move_toward_pos(ctx, caster_id, start, end, dash_speed, dash_ticks);
+    let width_sq = line_width.saturating_mul(line_width);
+    let targets: Vec<usize> = (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .filter(|entity| {
+            entity.team() != caster_team
+                && entity.is_alive()
+                && !entity.is_tower()
+                && distance_to_segment_sq(entity.pos(), start, end) <= width_sq
+        })
+        .map(|entity| entity.id())
+        .collect();
+
+    for target_id in targets {
+        let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            target_id,
+            damage.max(1),
+            0,
+            AttackType::Skill,
+            PokemonType::Normal,
+            attacker_types,
+            defender_types,
+        );
+    }
+
+    if let Some(caster) = ctx.get_entity(caster_id) {
+        let shield = caster.hp().max.saturating_mul(shield_hp_percent) / 100;
+        drop(caster);
+        if shield > 0 {
+            add_beneficial_buff(
+                ctx,
+                caster_id,
+                caster_id,
+                BuffState {
+                    duration: BuffType::Time { tick: shield_ticks },
+                    hp: shield.min(i32::MAX as usize) as i32,
+                    ..Default::default()
+                },
+            );
+            let states = ARCANINE_EXTREMESPEED_SHIELDS.get_or_init(|| Mutex::new(Vec::new()));
+            let mut states = states.lock().expect("arcanine extremespeed shield state poisoned");
+            let expires_at = ctx.tick().saturating_add(shield_ticks);
+            states.retain(|state| state.entity_id != caster_id && state.expires_at > ctx.tick());
+            states.push(ArcanineExtremespeedShieldState {
+                entity_id: caster_id,
+                expires_at,
+                broken_move_speed_mult,
+                broken_move_speed_ticks,
+            });
+        }
+    }
+    draw_line_band(ctx, start, end, line_width, VFX_NORMAL);
+}
+
+#[allow(clippy::too_many_arguments)]
+pub fn apply_arcanine_white_flames(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    start: EntityPos,
+    end: EntityPos,
+    damage: usize,
+    attacker_types: TypeSet,
+    line_width: u64,
+    side_offset: u64,
+    burn_chance_percent: usize,
+    burn_ticks: usize,
+    burn_damage: usize,
+    heal_percent: usize,
+) {
+    let (left_start, left_end, right_start, right_end) =
+        parallel_line_segments(start, end, side_offset);
+    let width_sq = line_width.saturating_mul(line_width);
+    let targets: Vec<usize> = (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .filter(|entity| {
+            entity.team() != caster_team
+                && entity.is_alive()
+                && !entity.is_tower()
+                && (distance_to_segment_sq(entity.pos(), left_start, left_end) <= width_sq
+                    || distance_to_segment_sq(entity.pos(), right_start, right_end) <= width_sq)
+        })
+        .map(|entity| entity.id())
+        .collect();
+
+    for target_id in targets {
+        let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let result = crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            target_id,
+            0,
+            damage.max(1),
+            AttackType::Skill,
+            PokemonType::Fire,
+            attacker_types,
+            defender_types,
+        );
+        arcanine_heal_from_ability_damage(ctx, caster_id, target_id, result.applied_damage, heal_percent);
+        if burn_chance_percent >= 100
+            || chance_percent(ctx.seed(), caster_id, target_id, ctx.tick(), burn_chance_percent)
+        {
+            apply_burn_for(ctx, caster_id, target_id, burn_damage.max(1), burn_ticks);
+        }
+    }
+    draw_line_band(ctx, left_start, left_end, line_width, VFX_FIRE);
+    draw_line_band(ctx, right_start, right_end, line_width, VFX_FIRE);
+}
+
+pub fn apply_arcanine_flames_of_rage(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    radius: u64,
+    base_damage: usize,
+    burned_bonus_percent: usize,
+    heal_missing_hp_percent_per_champion: usize,
+    attacker_types: TypeSet,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_pos = caster.pos();
+    let max_hp = caster.hp().max.max(1);
+    let current_hp = caster.hp().current.min(max_hp);
+    drop(caster);
+
+    let missing_bonus_percent = max_hp.saturating_sub(current_hp).saturating_mul(100) / max_hp;
+    let radius_sq = radius.saturating_mul(radius);
+    let targets: Vec<(usize, bool)> = (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .filter(|entity| {
+            entity.team() != caster_team
+                && entity.is_alive()
+                && !entity.is_tower()
+                && distance_sq(entity.pos(), caster_pos) <= radius_sq
+        })
+        .map(|entity| (entity.id(), entity.is_champion()))
+        .collect();
+
+    let mut champion_hits = 0usize;
+    for (target_id, is_champion) in targets {
+        let mut damage = base_damage.saturating_mul(100 + missing_bonus_percent) / 100;
+        if is_burned(ctx, target_id) {
+            damage = damage.saturating_mul(100 + burned_bonus_percent) / 100;
+        }
+        let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let result = crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            target_id,
+            0,
+            damage.max(1),
+            AttackType::Skill,
+            PokemonType::Fire,
+            attacker_types,
+            defender_types,
+        );
+        arcanine_heal_from_ability_damage(
+            ctx,
+            caster_id,
+            target_id,
+            result.applied_damage,
+            ARCANINE_BLAZING_MANE_ABILITY_HEAL_PERCENT,
+        );
+        if is_champion {
+            champion_hits = champion_hits.saturating_add(1);
+        }
+    }
+
+    if champion_hits > 0 {
+        if let Some(caster) = ctx.get_entity(caster_id) {
+            let missing_hp = caster.hp().max.saturating_sub(caster.hp().current);
+            drop(caster);
+            let heal = missing_hp
+                .saturating_mul(heal_missing_hp_percent_per_champion)
+                .saturating_mul(champion_hits)
+                / 100;
+            if heal > 0 {
+                heal_with_antiheal(ctx, caster_id, caster_id, heal);
+            }
+        }
+    }
+    draw_field_circle(ctx, caster_pos, radius, VFX_FIRE);
+}
+
+fn arcanine_heal_from_ability_damage(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    applied_damage: usize,
+    heal_percent: usize,
+) {
+    if applied_damage == 0 || heal_percent == 0 {
+        return;
+    }
+    let heal = applied_damage.saturating_mul(heal_percent) / 100;
+    if heal > 0 {
+        heal_from_damage_or_poison_yanmega(ctx, caster_id, target_id, heal);
+    }
+}
+
+fn has_blazing_mane(entity_id: usize) -> bool {
+    entity_is_champion_id(entity_id, "pokemon_moba_arcanine")
+        || receiver_has_copied(entity_id, "pokemon_moba_arcanine")
+}
+
+pub fn handle_arcanine_damaged(
+    ctx: &mut GameCtx,
+    arcanine_id: usize,
+    attacker_id: usize,
+    damage: usize,
+) {
+    if damage == 0 || !has_blazing_mane(arcanine_id) {
+        return;
+    }
+    let Some(arcanine) = ctx.get_entity(arcanine_id) else {
+        return;
+    };
+    if !arcanine.is_alive() {
+        return;
+    }
+    let arcanine_team = arcanine.team();
+    let arcanine_pos = arcanine.pos();
+    let shield_after = arcanine.shield();
+    drop(arcanine);
+
+    let Some(attacker) = ctx.get_entity(attacker_id) else {
+        return;
+    };
+    if !attacker.is_alive() || !attacker.is_champion() || attacker.team() == arcanine_team {
+        return;
+    }
+    let attacker_pos = attacker.pos();
+    drop(attacker);
+
+    handle_arcanine_extremespeed_shield_hit(ctx, arcanine_id, shield_after);
+    apply_arcanine_blazing_mane_stack(ctx, arcanine_id, attacker_id);
+
+    if distance_sq(arcanine_pos, attacker_pos)
+        <= ARCANINE_MELEE_CONTACT_RANGE.saturating_mul(ARCANINE_MELEE_CONTACT_RANGE)
+        && chance_percent(
+            ctx.seed(),
+            arcanine_id,
+            attacker_id,
+            ctx.tick(),
+            ARCANINE_BLAZING_MANE_MELEE_BURN_CHANCE,
+        )
+    {
+        apply_burn_for(
+            ctx,
+            arcanine_id,
+            attacker_id,
+            ARCANINE_BLAZING_MANE_BURN_DAMAGE,
+            ARCANINE_BLAZING_MANE_BURN_TICKS,
+        );
+    }
+}
+
+fn handle_arcanine_extremespeed_shield_hit(
+    ctx: &mut GameCtx,
+    entity_id: usize,
+    shield_after: usize,
+) {
+    let tick = ctx.tick();
+    let states = ARCANINE_EXTREMESPEED_SHIELDS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("arcanine extremespeed shield state poisoned");
+    let mut speed_buff = None;
+    states.retain(|state| {
+        if state.expires_at <= tick {
+            return false;
+        }
+        if state.entity_id == entity_id && shield_after == 0 && speed_buff.is_none() {
+            speed_buff = Some((state.broken_move_speed_mult, state.broken_move_speed_ticks));
+            return false;
+        }
+        true
+    });
+    drop(states);
+
+    if let Some((move_speed_mult, ticks)) = speed_buff {
+        add_beneficial_buff(
+            ctx,
+            entity_id,
+            entity_id,
+            BuffState {
+                duration: BuffType::Time { tick: ticks },
+                move_speed_mult,
+                ..Default::default()
+            },
+        );
+    }
+}
+
+fn apply_arcanine_blazing_mane_stack(
+    ctx: &mut GameCtx,
+    arcanine_id: usize,
+    attacker_id: usize,
+) {
+    let tick = ctx.tick();
+    let expires_at = tick.saturating_add(ARCANINE_BLAZING_MANE_TICKS);
+    let states = ARCANINE_BLAZING_MANES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("arcanine blazing mane state poisoned");
+    states.retain(|state| {
+        state.expires_at > tick
+            && ctx
+                .get_entity(state.arcanine_id)
+                .map(|entity| entity.is_alive())
+                .unwrap_or(false)
+            && ctx
+                .get_entity(state.attacker_id)
+                .map(|entity| entity.is_alive())
+                .unwrap_or(false)
+    });
+    let mut should_add_stack = false;
+    if let Some(state) = states
+        .iter_mut()
+        .find(|state| state.arcanine_id == arcanine_id && state.attacker_id == attacker_id)
+    {
+        if state.stacks < ARCANINE_BLAZING_MANE_MAX_STACKS {
+            state.stacks = state.stacks.saturating_add(1);
+            should_add_stack = true;
+        }
+        state.expires_at = expires_at;
+    } else {
+        states.push(ArcanineBlazingManeState {
+            arcanine_id,
+            attacker_id,
+            stacks: 1,
+            expires_at,
+        });
+        should_add_stack = true;
+    }
+    drop(states);
+
+    if should_add_stack {
+        add_harmful_buff(
+            ctx,
+            arcanine_id,
+            attacker_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: ARCANINE_BLAZING_MANE_TICKS,
+                },
+                attack_mult: -ARCANINE_BLAZING_MANE_ATTACK_AP_REDUCE,
+                magic_power_mult: -ARCANINE_BLAZING_MANE_ATTACK_AP_REDUCE,
+                ..Default::default()
+            },
+        );
+    }
+}
+
+fn wishiwashi_nearby_ally_count(ctx: &GameCtx, entity_id: usize, radius: u64) -> usize {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return 0;
+    };
+    if !entity.is_alive() {
+        return 0;
+    }
+    let team = entity.team();
+    let pos = entity.pos();
+    drop(entity);
+
+    let radius_sq = radius.saturating_mul(radius);
+    (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .filter(|ally| {
+            ally.id() != entity_id
+                && ally.team() == team
+                && ally.is_alive()
+                && ally.is_champion()
+                && distance_sq(ally.pos(), pos) <= radius_sq
+        })
+        .count()
+}
+
+pub fn force_wishiwashi_schooling(ctx: &GameCtx, entity_id: usize, ticks: usize) {
+    let until = ctx.tick().saturating_add(ticks);
+    let states = WISHIWASHI_SCHOOLINGS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("wishiwashi schooling state poisoned");
+    states.retain(|state| {
+        state.entity_id == entity_id
+            || ctx
+                .get_entity(state.entity_id)
+                .map(|entity| entity.is_alive())
+                .unwrap_or(false)
+    });
+    if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
+        state.force_school_until = state.force_school_until.max(until);
+        return;
+    }
+    states.push(WishiwashiSchoolingState {
+        entity_id,
+        force_school_until: until,
+    });
+}
+
+pub fn wishiwashi_is_schooling(ctx: &GameCtx, entity_id: usize) -> bool {
+    let tick = ctx.tick();
+    let forced = WISHIWASHI_SCHOOLINGS
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("wishiwashi schooling state poisoned")
+        .iter()
+        .any(|state| state.entity_id == entity_id && state.force_school_until > tick);
+    forced || wishiwashi_nearby_ally_count(ctx, entity_id, WISHIWASHI_SCHOOLING_RADIUS) > 0
+}
+
+pub fn update_wishiwashi_schooling(ctx: &mut GameCtx, entity_id: usize) {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() {
+        return;
+    }
+    let pos = entity.pos();
+    drop(entity);
+
+    let nearby_allies = wishiwashi_nearby_ally_count(ctx, entity_id, WISHIWASHI_SCHOOLING_RADIUS)
+        .min(WISHIWASHI_SCHOOLING_MAX_ALLIES);
+    let schooling = wishiwashi_is_schooling(ctx, entity_id);
+    if schooling {
+        let ally_count = nearby_allies.max(1) as i32;
+        let defence_bonus = WISHIWASHI_SCHOOLING_DEFENCE_PER_ALLY.saturating_mul(ally_count);
+        let cooldown_bonus = WISHIWASHI_SCHOOLING_COOLDOWN_PER_ALLY.saturating_mul(ally_count);
+        add_beneficial_buff(
+            ctx,
+            entity_id,
+            entity_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: WISHIWASHI_SCHOOLING_BUFF_TICKS,
+                },
+                defence_mult: defence_bonus,
+                magic_resistance_mult: defence_bonus,
+                skill_cooldown_mult: cooldown_bonus,
+                ult_cooldown_mult: cooldown_bonus,
+                ..Default::default()
+            },
+        );
+        draw_status_marker(ctx, pos, 18000, VFX_WATER);
+    } else {
+        add_beneficial_buff(
+            ctx,
+            entity_id,
+            entity_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: WISHIWASHI_SCHOOLING_BUFF_TICKS,
+                },
+                hp_mult: WISHIWASHI_ALONE_HP_MULT,
+                move_speed_mult: WISHIWASHI_ALONE_MOVE_SPEED_MULT,
+                ..Default::default()
+            },
+        );
+    }
+}
+
+pub fn apply_wishiwashi_wave_splash(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    start: EntityPos,
+    end: EntityPos,
+    wall_length: u64,
+    damage: usize,
+    heal: usize,
+    schooling: bool,
+    airborne_ticks: usize,
+    attacker_types: TypeSet,
+) {
+    let half_wall = wall_length / 2;
+    let width_sq = half_wall.saturating_mul(half_wall);
+    let mut ally_hits = Vec::new();
+    let mut enemy_hits = Vec::new();
+    for index in 0..ctx.entity_count() {
+        let Some(entity) = ctx.entity_at(index) else {
+            continue;
+        };
+        if !entity.is_alive() || entity.is_tower() {
+            continue;
+        }
+        if distance_to_segment_sq(entity.pos(), start, end) > width_sq {
+            continue;
+        }
+        if entity.team() == caster_team && entity.is_champion() {
+            ally_hits.push(entity.id());
+        } else if entity.team() != caster_team {
+            enemy_hits.push(entity.id());
+        }
+    }
+
+    for ally_id in ally_hits {
+        heal_with_antiheal(ctx, caster_id, ally_id, heal);
+        if schooling {
+            cleanse_harmful_statuses(ctx, ally_id);
+            add_beneficial_buff(
+                ctx,
+                caster_id,
+                ally_id,
+                BuffState {
+                    duration: BuffType::Time { tick: 45 },
+                    move_speed_mult: 10,
+                    ..Default::default()
+                },
+            );
+        }
+    }
+
+    for target_id in enemy_hits {
+        let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            target_id,
+            0,
+            damage.max(1),
+            AttackType::Skill,
+            PokemonType::Water,
+            attacker_types,
+            defender_types,
+        );
+        if schooling {
+            apply_airborne_hard_cc(ctx, caster_id, target_id, airborne_ticks);
+        }
+    }
+    draw_status_marker(ctx, end, half_wall.max(9000), VFX_WATER);
+}
+
+pub fn apply_wishiwashi_cowardice(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    ally_radius: u64,
+    heal_hp_percent: usize,
+    shield_hp_percent: usize,
+    shield_ticks: usize,
+    solo_move_speed_mult: i32,
+    solo_ticks: usize,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_team = caster.team();
+    let caster_pos = caster.pos();
+    drop(caster);
+
+    if !wishiwashi_is_schooling(ctx, caster_id) {
+        add_beneficial_buff(
+            ctx,
+            caster_id,
+            caster_id,
+            BuffState {
+                duration: BuffType::Time { tick: solo_ticks },
+                move_speed_mult: solo_move_speed_mult,
+                ..Default::default()
+            },
+        );
+        draw_status_marker(ctx, caster_pos, 14000, VFX_NORMAL);
+        return;
+    }
+
+    let radius_sq = ally_radius.saturating_mul(ally_radius);
+    let allies: Vec<usize> = (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .filter(|entity| {
+            entity.team() == caster_team
+                && entity.is_alive()
+                && entity.is_champion()
+                && distance_sq(entity.pos(), caster_pos) <= radius_sq
+        })
+        .map(|entity| entity.id())
+        .collect();
+
+    for ally_id in allies {
+        let Some(ally) = ctx.get_entity(ally_id) else {
+            continue;
+        };
+        let max_hp = ally.hp().max;
+        drop(ally);
+        let heal = max_hp.saturating_mul(heal_hp_percent) / 100;
+        let shield = max_hp.saturating_mul(shield_hp_percent) / 100;
+        heal_with_antiheal(ctx, caster_id, ally_id, heal.max(1));
+        add_beneficial_buff(
+            ctx,
+            caster_id,
+            ally_id,
+            BuffState {
+                duration: BuffType::Time { tick: shield_ticks },
+                hp: shield.min(i32::MAX as usize) as i32,
+                ..Default::default()
+            },
+        );
+    }
+    draw_status_marker(ctx, caster_pos, ally_radius, VFX_WATER);
+}
+
+fn force_move_toward_pos(ctx: &mut GameCtx, entity_id: usize, from: EntityPos, to: EntityPos, speed: u64, ticks: usize) {
+    let distance = integer_sqrt(distance_sq(from, to));
+    let speed = bounded_force_move_speed(speed, ticks as u64, distance);
+    if speed == 0 {
+        return;
+    }
+    apply_pokemon_cc(
+        ctx,
+        entity_id,
+        entity_id,
+        CCState::ForceMove {
+            tick: ticks as u64,
+            dx: to.x as i64 - from.x as i64,
+            dy: to.y as i64 - from.y as i64,
+            speed,
+        },
+    );
+}
+
+fn wishiwashi_spit_pos(start: EntityPos, target: EntityPos, distance: u64) -> EntityPos {
+    let dx = start.x as i128 - target.x as i128;
+    let dy = start.y as i128 - target.y as i128;
+    let len = integer_sqrt(squared_len_i128(dx, dy).min(u64::MAX as i128) as u64).max(1) as i128;
+    let spit_x = start.x as i128 + dx.saturating_mul(distance as i128) / len;
+    let spit_y = start.y as i128 + dy.saturating_mul(distance as i128) / len;
+    EntityPos {
+        x: spit_x.clamp(0, u64::MAX as i128) as u64,
+        y: spit_y.clamp(0, u64::MAX as i128) as u64,
+    }
+}
+
+pub fn begin_wishiwashi_massive_catch(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    dash_range: u64,
+    schooling_dash_bonus: u64,
+    line_width: u64,
+    damage: usize,
+    chew_damage: usize,
+    channel_ticks: usize,
+    outbound_ticks: usize,
+    return_ticks: usize,
+    chew_interval_ticks: usize,
+    throw_ticks: usize,
+    force_move_speed: u64,
+    schooling_ticks: usize,
+    attacker_types: TypeSet,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_team = caster.team();
+    let start_pos = caster.pos();
+    drop(caster);
+
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() || target.team() == caster_team || !target.is_champion() {
+        return;
+    }
+    let target_pos = target.pos();
+    drop(target);
+
+    force_wishiwashi_schooling(ctx, caster_id, schooling_ticks);
+    let range = dash_range.saturating_add(if wishiwashi_is_schooling(ctx, caster_id) {
+        schooling_dash_bonus
+    } else {
+        0
+    });
+    let distance = integer_sqrt(distance_sq(start_pos, target_pos));
+    if distance > range {
+        return;
+    }
+
+    let spit_pos = wishiwashi_spit_pos(start_pos, target_pos, 26000);
+    let tick = ctx.tick();
+    let states = WISHIWASHI_MASSIVE_CATCHES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("wishiwashi massive catch state poisoned");
+    states.retain(|state| state.caster_id != caster_id && state.target_id != target_id);
+    states.push(WishiwashiMassiveCatchState {
+        caster_id,
+        target_id,
+        caster_team,
+        start_pos,
+        target_pos,
+        spit_pos,
+        trigger_at: tick.saturating_add(channel_ticks),
+        catch_at: tick.saturating_add(channel_ticks).saturating_add(outbound_ticks),
+        spit_at: tick
+            .saturating_add(channel_ticks)
+            .saturating_add(outbound_ticks)
+            .saturating_add(return_ticks),
+        next_chew_at: tick
+            .saturating_add(channel_ticks)
+            .saturating_add(outbound_ticks)
+            .saturating_add(chew_interval_ticks),
+        line_width,
+        damage,
+        chew_damage,
+        outbound_ticks,
+        return_ticks,
+        chew_interval_ticks,
+        throw_ticks,
+        force_move_speed,
+        attacker_types,
+        outbound_started: false,
+        caught: false,
+    });
+    drop(states);
+
+    apply_pokemon_cc(
+        ctx,
+        caster_id,
+        caster_id,
+        CCState::BlockSkill {
+            tick: channel_ticks.saturating_add(outbound_ticks).saturating_add(return_ticks),
+        },
+    );
+    draw_status_marker(ctx, start_pos, 22000, VFX_WATER);
+}
+
+fn update_wishiwashi_massive_catches(ctx: &mut GameCtx, tick: usize) {
+    let states = WISHIWASHI_MASSIVE_CATCHES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("wishiwashi massive catch state poisoned");
+
+    let mut outbound = Vec::new();
+    let mut caught = Vec::new();
+    let mut chewing = Vec::new();
+    let mut tethering = Vec::new();
+    let mut spitting = Vec::new();
+
+    states.retain_mut(|state| {
+        let caster_alive = ctx
+            .get_entity(state.caster_id)
+            .map(|entity| entity.is_alive())
+            .unwrap_or(false);
+        let target_alive = ctx
+            .get_entity(state.target_id)
+            .map(|entity| entity.is_alive())
+            .unwrap_or(false);
+        if !caster_alive || !target_alive {
+            return false;
+        }
+
+        if !state.outbound_started && tick >= state.trigger_at {
+            state.outbound_started = true;
+            outbound.push(*state);
+        }
+
+        if state.outbound_started && !state.caught && tick >= state.catch_at {
+            state.caught = true;
+            caught.push(*state);
+        }
+
+        if state.caught && tick < state.spit_at {
+            tethering.push(*state);
+            if tick >= state.next_chew_at {
+                chewing.push(*state);
+                state.next_chew_at = state
+                    .next_chew_at
+                    .saturating_add(state.chew_interval_ticks.max(1));
+            }
+        }
+
+        if state.caught && tick >= state.spit_at {
+            spitting.push(*state);
+            return false;
+        }
+
+        true
+    });
+    drop(states);
+
+    for state in outbound {
+        force_move_toward_pos(
+            ctx,
+            state.caster_id,
+            state.start_pos,
+            state.target_pos,
+            state.force_move_speed,
+            state.outbound_ticks,
+        );
+        let width_sq = state.line_width.saturating_mul(state.line_width);
+        let pass_through_targets: Vec<usize> = (0..ctx.entity_count())
+            .filter_map(|index| ctx.entity_at(index))
+            .filter(|entity| {
+                entity.is_alive()
+                    && !entity.is_tower()
+                    && !entity.is_champion()
+                    && entity.team() != state.caster_team
+                    && distance_to_segment_sq(entity.pos(), state.start_pos, state.target_pos)
+                        <= width_sq
+            })
+            .map(|entity| entity.id())
+            .collect();
+
+        for target_id in pass_through_targets {
+            let defender_types =
+                crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+            crate::pokemon_types::deal_pokemon_damage(
+                ctx,
+                state.caster_id,
+                target_id,
+                0,
+                state.damage.max(1),
+                AttackType::Skill,
+                PokemonType::Water,
+                state.attacker_types,
+                defender_types,
+            );
+        }
+        draw_status_marker(ctx, state.target_pos, state.line_width.max(12000), VFX_WATER);
+    }
+
+    for state in caught {
+        let target_ticks = state.return_ticks.saturating_add(state.throw_ticks).max(1);
+        if !is_limber(ctx, state.target_id) {
+            let adjusted = adjusted_cc_ticks(ctx, state.target_id, target_ticks);
+            break_kommoo_duel_on_hard_cc(ctx, state.caster_id, state.target_id);
+            apply_pokemon_cc(
+                ctx,
+                state.caster_id,
+                state.target_id,
+                CCState::Stun {
+                    tick: adjusted as u64,
+                },
+            );
+            apply_pokemon_cc(ctx, state.caster_id, state.target_id, CCState::BlockSkill { tick: adjusted });
+        }
+        force_move_toward_pos(
+            ctx,
+            state.caster_id,
+            state.target_pos,
+            state.start_pos,
+            state.force_move_speed,
+            state.return_ticks,
+        );
+        if !has_stalwart(ctx, state.target_id) {
+            force_move_toward_pos(
+                ctx,
+                state.target_id,
+                state.target_pos,
+                state.start_pos,
+                state.force_move_speed,
+                state.return_ticks,
+            );
+        }
+    }
+
+    for state in tethering {
+        if has_stalwart(ctx, state.target_id) {
+            continue;
+        }
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            continue;
+        };
+        let caster_pos = caster.pos();
+        drop(caster);
+        let Some(target) = ctx.get_entity(state.target_id) else {
+            continue;
+        };
+        let target_pos = target.pos();
+        drop(target);
+        force_move_toward_pos(
+            ctx,
+            state.target_id,
+            target_pos,
+            caster_pos,
+            state.force_move_speed,
+            4,
+        );
+    }
+
+    for state in chewing {
+        let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, state.target_id);
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            state.caster_id,
+            state.target_id,
+            0,
+            state.chew_damage.max(1),
+            AttackType::Skill,
+            PokemonType::Water,
+            state.attacker_types,
+            defender_types,
+        );
+    }
+
+    for state in spitting {
+        if !has_stalwart(ctx, state.target_id) {
+            let Some(target) = ctx.get_entity(state.target_id) else {
+                continue;
+            };
+            let target_pos = target.pos();
+            drop(target);
+            force_move_toward_pos(
+                ctx,
+                state.target_id,
+                target_pos,
+                state.spit_pos,
+                state.force_move_speed,
+                state.throw_ticks,
+            );
+        }
+        draw_status_marker(ctx, state.spit_pos, 16000, VFX_WATER);
+    }
+}
+
+pub fn apply_missingno_glitch_basic(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    damage: usize,
+    stray_damage: usize,
+    stray_chance_percent: usize,
+    stray_range: u64,
+    stray_width: u64,
+    attacker_types: TypeSet,
+) {
+    let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+    crate::pokemon_types::deal_pokemon_damage(
+        ctx,
+        caster_id,
+        target_id,
+        0,
+        damage.max(1),
+        AttackType::BaseAttack,
+        PokemonType::Bird,
+        attacker_types,
+        defender_types,
+    );
+
+    let seed = ctx.seed()
+        ^ ((caster_id as u64) << 36)
+        ^ ((target_id as u64) << 12)
+        ^ ctx.tick() as u64
+        ^ 0x4d495353494e47_u64;
+    if !chance_percent(seed, caster_id, target_id, ctx.tick(), stray_chance_percent) {
+        return;
+    }
+
+    let Some(caster_pos) = ctx.get_entity(caster_id).map(|entity| entity.pos()) else {
+        return;
+    };
+    let angle_seed = splitmix64(seed ^ 0x6e6f_u64);
+    let angle = (angle_seed % 6284) as f64 / 1000.0;
+    let end = pos_from_f64(
+        caster_pos.x as f64 + angle.cos() * stray_range as f64,
+        caster_pos.y as f64 + angle.sin() * stray_range as f64,
+    );
+    draw_line_band(ctx, caster_pos, end, stray_width, VFX_PSYCHIC);
+    let Some(stray_target) = first_target_on_line_any_team(ctx, caster_id, caster_pos, end, stray_width)
+    else {
+        return;
+    };
+    deal_tracked_damage(
+        ctx,
+        caster_id,
+        stray_target,
+        0,
+        stray_damage.max(1),
+        AttackType::Skill,
+    );
+}
+
+pub fn apply_missingno_random_status(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_id: usize,
+    dot_damage: usize,
+    dot_duration_ticks: usize,
+    control_ticks: usize,
+    move_speed_mult: i32,
+    cooldown_mult: i32,
+    buff_ticks: usize,
+) {
+    let seed = ctx.seed()
+        ^ ((caster_id as u64) << 40)
+        ^ ((target_id as u64) << 16)
+        ^ ctx.tick() as u64
+        ^ 0x00b1_7d00_u64;
+    let roll = (splitmix64(seed) % 6) as usize;
+    let mut damaging_status = false;
+    match roll {
+        0 => {
+            apply_burn_for(ctx, caster_id, target_id, dot_damage.max(1), dot_duration_ticks);
+            damaging_status = true;
+        }
+        1 => {
+            apply_poison_for(
+                ctx,
+                caster_id,
+                target_id,
+                dot_damage.max(1),
+                dot_duration_ticks,
+            );
+            damaging_status = true;
+        }
+        2 => {
+            apply_bleed_for(ctx, caster_id, target_id, dot_damage.max(1), dot_duration_ticks);
+            damaging_status = true;
+        }
+        3 => apply_frozen_from(ctx, caster_id, target_id, control_ticks),
+        4 => apply_paralysis_from(ctx, caster_id, target_id, control_ticks),
+        _ => apply_confusion_from(ctx, caster_id, target_id, 1, control_ticks),
+    }
+    if !damaging_status {
+        add_beneficial_buff(
+            ctx,
+            caster_id,
+            caster_id,
+            BuffState {
+                duration: BuffType::Time { tick: buff_ticks },
+                move_speed_mult,
+                skill_cooldown_mult: cooldown_mult,
+                ult_cooldown_mult: cooldown_mult,
+                ..Default::default()
+            },
+        );
+    }
+    maybe_trigger_missingno_positive_glitch(ctx, caster_id, target_id);
+}
+
+pub fn begin_missingno_glitch_storm(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    radius: u64,
+    chain_radius: u64,
+    damage: usize,
+    chain_jumps: usize,
+    duration_ticks: usize,
+    tick_interval_min: usize,
+    tick_interval_max: usize,
+    attacker_types: TypeSet,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_team = caster.team();
+    let caster_pos = caster.pos();
+    drop(caster);
+
+    let seed = ctx.seed() ^ ((caster_id as u64) << 32) ^ ctx.tick() as u64 ^ 0x4d5f3030_u64;
+    let states = MISSINGNO_GLITCH_STORMS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("missingno storm state poisoned");
+    states.retain(|state| state.caster_id != caster_id);
+    states.push(MissingNoGlitchStormState {
+        caster_id,
+        caster_team,
+        radius,
+        chain_radius,
+        damage,
+        chain_jumps,
+        tick_interval_min: tick_interval_min.max(1),
+        tick_interval_max: tick_interval_max.max(tick_interval_min.max(1)),
+        next_tick_at: ctx.tick().saturating_add(tick_interval_min.max(1)),
+        expires_at: ctx.tick().saturating_add(duration_ticks),
+        attacker_types,
+        seed,
+    });
+    draw_field_circle(ctx, caster_pos, radius, VFX_PSYCHIC);
+}
+
+pub fn begin_missingno_trick_room(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    target_pos: EntityPos,
+    length: u64,
+    width: u64,
+    duration_ticks: usize,
+    enemy_speed_slow: i32,
+    enemy_attack_speed_slow: i32,
+    enemy_hp_random_min: i32,
+    enemy_hp_random_max: i32,
+    enemy_cooldown_random_min: i32,
+    enemy_cooldown_random_max: i32,
+    missingno_speed_mult: i32,
+    missingno_attack_speed_mult: i32,
+    missingno_cooldown_mult: i32,
+    ally_speed_mult: i32,
+    ally_attack_speed_mult: i32,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_team = caster.team();
+    let caster_pos = caster.pos();
+    drop(caster);
+
+    let end = point_at_distance(caster_pos, target_pos, length);
+    let states = MISSINGNO_TRICK_ROOMS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("missingno trick room state poisoned");
+    states.retain(|state| state.caster_id != caster_id);
+    states.push(MissingNoTrickRoomState {
+        caster_id,
+        caster_team,
+        start: caster_pos,
+        end,
+        length,
+        width,
+        expires_at: ctx.tick().saturating_add(duration_ticks),
+        next_tick_at: ctx.tick(),
+        tick_interval: 30,
+        enemy_speed_slow,
+        enemy_attack_speed_slow,
+        enemy_hp_random_min,
+        enemy_hp_random_max,
+        enemy_cooldown_random_min,
+        enemy_cooldown_random_max,
+        missingno_speed_mult,
+        missingno_attack_speed_mult,
+        missingno_cooldown_mult,
+        ally_speed_mult,
+        ally_attack_speed_mult,
+        buff_ticks: 40,
+        seed: ctx.seed() ^ ((caster_id as u64) << 28) ^ ctx.tick() as u64 ^ 0x747269636b_u64,
+    });
+    draw_line_band(ctx, caster_pos, end, width, VFX_PSYCHIC);
+}
+
+fn update_missingno_glitch_storms(ctx: &mut GameCtx, tick: usize) {
+    let states = MISSINGNO_GLITCH_STORMS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("missingno storm state poisoned");
+    let mut sparks = Vec::new();
+    let mut visuals = Vec::new();
+
+    states.retain_mut(|state| {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            return false;
+        };
+        if !caster.is_alive() || state.expires_at <= tick {
+            return false;
+        }
+        let caster_pos = caster.pos();
+        visuals.push((caster_pos, state.radius));
+        while state.next_tick_at <= tick {
+            sparks.push((*state, caster_pos));
+            let span = state
+                .tick_interval_max
+                .saturating_sub(state.tick_interval_min)
+                .saturating_add(1);
+            let seed = splitmix64(state.seed ^ ((state.next_tick_at as u64) << 8));
+            let offset = (seed as usize) % span.max(1);
+            state.next_tick_at = state
+                .next_tick_at
+                .saturating_add(state.tick_interval_min.saturating_add(offset));
+        }
+        true
+    });
+    drop(states);
+
+    for (center, radius) in visuals {
+        draw_field_circle(ctx, center, radius, VFX_PSYCHIC);
+    }
+
+    for (state, caster_pos) in sparks {
+        let seed = splitmix64(state.seed ^ tick as u64 ^ 0x737061726b_u64);
+        let Some(first_target) =
+            random_enemy_in_radius(ctx, state.caster_team, caster_pos, state.radius, seed)
+        else {
+            continue;
+        };
+        missingno_chain_damage(
+            ctx,
+            state.caster_id,
+            state.caster_team,
+            first_target,
+            state.damage,
+            state.chain_radius,
+            state.chain_jumps,
+            state.attacker_types,
+            seed,
+        );
+    }
+}
+
+fn update_missingno_trick_rooms(ctx: &mut GameCtx, tick: usize) {
+    let states = MISSINGNO_TRICK_ROOMS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("missingno trick room state poisoned");
+    let mut applications = Vec::new();
+    let mut visuals = Vec::new();
+
+    states.retain_mut(|state| {
+        let caster_alive = ctx
+            .get_entity(state.caster_id)
+            .map(|entity| entity.is_alive())
+            .unwrap_or(false);
+        if !caster_alive || state.expires_at <= tick {
+            return false;
+        }
+        visuals.push((state.start, state.end, state.width));
+        if state.next_tick_at <= tick {
+            applications.push(*state);
+            state.next_tick_at = state.next_tick_at.saturating_add(state.tick_interval.max(1));
+        }
+        true
+    });
+    drop(states);
+
+    for (start, end, width) in visuals {
+        draw_line_band(ctx, start, end, width, VFX_PSYCHIC);
+    }
+
+    for state in applications {
+        for index in 0..ctx.entity_count() {
+            let Some(entity) = ctx.entity_at(index) else {
+                continue;
+            };
+            if !entity.is_alive()
+                || !entity.is_champion()
+                || !point_in_oriented_rect(entity.pos(), state.start, state.end, state.length, state.width)
+            {
+                continue;
+            }
+            let entity_id = entity.id();
+            let team = entity.team();
+            let stat = entity.stat();
+            drop(entity);
+
+            if entity_id == state.caster_id {
+                add_beneficial_buff(
+                    ctx,
+                    state.caster_id,
+                    entity_id,
+                    BuffState {
+                        duration: BuffType::Time { tick: state.buff_ticks },
+                        move_speed_mult: state.missingno_speed_mult,
+                        attack_speed_mult: state.missingno_attack_speed_mult,
+                        skill_cooldown_mult: state.missingno_cooldown_mult,
+                        ult_cooldown_mult: state.missingno_cooldown_mult,
+                        ..Default::default()
+                    },
+                );
+            } else if team == state.caster_team {
+                add_beneficial_buff(
+                    ctx,
+                    state.caster_id,
+                    entity_id,
+                    BuffState {
+                        duration: BuffType::Time { tick: state.buff_ticks },
+                        move_speed_mult: state.ally_speed_mult,
+                        attack_speed_mult: state.ally_attack_speed_mult,
+                        ..Default::default()
+                    },
+                );
+            } else {
+                let random_hp = random_range_i32(
+                    state.seed ^ ((entity_id as u64) << 18) ^ tick as u64,
+                    state.enemy_hp_random_min,
+                    state.enemy_hp_random_max,
+                );
+                let random_cooldown = random_range_i32(
+                    state.seed ^ ((entity_id as u64) << 24) ^ tick as u64 ^ 0xcd_u64,
+                    state.enemy_cooldown_random_min,
+                    state.enemy_cooldown_random_max,
+                );
+                let attack_flip = percent_delta_for_swap(stat.attack, stat.magic_power);
+                let ap_flip = percent_delta_for_swap(stat.magic_power, stat.attack);
+                let defence_flip = percent_delta_for_swap(stat.defence, stat.magic_resistance);
+                let mr_flip = percent_delta_for_swap(stat.magic_resistance, stat.defence);
+                add_harmful_buff(
+                    ctx,
+                    state.caster_id,
+                    entity_id,
+                    BuffState {
+                        duration: BuffType::Time { tick: state.buff_ticks },
+                        move_speed_mult: -state.enemy_speed_slow.abs(),
+                        attack_speed_mult: -state.enemy_attack_speed_slow.abs(),
+                        attack_mult: attack_flip,
+                        magic_power_mult: ap_flip,
+                        defence_mult: defence_flip,
+                        magic_resistance_mult: mr_flip,
+                        hp_mult: random_hp,
+                        skill_cooldown_mult: random_cooldown,
+                        ult_cooldown_mult: random_cooldown,
+                        ..Default::default()
+                    },
+                );
+            }
+        }
+    }
+}
+
+fn maybe_trigger_missingno_positive_glitch(ctx: &mut GameCtx, caster_id: usize, target_id: usize) {
+    if !entity_is_champion_id(caster_id, "pokemon_moba_missingno") {
+        return;
+    }
+    let seed = ctx.seed()
+        ^ ((caster_id as u64) << 34)
+        ^ ((target_id as u64) << 13)
+        ^ ctx.tick() as u64
+        ^ 0x6f6c646d616e_u64;
+    if !chance_percent(seed, caster_id, target_id, ctx.tick(), MISSINGNO_PASSIVE_CHANCE_PERCENT) {
+        return;
+    }
+    add_beneficial_buff(
+        ctx,
+        caster_id,
+        caster_id,
+        BuffState {
+            duration: BuffType::Time {
+                tick: MISSINGNO_PASSIVE_BUFF_TICKS,
+            },
+            move_speed_mult: MISSINGNO_PASSIVE_MOVE_SPEED_MULT,
+            skill_cooldown_mult: MISSINGNO_PASSIVE_COOLDOWN_MULT,
+            ult_cooldown_mult: MISSINGNO_PASSIVE_COOLDOWN_MULT,
+            ..Default::default()
+        },
+    );
+}
+
+fn maybe_trigger_missingno_negative_glitch(
+    ctx: &GameCtx,
+    attacker_id: usize,
+    missingno_id: usize,
+    attack_type: AttackType,
+) {
+    if matches!(attack_type, AttackType::BaseAttack | AttackType::Dot)
+        || !entity_is_champion_id(missingno_id, "pokemon_moba_missingno")
+    {
+        return;
+    }
+    let seed = ctx.seed()
+        ^ ((attacker_id as u64) << 31)
+        ^ ((missingno_id as u64) << 9)
+        ^ ctx.tick() as u64
+        ^ 0x676c69746368_u64;
+    if !chance_percent(
+        seed,
+        missingno_id,
+        attacker_id,
+        ctx.tick(),
+        MISSINGNO_PASSIVE_CHANCE_PERCENT,
+    ) {
+        return;
+    }
+    let states = MISSINGNO_PENDING_DEBUFFS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("missingno pending debuff state poisoned");
+    states.push(MissingNoPendingDebuffState {
+        source_id: missingno_id,
+        target_id: attacker_id,
+        trigger_at: ctx.tick().saturating_add(1),
+    });
+}
+
+fn update_missingno_pending_debuffs(ctx: &mut GameCtx, tick: usize) {
+    let states = MISSINGNO_PENDING_DEBUFFS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("missingno pending debuff state poisoned");
+    let mut pending = Vec::new();
+    states.retain(|state| {
+        if state.trigger_at > tick {
+            return true;
+        }
+        pending.push(*state);
+        false
+    });
+    drop(states);
+
+    for state in pending {
+        add_harmful_buff(
+            ctx,
+            state.source_id,
+            state.target_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: MISSINGNO_PASSIVE_BUFF_TICKS,
+                },
+                move_speed_mult: -MISSINGNO_PASSIVE_MOVE_SPEED_MULT,
+                skill_cooldown_mult: -MISSINGNO_PASSIVE_COOLDOWN_MULT,
+                ult_cooldown_mult: -MISSINGNO_PASSIVE_COOLDOWN_MULT,
+                ..Default::default()
+            },
+        );
+    }
+}
+
+fn missingno_chain_damage(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    first_target_id: usize,
+    damage: usize,
+    chain_radius: u64,
+    chain_jumps: usize,
+    attacker_types: TypeSet,
+    seed: u64,
+) {
+    let mut current_id = first_target_id;
+    let mut previous_ids = vec![caster_id];
+    for jump in 0..=chain_jumps {
+        if previous_ids.iter().any(|id| *id == current_id) {
+            break;
+        }
+        previous_ids.push(current_id);
+        let Some(target) = ctx.get_entity(current_id) else {
+            break;
+        };
+        if !target.is_alive() {
+            break;
+        }
+        let target_team = target.team();
+        let target_pos = target.pos();
+        drop(target);
+        if target_team == caster_team {
+            deal_tracked_damage(ctx, caster_id, current_id, 0, damage.max(1), AttackType::Skill);
+        } else {
+            let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, current_id);
+            crate::pokemon_types::deal_pokemon_damage(
+                ctx,
+                caster_id,
+                current_id,
+                0,
+                damage.max(1),
+                AttackType::Skill,
+                PokemonType::Bird,
+                attacker_types,
+                defender_types,
+            );
+            maybe_trigger_missingno_positive_glitch(ctx, caster_id, current_id);
+        }
+        draw_status_marker(ctx, target_pos, 9000, VFX_PSYCHIC);
+
+        let prefer_enemy = jump % 2 == 1;
+        let Some(next_id) = nearest_chain_target(
+            ctx,
+            caster_team,
+            target_pos,
+            chain_radius,
+            &previous_ids,
+            prefer_enemy,
+            seed ^ ((jump as u64) << 10),
+        ) else {
+            break;
+        };
+        current_id = next_id;
+    }
+}
+
+fn nearest_chain_target(
+    ctx: &GameCtx,
+    caster_team: usize,
+    center: EntityPos,
+    radius: u64,
+    excluded: &[usize],
+    prefer_enemy: bool,
+    seed: u64,
+) -> Option<usize> {
+    let radius_sq = radius.saturating_mul(radius);
+    let mut best_preferred: Option<(u64, u64, usize)> = None;
+    let mut best_any: Option<(u64, u64, usize)> = None;
+    for index in 0..ctx.entity_count() {
+        let Some(entity) = ctx.entity_at(index) else {
+            continue;
+        };
+        if !entity.is_alive()
+            || entity.is_tower()
+            || excluded.iter().any(|id| *id == entity.id())
+        {
+            continue;
+        }
+        let distance = distance_sq(entity.pos(), center);
+        if distance > radius_sq {
+            continue;
+        }
+        let jitter = splitmix64(seed ^ entity.id() as u64) % 1024;
+        let candidate = (distance, jitter, entity.id());
+        if best_any
+            .map(|best| (distance, jitter) < (best.0, best.1))
+            .unwrap_or(true)
+        {
+            best_any = Some(candidate);
+        }
+        let preferred = if prefer_enemy {
+            entity.team() != caster_team
+        } else {
+            entity.team() == caster_team
+        };
+        if preferred
+            && best_preferred
+                .map(|best| (distance, jitter) < (best.0, best.1))
+                .unwrap_or(true)
+        {
+            best_preferred = Some(candidate);
+        }
+    }
+    best_preferred.or(best_any).map(|(_, _, entity_id)| entity_id)
+}
+
+fn random_enemy_in_radius(
+    ctx: &GameCtx,
+    caster_team: usize,
+    center: EntityPos,
+    radius: u64,
+    seed: u64,
+) -> Option<usize> {
+    let mut candidates = Vec::new();
+    let radius_sq = radius.saturating_mul(radius);
+    for index in 0..ctx.entity_count() {
+        let Some(entity) = ctx.entity_at(index) else {
+            continue;
+        };
+        if entity.team() == caster_team
+            || !entity.is_alive()
+            || !entity.is_targetable()
+            || distance_sq(entity.pos(), center) > radius_sq
+        {
+            continue;
+        }
+        candidates.push(entity.id());
+    }
+    if candidates.is_empty() {
+        None
+    } else {
+        Some(candidates[(seed as usize) % candidates.len()])
+    }
+}
+
+fn first_target_on_line_any_team(
+    ctx: &GameCtx,
+    caster_id: usize,
+    start: EntityPos,
+    end: EntityPos,
+    width: u64,
+) -> Option<usize> {
+    let ax = start.x as i128;
+    let ay = start.y as i128;
+    let bx = end.x as i128;
+    let by = end.y as i128;
+    let abx = bx - ax;
+    let aby = by - ay;
+    let ab_len_sq = abx * abx + aby * aby;
+    if ab_len_sq == 0 {
+        return None;
+    }
+    let mut best: Option<(i128, usize)> = None;
+    for index in 0..ctx.entity_count() {
+        let Some(entity) = ctx.entity_at(index) else {
+            continue;
+        };
+        if entity.id() == caster_id || !entity.is_alive() || !entity.is_targetable() {
+            continue;
+        }
+        let pos = entity.pos();
+        if distance_to_segment_sq(pos, start, end) > width.saturating_mul(width) {
+            continue;
+        }
+        let projection = (pos.x as i128 - ax) * abx + (pos.y as i128 - ay) * aby;
+        if projection < 0 || projection > ab_len_sq {
+            continue;
+        }
+        if best
+            .map(|(best_projection, _)| projection < best_projection)
+            .unwrap_or(true)
+        {
+            best = Some((projection, entity.id()));
+        }
+    }
+    best.map(|(_, entity_id)| entity_id)
+}
+
+fn point_at_distance(start: EntityPos, target: EntityPos, distance: u64) -> EntityPos {
+    let dx = target.x as f64 - start.x as f64;
+    let dy = target.y as f64 - start.y as f64;
+    let len = (dx * dx + dy * dy).sqrt();
+    if len <= 0.0 {
+        return EntityPos {
+            x: start.x.saturating_add(distance),
+            y: start.y,
+        };
+    }
+    let unit_x = dx / len;
+    let unit_y = dy / len;
+    pos_from_f64(
+        start.x as f64 + unit_x * distance as f64,
+        start.y as f64 + unit_y * distance as f64,
+    )
+}
+
+fn point_in_oriented_rect(
+    pos: EntityPos,
+    start: EntityPos,
+    end: EntityPos,
+    length: u64,
+    half_width: u64,
+) -> bool {
+    let ax = start.x as i128;
+    let ay = start.y as i128;
+    let bx = end.x as i128;
+    let by = end.y as i128;
+    let px = pos.x as i128;
+    let py = pos.y as i128;
+    let abx = bx - ax;
+    let aby = by - ay;
+    let apx = px - ax;
+    let apy = py - ay;
+    let ab_len_sq = squared_len_i128(abx, aby);
+    if ab_len_sq <= 0 {
+        return distance_sq(pos, start) <= half_width.saturating_mul(half_width);
+    }
+    let projection = apx * abx + apy * aby;
+    if projection < 0 {
+        return false;
+    }
+    let max_projection = (length as i128)
+        .saturating_mul(integer_sqrt(ab_len_sq.min(u64::MAX as i128) as u64) as i128);
+    if projection > max_projection.max(ab_len_sq) {
+        return false;
+    }
+    distance_to_segment_sq(pos, start, end) <= half_width.saturating_mul(half_width)
+}
+
+fn random_range_i32(seed: u64, min_value: i32, max_value: i32) -> i32 {
+    let low = min_value.min(max_value);
+    let high = min_value.max(max_value);
+    let span = high.saturating_sub(low).saturating_add(1).max(1) as u32;
+    low.saturating_add((splitmix64(seed) as u32 % span) as i32)
+}
+
+fn percent_delta_for_swap(current: usize, desired: usize) -> i32 {
+    if current == 0 {
+        return if desired == 0 { 0 } else { 75 };
+    }
+    let delta = desired as i128 - current as i128;
+    ((delta * 100) / current as i128).clamp(-75, 75) as i32
+}
+
+fn trick_room_inverts_allied_effect(ctx: &GameCtx, source_id: usize, target_id: usize) -> Option<usize> {
+    let source_team = ctx.get_entity(source_id).map(|entity| entity.team())?;
+    let target = ctx.get_entity(target_id)?;
+    if source_team != target.team() {
+        return None;
+    }
+    let target_pos = target.pos();
+    let target_team = target.team();
+    drop(target);
+    let tick = ctx.tick();
+    let states = MISSINGNO_TRICK_ROOMS.get_or_init(|| Mutex::new(Vec::new()));
+    states
+        .lock()
+        .expect("missingno trick room state poisoned")
+        .iter()
+        .find(|state| {
+            state.expires_at > tick
+                && target_team != state.caster_team
+                && point_in_oriented_rect(target_pos, state.start, state.end, state.length, state.width)
+        })
+        .map(|state| state.caster_id)
+}
+
+fn trick_room_doubles_missingno_buffs(ctx: &GameCtx, target_id: usize) -> bool {
+    if !entity_is_champion_id(target_id, "pokemon_moba_missingno") {
+        return false;
+    }
+    let Some(target) = ctx.get_entity(target_id) else {
+        return false;
+    };
+    let target_pos = target.pos();
+    drop(target);
+    let tick = ctx.tick();
+    let states = MISSINGNO_TRICK_ROOMS.get_or_init(|| Mutex::new(Vec::new()));
+    states
+        .lock()
+        .expect("missingno trick room state poisoned")
+        .iter()
+        .any(|state| {
+            state.expires_at > tick
+                && state.caster_id == target_id
+                && point_in_oriented_rect(target_pos, state.start, state.end, state.length, state.width)
+        })
+}
+
+fn invert_buff_state(buff: &mut BuffState) {
+    buff.attack_mult = -buff.attack_mult;
+    buff.magic_power_mult = -buff.magic_power_mult;
+    buff.attack_speed_mult = -buff.attack_speed_mult;
+    buff.defence_mult = -buff.defence_mult;
+    buff.magic_resistance_mult = -buff.magic_resistance_mult;
+    buff.hp_mult = -buff.hp_mult;
+    buff.move_speed_mult = -buff.move_speed_mult;
+    buff.skill_cooldown_mult = -buff.skill_cooldown_mult;
+    buff.ult_cooldown_mult = -buff.ult_cooldown_mult;
+}
+
+fn double_positive_buff_state(buff: &mut BuffState) {
+    if buff.attack_mult > 0 {
+        buff.attack_mult = buff.attack_mult.saturating_mul(2);
+    }
+    if buff.magic_power_mult > 0 {
+        buff.magic_power_mult = buff.magic_power_mult.saturating_mul(2);
+    }
+    if buff.attack_speed_mult > 0 {
+        buff.attack_speed_mult = buff.attack_speed_mult.saturating_mul(2);
+    }
+    if buff.defence_mult > 0 {
+        buff.defence_mult = buff.defence_mult.saturating_mul(2);
+    }
+    if buff.magic_resistance_mult > 0 {
+        buff.magic_resistance_mult = buff.magic_resistance_mult.saturating_mul(2);
+    }
+    if buff.hp_mult > 0 {
+        buff.hp_mult = buff.hp_mult.saturating_mul(2);
+    }
+    if buff.move_speed_mult > 0 {
+        buff.move_speed_mult = buff.move_speed_mult.saturating_mul(2);
+    }
+    if buff.skill_cooldown_mult > 0 {
+        buff.skill_cooldown_mult = buff.skill_cooldown_mult.saturating_mul(2);
+    }
+    if buff.ult_cooldown_mult > 0 {
+        buff.ult_cooldown_mult = buff.ult_cooldown_mult.saturating_mul(2);
+    }
+}
+
+fn shiftry_inferred_in_bush(ctx: &GameCtx, entity_id: usize) -> bool {
+    if ampharos_true_sight_reveals(ctx, entity_id) {
+        return false;
+    }
+    let Some(shiftry) = ctx.get_entity(entity_id) else {
+        return false;
+    };
+    if !shiftry.is_alive() {
+        return false;
+    }
+    let shiftry_team = shiftry.team();
+    let shiftry_pos = shiftry.pos();
+    let radius_sq = SHIFTRY_BUSH_PROBE_RADIUS.saturating_mul(SHIFTRY_BUSH_PROBE_RADIUS);
+    drop(shiftry);
+
+    for index in 0..ctx.entity_count() {
+        let Some(observer) = ctx.entity_at(index) else {
+            continue;
+        };
+        if !observer.is_alive() || observer.team() == shiftry_team {
+            continue;
+        }
+        if !(observer.is_champion() || observer.is_minion() || observer.is_tower()) {
+            continue;
+        }
+        let observer_team = observer.team();
+        if distance_sq(observer.pos(), shiftry_pos) > radius_sq {
+            continue;
+        }
+        if !ctx.is_visible(observer_team, entity_id) {
+            return true;
+        }
+    }
+
+    false
+}
+
+pub fn update_shiftry_forest_camouflage(ctx: &mut GameCtx, entity_id: usize) {
+    let tick = ctx.tick();
+    let in_bush = shiftry_inferred_in_bush(ctx, entity_id);
+    let states = SHIFTRY_FOREST_CAMOUFLAGES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("shiftry forest camouflage state poisoned");
+    let state = if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id)
+    {
+        existing
+    } else {
+        states.push(ShiftryForestCamouflageState {
+            entity_id,
+            entered_bush_at: tick,
+            in_bush: false,
+            linger_until: 0,
+            last_buff_at: 0,
+        });
+        states.last_mut().expect("inserted shiftry forest state")
+    };
+
+    if in_bush {
+        if !state.in_bush {
+            state.entered_bush_at = tick;
+            state.in_bush = true;
+        }
+        if tick.saturating_sub(state.entered_bush_at) >= SHIFTRY_BUSH_REQUIRED_TICKS {
+            state.linger_until = tick.saturating_add(SHIFTRY_BUSH_LINGER_TICKS);
+        }
+    } else if state.in_bush {
+        if tick.saturating_sub(state.entered_bush_at) >= SHIFTRY_BUSH_REQUIRED_TICKS {
+            state.linger_until = tick.saturating_add(SHIFTRY_BUSH_LINGER_TICKS);
+        }
+        state.in_bush = false;
+    }
+
+    let active = in_bush || tick <= state.linger_until;
+    let should_refresh = active
+        && (state.last_buff_at == 0
+            || tick.saturating_sub(state.last_buff_at) >= SHIFTRY_BUSH_BUFF_REFRESH_TICKS);
+    if should_refresh {
+        state.last_buff_at = tick;
+    }
+    drop(states);
+
+    if should_refresh {
+        add_beneficial_buff(
+            ctx,
+            entity_id,
+            entity_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: SHIFTRY_BUSH_BUFF_TICKS,
+                },
+                move_speed_mult: 15,
+                ..Default::default()
+            },
+        );
+    }
+}
+
+pub fn note_rillaboom_skill_cast(ctx: &mut GameCtx, entity_id: usize) {
+    let has_drum_solo = champion_id_for_entity(entity_id)
+        .map(|champion_id| champion_id == "pokemon_moba_rillaboom")
+        .unwrap_or(false)
+        || receiver_has_copied(entity_id, "pokemon_moba_rillaboom");
+    if !has_drum_solo {
+        return;
+    }
+    const WINDOW_TICKS: usize = 5 * 60;
+    const HEAL_AMOUNT: usize = 45;
+    const ALLY_RADIUS: u64 = 42000;
+    const ALLY_SPEED_MULT: i32 = 12;
+    const ALLY_SPEED_TICKS: usize = 2 * 60;
+
+    let tick = ctx.tick();
+    let solos = RILLABOOM_DRUM_SOLOS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut solos = solos.lock().expect("rillaboom drum solo state poisoned");
+    let Some(state) = solos.iter_mut().find(|state| state.entity_id == entity_id) else {
+        solos.push(RillaboomDrumSoloState {
+            entity_id,
+            window_start: tick,
+            casts: 1,
+        });
+        return;
+    };
+    if tick.saturating_sub(state.window_start) > WINDOW_TICKS {
+        state.window_start = tick;
+        state.casts = 0;
+    }
+    state.casts = state.casts.saturating_add(1);
+    if state.casts < 2 {
+        return;
+    }
+    state.window_start = tick;
+    state.casts = 0;
+    drop(solos);
+
+    let Some(caster) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let team = caster.team();
+    let pos = caster.pos();
+    drop(caster);
+
+    let _ = heal_with_antiheal(ctx, entity_id, entity_id, HEAL_AMOUNT);
+    for index in 0..ctx.entity_count() {
+        let Some(entity) = ctx.entity_at(index) else {
+            continue;
+        };
+        if !entity.is_alive()
+            || !entity.is_champion()
+            || entity.team() != team
+            || entity.id() == entity_id
+            || distance_sq(entity.pos(), pos) > ALLY_RADIUS.saturating_mul(ALLY_RADIUS)
+        {
+            continue;
+        }
+        add_beneficial_buff(
+            ctx,
+            entity_id,
+            entity.id(),
+            BuffState {
+                duration: BuffType::Time {
+                    tick: ALLY_SPEED_TICKS,
+                },
+                move_speed_mult: ALLY_SPEED_MULT,
+                ..Default::default()
+            },
+        );
+    }
+    draw_field_circle(ctx, pos, ALLY_RADIUS, VFX_GRASS);
 }
 
 pub fn clear_grassy_terrains_at(center: EntityPos, radius: u64) {
@@ -8564,7 +14347,6 @@ pub fn grassy_terrain_damage_bonus_for_caster(
         .lock()
         .expect("grassy terrain state poisoned")
         .iter()
-        .filter(|state| state.caster_id == caster_id)
         .filter(|state| {
             distance_sq(caster_pos, state.center) <= state.radius.saturating_mul(state.radius)
         })
@@ -8820,10 +14602,28 @@ fn note_web_walker_spot(
     target_id: usize,
     target_pos: EntityPos,
 ) {
+    note_team_spot_for_ticks(
+        tick,
+        source_id,
+        team,
+        target_id,
+        target_pos,
+        WEB_WALKER_SPOT_TICKS,
+    );
+}
+
+fn note_team_spot_for_ticks(
+    tick: usize,
+    source_id: usize,
+    team: usize,
+    target_id: usize,
+    target_pos: EntityPos,
+    duration_ticks: usize,
+) {
     let spots = WEB_WALKER_SPOTS.get_or_init(|| Mutex::new(Vec::new()));
     let mut spots = spots.lock().expect("web walker spot state poisoned");
     spots.retain(|spot| spot.expires_at > tick);
-    let expires_at = tick.saturating_add(WEB_WALKER_SPOT_TICKS);
+    let expires_at = tick.saturating_add(duration_ticks);
     if let Some(existing) = spots
         .iter_mut()
         .find(|spot| spot.team == team && spot.target_id == target_id)
@@ -9810,6 +15610,9 @@ pub fn update_receiver_copied_passive(ctx: &mut GameCtx, entity_id: usize) {
         Some("pokemon_moba_delibird") => update_delibird_hustle(ctx, entity_id),
         Some("pokemon_moba_cloyster") => update_cloyster_overcoat(ctx, entity_id),
         Some("pokemon_moba_snorlax") => update_snorlax_gluttony(ctx, entity_id),
+        Some("pokemon_moba_swanna") => update_swanna_tailwind(ctx, entity_id),
+        Some("pokemon_moba_ampharos") => update_ampharos_luminous_pulse(ctx, entity_id),
+        Some("pokemon_moba_quaquaval") => update_quaquaval_aqua_step(ctx, entity_id),
         Some("pokemon_moba_inteleon") => ctx.add_buff(
             entity_id,
             BuffState {
@@ -10294,6 +16097,102 @@ pub fn begin_roost(ctx: &GameCtx, entity_id: usize, duration_ticks: usize, heal_
     });
 }
 
+pub fn begin_sigilyph_gravity(ctx: &GameCtx, entity_id: usize, duration_ticks: usize) {
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return;
+    };
+    if !entity.is_alive() {
+        return;
+    }
+
+    let tick = ctx.tick();
+    let states = SIGILYPH_GRAVITIES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("sigilyph gravity state poisoned");
+    let original_types = states
+        .iter()
+        .find(|state| state.entity_id == entity_id)
+        .map(|state| state.original_types)
+        .unwrap_or_else(|| {
+            entity_types(entity_id)
+                .unwrap_or(TypeSet::dual(PokemonType::Psychic, PokemonType::Flying))
+        });
+    states.retain(|state| state.entity_id != entity_id);
+    states.push(SigilyphGravityState {
+        entity_id,
+        original_types,
+        expires_at: tick.saturating_add(duration_ticks),
+    });
+    register_entity_types(entity_id, TypeSet::single(PokemonType::Psychic));
+}
+
+pub fn has_sigilyph_glypher(_ctx: &GameCtx, entity_id: usize) -> bool {
+    entity_is_champion_id(entity_id, "pokemon_moba_sigilyph")
+        || receiver_has_copied(entity_id, "pokemon_moba_sigilyph")
+}
+
+pub fn apply_sigilyph_glyph(ctx: &GameCtx, caster_id: usize, target_id: usize) {
+    if !has_sigilyph_glypher(ctx, caster_id) {
+        return;
+    }
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_team = caster.team();
+    drop(caster);
+
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() {
+        return;
+    }
+    let target_team = target.team();
+    drop(target);
+
+    let tick = ctx.tick();
+    let states = SIGILYPH_GLYPHS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("sigilyph glyph state poisoned");
+    if let Some(existing) = states
+        .iter_mut()
+        .find(|state| state.caster_id == caster_id && state.target_id == target_id)
+    {
+        existing.caster_team = caster_team;
+        existing.target_team = target_team;
+        existing.expires_at = tick.saturating_add(SIGILYPH_GLYPH_DURATION_TICKS);
+        return;
+    }
+    states.push(SigilyphGlyphState {
+        caster_id,
+        caster_team,
+        target_id,
+        target_team,
+        expires_at: tick.saturating_add(SIGILYPH_GLYPH_DURATION_TICKS),
+    });
+}
+
+pub fn sigilyph_glyph_damage_bonus_percent(
+    ctx: &GameCtx,
+    caster_id: usize,
+    target_id: usize,
+) -> usize {
+    if !has_sigilyph_glypher(ctx, caster_id) {
+        return 0;
+    }
+    let tick = ctx.tick();
+    let states = SIGILYPH_GLYPHS.get_or_init(|| Mutex::new(Vec::new()));
+    let states = states.lock().expect("sigilyph glyph state poisoned");
+    if states.iter().any(|state| {
+        state.caster_id == caster_id && state.target_id == target_id && state.expires_at > tick
+    }) {
+        SIGILYPH_GLYPH_DAMAGE_BONUS_PERCENT
+    } else {
+        0
+    }
+}
+
 pub fn is_blood_moon_active(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
     BLOOD_MOONS
@@ -10554,6 +16453,7 @@ pub fn note_direct_pokemon_damage(
         tick,
     });
     note_bouffalant_retaliate_damage(ctx, target_id, attacker_id, damage);
+    maybe_trigger_missingno_negative_glitch(ctx, attacker_id, target_id, attack_type);
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -12930,7 +18830,9 @@ pub fn try_consume_zeraora_zing_zap(
     {
         let dx = attacker_pos.x as i64 - zeraora_pos.x as i64;
         let dy = attacker_pos.y as i64 - zeraora_pos.y as i64;
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            entity_id,
             entity_id,
             CCState::ForceMove {
                 tick: state.force_move_ticks,
@@ -13309,6 +19211,161 @@ fn grant_hawlucha_unique_ad(ctx: &mut GameCtx, entity_id: usize) {
     );
 }
 
+fn update_sigilyph_gravities(ctx: &GameCtx, tick: usize) {
+    let states = SIGILYPH_GRAVITIES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("sigilyph gravity state poisoned");
+    let mut restores = Vec::new();
+    states.retain(|state| {
+        let alive = ctx
+            .get_entity(state.entity_id)
+            .map(|entity| entity.is_alive())
+            .unwrap_or(false);
+        if alive && state.expires_at > tick {
+            true
+        } else {
+            restores.push((state.entity_id, state.original_types));
+            false
+        }
+    });
+    drop(states);
+
+    for (entity_id, original_types) in restores {
+        register_entity_types(entity_id, original_types);
+    }
+}
+
+fn update_sigilyph_glyphs(ctx: &mut GameCtx, tick: usize) {
+    let states = SIGILYPH_GLYPHS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("sigilyph glyph state poisoned");
+    states.retain(|state| {
+        if state.expires_at <= tick {
+            return false;
+        }
+        ctx.get_entity(state.caster_id)
+            .map(|caster| caster.is_alive())
+            .unwrap_or(false)
+            && ctx
+                .get_entity(state.target_id)
+                .map(|target| target.is_alive())
+                .unwrap_or(false)
+    });
+
+    let snapshot = states.clone();
+    let mut exploding_pairs: Vec<(SigilyphGlyphState, SigilyphGlyphState)> = Vec::new();
+    let mut remove_marks: Vec<(usize, usize)> = Vec::new();
+    for (left_index, left) in snapshot.iter().enumerate() {
+        if left.target_team == left.caster_team
+            || remove_marks.contains(&(left.caster_id, left.target_id))
+        {
+            continue;
+        }
+        let Some(left_pos) = ctx.get_entity(left.target_id).map(|target| target.pos()) else {
+            continue;
+        };
+        for right in snapshot.iter().skip(left_index + 1) {
+            if right.caster_id != left.caster_id
+                || right.target_team == right.caster_team
+                || remove_marks.contains(&(right.caster_id, right.target_id))
+            {
+                continue;
+            }
+            let Some(right_pos) = ctx.get_entity(right.target_id).map(|target| target.pos()) else {
+                continue;
+            };
+            if distance_sq(left_pos, right_pos)
+                <= SIGILYPH_GLYPH_PROXIMITY_RADIUS.saturating_mul(SIGILYPH_GLYPH_PROXIMITY_RADIUS)
+            {
+                exploding_pairs.push((*left, *right));
+                remove_marks.push((left.caster_id, left.target_id));
+                remove_marks.push((right.caster_id, right.target_id));
+                break;
+            }
+        }
+    }
+    states.retain(|state| !remove_marks.contains(&(state.caster_id, state.target_id)));
+    drop(states);
+
+    for (left, right) in exploding_pairs {
+        explode_sigilyph_glyph(ctx, left.caster_id, left.target_id);
+        explode_sigilyph_glyph(ctx, right.caster_id, right.target_id);
+    }
+}
+
+fn explode_sigilyph_glyph(ctx: &mut GameCtx, caster_id: usize, target_id: usize) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_team = caster.team();
+    let caster_ap = caster.stat().magic_power;
+    let caster_types =
+        entity_types(caster_id).unwrap_or(TypeSet::dual(PokemonType::Psychic, PokemonType::Flying));
+    drop(caster);
+
+    let Some(target) = ctx.get_entity(target_id) else {
+        return;
+    };
+    if !target.is_alive() {
+        return;
+    }
+    let target_pos = target.pos();
+    drop(target);
+
+    let primary_damage = SIGILYPH_GLYPH_EXPLOSION_BASE_AP
+        + caster_ap.saturating_mul(SIGILYPH_GLYPH_EXPLOSION_AP_RATIO) / 100;
+    let defender_types = crate::neutral_objectives::defender_types_for_target(ctx, target_id);
+    crate::pokemon_types::deal_pokemon_damage(
+        ctx,
+        caster_id,
+        target_id,
+        0,
+        primary_damage.max(1),
+        AttackType::Skill,
+        PokemonType::Psychic,
+        caster_types,
+        defender_types,
+    );
+
+    let splash_damage = primary_damage.saturating_mul(SIGILYPH_GLYPH_SPLASH_PERCENT) / 100;
+    if splash_damage > 0 {
+        let splash_targets: Vec<usize> = (0..ctx.entity_count())
+            .filter_map(|index| ctx.entity_at(index))
+            .filter(|entity| {
+                entity.team() != caster_team
+                    && entity.is_alive()
+                    && !entity.is_tower()
+                    && distance_sq(entity.pos(), target_pos)
+                        <= SIGILYPH_GLYPH_EXPLOSION_RADIUS
+                            .saturating_mul(SIGILYPH_GLYPH_EXPLOSION_RADIUS)
+            })
+            .map(|entity| entity.id())
+            .collect();
+        for splash_target_id in splash_targets {
+            let defender_types =
+                crate::neutral_objectives::defender_types_for_target(ctx, splash_target_id);
+            crate::pokemon_types::deal_pokemon_damage(
+                ctx,
+                caster_id,
+                splash_target_id,
+                0,
+                splash_damage.max(1),
+                AttackType::Skill,
+                PokemonType::Psychic,
+                caster_types,
+                defender_types,
+            );
+        }
+    }
+    draw_status_marker(
+        ctx,
+        target_pos,
+        SIGILYPH_GLYPH_EXPLOSION_RADIUS,
+        VFX_PSYCHIC,
+    );
+}
+
 pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
     let tick = ctx.tick();
     let last_update = LAST_UPDATE_TICK.get_or_init(|| Mutex::new(usize::MAX));
@@ -13322,6 +19379,20 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
 
     prune_tracked_buffs(ctx);
     update_zeraora_thunder_cages(ctx);
+    update_sigilyph_gravities(ctx, tick);
+    update_sigilyph_glyphs(ctx, tick);
+    update_swanna_cyclones(ctx, tick);
+    update_swanna_sky_circuses(ctx, tick);
+    update_marowak_bone_windmills(ctx, tick);
+    update_garganacl_salt(ctx, tick);
+    update_ampharos_gigavolts(ctx, tick);
+    update_xatu_super_psys(ctx, tick);
+    update_wishiwashi_massive_catches(ctx, tick);
+    update_missingno_glitch_storms(ctx, tick);
+    update_missingno_trick_rooms(ctx, tick);
+    update_missingno_pending_debuffs(ctx, tick);
+    update_yanmega_tinted_lenses(ctx, tick);
+    update_yanmega_giga_drains(ctx, tick);
 
     let delayed_confusions = DELAYED_CONFUSIONS.get_or_init(|| Mutex::new(Vec::new()));
     let mut delayed_confusions = delayed_confusions
@@ -13379,7 +19450,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         if target_full_hp {
             let stun_ticks = adjusted_cc_ticks(ctx, state.target_id, state.stun_ticks) as u64;
             break_kommoo_duel_on_hard_cc(ctx, state.caster_id, state.target_id);
-            ctx.apply_cc(state.target_id, CCState::Stun { tick: stun_ticks });
+            apply_pokemon_cc(ctx, state.caster_id, state.target_id, CCState::Stun { tick: stun_ticks });
             note_steadfast_cc(ctx, state.target_id);
             if let Some(pos) = ctx.get_entity(state.target_id).map(|target| target.pos()) {
                 draw_status_marker(ctx, pos, 13000, VFX_DARK);
@@ -13604,7 +19675,9 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
             draw_status_marker(ctx, target_pos, 10500, VFX_ELECTRIC);
         }
         break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            caster_id,
             target_id,
             CCState::Stun {
                 tick: PARALYSIS_STUN_TICKS,
@@ -13834,6 +19907,10 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
     update_misty_terrains(ctx, tick);
     update_brine_fields(ctx, tick);
     update_grassy_terrains(ctx, tick);
+    update_rillaboom_drum_auras(ctx, tick);
+    update_rillaboom_grassy_surges(ctx, tick);
+    update_shiftry_tornadoes(ctx, tick);
+    update_quaquaval_aqua_step_segments(ctx, tick);
     update_sticky_webs(ctx, tick);
     update_whirlpools(ctx, tick);
     update_sing_auras(ctx, tick);
@@ -13957,6 +20034,18 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         .expect("soft untargetable state poisoned")
         .retain(|state| {
             state.expires_at > tick
+                && ctx
+                    .get_entity(state.entity_id)
+                    .map(|entity| entity.is_alive())
+                    .unwrap_or(false)
+        });
+
+    WEAVILE_HUNTS
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("weavile hunt state poisoned")
+        .retain(|state| {
+            state.stealth_expires_at > tick
                 && ctx
                     .get_entity(state.entity_id)
                     .map(|entity| entity.is_alive())
@@ -14510,6 +20599,280 @@ fn update_brine_fields(ctx: &mut GameCtx, tick: usize) {
     }
 }
 
+fn update_rillaboom_drum_auras(ctx: &mut GameCtx, tick: usize) {
+    let auras = RILLABOOM_DRUM_AURAS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut auras = auras.lock().expect("rillaboom drum aura state poisoned");
+    let mut ally_heals = Vec::new();
+    let mut ally_speeds = Vec::new();
+    let mut enemy_slows = Vec::new();
+    let mut final_stuns = Vec::new();
+    let mut visuals = Vec::new();
+
+    auras.retain_mut(|state| {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            return false;
+        };
+        if !caster.is_alive() {
+            return false;
+        }
+        let caster_pos = caster.pos();
+        drop(caster);
+
+        if state.expires_at <= tick {
+            if state.final_stun_ticks > 0 {
+                for index in 0..ctx.entity_count() {
+                    let Some(entity) = ctx.entity_at(index) else {
+                        continue;
+                    };
+                    if !entity.is_alive()
+                        || entity.team() == state.caster_team
+                        || distance_sq(entity.pos(), caster_pos)
+                            > state.radius.saturating_mul(state.radius)
+                    {
+                        continue;
+                    }
+                    final_stuns.push((state.caster_id, entity.id(), state.final_stun_ticks));
+                }
+            }
+            return false;
+        }
+
+        visuals.push((caster_pos, state.radius));
+        if state.next_tick_at > tick {
+            return true;
+        }
+        while state.next_tick_at <= tick {
+            state.next_tick_at += MISTY_TERRAIN_INTERVAL_TICKS;
+        }
+
+        for index in 0..ctx.entity_count() {
+            let Some(entity) = ctx.entity_at(index) else {
+                continue;
+            };
+            if !entity.is_alive()
+                || distance_sq(entity.pos(), caster_pos) > state.radius.saturating_mul(state.radius)
+            {
+                continue;
+            }
+            if entity.team() == state.caster_team && entity.is_champion() {
+                ally_heals.push((state.caster_id, entity.id(), state.heal_per_tick));
+                if state.ally_move_speed_mult != 0 {
+                    ally_speeds.push((
+                        state.caster_id,
+                        entity.id(),
+                        state.ally_move_speed_mult,
+                        state.ally_buff_ticks,
+                    ));
+                }
+            } else if entity.team() != state.caster_team && state.enemy_slow_percent != 0 {
+                enemy_slows.push((
+                    entity.id(),
+                    state.enemy_slow_percent,
+                    state.enemy_slow_ticks,
+                ));
+            }
+        }
+
+        true
+    });
+    drop(auras);
+
+    for (center, radius) in visuals {
+        draw_field_circle(ctx, center, radius, VFX_GRASS);
+    }
+    for (caster_id, target_id, amount) in ally_heals {
+        let _ = heal_with_antiheal(ctx, caster_id, target_id, amount);
+    }
+    for (caster_id, target_id, move_speed_mult, ticks) in ally_speeds {
+        add_beneficial_buff(
+            ctx,
+            caster_id,
+            target_id,
+            BuffState {
+                duration: BuffType::Time { tick: ticks },
+                move_speed_mult,
+                ..Default::default()
+            },
+        );
+    }
+    for (target_id, slow_percent, ticks) in enemy_slows {
+        ctx.add_buff(
+            target_id,
+            BuffState {
+                duration: BuffType::Time { tick: ticks },
+                move_speed_mult: -slow_percent,
+                ..Default::default()
+            },
+        );
+    }
+    for (caster_id, target_id, ticks) in final_stuns {
+        let ticks = adjusted_cc_ticks(ctx, target_id, ticks);
+        break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::Stun { tick: ticks as u64 });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockSkill { tick: ticks });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockAttack { tick: ticks });
+    }
+}
+
+fn update_rillaboom_grassy_surges(ctx: &mut GameCtx, tick: usize) {
+    let surges = RILLABOOM_GRASSY_SURGES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut surges = surges
+        .lock()
+        .expect("rillaboom grassy surge state poisoned");
+    let mut hits = Vec::new();
+    let mut visuals = Vec::new();
+
+    surges.retain_mut(|state| {
+        if state.expires_at <= tick {
+            return false;
+        }
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            return false;
+        };
+        if !caster.is_alive() {
+            return false;
+        }
+        drop(caster);
+
+        visuals.push((state.start, state.end, state.width));
+        if state.next_tick_at > tick {
+            return true;
+        }
+        while state.next_tick_at <= tick {
+            state.next_tick_at += state.tick_interval;
+        }
+
+        for index in 0..ctx.entity_count() {
+            let Some(entity) = ctx.entity_at(index) else {
+                continue;
+            };
+            if !entity.is_alive()
+                || entity.team() == state.caster_team
+                || distance_to_segment_sq(entity.pos(), state.start, state.end)
+                    > state.width.saturating_mul(state.width)
+            {
+                continue;
+            }
+            hits.push((
+                state.caster_id,
+                entity.id(),
+                state.damage_per_tick,
+                state.slow_percent,
+                state.slow_ticks,
+            ));
+        }
+
+        true
+    });
+    drop(surges);
+
+    for (start, end, width) in visuals {
+        draw_line_band(ctx, start, end, width, VFX_GRASS);
+    }
+    for (caster_id, target_id, damage, slow_percent, slow_ticks) in hits {
+        let actual_target_id = audino_protect_redirect(ctx, target_id).unwrap_or(target_id);
+        let defender_types =
+            crate::neutral_objectives::defender_types_for_target(ctx, actual_target_id);
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            actual_target_id,
+            0,
+            damage.max(1),
+            AttackType::Dot,
+            PokemonType::Grass,
+            TypeSet::single(PokemonType::Grass),
+            defender_types,
+        );
+        ctx.add_buff(
+            actual_target_id,
+            BuffState {
+                duration: BuffType::Time { tick: slow_ticks },
+                move_speed_mult: -slow_percent,
+                ..Default::default()
+            },
+        );
+    }
+}
+
+fn update_shiftry_tornadoes(ctx: &mut GameCtx, tick: usize) {
+    let states = SHIFTRY_TORNADOES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("shiftry tornado state poisoned");
+    let mut hits = Vec::new();
+    let mut visuals = Vec::new();
+
+    states.retain_mut(|state| {
+        if state.expires_at <= tick {
+            return false;
+        }
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            return false;
+        };
+        if !caster.is_alive() {
+            return false;
+        }
+        drop(caster);
+
+        visuals.push((state.center, state.radius));
+        if state.next_tick_at > tick {
+            return true;
+        }
+        while state.next_tick_at <= tick {
+            let damage = state.damage_per_tick.saturating_mul(
+                100usize
+                    .saturating_add(state.ticks_done.saturating_mul(state.damage_growth_percent)),
+            ) / 100;
+            for index in 0..ctx.entity_count() {
+                let Some(entity) = ctx.entity_at(index) else {
+                    continue;
+                };
+                if !entity.is_alive()
+                    || entity.team() == state.caster_team
+                    || entity.is_tower()
+                    || distance_sq(entity.pos(), state.center)
+                        > state.radius.saturating_mul(state.radius)
+                {
+                    continue;
+                }
+                hits.push((
+                    state.caster_id,
+                    entity.id(),
+                    damage.max(1),
+                    state.lift_ticks,
+                ));
+            }
+            state.ticks_done = state.ticks_done.saturating_add(1);
+            state.next_tick_at = state.next_tick_at.saturating_add(state.tick_interval);
+        }
+
+        true
+    });
+    drop(states);
+
+    for (center, radius) in visuals {
+        draw_field_circle(ctx, center, radius, VFX_GRASS);
+    }
+    for (caster_id, target_id, damage, lift_ticks) in hits {
+        let actual_target_id = audino_protect_redirect(ctx, target_id).unwrap_or(target_id);
+        let defender_types =
+            crate::neutral_objectives::defender_types_for_target(ctx, actual_target_id);
+        let attacker_types = entity_types(caster_id)
+            .unwrap_or_else(|| TypeSet::dual(PokemonType::Grass, PokemonType::Dark));
+        crate::pokemon_types::deal_pokemon_damage(
+            ctx,
+            caster_id,
+            actual_target_id,
+            damage,
+            0,
+            AttackType::Dot,
+            PokemonType::Grass,
+            attacker_types,
+            defender_types,
+        );
+        apply_airborne_hard_cc(ctx, caster_id, actual_target_id, lift_ticks);
+    }
+}
+
 fn update_grassy_terrains(ctx: &mut GameCtx, tick: usize) {
     let fields = GRASSY_TERRAINS.get_or_init(|| Mutex::new(Vec::new()));
     let mut fields = fields.lock().expect("grassy terrain state poisoned");
@@ -14517,6 +20880,9 @@ fn update_grassy_terrains(ctx: &mut GameCtx, tick: usize) {
     let mut visuals = Vec::new();
 
     fields.retain_mut(|state| {
+        if state.expires_at <= tick {
+            return false;
+        }
         let Some(caster) = ctx.get_entity(state.caster_id) else {
             return false;
         };
@@ -14675,9 +21041,9 @@ fn update_sing_auras(ctx: &mut GameCtx, tick: usize) {
     for (caster_id, target_id, ticks) in sleeps {
         let ticks = adjusted_cc_ticks(ctx, target_id, ticks);
         break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
-        ctx.apply_cc(target_id, CCState::Stun { tick: ticks as u64 });
-        ctx.apply_cc(target_id, CCState::BlockSkill { tick: ticks });
-        ctx.apply_cc(target_id, CCState::BlockAttack { tick: ticks });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::Stun { tick: ticks as u64 });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockSkill { tick: ticks });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockAttack { tick: ticks });
         note_steadfast_cc(ctx, target_id);
     }
 }
@@ -14757,7 +21123,9 @@ fn update_frosmoth_sleep_circles(ctx: &mut GameCtx, tick: usize) {
     for (entity_id, current_pos, target_pos, speed, ticks) in moves {
         let dx = target_pos.x as i64 - current_pos.x as i64;
         let dy = target_pos.y as i64 - current_pos.y as i64;
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            entity_id,
             entity_id,
             CCState::ForceMove {
                 tick: ticks,
@@ -14771,9 +21139,9 @@ fn update_frosmoth_sleep_circles(ctx: &mut GameCtx, tick: usize) {
     for (caster_id, target_id, ticks) in sleeps {
         let ticks = adjusted_cc_ticks(ctx, target_id, ticks);
         break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
-        ctx.apply_cc(target_id, CCState::Stun { tick: ticks as u64 });
-        ctx.apply_cc(target_id, CCState::BlockSkill { tick: ticks });
-        ctx.apply_cc(target_id, CCState::BlockAttack { tick: ticks });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::Stun { tick: ticks as u64 });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockSkill { tick: ticks });
+        apply_pokemon_cc(ctx, caster_id, target_id, CCState::BlockAttack { tick: ticks });
         note_steadfast_cc(ctx, target_id);
     }
 }
@@ -15038,7 +21406,9 @@ fn update_alluring_voice_auras(ctx: &mut GameCtx, tick: usize) {
     for (caster_id, target_id, taunt_ticks) in taunts {
         let ticks = adjusted_cc_ticks(ctx, target_id, taunt_ticks);
         break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            caster_id,
             target_id,
             CCState::Taunt {
                 tick: ticks as u64,
@@ -15085,7 +21455,7 @@ fn update_thievul_stakeouts(ctx: &mut GameCtx, tick: usize) {
             let ticks = adjusted_cc_ticks(ctx, target_id, state.root_ticks);
             if ticks > 0 {
                 break_kommoo_duel_on_hard_cc(ctx, state.caster_id, target_id);
-                ctx.apply_cc(target_id, CCState::Bind { tick: ticks as u64 });
+                apply_pokemon_cc(ctx, state.caster_id, target_id, CCState::Bind { tick: ticks as u64 });
                 note_steadfast_cc(ctx, target_id);
             }
             draw_status_marker(ctx, target_pos, 8500, VFX_DARK);
@@ -15192,7 +21562,9 @@ fn update_quick_return_dashes(ctx: &mut GameCtx, tick: usize) {
     for (entity_id, current_pos, origin, speed, ticks) in returns {
         let dx = origin.x as i64 - current_pos.x as i64;
         let dy = origin.y as i64 - current_pos.y as i64;
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            entity_id,
             entity_id,
             CCState::ForceMove {
                 tick: ticks,
@@ -15234,7 +21606,9 @@ fn update_scheduled_force_aways(ctx: &mut GameCtx, tick: usize) {
     for (entity_id, current_pos, away_from, speed, ticks) in moves {
         let dx = current_pos.x as i64 - away_from.x as i64;
         let dy = current_pos.y as i64 - away_from.y as i64;
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            entity_id,
             entity_id,
             CCState::ForceMove {
                 tick: ticks,
@@ -15318,7 +21692,9 @@ fn update_orbeetle_agility_chains(ctx: &mut GameCtx, tick: usize) {
 
         let dx = target_pos.x as i64 - caster_pos.x as i64;
         let dy = target_pos.y as i64 - caster_pos.y as i64;
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            caster_id,
             caster_id,
             CCState::ForceMove {
                 tick: force_move_ticks,
@@ -15600,13 +21976,17 @@ fn update_ice_fields(ctx: &mut GameCtx, tick: usize, rng_seed: u64) {
                 AttackType::Dot,
             );
         }
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            caster_id,
             target_id,
             CCState::BlockAttack {
                 tick: control_ticks,
             },
         );
-        ctx.apply_cc(
+        apply_pokemon_cc(
+            ctx,
+            caster_id,
             target_id,
             CCState::BlockSkill {
                 tick: control_ticks,
@@ -16342,13 +22722,17 @@ pub fn begin_grapploct_submission(
     drop(target);
     let tick = ctx.tick();
     let tick_interval = tick_interval.max(1);
-    ctx.apply_cc(
+    apply_pokemon_cc(
+        ctx,
+        caster_id,
         caster_id,
         CCState::Bind {
             tick: duration_ticks as u64,
         },
     );
-    ctx.apply_cc(
+    apply_pokemon_cc(
+        ctx,
+        caster_id,
         target_id,
         CCState::Bind {
             tick: duration_ticks as u64,
@@ -16651,6 +23035,26 @@ fn distance_sq(a: mod_api::EntityPos, b: mod_api::EntityPos) -> u64 {
     let dx = a.x as i128 - b.x as i128;
     let dy = a.y as i128 - b.y as i128;
     squared_len_i128(dx, dy).min(u64::MAX as i128) as u64
+}
+
+fn integer_sqrt(value: u64) -> u64 {
+    if value <= 1 {
+        return value;
+    }
+    let mut left = 1u64;
+    let mut right = value.min(1 << 32);
+    let mut result = 1u64;
+    while left <= right {
+        let mid = left + (right - left) / 2;
+        let square = mid.saturating_mul(mid);
+        if square <= value {
+            result = mid;
+            left = mid.saturating_add(1);
+        } else {
+            right = mid.saturating_sub(1);
+        }
+    }
+    result
 }
 
 fn squared_len_i128(dx: i128, dy: i128) -> i128 {

@@ -39,7 +39,7 @@ pub struct PokemonPositionInfo {
     pub label: &'static str,
 }
 
-pub const POKEMON_POSITIONS: [PokemonPositionInfo; 86] = [
+pub const POKEMON_POSITIONS: [PokemonPositionInfo; 101] = [
     PokemonPositionInfo {
         id: "pokemon_moba_pikachu",
         positions: &[MID, JUNGLE],
@@ -404,6 +404,81 @@ pub const POKEMON_POSITIONS: [PokemonPositionInfo; 86] = [
         id: "pokemon_moba_zeraora",
         positions: &[MID, JUNGLE],
         label: "Mid / Jungle",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_rillaboom",
+        positions: &[SUPPORT],
+        label: "Support",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_dragapult",
+        positions: &[BOTTOM],
+        label: "Bottom",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_shiftry",
+        positions: &[JUNGLE],
+        label: "Jungle",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_sigilyph",
+        positions: &[MID],
+        label: "Mid",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_weavile",
+        positions: &[JUNGLE],
+        label: "Jungle",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_swanna",
+        positions: &[MID],
+        label: "Mid",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_marowak",
+        positions: &[BOTTOM],
+        label: "Bottom",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_garganacl",
+        positions: &[TOP],
+        label: "Top",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_ampharos",
+        positions: &[MID],
+        label: "Mid",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_xatu",
+        positions: &[MID],
+        label: "Mid",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_quaquaval",
+        positions: &[BOTTOM],
+        label: "Bottom",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_arcanine",
+        positions: &[MID, TOP],
+        label: "Mid / Top",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_missingno",
+        positions: &[MID],
+        label: "Mid",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_yanmega",
+        positions: &[TOP, MID],
+        label: "Top / Mid",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_wishiwashi",
+        positions: &[SUPPORT],
+        label: "Support",
     },
     PokemonPositionInfo {
         id: "pokemon_moba_comfey",

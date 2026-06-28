@@ -73,7 +73,7 @@ Ultimate:
 - Effect notes:
 
 Assets:
-- Champion sprite id, usually Showdown slug:
+- Champion sprite asset id / short-id for staged PMD/custom files:
 - Skill icon override needed? yes/no
 - Projectile/effect notes:
 ```
@@ -90,3 +90,5 @@ If you leave numbers open, I will choose a conservative baseline:
 - Status move: no direct damage, may heal, shield, buff, debuff, DOT, or CC
 - Draft strategy traits should describe gameplay capabilities and weaknesses, not exact pair counters. Use explicit one-off counters only when broad traits cannot model the matchup.
 - Use `AdDamage` or `ApDamage` for a Pokemon's meaningful team damage profile. Pure healers or utility tanks with only token damage can omit both so the draft scorer does not treat them as real damage sources.
+- Be explicit about area shape. "Cone" means a forward cone/wedge. "Arc" means a melee cleave/fan around the attacker, usually basic-attack-like, and should not be implemented or described as a projectile cone unless the design says so.
+- Invisibility/stealth currently means Pokemon-layer hidden targeting/AI awareness plus soft untargetable. It does not change native renderer visibility unless a later SDK visibility hook is found.

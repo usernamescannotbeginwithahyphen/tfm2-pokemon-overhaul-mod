@@ -1,13 +1,13 @@
 {
   "name": "Pokemon MOBA Overhaul",
-  "author": "James",
+  "author": "Sirvalkyerie",
   "version": "0.1.0",
-  "description": "Pokemon-only MOBA overhaul. Gameplay is forced to use the native Pokemon roster and base champions are removed from active match availability.",
+  "description": "This is a complete overhaul mod and is not meant to be compatible or balanced with either base game champions or other mods. This mod currently contains 89 Pokemon. While creating a new game click \"Custom\" for the Champion Pool, deselect all base game champions and select each of the 89 Pokemon. Including base game champs in your game may cause crashes.\n\nThis is an Alpha version of a mod that's in active development. There are some features not yet implemented and there are some features the Devs have not yet made possible via the current modtools. Namely, this is a Rust mod featuring all new functions such as type effectiveness and STAB as well as brand new passives for each Pokemon. But the Devs currently have not enabled a way for Rust modded champs to use custom VFX. As a result THERE ARE NO VFX in this mod currently until the Devs enable the ability to include custom VFX in a Rust mod.\n\nThere is an active Discord for the mod here ( https://discord.gg/mB8dyd4Qw ) where you can get faster updates than are provided to the Steam Workshop. You can also report issues with bugs and balancing in the Discord.\n\nIf you'd like to help, I need someone who is better with art than I am to help provide new sprites. For now I'm using PMD-style spritework but would love to provide sprites that match the game's art style. If you'd like to help, please reach out on Discord.\n\nLastly, every single Pokemon has a basic attack, two skills, an ultimate, and a passive ability. The in-game UI can only show the two skills and ultimate in the Game Info screen. The passives can change how the Pokemon behave significantly. As such, I've included a guide with the mod that you can find inside the mod folder inside of a folder called guide. The guide is also available on the Discord. Please read the guide to learn about the Pokemon in the game, their moves, their synergies and their counters. Make sure you've read the guide before reporting bugs. And again, please make all bug reports on the Discord server.\n\nThank you!\n\n[Code Mod Notice]\nThis Workshop item contains native/executable code files. Enabling it allows code to run inside the game process. Use only mods from creators you trust.\nFiles: pokemon_moba.dll.",
   "last_updated": "2026-06-18",
   "dependencies": [
     {
       "mod_id": "base",
-      "version": ">=0.4.13"
+      "version": ">=0.4.14"
     }
   ]
 }

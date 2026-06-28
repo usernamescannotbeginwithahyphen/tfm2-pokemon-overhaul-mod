@@ -22,6 +22,7 @@ pub enum PokemonType {
     Dark,
     Steel,
     Fairy,
+    Bird,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -204,6 +205,19 @@ pub fn deal_pokemon_damage(
     } else {
         (modified_ad_damage, modified_ap_damage)
     };
+    let aqua_step_bonus = if matches!(move_type, PokemonType::Water) {
+        crate::pokemon_status::quaquaval_water_damage_bonus_percent(ctx, attacker)
+    } else {
+        0
+    };
+    let (ad_damage, ap_damage) = if aqua_step_bonus > 0 {
+        (
+            ad_damage.saturating_mul(100usize.saturating_add(aqua_step_bonus)) / 100,
+            ap_damage.saturating_mul(100usize.saturating_add(aqua_step_bonus)) / 100,
+        )
+    } else {
+        (ad_damage, ap_damage)
+    };
     let reduce_percent =
         crate::pokemon_status::gallade_prediction_reduce_percent(ctx, target, attacker);
     let (ad_damage, ap_damage) = if reduce_percent > 0 {
@@ -287,6 +301,15 @@ pub fn deal_pokemon_damage(
         crate::pokemon_status::adjust_endure_damage(ctx, target, ad_damage, ap_damage);
     let (ad_damage, ap_damage) =
         crate::pokemon_status::adjust_sturdy_damage(ctx, target, attack_type, ad_damage, ap_damage);
+    let pain_amp_bonus = crate::pokemon_status::xatu_pain_amplifier_bonus_percent(ctx, target);
+    let (ad_damage, ap_damage) = if pain_amp_bonus > 0 {
+        (
+            ad_damage.saturating_mul(100usize.saturating_add(pain_amp_bonus)) / 100,
+            ap_damage.saturating_mul(100usize.saturating_add(pain_amp_bonus)) / 100,
+        )
+    } else {
+        (ad_damage, ap_damage)
+    };
     if ad_damage > 0 || ap_damage > 0 {
         crate::pokemon_status::note_light_metal_dealt_damage(ctx, attacker);
         crate::pokemon_status::note_direct_pokemon_damage(
@@ -324,6 +347,11 @@ pub fn deal_pokemon_damage(
         ap_damage,
         attack_type,
     );
+    if damage_result.applied_damage > 0 && ad_damage > 0 {
+        crate::pokemon_status::trigger_garganacl_salt_cure_from_physical_damage(
+            ctx, target, ad_damage,
+        );
+    }
     let before = damage_result.before;
     let after = damage_result.after;
     log_pokemon_stat_probe(

@@ -7,6 +7,7 @@ Use this for Pokemon champion sprite work. The workflow is PMDCollab-source-firs
 - Stage converted sheets and animation files under `assets\custom_spritework\champions`.
 - Runtime copies live under `mod\pokemon_moba\champions_custom`; do not put new Pokemon champion sprites back into `mod\pokemon_moba\champions`.
 - `mod.override_info` should map Pokemon champion `#sheet` and `#anim` assets to `asset/pokemon_moba/champions_custom/<short-id>#sheet` and `#anim`.
+- Current new-Pokemon flow: new Pokemon are expected to already have `mod.override_info` mappings or to receive them when `tools\sync-custom-champion-sprites.py` runs. After making a new sprite group, generate previews and sync immediately into `mod\pokemon_moba\champions_custom`; do not wait for a separate staging/remap batch unless James asks for one.
 - Stage future-ready custom projectile/spell VFX under `assets\custom_spritework\vfx`.
 - Stage QC GIFs under `assets\custom_spritework\previews`.
 - Store downloaded PMDCollab source material and credits under `assets\custom_spritework\references\pmdcollab\<species-id>`.
@@ -24,6 +25,7 @@ assets\custom_spritework\previews\ambipom_basicattack_preview.gif
 assets\custom_spritework\previews\ambipom_skill1_preview.gif
 assets\custom_spritework\previews\ambipom_skill2_preview.gif
 assets\custom_spritework\previews\ambipom_ult_preview.gif
+assets\custom_spritework\previews\ambipom_size_compare.png
 ```
 
 Optional passive/buff previews may be added when they help QC. Do not make them by default when the passive has no important persistent visual state.
@@ -47,9 +49,10 @@ For each Pokemon:
    When an action needs a longer bridge into another pose, use roughly four prep/transition frames as the default starting point. Four frames has been enough to make abrupt pose changes, such as standing into a low shooting pose, read as intentional without overextending the move.
 8. Detached projectile/spell-area VFX can be designed and staged now, but do not rely on them for current in-game readability until the native Rust champion VFX call path exists. Keep those files under `assets\custom_spritework\vfx` and preview them separately.
 9. Generate looping preview GIFs for idle/run/basic/skill1/skill2/ult and any passive or buff state that needs visual QC. Use transparent GIF backgrounds (`--background 0,0,0,0`) rather than chroma-key green so the previews match the alpha behavior expected in-game. Use 288x288 previews for standard 96x96 champion frames so every Pokemon is reviewed at the same 3x scale.
-10. Verify the staged `.fanim` JSON parses, every referenced rectangle fits inside the staged sheet, and preview GIFs play without neighboring-frame bleed.
-11. Treat the preview GIFs as the framing check before in-game testing. Existing live Showdown-converted sprites usually put idle bottoms around y=66-70 inside the 96x96 frame, so PMDCollab conversions should usually use a ground line in that range. If the Pokemon sits too low in-game, raise it by increasing `--bottom-padding`; if it sits too high, lower that value. Do not align to the full transparent PMD source cell.
-12. When a Pokemon's staged files are accepted, run `.\.venv\Scripts\python.exe .\tools\sync-custom-champion-sprites.py` to copy staged assets into `mod\pokemon_moba\champions_custom` and normalize `mod.override_info`.
+10. Generate an idle size comparison PNG for every new Pokemon before accepting scale. Use `tools\render-sprite-size-comparison.py <short-id>` so the new Pokemon appears beside the current reference spread: Shedinja, Electrode, Gallade, Venusaur, and Snorlax. The output is `assets\custom_spritework\previews\<short-id>_size_compare.png` and includes visible height, bottom anchor, and a shared ground line.
+11. Verify the staged `.fanim` JSON parses, every referenced rectangle fits inside the staged sheet, preview GIFs play without neighboring-frame bleed, and the size comparison does not show the new Pokemon as an obvious scale outlier.
+12. Treat the preview GIFs and size comparison as the framing check before in-game testing. Existing live Showdown-converted sprites usually put idle bottoms around y=66-70 inside the 96x96 frame, but the current custom roster has accepted exceptions by size bucket. If the Pokemon sits too low in comparison, raise it by increasing `--bottom-padding` or applying a small negative `--shift-y`; if it sits too high, lower it. Do not align to the full transparent PMD source cell.
+13. When a Pokemon's staged files are accepted, run `.\.venv\Scripts\python.exe .\tools\sync-custom-champion-sprites.py` to copy staged assets into `mod\pokemon_moba\champions_custom` and normalize `mod.override_info`.
 
 ## Size QA rules
 
@@ -91,6 +94,14 @@ Preview command after a staged sheet exists:
 ```
 
 The renderer writes to `assets\custom_spritework\previews` by default.
+
+Size comparison command after the standard preview GIFs exist:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\render-sprite-size-comparison.py ambipom
+```
+
+The comparison renderer writes `assets\custom_spritework\previews\<short-id>_size_compare.png` by default. Override references with `--compare shedinja electrode gallade venusaur snorlax` if a specific Pokemon needs a more targeted comparison set.
 
 ## Animation Naming
 
@@ -1194,7 +1205,7 @@ Electrode conversion command:
   --bottom-padding 28
 ```
 
-After conversion, pack `electrode_explosions_source.png` into one callable large AOE VFX asset and one temporary small-death bake source. Bake the ult red/flash charge and both explosion rows into `assets\custom_spritework\champions\electrode#sheet.png`, then remove the temporary small-death VFX files so only `electrode_ult_self_destruct_explosion_aoe` remains under `assets\custom_spritework\vfx`. Regenerate the Electrode preview GIFs and contact sheets after the bake.
+After conversion, pack `electrode_explosions_source.png` into one callable large AOE VFX asset and one temporary small-death bake source. Bake the ult red/flash charge and both explosion rows into `assets\custom_spritework\champions\electrode#sheet.png`, then remove the temporary small-death VFX files so only `electrode_ult_self_destruct_explosion_aoe` remains under `assets\custom_spritework\vfx`. Regenerate the Electrode preview GIFs and contact sheets after the bake. After size comparison QA, the accepted champion sheet was downscaled in place with `tools\scale-sprite-sheet-content.py --scale 0.90 --shift-y 0`, making the first idle frame 29 px tall with bottom anchor 68.
 
 ## Emboar Source Mapping
 
@@ -1427,7 +1438,7 @@ When packing `frosmoth_vfx_source.png`, use flood chroma cleanup so the pale gre
 - `attack` / Sacred Sword: `Strike`, with reduced travel because this is a melee basic.
 - `skill` / Future Sight: `Charge`. No separate VFX is staged in this pass.
 - `skill2` / Calm Mind: `RearUp`. No separate VFX is staged in this pass.
-- `ult` / Psycho Cut: `Shoot`. A separate future-ready left-to-right psychic cone slash is staged as `assets\custom_spritework\vfx\gallade_ult_psycho_cut_cone#sheet.png` and `#anim.fanim`.
+- `ult` / Psycho Cut: `Shoot`. A separate future-ready left-to-right psychic arc slash is staged as `assets\custom_spritework\vfx\gallade_ult_psycho_cut_cone#sheet.png` and `#anim.fanim`.
 - `dead`: `Hurt+Sleep`
 - Justified passive does not need separate spritework.
 
@@ -1459,7 +1470,7 @@ Gallade conversion command:
   --bottom-padding 28
 ```
 
-When packing `gallade_psycho_cut_source.png`, use flood chroma cleanup, detected six frame groups, and pack to 192x96 `cone` frames. ImageGen left some lime-green antialias/trail pixels after chroma cleanup; recolor/remove green-dominant remaining pixels so Psycho Cut reads as cyan/magenta psychic energy rather than a chroma-key artifact.
+When packing `gallade_psycho_cut_source.png`, use flood chroma cleanup, detected six frame groups, and pack to 192x96 arc-slash frames. ImageGen left some lime-green antialias/trail pixels after chroma cleanup; recolor/remove green-dominant remaining pixels so Psycho Cut reads as cyan/magenta psychic energy rather than a chroma-key artifact. After size comparison QA, the accepted champion sheet was downscaled in place with `tools\scale-sprite-sheet-content.py --scale 0.92 --shift-y 0`, making the first idle frame 35 px tall with bottom anchor 68.
 
 ## Gholdengo Source Mapping
 
@@ -2535,12 +2546,12 @@ Final VFX counts are 6 Bubble `projectile` frames, 6 Brine `field` frames, 6 Div
 
 - PMDCollab source: `sprite/0715`, from `https://sprites.pmdcollab.org/#/0715?form=0`.
 - PMDCollab credits: current `CC_BY-NC_4` in `assets\custom_spritework\references\pmdcollab\0715\credits.txt` covers Idle/Walk/Sleep/Hurt/Attack/Charge/Shoot/Strike/Swing/Double/Rotate/Hop/Hover.
-- ImageGen VFX sources are preserved as `assets\custom_spritework\references\imagegen\noivern_basicattack_screech_v2_source.png`, `noivern_skill1_whirlwind_source.png`, `noivern_skill2_tailwind_source.png`, and `noivern_ult_dragon_pulse_source.png`. Use the v2 Screech source; the first Screech pass was rejected because it read like debris/impact chunks instead of sound.
+- ImageGen VFX sources are preserved as `assets\custom_spritework\references\imagegen\noivern_basicattack_screech_v2_source.png`, `noivern_skill1_whirlwind_source.png`, `noivern_skill2_tailwind_source.png`, and `noivern_ult_dragon_pulse_source.png`. Use the v2 Screech source; the first Screech pass was rejected because it read like debris/impact chunks instead of sound. Noivern's former Tailwind move is now named Fighting Wings; keep the existing file stem unless the VFX asset is repacked.
 - `idle`: `Idle`
 - `run`: `Walk`
 - `attack` / Screech: `Shoot`, with reduced travel and recentering. A separate future-ready sonic debuff wave is staged as `assets\custom_spritework\vfx\noivern_basicattack_screech_soundwave#sheet.png` and `#anim.fanim`; it should read as expanding waveform arcs/concentric audio rings, not a projectile, debris wall, or impact burst.
 - `skill` / Whirlwind: `Shoot`, with reduced travel and recentering. A separate future-ready heavier wind/debris line is staged as `assets\custom_spritework\vfx\noivern_skill1_whirlwind_line#sheet.png` and `#anim.fanim`.
-- `skill2` / Tailwind: `Shoot`, with reduced travel and recentering. A separate future-ready faster, cleaner wind-speed line is staged as `assets\custom_spritework\vfx\noivern_skill2_tailwind_line#sheet.png` and `#anim.fanim`.
+- `skill2` / Fighting Wings: `Shoot`, with reduced travel and recentering. A separate future-ready faster, cleaner wind-speed line is staged as `assets\custom_spritework\vfx\noivern_skill2_tailwind_line#sheet.png` and `#anim.fanim`.
 - `ult` / Dragon Pulse: `Shoot`, with reduced travel and recentering. A separate future-ready purple-blue dragon projectile is staged as `assets\custom_spritework\vfx\noivern_ult_dragon_pulse_projectile#sheet.png` and `#anim.fanim`.
 - `dead`: `Hurt+Sleep`
 - Passive / Infiltrator: no separate spritework or VFX is staged.
@@ -2576,7 +2587,7 @@ Noivern conversion command:
   --bottom-padding 26
 ```
 
-Final VFX counts are 6 Screech `wave` frames, 6 Whirlwind `line` frames, 6 Tailwind `line` frames, and 6 Dragon Pulse `projectile` frames. The sources used green chroma key, and the final packed sheets include a cleanup pass that remaps remaining green key-fringe pixels into cool wind/sound/dragon highlights. Keep that cleanup if these VFX are repacked from source, and validate packed sheets/GIF previews for green/magenta chroma residue before treating the assets as final.
+Final VFX counts are 6 Screech `wave` frames, 6 Whirlwind `line` frames, 6 Fighting Wings `line` frames, and 6 Dragon Pulse `projectile` frames. The sources used green chroma key, and the final packed sheets include a cleanup pass that remaps remaining green key-fringe pixels into cool wind/sound/dragon highlights. Keep that cleanup if these VFX are repacked from source, and validate packed sheets/GIF previews for green/magenta chroma residue before treating the assets as final.
 
 ## Octillery Source Mapping
 
@@ -3635,3 +3646,575 @@ Zeraora conversion command:
 ```
 
 Final VFX counts are 6 Thunder Cage `field` frames, 6 Zing Zap `counter` frames, 6 Wild Charge `bolts` frames, and 6 Merciless `overlay` frames. The ImageGen source is preserved as `assets\custom_spritework\references\imagegen\zeraora_vfx_source.png`; it used a magenta chroma key so yellow/blue electric pixels were preserved. Pack from detected whole source groups because the lightning varies heavily in width, then run a hot magenta/pink fringe cleanup pass. Wild Charge also needs a tiny-component cleanup for detached high-frame specks after packing. Final packed sheets validate with no edge alpha, magenta residue, or pure green chroma residue.
+
+## Rillaboom Source Mapping
+
+PMDCollab `sprite/0812` supplies the body source. `Strike` is a `CopyOf Attack` alias in `AnimData.xml`, so the staged basic attack maps to the concrete `Attack` source while still representing the requested Strike animation. Rillaboom is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+
+- `idle`: `Idle`, 2 frames.
+- `run`: `Walk`, 4 frames.
+- `attack` / Drum Stick: `Attack` as the concrete PMDCollab source for the `Strike` alias, recentered with reduced travel.
+- `skill` / Drum Beating: `Sing`, recentered with reduced travel, with a small ImageGen-created green/yellow drum aura baked behind the body for current readability. Separate future-ready VFX is staged as `assets\custom_spritework\vfx\rillaboom_skill1_drum_beating_aura#sheet.png` and `#anim.fanim`.
+- `skill2` / Drum Roll: `Sing`, recentered with reduced travel, with a distinct ImageGen-created amber/green rolling drum aura baked behind the body. Separate future-ready VFX is staged as `assets\custom_spritework\vfx\rillaboom_skill2_drum_roll_aura#sheet.png` and `#anim.fanim`.
+- `ult` / Grassy Surge: `Shoot`, recentered with reduced travel. Separate future-ready left-to-right grass wave VFX is staged as `assets\custom_spritework\vfx\rillaboom_ult_grassy_surge_wave#sheet.png` and `#anim.fanim`.
+- `dead`: `Hurt+Sleep`, 4 frames.
+- Passive / Drum Solo: no separate animation or VFX.
+
+Rillaboom body conversion command:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\convert-pmdcollab-sprite.py `
+  --species 0812 `
+  --source-dir assets\custom_spritework\references\pmdcollab\0812 `
+  --output-base assets\custom_spritework\champions\rillaboom `
+  --map idle=Idle `
+  --map run=Walk `
+  --map attack=Attack `
+  --map skill=Sing `
+  --map skill2=Sing `
+  --map ult=Shoot `
+  --map dead=Hurt+Sleep `
+  --direction-row 1 `
+  --canvas-size 96 `
+  --max-content-size 50 `
+  --bottom-padding 18 `
+  --recenter-tag attack `
+  --recenter-tag skill `
+  --recenter-tag skill2 `
+  --recenter-tag ult `
+  --travel-scale attack=0.35 `
+  --travel-scale skill=0.20 `
+  --travel-scale skill2=0.20 `
+  --travel-scale ult=0.25 `
+  --tag-duration attack=0.5667 `
+  --tag-duration skill=0.7333 `
+  --tag-duration skill2=0.7333 `
+  --tag-duration ult=0.7333 `
+  --tag-duration dead=1.0
+```
+
+ImageGen source is preserved as `assets\custom_spritework\references\imagegen\rillaboom_vfx_source.png`, with cleaned source at `rillaboom_vfx_source_cleaned.png`. The source used a magenta chroma key; generated hot pink/magenta accent pixels were recolored into yellow/amber/green before packing so the final previews do not look like chroma-key residue. Final Rillaboom idle body is 50 px tall inside the 96x96 frame, which matches the current Extra Large cap without making him larger than accepted roster scale.
+
+## Dragapult Source Mapping
+
+PMDCollab `sprite/0887` supplies the full body source. Dragapult is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+
+- `idle`: `Idle`, 2 frames.
+- `run`: `Walk`, 4 frames.
+- `attack` / Shred: `Shoot`, recentered with reduced travel. Separate future-ready VFX is staged as `assets\custom_spritework\vfx\dragapult_basicattack_shred_projectile#sheet.png` and `#anim.fanim`.
+- `skill` / Dragon Darts: `Shoot`, recentered with reduced travel. Separate future-ready paired-dart VFX is staged as `assets\custom_spritework\vfx\dragapult_skill1_dragon_darts_projectile#sheet.png` and `#anim.fanim`.
+- `skill2` / Diving Swipe: `Attack`, with moderate retained travel. The staged champion sheet bakes in a pale ghost-tinted body plus a white/cyan dash trail so the dash reads in the current no-custom-VFX runtime. Separate future-ready dash VFX is staged as `assets\custom_spritework\vfx\dragapult_skill2_diving_swipe_ghost_dash#sheet.png` and `#anim.fanim`.
+- `ult` / Spooky Shot: `Charge`, recentered with reduced travel. Separate future-ready spooky projectile VFX is staged as `assets\custom_spritework\vfx\dragapult_ult_spooky_shot_projectile#sheet.png` and `#anim.fanim`.
+- Passive / Dragon Launcher: no body animation. A separate future-ready ghostly Dreepy follow-up projectile is staged as `assets\custom_spritework\vfx\dragapult_passive_dragon_launcher_dreepy#sheet.png` and `#anim.fanim`.
+- `dead`: `Hurt+Sleep`, 4 frames.
+
+Dragapult body conversion command before baking the skill2 ghost tint:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\convert-pmdcollab-sprite.py `
+  --species 0887 `
+  --source-dir assets\custom_spritework\references\pmdcollab\0887 `
+  --output-base assets\custom_spritework\champions\dragapult `
+  --map idle=Idle `
+  --map run=Walk `
+  --map attack=Shoot `
+  --map skill=Shoot `
+  --map skill2=Attack `
+  --map ult=Charge `
+  --map dead=Hurt+Sleep `
+  --direction-row 1 `
+  --canvas-size 96 `
+  --max-content-size 48 `
+  --bottom-padding 20 `
+  --recenter-tag attack `
+  --recenter-tag skill `
+  --recenter-tag skill2 `
+  --recenter-tag ult `
+  --travel-scale attack=0.25 `
+  --travel-scale skill=0.25 `
+  --travel-scale skill2=0.55 `
+  --travel-scale ult=0.25 `
+  --tag-duration attack=0.6333 `
+  --tag-duration skill=0.7333 `
+  --tag-duration skill2=0.6333 `
+  --tag-duration ult=0.7667 `
+  --tag-duration dead=1.0
+```
+
+ImageGen source is preserved as `assets\custom_spritework\references\imagegen\dragapult_vfx_source.png`, with cleaned source at `dragapult_vfx_source_cleaned.png`. The source used a magenta chroma key; key removal was intentionally strict so darker purple ghost smoke survived, then remaining hot magenta was recolored to dark purple before packing. Final VFX counts are 6 frames each for Shred, Dragon Darts, Diving Swipe, Spooky Shot, and the passive Dreepy. After size comparison QA, the accepted champion sheet was downscaled in place first with `tools\scale-sprite-sheet-content.py --scale 0.875 --shift-y -6`, then again with `--scale 0.905 --shift-y 0`, making the first idle frame 38 px tall with bottom anchor 70.
+
+## Shiftry Source Mapping
+
+PMDCollab `sprite/0275` supplies the full body source. Shiftry is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+
+- `idle`: `Idle`, 2 frames.
+- `run`: `Walk`, 4 frames.
+- `attack` / Thwack: `MultiStrike`, recentered with reduced travel.
+- `skill` / Fan Away: `Shoot`, recentered with reduced travel. Separate future-ready cone gust VFX is staged as `assets\custom_spritework\vfx\shiftry_skill1_fan_away_cone#sheet.png` and `#anim.fanim`.
+- `skill2` / Shiftadieu: `MultiStrike`, recentered with reduced travel, with a small baked dark/leaf slash cue so it is visually distinct from the basic attack while still using the same PMDCollab action source.
+- `ult` / Fan Tornado: `Charge`, recentered with reduced travel. Separate future-ready tornado field VFX is staged as `assets\custom_spritework\vfx\shiftry_ult_fan_tornado_field#sheet.png` and `#anim.fanim`.
+- `dead`: `Hurt+Sleep`, 4 frames.
+- Passive / Forest Camouflage: no separate animation or VFX.
+
+Shiftry body conversion command before baking the skill2 cue:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\convert-pmdcollab-sprite.py `
+  --species 0275 `
+  --source-dir assets\custom_spritework\references\pmdcollab\0275 `
+  --output-base assets\custom_spritework\champions\shiftry `
+  --map idle=Idle `
+  --map run=Walk `
+  --map attack=MultiStrike `
+  --map skill=Shoot `
+  --map skill2=MultiStrike `
+  --map ult=Charge `
+  --map dead=Hurt+Sleep `
+  --direction-row 1 `
+  --canvas-size 96 `
+  --max-content-size 46 `
+  --bottom-padding 22 `
+  --recenter-tag attack `
+  --recenter-tag skill `
+  --recenter-tag skill2 `
+  --recenter-tag ult `
+  --travel-scale attack=0.30 `
+  --travel-scale skill=0.25 `
+  --travel-scale skill2=0.35 `
+  --travel-scale ult=0.25 `
+  --tag-duration attack=0.4667 `
+  --tag-duration skill=0.6333 `
+  --tag-duration skill2=0.6333 `
+  --tag-duration ult=0.7667 `
+  --tag-duration dead=1.0
+```
+
+ImageGen source is preserved as `assets\custom_spritework\references\imagegen\shiftry_vfx_source.png`, with cleaned source at `shiftry_vfx_source_cleaned.png`. The source used a magenta chroma key; hot magenta residue was recolored into dark forest-purple pixels before packing. The generated Fan Away row's final frame was tight against the source edge, so the packed cone uses clean frames `0,1,2,3,4,4` rather than the clipped sixth source frame. Final VFX counts are 6 frames each for Fan Away and Fan Tornado.
+
+## Sigilyph Source Mapping
+
+PMDCollab `sprite/0561` supplies the full body source. Sigilyph is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+
+- `idle`: `Idle`, 8 frames.
+- `run`: `Walk`, 4 frames.
+- `attack` / Psychic Sphere: `Shoot`, recentered and travel-reduced. A separate future-ready projectile is staged as `assets\custom_spritework\vfx\sigilyph_basicattack_psychic_sphere_projectile#sheet.png` and `#anim.fanim`.
+- `skill` / Sonic Wing: `Double`, recentered and travel-reduced. A separate future-ready cone is staged as `assets\custom_spritework\vfx\sigilyph_skill1_sonic_wing_cone#sheet.png` and `#anim.fanim`.
+- `skill2` / Gravity: `Hop`, using only source frames `4-9` so Sigilyph starts at normal hover height and descends until touching the ground.
+- `ult` / Psychic Assault: `SpAttack`, recentered and travel-reduced. A separate future-ready projectile is staged as `assets\custom_spritework\vfx\sigilyph_ult_psychic_assault_projectile#sheet.png` and `#anim.fanim`.
+- Passive / Glypher: no body animation. Future-ready enemy mark and mark explosion VFX are staged as `assets\custom_spritework\vfx\sigilyph_passive_glypher_mark#sheet.png` / `#anim.fanim` and `assets\custom_spritework\vfx\sigilyph_passive_glypher_explosion_aoe#sheet.png` / `#anim.fanim`.
+- `dead`: `Hurt+Sleep`, 8 frames.
+
+Sigilyph body conversion command:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\convert-pmdcollab-sprite.py `
+  --species 0561 `
+  --source-dir assets\custom_spritework\references\pmdcollab\0561 `
+  --output-base assets\custom_spritework\champions\sigilyph `
+  --map idle=Idle `
+  --map run=Walk `
+  --map attack=Shoot `
+  --map skill=Double `
+  --map skill2=Hop `
+  --map ult=SpAttack `
+  --map dead=Hurt+Sleep `
+  --direction-row 1 `
+  --canvas-size 96 `
+  --max-content-size 40 `
+  --bottom-padding 24 `
+  --frame-select skill2=4-9 `
+  --recenter-tag attack `
+  --recenter-tag skill `
+  --recenter-tag skill2 `
+  --recenter-tag ult `
+  --travel-scale attack=0.25 `
+  --travel-scale skill=0.25 `
+  --travel-scale skill2=0.20 `
+  --travel-scale ult=0.25 `
+  --tag-duration attack=0.4667 `
+  --tag-duration skill=0.5667 `
+  --tag-duration skill2=0.5000 `
+  --tag-duration ult=0.7333 `
+  --tag-duration dead=1.0
+```
+
+ImageGen source is preserved as `assets\custom_spritework\references\imagegen\sigilyph_vfx_source.png`, with cleaned source at `sigilyph_vfx_source_cleaned.png`. The source uses a magenta chroma key to preserve cyan/purple psychic pixels. Pack the five rows deterministically as Psychic Sphere projectile, Sonic Wing cone, Psychic Assault projectile, Glypher mark, and Glypher explosion AoE. Recolor hot magenta residue to psychic purple after packing. The Glypher explosion row needed tighter cell cleanup because the generated contact sheet placed some adjacent-frame fragments near the cell edges; keep the final component/edge cleanup if repacking from the source image. Final VFX counts are 6 frames each. After size comparison QA, the accepted champion sheet was downscaled in place with `tools\scale-sprite-sheet-content.py --scale 0.92 --shift-y 0`, making the first idle frame 35 px tall with bottom anchor 72.
+
+## Weavile Source Mapping
+
+PMDCollab `sprite/0461` supplies the full body source. Weavile is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+
+- `idle`: `Idle`, 2 frames.
+- `run`: `Walk`, 4 frames.
+- `attack` / Hail Claw: `Attack`, recentered and travel-reduced.
+- `skill` / Scratch and Shuffle: `Attack`, recentered with a little more retained travel than the basic so the two-hit dash action reads differently while native Rust movement handles the actual displacement.
+- `skill2` / Pursuit Claw: `Attack`, recentered and travel-reduced, with a subtle ImageGen-guided icy/dark claw arc baked into the champion frames. This cue is baked into the body sheet, not staged as a separate VFX asset.
+- `ult` / Assaulting Hunt: `Charge`, recentered and travel-reduced, with ImageGen-guided stealth shimmer plus a progressive body fade/desaturation baked into the champion frames so Weavile looks like she is becoming invisible. This cue is baked into the body sheet, not staged as a separate VFX asset.
+- `dead`: `Hurt+Sleep`, 4 frames.
+- Passive / Lone Predator: no separate animation or VFX.
+
+Weavile body conversion command before baking the skill2 and ult cues:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\convert-pmdcollab-sprite.py `
+  --species 0461 `
+  --source-dir assets\custom_spritework\references\pmdcollab\0461 `
+  --output-base assets\custom_spritework\champions\weavile `
+  --map idle=Idle `
+  --map run=Walk `
+  --map attack=Attack `
+  --map skill=Attack `
+  --map skill2=Attack `
+  --map ult=Charge `
+  --map dead=Hurt+Sleep `
+  --direction-row 1 `
+  --canvas-size 96 `
+  --max-content-size 38 `
+  --bottom-padding 26 `
+  --recenter-tag attack `
+  --recenter-tag skill `
+  --recenter-tag skill2 `
+  --recenter-tag ult `
+  --travel-scale attack=0.25 `
+  --travel-scale skill=0.35 `
+  --travel-scale skill2=0.25 `
+  --travel-scale ult=0.20 `
+  --tag-duration attack=0.3000 `
+  --tag-duration skill=0.4000 `
+  --tag-duration skill2=0.4333 `
+  --tag-duration ult=0.5000 `
+  --tag-duration dead=1.0
+```
+
+ImageGen source for the baked cues is preserved as `assets\custom_spritework\references\imagegen\weavile_baked_effects_source.png`, with cleaned source at `weavile_baked_effects_source_cleaned.png`. The first row is a light claw arc for Pursuit Claw; scale it down and keep opacity modest so it distinguishes `skill2` without reading as a projectile. The second row is a stealth shimmer overlay for Assaulting Hunt; combine it with a body fade/desaturation rather than replacing Weavile with a separate silhouette. After baking, the accepted champion sheet was downscaled in place with `tools\scale-sprite-sheet-content.py --scale 0.92 --shift-y 0`, making the first idle frame 35 px tall with bottom anchor 70.
+
+## Swanna Source Mapping
+
+PMDCollab `sprite/0581` supplies the full body source. Swanna is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\swanna#sheet.png` and `swanna#anim.fanim`.
+
+- `idle`: `Idle`.
+- `run`: `FlapAround` frames `0,1,0,1`, not `Walk` and not the full FlapAround row. The full row rotates through too many facing angles; this compact loop keeps the three-quarter right-facing flying read.
+- `attack` / Flap: `Shoot`, with separate future-ready flying gust projectile VFX.
+- `skill` / Feather Slice: `Attack`, because `Strike` is a `CopyOf Attack` alias in `AnimData.xml` and does not have its own `Strike-Anim.png`.
+- `skill2` / Feathery Cyclone: `Charge`, with separate future-ready water/wind aura VFX.
+- `ult` / Sky Circus: `Hop`; PMDCollab's right-facing Hop row already starts grounded, lifts off, holds an airborne travel pose, and returns to ground, so keep the full 0-9 frame sequence. Native Rust handles the actual x/y capture, Airborne, forced movement, pass-through damage, and return movement.
+- Passive / Tailwind needs no separate spritework unless a subtle movement-buff overlay is added later.
+
+Swanna body conversion command before final scale correction:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\convert-pmdcollab-sprite.py `
+  --species 0581 `
+  --source-dir .\assets\custom_spritework\references\pmdcollab\0581 `
+  --output-base .\assets\custom_spritework\champions\swanna `
+  --map idle=Idle `
+  --map run=FlapAround `
+  --map attack=Shoot `
+  --map skill=Attack `
+  --map skill2=Charge `
+  --map ult=Hop `
+  --map dead=Hurt+Sleep `
+  --direction-row 1 `
+  --max-content-size 28 `
+  --bottom-padding 24 `
+  --frame-select run=0,1,0,1 `
+  --tag-duration run=0.5333 `
+  --tag-duration attack=0.3667 `
+  --tag-duration skill=0.4000 `
+  --tag-duration skill2=0.5667 `
+  --tag-duration ult=0.9667 `
+  --tag-duration dead=1.0
+```
+
+After preview comparison, downscale and lift the accepted champion sheet:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\scale-sprite-sheet-content.py .\assets\custom_spritework\champions\swanna --scale 0.92 --shift-y -6
+```
+
+This makes Swanna's first idle frame 35 px tall with bottom anchor 72, matching Sigilyph's current size band and avoiding the earlier Venusaur-sized read.
+
+ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\swanna_vfx_source.png`, with cleaned source at `swanna_vfx_source_cleaned.png`. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\swanna_basicattack_flap_gust_projectile#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\swanna_skill2_feathery_cyclone_aura#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\swanna_ult_sky_circus_aoe#sheet.png` / `#anim.fanim`
+
+## Marowak Source Mapping
+
+PMDCollab `sprite/0105` supplies the full body source. Marowak is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\marowak#sheet.png` and `marowak#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0105\credits.txt`.
+
+- `idle`: `Idle`.
+- `run`: `Walk`.
+- `attack` / Bonemerang: `Shoot` frames `0,1,2,1`, not the full Shoot row. The later Shoot frames rotate Marowak too far away; the compact loop keeps the three-quarter facing while the detached Bonemerang VFX sells the projectile.
+- `skill` / Bone Rush: `Attack`.
+- `skill2` / Bone Club: `Strike`.
+- `ult` / Bone Windmill: `Charge`; native Rust handles the defensive aura, knockback, and next-Bonemerang empower state.
+- `dead`: `Hurt+Sleep`.
+
+Marowak body conversion command before final lift correction:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\convert-pmdcollab-sprite.py `
+  --species 0105 `
+  --source-dir .\assets\custom_spritework\references\pmdcollab\0105 `
+  --output-base .\assets\custom_spritework\champions\marowak `
+  --map idle=Idle `
+  --map run=Walk `
+  --map attack=Shoot `
+  --map skill=Attack `
+  --map skill2=Strike `
+  --map ult=Charge `
+  --map dead=Hurt+Sleep `
+  --direction-row 1 `
+  --max-content-size 40 `
+  --bottom-padding 18 `
+  --frame-select attack=0,1,2,1 `
+  --tag-duration attack=0.5667 `
+  --tag-duration skill=0.7333 `
+  --tag-duration skill2=0.4667 `
+  --tag-duration ult=0.6333 `
+  --tag-duration dead=1.0
+```
+
+This makes Marowak's first idle frame 28 px tall with bottom anchor 72, matching Shedinja's small size band. ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\marowak_vfx_source.png`, with cleaned source at `marowak_vfx_source_cleaned.png`; however, the accepted Bonemerang projectile was rebuilt deterministically after review so the bone stays straight and rotates as a rigid object instead of bending between frames. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\marowak_basicattack_bonemerang_projectile#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\marowak_ult_bone_windmill_aura#sheet.png` / `#anim.fanim`
+
+## Garganacl Source Mapping
+
+PMDCollab `sprite/0934` supplies the full body source. Garganacl is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\garganacl#sheet.png` and `garganacl#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0934\credits.txt`.
+
+- `idle`: `Idle`.
+- `run`: `Walk`.
+- `attack` / Block Hammer: `Attack`.
+- `skill` / Land Crush: `RearUp`, with separate future-ready ground shockwave VFX.
+- `skill2` / Purifying Salt: `Double`, per the accepted request for this pass.
+- `ult` / Blessed Salt: `Charge`, with separate future-ready salt spire and salt ring VFX.
+- `dead`: `Hurt+Sleep`.
+
+Garganacl body conversion command before final lift correction:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\convert-pmdcollab-sprite.py `
+  --species 0934 `
+  --source-dir .\assets\custom_spritework\references\pmdcollab\0934 `
+  --output-base .\assets\custom_spritework\champions\garganacl `
+  --map idle=Idle `
+  --map run=Walk `
+  --map attack=Attack `
+  --map skill=RearUp `
+  --map skill2=Double `
+  --map ult=Charge `
+  --map dead=Hurt+Sleep `
+  --direction-row 1 `
+  --max-content-size 44 `
+  --bottom-padding 18 `
+  --tag-duration attack=0.7333 `
+  --tag-duration skill=0.7000 `
+  --tag-duration skill2=0.4667 `
+  --tag-duration ult=0.6667 `
+  --tag-duration dead=1.0
+```
+
+After preview comparison, lift Garganacl without changing scale:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\scale-sprite-sheet-content.py .\assets\custom_spritework\champions\garganacl --scale 1 --shift-y -6
+```
+
+This makes Garganacl's first idle frame 44 px tall with bottom anchor 72, keeping him in the bulky tank size band near Venusaur/Pangoro but below Rillaboom/Snorlax. ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\garganacl_vfx_source.png`, with cleaned source at `garganacl_vfx_source_cleaned.png`. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\garganacl_skill1_land_crush_shockwave#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\garganacl_ult_blessed_salt_spire_ring#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\garganacl_passive_salt_cure_patch#sheet.png` / `#anim.fanim`
+
+## Ampharos Source Mapping
+
+PMDCollab `sprite/0181` supplies the full body source. Ampharos is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\ampharos#sheet.png` and `ampharos#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0181\credits.txt`.
+
+- `idle`: `Idle`.
+- `run`: `Walk`.
+- `attack` / Cluster Bolt: `Shoot`, with separate future-ready Electric projectile VFX.
+- `skill` / Flash: `Attack`, with travel removed by `--travel-scale skill=0` and `--recenter-tag skill`; separate future-ready Electric self-AoE VFX.
+- `skill2` / Searchlight Tail: `Charge`, with separate future-ready searchlight aura/buff VFX.
+- `ult` / Gigavolt: `Charge`, with separate future-ready lightning strike and Amped Zone VFX.
+- `dead`: `Hurt+Sleep`.
+
+Ampharos body conversion command:
+
+```powershell
+.\.venv\Scripts\python.exe .\tools\convert-pmdcollab-sprite.py `
+  --species 0181 `
+  --source-dir .\assets\custom_spritework\references\pmdcollab\0181 `
+  --output-base .\assets\custom_spritework\champions\ampharos `
+  --map idle=Idle `
+  --map run=Walk `
+  --map attack=Shoot `
+  --map skill=Attack `
+  --map skill2=Charge `
+  --map ult=Charge `
+  --map dead=Hurt+Sleep `
+  --direction-row 1 `
+  --max-content-size 48 `
+  --bottom-padding 24 `
+  --travel-scale skill=0 `
+  --recenter-tag skill `
+  --tag-duration attack=0.5333 `
+  --tag-duration skill=0.5000 `
+  --tag-duration skill2=0.4667 `
+  --tag-duration ult=0.6667 `
+  --tag-duration dead=1.0
+```
+
+This makes Ampharos's first idle frame 34 px tall with bottom anchor 72, aligned with the normal-medium size band near Gallade/Sigilyph/Swanna. ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\ampharos_vfx_source.png`, with cleaned source at `ampharos_vfx_source_cleaned.png`. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\ampharos_basicattack_cluster_bolt_projectile#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\ampharos_skill1_flash_aoe#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\ampharos_skill2_searchlight_tail_aura#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\ampharos_ult_gigavolt_strike_zone#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\ampharos_passive_luminous_pulse_aura#sheet.png` / `#anim.fanim`
+
+## Xatu Source Mapping
+
+PMDCollab `sprite/0178` supplies the full body source. Xatu is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\xatu#sheet.png` and `xatu#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0178\credits.txt`.
+
+- `idle`: `Idle`.
+- `run`: `Hop` frames `0,2,5,6,7,8,5,2`, using the stable three-quarter start/end plus the raised-wing frames so the loop reads as flying rather than face/body bobbing.
+- `attack` / Energy Singe: `Shoot`, with separate future-ready Psychic projectile VFX.
+- `skill` / Mind Bend: `Rotate`, because PMDCollab `SpAttack` is a `CopyOf Rotate` alias; ImageGen psychic ring aura is baked into the champion frames.
+- `skill2` / Pain Amplifier: `Rotate`, again standing in for `SpAttack`; ImageGen pressure/debuff aura is baked into the champion frames.
+- `ult` / Super Psy: `Charge`, with separate future-ready thin global Psychic beam VFX.
+- `dead`: `Hurt+Sleep`.
+
+The accepted champion sheet is downscaled to 34 px idle height with bottom anchor 72, just under Sigilyph/Swanna's 35 px flyer/mage band. Prophecy needs no separate spritework or VFX. ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\xatu_vfx_source.png`, with row crops preserved beside it. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\xatu_basicattack_energy_singe_projectile#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\xatu_skill1_mind_bend_aura#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\xatu_skill2_pain_amplifier_aura#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\xatu_ult_super_psy_beam#sheet.png` / `#anim.fanim`
+
+## Quaquaval Source Mapping
+
+PMDCollab `sprite/0914` supplies the full body source. Use source row 2 for the right-facing three-quarter read; row 1 is too front-facing for Quaquaval. Quaquaval is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\quaquaval#sheet.png` and `quaquaval#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0914\credits.txt`.
+
+- `idle`: `Idle`.
+- `run`: `Walk`.
+- `attack` / Hydro Kick: `Attack`, with separate future-ready water-splash kick VFX.
+- `skill` / Spiral Shot: `Shoot`, with separate future-ready Water projectile VFX.
+- `skill2` / Up-Tempo: `Charge`, with dash movement supplied by Rust and separate water/kick impact VFX.
+- `ult` / Exciting Dance: `Shoot`, because PMDCollab `RearUp` is a `CopyOf Shoot` alias; no extra VFX staged for the ult itself.
+- `dead`: `Hurt+Sleep`.
+
+The accepted champion sheet uses source row 2 and is downscaled to 39-40 px idle height with bottom anchor 72, keeping Quaquaval in the medium ADC band rather than tank scale. Aqua Step needs trail VFX only; the passive body animation remains ordinary run/walk. ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\quaquaval_vfx_source.png`, with row crops preserved beside it. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\quaquaval_basicattack_hydro_kick_splash#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\quaquaval_skill1_spiral_shot_projectile#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\quaquaval_skill2_up_tempo_impact#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\quaquaval_passive_aqua_step_trail#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\quaquaval_passive_aqua_step_empowered_trail#sheet.png` / `#anim.fanim`
+
+## Arcanine Source Mapping
+
+PMDCollab `sprite/0059` supplies the body source for this pass. Arcanine is mapped through `mod.override_info`; sync staged assets directly into `mod\pokemon_moba\champions_custom\arcanine#sheet.png` and `arcanine#anim.fanim`. Preserve credits in `assets\custom_spritework\references\pmdcollab\0059\credits.txt`.
+
+- `idle`: `Idle`.
+- `run`: `Walk`.
+- `attack` / Flare: `Shoot`, with separate future-ready short Fire flare VFX.
+- `skill` / Extremespeed: `Attack`; Rust supplies the actual dash path and shield state.
+- `skill2` / White Flames: `Rumble`, the concrete source for PMDCollab's `SpAttack` alias, with separate future-ready single-line white-fire AoE VFX. Rust computes two offset line segments; future custom VFX should call the same single-line asset once for each segment rather than using a paired two-line asset.
+- `ult` / Flames of Rage: `Charge`, with separate future-ready self-centered inferno aura VFX.
+- `dead`: `Hurt+Sleep`.
+
+The accepted champion sheet uses source row 1 and a 46 px idle height with bottom anchor 72, placing Arcanine in the large mage/bruiser visual band near Venusaur but below Snorlax/Torterra scale. Keep the body grounded and readable because Extremespeed movement is handled by native forced movement, not by large source-frame travel.
+
+ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\arcanine_vfx_source.png`, with row crops preserved beside it. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\arcanine_basicattack_flare_projectile#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\arcanine_skill2_white_flames_line_aoe#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\arcanine_ult_flames_of_rage_inferno_aura#sheet.png` / `#anim.fanim`
+
+## Wishiwashi Source Mapping
+
+PMDCollab `sprite/0746` supplies regular Solo Form Wishiwashi. PMDCollab `sprite/0746/0001` supplies School Form for the custom Massive Catch `ult` tag. Wishiwashi is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\wishiwashi#sheet.png` and `wishiwashi#anim.fanim`.
+
+- `idle`: regular `Idle`.
+- `run`: regular `Walk`.
+- `attack` / Splash: regular `Shoot`, with separate future-ready water droplet VFX.
+- `skill` / Wave Splash: regular `Charge`, with separate future-ready traveling water wave VFX.
+- `skill2` / Cowardice: regular `Double`; no separate VFX staged for this pass.
+- `ult` / Massive Catch: custom spliced sequence using Solo Form startup, School Form body frames, baked schooling-channel fish/water aura, dash/swallow water wake, spit burst, and return to Solo Form.
+- `dead`: regular `Hurt+Sleep`.
+
+Wishiwashi sprite implementation notes:
+
+- Keep Solo Form the smallest staged Pokemon while preserving legibility. Current first idle frame is 22 px tall with bottom anchor 72, smaller than Marowak/Shedinja at 28 px.
+- Keep School Form isolated to the `ult` tag. Current School Form frames peak around 65 px tall, making the ult form larger than Snorlax/Rillaboom without scaling the normal champion.
+- Massive Catch should visually read as School Form taking over for the ult duration. The Rust move handles the channel, dash, tether, chew ticks, return, and spit displacement; the sprite tag provides a readable 0.5s school-up channel, forward surge, swallow/splash, return/spit, and collapse back to Solo.
+- ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\wishiwashi_vfx_source.png`, with row crops preserved beside it. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\wishiwashi_basicattack_splash_projectile#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\wishiwashi_skill1_wave_splash_wave#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\wishiwashi_ult_schooling_channel_aura#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\wishiwashi_ult_massive_catch_water_burst#sheet.png` / `#anim.fanim`
+
+## MissingNo. Source Mapping
+
+MissingNo. is mapped through `mod.override_info` and intentionally does not use PMDCollab MissingNo. source forms. The accepted body source was generated from ImageGen using the original Red/Blue-style backward-L glitch-block sprite reference and a separate fan-sprite mood reference, then packed into:
+
+- `mod\pokemon_moba\champions_custom\missingno#sheet.png`
+- `mod\pokemon_moba\champions_custom\missingno#anim.fanim`
+
+Use the display name `MissingNo.` with the dot. Tags:
+
+- `idle`: glitch/static idle.
+- `run`: right-facing teleport-step/glitch reassembly. The lower L-block must stay on the right side in every frame, the body should remain about 40 px tall with bottom anchor 72, and the motion should read as left-to-right by breaking apart and reforming several pixels farther forward rather than using a backward speed trail.
+- `attack` / ???: glitch data cast, with no detached projectile baked into the body.
+- `skill` / --: corrupted status burst cast.
+- `skill2` / 'M (00): erratic glitch aura/cast, with a small body-attached glitch aura.
+- `ult` / Trick Room: warped reality cast, with no large arena field baked into the body.
+- `dead`: static collapse.
+
+MissingNo. uses the custom Bird type. Bird has no standard PMD type source requirement; choose glitch/monochrome/VHS-like VFX language over a natural flying-bird treatment.
+
+The accepted champion sheet uses a 40 px idle height with bottom anchor 72, so MissingNo. is taller than normal mages but no longer towers over Venusaur. Keep the footprint narrow and vertical; the shape should read as a corrupted backward-L block rather than a conventional creature.
+
+ImageGen sources are preserved as:
+
+- `assets\custom_spritework\references\imagegen\missingno_body_source.png`
+- `assets\custom_spritework\references\imagegen\missingno_run_glitchstep_source.png`
+- `assets\custom_spritework\references\imagegen\missingno_vfx_source.png`
+
+Packed future-ready VFX assets are:
+
+- `assets\custom_spritework\vfx\missingno_basicattack_glitch_data_projectile#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\missingno_basicattack_stray_glitch_line#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\missingno_skill1_random_status_corruption#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\missingno_skill2_glitch_storm_aura#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\missingno_skill2_chain_spark_arc#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\missingno_ult_trick_room_field#sheet.png` / `#anim.fanim`
+
+Green-dominant generated pixels were recolored into cyan/magenta/lavender glitch pixels instead of left as chroma-key residue. If repacking from source, validate both the champion and VFX sheets for strict green and green-dominant residue.
+
+## Yanmega Source Mapping
+
+PMDCollab `sprite/0469` supplies `Idle`, `Walk`, `Shoot`, `Double`, `Charge`, `Hurt`, and `Sleep`. Yanmega's body was converted with a conservative `max-content-size` of 34 because the wing span can otherwise make him read too large compared to other medium ranged Pokemon.
+
+Tags:
+
+- `idle`: `Idle`.
+- `run`: `Walk`.
+- `attack` / Linear Beam: `Shoot`, with separate future-ready thin Bug beam VFX.
+- `skill` / Buzzing Boost: `Shoot`, with separate future-ready buzzing Bug line VFX.
+- `skill2` / Tinted Lens: `Double`; no separate VFX staged for this pass.
+- `ult` / Giga Drain: `Charge`, with separate future-ready green drain tether/channel VFX.
+- `dead`: `Hurt+Sleep`.
+
+ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\yanmega_vfx_source.png`, with row crops preserved beside it. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\yanmega_basicattack_linear_beam#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\yanmega_skill1_buzzing_boost_line#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\yanmega_ult_giga_drain_tether#sheet.png` / `#anim.fanim`
+
+The VFX were generated on a magenta chroma key to preserve green/yellow Bug and Grass pixels, then cleaned for strict magenta residue. Do not use a green chroma key for future Yanmega VFX because both the body and Giga Drain effects legitimately contain green.

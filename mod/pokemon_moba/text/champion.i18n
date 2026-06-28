@@ -245,7 +245,7 @@
         "attack": "Sacred Sword: Slashes an enemy for physical Fighting damage.",
         "skill": "Future Sight: Predicts one enemy, reducing that enemy's Pokemon damage to Gallade for a short duration.",
         "skill2": "Calm Mind: Cleanses harmful Pokemon statuses and increases Gallade's attack damage.",
-        "ult": "Psycho Cut: Slashes a short cone for heavy physical Psychic damage and can hit towers.",
+        "ult": "Psycho Cut: Slashes a melee arc for heavy physical Psychic damage and can hit towers.",
         "passive": "Justified: Dark-type Pokemon damage gives Gallade a temporary attack buff."
       },
       "pokemon_moba_audino": {
@@ -543,6 +543,126 @@
         "skill2": "Zing Zap: Enters a brief parry stance. The next enemy ability that hits Zeraora is negated, then Zeraora blinks toward the caster and retaliates.",
         "ult": "Wild Charge: Fires lightning bolts at low-health enemies nearby, then grants movement speed and empowers Plasma Fists against enemies struck.",
         "passive": "Merciless: Hitting an enemy Pokemon with two different non-basic abilities in quick succession triggers an Electric burst and grants cooldown recovery."
+      },
+      "pokemon_moba_rillaboom": {
+        "name": "Rillaboom",
+        "attack": "Drum Stick: Smacks a nearby enemy with a drumstick branch, dealing physical damage.",
+        "skill": "Drum Beating: Creates a moving aura around Rillaboom that heals allied Pokemon and increases their movement speed.",
+        "skill2": "Drum Roll: Creates a moving aura around Rillaboom that heals allies and slows enemies. When the roll ends, enemies still inside are stunned.",
+        "ult": "Grassy Surge: Sends a long strip of Grassy Terrain forward, slowing and damaging enemies standing in it.",
+        "passive": "Drum Solo: Casting two non-basic skills within a short window heals Rillaboom and grants nearby allies a brief movement speed boost."
+      },
+      "pokemon_moba_dragapult": {
+        "name": "Dragapult",
+        "attack": "Shred: Fires dragon energy at an enemy, dealing physical damage.",
+        "skill": "Dragon Darts: Fires two Dreepy at one enemy, dealing two separate physical hits that can critically strike and lifesteal.",
+        "skill2": "Diving Swipe: Dashes through enemies in a line. Enemies passed through take reduced magic damage and heal Dragapult; the final target takes full magic damage.",
+        "ult": "Spooky Shot: Blasts an enemy with ghostly energy, dealing heavy magic damage and Terrifying them.",
+        "passive": "Dragon Launcher: Shred, Dragon Darts, and Spooky Shot fire a following ghostly Dreepy that deals extra magic damage and heals Dragapult."
+      },
+      "pokemon_moba_shiftry": {
+        "name": "Shiftry",
+        "attack": "Thwack: Strikes an enemy for Grass physical damage.",
+        "skill": "Fan Away: Blows enemies in a cone away from Shiftry and briefly slows them.",
+        "skill2": "Shiftadieu: Slashes an enemy for Dark physical damage, dealing more while Shiftry has a movement speed buff.",
+        "ult": "Fan Tornado: Places a tornado that repeatedly damages and knocks airborne enemies caught inside.",
+        "passive": "Forest Camouflage: Gains movement speed while hidden from nearby enemies by bush visibility. Movement speed buffs empower Shiftry's basic attacks."
+      },
+      "pokemon_moba_sigilyph": {
+        "name": "Sigilyph",
+        "attack": "Psychic Sphere: Fires a psychic projectile that deals magic damage and marks the target with a glyph.",
+        "skill": "Sonic Wing: Sends a cone of flying sound forward, dealing magic damage.",
+        "skill2": "Gravity: Grounds Sigilyph, temporarily removing Flying typing while increasing AP and cooldown recovery at the cost of movement speed.",
+        "ult": "Psychic Assault: Blasts an enemy with psychic power, dealing heavy magic damage and applying Confusion.",
+        "passive": "Glypher: Psychic Sphere marks targets. Sigilyph's abilities deal more damage to marked enemies, and two nearby enemy marks explode for Psychic splash damage."
+      },
+      "pokemon_moba_weavile": {
+        "name": "Weavile",
+        "attack": "Hail Claw: Slashes an enemy for Ice physical damage with a small chance to Freeze.",
+        "skill": "Scratch and Shuffle: Dashes in and out, striking twice with basic attacks that resolve as Ice or Dark, whichever is stronger.",
+        "skill2": "Pursuit Claw: Slashes enemies in a melee arc. If only one enemy champion is hit, Weavile gains attack and attack speed.",
+        "ult": "Assaulting Hunt: Temporarily increases Weavile's attack and attack speed, briefly hiding it from Pokemon targeting until it attacks again or takes damage.",
+        "passive": "Lone Predator: Deals bonus damage to isolated enemy Pokemon and gains movement speed when basic attacking an isolated target."
+      },
+      "pokemon_moba_swanna": {
+        "name": "Swanna",
+        "attack": "Flap: Sends a burst of air at an enemy, dealing Flying magic damage.",
+        "skill": "Feather Slice: Slashes an enemy at close range, dealing physical damage and applying Bleed.",
+        "skill2": "Feathery Cyclone: Creates a moving Water cyclone around Swanna that damages and slows enemies. Tailwind increases the slow and damage.",
+        "ult": "Sky Circus: Knocks enemies in an area airborne, then Swanna becomes untargetable and damage immune while zig-zagging through the circle, damaging airborne enemies she passes through before returning to her starting position.",
+        "passive": "Tailwind: Moving in one direction grants movement speed, cooldown recovery, and empowers Swanna's next damaging ability."
+      },
+      "pokemon_moba_marowak": {
+        "name": "Marowak",
+        "attack": "Bonemerang: Throws Marowak's bone in a line, damaging enemies it passes through, then damaging enemies again as it returns.",
+        "skill": "Bone Rush: Dashes to the first enemy hit, stunning them and striking up to three times with chance-based follow-up hits.",
+        "skill2": "Bone Club: Strikes a nearby enemy with Marowak's bone, dealing heavy physical damage and stunning them.",
+        "ult": "Bone Windmill: Spins Marowak's bone to reduce incoming projectile and area damage, knock back nearby enemies, and empower the next Bonemerang.",
+        "passive": "Rhythm: A successful Bonemerang briefly increases Marowak's Bonemerang speed and cooldown recovery. Rhythm refreshes but does not stack."
+      },
+      "pokemon_moba_garganacl": {
+        "name": "Garganacl",
+        "attack": "Block Hammer: Slams a heavy salt-block hand into an enemy, dealing Rock physical damage.",
+        "skill": "Land Crush: Sends a wide Rock shockwave forward. Enemies standing in Salt Cure are heavily slowed.",
+        "skill2": "Purifying Salt: Cleanses harmful statuses and heals Garganacl. Salt Cure greatly improves the heal and briefly speeds Garganacl up.",
+        "ult": "Blessed Salt: Raises a salt spire that pulses damage, slow, and healing reduction before crumbling into permanent Salt Cure terrain.",
+        "passive": "Salt Cure: Physical damage causes Garganacl to drop temporary salt patches. Enemies entering salt take Rock damage and are slowed, with Water and Steel types taking extra damage."
+      },
+      "pokemon_moba_ampharos": {
+        "name": "Ampharos",
+        "attack": "Cluster Bolt: Fires an Electric bolt at an enemy, dealing magic damage.",
+        "skill": "Flash: Emits a brilliant pulse around Ampharos, damaging, silencing, and slowing nearby enemies.",
+        "skill2": "Searchlight Tail: Lights Ampharos's tail, increasing movement speed and empowering Luminous Pulse. Empowered pulses can extend the buff and paralyze enemies.",
+        "ult": "Gigavolt: Channels before calling down a large lightning strike. The impact leaves an Amped Zone that slows enemies and speeds up Ampharos's attacks while he stands inside it.",
+        "passive": "Luminous Pulse: Ampharos reveals nearby stealth and bush-hidden enemies to Pokemon AI. The aura periodically pulses, dealing Electric magic damage and slowing enemies."
+      },
+      "pokemon_moba_xatu": {
+        "name": "Xatu",
+        "attack": "Energy Singe: Fires a spat of Psychic energy at an enemy, dealing magic damage.",
+        "skill": "Mind Bend: Warps an enemy's mind, inflicting Confusion. If Xatu stood still before casting, it also deals Psychic magic damage.",
+        "skill2": "Pain Amplifier: Weakens an enemy's spirit, causing them to take increased damage. If Xatu stood still before casting, the enemy is briefly stunned.",
+        "ult": "Super Psy: Channels a global Psychic beam, revealing enemies and damaging enemies in the line. Xatu can retarget the beam during the channel.",
+        "passive": "Prophecy: Enemy Pokemon that cast non-basic skills near Xatu are briefly revealed and lose magic resistance."
+      },
+      "pokemon_moba_quaquaval": {
+        "name": "Quaquaval",
+        "attack": "Hydro Kick: Kicks up a watery splash, dealing Water physical damage. Enemies recently hit by Spiral Shot take extra damage.",
+        "skill": "Spiral Shot: Fires an aimed Water projectile that stops on the first enemy hit, dealing physical damage and slowing them.",
+        "skill2": "Up-Tempo: Dashes into an enemy champion, dealing Fighting physical damage and knocking them back. Crossing Aqua Step during the dash empowers the hit.",
+        "ult": "Exciting Dance: Enters a dancer's trance, increasing movement speed and attack speed while empowering newly dropped Aqua Step trails.",
+        "passive": "Aqua Step: Leaves watery trail segments while moving. Allied Pokemon in the trail move faster and cast stronger Water moves; enemies in the trail are slowed."
+      },
+      "pokemon_moba_arcanine": {
+        "name": "Arcanine",
+        "attack": "Flare: Fires a short-range Fire flare at an enemy, dealing magic damage.",
+        "skill": "Extremespeed: Dashes in an aimed line, damaging enemies passed through and gaining a shield. If an enemy champion breaks the shield, Arcanine gains movement speed.",
+        "skill2": "White Flames: Fires two parallel lines of white-hot flame, damaging enemies, possibly Burning them, and healing Arcanine from enemies hit.",
+        "ult": "Flames of Rage: Roars into a self-centered inferno, dealing more damage while Arcanine is missing health and healing for each enemy champion hit.",
+        "passive": "Blazing Mane: Enemy champions that damage Arcanine lose attack and AP. Melee attackers can be Burned, and Arcanine heals from ability damage dealt."
+      },
+      "pokemon_moba_missingno": {
+        "name": "MissingNo.",
+        "attack": "???: Fires glitch data at an enemy, dealing Bird magic damage and sometimes firing a stray untyped projectile in a random direction.",
+        "skill": "--: Corrupts an enemy with a random status effect. Non-damaging statuses also speed up MissingNo. and improve its cooldown recovery.",
+        "skill2": "'M (00): Emits erratic glitch sparks while moving. Sparks damage enemies and can chain through allies as unstable conduits.",
+        "ult": "Trick Room: Creates a warped arena that scrambles enemy stats, slows enemies, empowers MissingNo. and its allies, and inverts enemy allied buffs and healing handled by the Pokemon layer.",
+        "passive": "Old man glitch: Damaging enemies with -- or 'M (00) can speed up MissingNo. and improve cooldown recovery. Non-basic abilities that damage MissingNo. can slow and disrupt their caster."
+      },
+      "pokemon_moba_yanmega": {
+        "name": "Yanmega",
+        "attack": "Linear Beam: Fires a piercing Bug beam that deals special damage to all enemies in the line.",
+        "skill": "Buzzing Boost: Sends a Bug line attack that applies Infestation to enemies hit and briefly increases Yanmega's movement speed.",
+        "skill2": "Tinted Lens: For a long duration, resisted Yanmega attacks are treated as super effective. Linear Beam applies anti-heal to Infested enemies during this buff.",
+        "ult": "Giga Drain: Channels a life-draining Grass attack on an enemy, rooting both Pokemon and healing Yanmega. The drain is stronger against Infested or Poisoned targets and applies Poison stacks when it ends.",
+        "passive": "Ogre Darner's Bug Blood: Yanmega is immune to Bleed. Pokemon-layer lifesteal and drain effects against Yanmega poison the attacker instead of healing them."
+      },
+      "pokemon_moba_wishiwashi": {
+        "name": "Wishiwashi",
+        "attack": "Splash: Fires a water droplet at an enemy, dealing light magic damage.",
+        "skill": "Wave Splash: Sends a wave forward that heals allies it passes through and damages non-structure enemies. While Schooling, it also cleanses allies and knocks enemies airborne.",
+        "skill2": "Cowardice: While Schooling, heals and shields nearby allies. While alone, Wishiwashi gains a burst of movement speed.",
+        "ult": "Massive Catch: Enters School Form, surges into an enemy Pokemon, carries them back to Wishiwashi's starting point, chews them, and spits them behind that point.",
+        "passive": "Schooling: Nearby allies increase Wishiwashi's defenses, range, and cooldown recovery. When alone, Wishiwashi loses some health but moves faster."
       },
       "pokemon_moba_comfey": {
         "name": "Comfey",

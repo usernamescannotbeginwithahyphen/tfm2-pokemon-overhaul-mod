@@ -834,5 +834,125 @@
   "asset/base/aseprite_resources/champions/pokemon_moba_zeraora#anim": {
     "remapping": "asset/pokemon_moba/champions_custom/zeraora#anim",
     "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_rillaboom#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/rillaboom#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_rillaboom#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/rillaboom#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_dragapult#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/dragapult#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_dragapult#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/dragapult#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_shiftry#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/shiftry#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_shiftry#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/shiftry#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_sigilyph#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/sigilyph#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_sigilyph#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/sigilyph#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_weavile#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/weavile#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_weavile#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/weavile#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_swanna#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/swanna#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_swanna#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/swanna#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_marowak#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/marowak#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_marowak#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/marowak#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_garganacl#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/garganacl#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_garganacl#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/garganacl#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_ampharos#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/ampharos#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_ampharos#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/ampharos#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_xatu#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/xatu#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_xatu#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/xatu#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_quaquaval#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/quaquaval#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_quaquaval#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/quaquaval#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_arcanine#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/arcanine#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_arcanine#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/arcanine#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_missingno#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/missingno#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_missingno#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/missingno#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_yanmega#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/yanmega#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_yanmega#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/yanmega#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_wishiwashi#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/wishiwashi#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_wishiwashi#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/wishiwashi#anim",
+    "type": "override"
   }
 }

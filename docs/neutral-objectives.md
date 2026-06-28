@@ -33,7 +33,7 @@ The June 25 sizing pass moved Beedrill, Amoonguss, Trevenant, Rhyperior, Eternat
 
 Ordinary jungle camps use a transparent or short `dead` animation tag. Their base-game healthbars and combat state despawn correctly, but visible idle-style dead frames can leave the Pokemon sprite on the map after death. Xerneas and Eternatus keep visible death frames because their objective lifecycle already clears correctly in game.
 
-Lane minions use `asset/base/aseprite_resources/UI_aseprite/minion`. The mod still overrides its `#sheet` and `#anim` with `asset/pokemon_moba/ingame/falinks_minion`, generated from a single body cropped out of the Falinks train and scaled to a 44x44 canvas with 24px max visible content. The current jungle/objective pass intentionally leaves Falinks and lane minions untouched.
+Lane minions use `asset/base/aseprite_resources/UI_aseprite/minion`. The mod still overrides its `#sheet` and `#anim` with `asset/pokemon_moba/ingame/falinks_minion`, generated from a single body cropped out of the Falinks train and packed on a 44x44 canvas. The current accepted Falinks minion sheet is staged at `assets\custom_spritework\ingame\falinks_minion#sheet.png` / `#anim.fanim` and synced to `mod\pokemon_moba\ingame`; its normal idle body is about 23 px tall after the June 26 scale pass.
 
 ```powershell
 .\tools\convert-minion-sprites.ps1
