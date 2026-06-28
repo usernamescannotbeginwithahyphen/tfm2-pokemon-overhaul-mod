@@ -16728,7 +16728,7 @@ struct CombatPlayerDeathSnapshot {
     champion_id: Option<&'static str>,
 }
 
-const POKEMON_TOWER_DAMAGE_PERCENT: usize = 60;
+const POKEMON_TOWER_DAMAGE_PERCENT: usize = 25;
 
 pub fn deal_tracked_damage(
     ctx: &mut GameCtx,
