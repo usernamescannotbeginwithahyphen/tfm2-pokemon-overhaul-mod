@@ -20672,6 +20672,15 @@ struct AiAttackTargetSnapshotState {
 }
 
 #[derive(Clone, Copy, Debug)]
+struct AiTowerSnapshotState {
+    entity_id: usize,
+    team: usize,
+    pos: EntityPos,
+    hp_current: usize,
+    tick: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
 struct DedenneStaticState {
     entity_id: usize,
     last_pos: EntityPos,
@@ -20798,6 +20807,7 @@ static LIFE_DEW_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
 static AI_ENTITY_SNAPSHOTS: OnceLock<Mutex<Vec<AiEntitySnapshotState>>> = OnceLock::new();
 static AI_ATTACK_TARGET_SNAPSHOTS: OnceLock<Mutex<Vec<AiAttackTargetSnapshotState>>> =
     OnceLock::new();
+static AI_TOWER_SNAPSHOTS: OnceLock<Mutex<Vec<AiTowerSnapshotState>>> = OnceLock::new();
 static DEDENNE_STATICS: OnceLock<Mutex<Vec<DedenneStaticState>>> = OnceLock::new();
 static DEDENNE_GRIDS: OnceLock<Mutex<Vec<DedenneGridState>>> = OnceLock::new();
 static DEDENNE_GRID_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
@@ -20842,6 +20852,7 @@ fn reset_pokemon_content_runtime_state_for_new_match() {
     clear_vec_store(&LIFE_DEW_PICKUPS);
     clear_vec_store(&AI_ENTITY_SNAPSHOTS);
     clear_vec_store(&AI_ATTACK_TARGET_SNAPSHOTS);
+    clear_vec_store(&AI_TOWER_SNAPSHOTS);
     clear_vec_store(&DEDENNE_STATICS);
     clear_vec_store(&DEDENNE_GRIDS);
     clear_vec_store(&DEDENNE_TERRAIN_COOLDOWNS);
@@ -22569,6 +22580,44 @@ fn update_ai_attack_target_snapshots(ctx: &GameCtx) {
     }
 }
 
+fn update_ai_tower_snapshots(ctx: &GameCtx) {
+    let tick = ctx.tick();
+    let snapshots = AI_TOWER_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut snapshots = snapshots.lock().expect("ai tower snapshot state poisoned");
+    snapshots.retain(|state| {
+        tick.saturating_sub(state.tick) <= 180
+            && ctx
+                .get_entity(state.entity_id)
+                .map(|entity| entity.is_alive() && entity.is_tower())
+                .unwrap_or(false)
+    });
+
+    for index in 0..ctx.entity_count() {
+        let Some(entity) = ctx.entity_at(index) else {
+            continue;
+        };
+        if !entity.is_alive() || !entity.is_tower() {
+            continue;
+        }
+        let hp = entity.hp();
+        let snapshot = AiTowerSnapshotState {
+            entity_id: entity.id(),
+            team: entity.team(),
+            pos: entity.pos(),
+            hp_current: hp.current,
+            tick,
+        };
+        if let Some(existing) = snapshots
+            .iter_mut()
+            .find(|state| state.entity_id == snapshot.entity_id)
+        {
+            *existing = snapshot;
+        } else {
+            snapshots.push(snapshot);
+        }
+    }
+}
+
 fn life_dew_move_input_for_player(
     player_id: usize,
     tick: usize,
@@ -22701,7 +22750,7 @@ fn attach_partner_move_input_for_player(
     champion_name: &str,
     _base_input: Option<&Input>,
 ) -> Option<Input> {
-    const ATTACH_AI_SEARCH_RADIUS: u64 = 340_000;
+    const ATTACH_AI_SEARCH_RADIUS: u64 = 600_000;
 
     let is_clawitzer = PokemonMobaInputAi::champion_name_matches(champion_name, "Clawitzer");
     let is_comfey = PokemonMobaInputAi::champion_name_matches(champion_name, "Comfey");
@@ -23810,6 +23859,7 @@ impl ModPassive for PokemonPassive {
                 crate::pokemon_status::register_entity_champion(ctx, _entity, self.champion.id);
                 update_ai_entity_snapshot(ctx, _player, _entity);
                 update_ai_attack_target_snapshots(ctx);
+                update_ai_tower_snapshots(ctx);
                 crate::pokemon_status::update_statuses(ctx, rng_seed);
                 update_instructs(ctx, rng_seed);
                 update_delayed_poison_areas(ctx);
@@ -24425,6 +24475,8 @@ fn log_pokemon_on_kill_stat_probe(
 pub struct PokemonMobaInputAi;
 
 impl PokemonMobaInputAi {
+    const DASH_TOWER_DANGER_RADIUS: u64 = 70_000;
+
     fn champion_name_matches(champion_name: &str, display_name: &str) -> bool {
         champion_name == display_name
             || champion_name
@@ -24464,7 +24516,12 @@ impl PokemonMobaInputAi {
         input: Option<Input>,
     ) -> PlayerInputDecision {
         match input {
-            Some(input) if ctx.is_valid_input(&input) => PlayerInputDecision::Replace(input),
+            Some(input)
+                if ctx.is_valid_input(&input)
+                    && !Self::input_for_current_champion_is_tower_dangerous_dash(ctx, &input) =>
+            {
+                PlayerInputDecision::Replace(input)
+            }
             _ => PlayerInputDecision::Pass,
         }
     }
@@ -24522,6 +24579,200 @@ impl PokemonMobaInputAi {
             ActionSlot::Skill2 => Input::Skill2 { target },
             ActionSlot::Ult => Input::Ult { target },
         }
+    }
+
+    fn champion_for_ai_name(champion_name: &str) -> Option<PokemonChampion> {
+        POKEMON_CHAMPIONS
+            .iter()
+            .copied()
+            .find(|champion| Self::champion_name_matches(champion_name, champion.display_name))
+    }
+
+    fn action_for_input(champion: PokemonChampion, input: &Input) -> Option<PokemonMove> {
+        match Self::slot_for_input(input)? {
+            ActionSlot::Attack => Some(champion.attack),
+            ActionSlot::Skill => Some(champion.skill),
+            ActionSlot::Skill2 => Some(champion.skill2),
+            ActionSlot::Ult => champion.ult,
+        }
+    }
+
+    fn target_pos_from_ai_snapshots(target: InputTarget, tick: usize) -> Option<EntityPos> {
+        match target {
+            InputTarget::Pos { x, y } => Some(EntityPos { x, y }),
+            InputTarget::Target { target_id } => {
+                {
+                    let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+                    if let Some(pos) = snapshots
+                        .lock()
+                        .expect("ai entity snapshot state poisoned")
+                        .iter()
+                        .find(|state| {
+                            state.entity_id == target_id
+                                && state.hp_current > 0
+                                && tick.saturating_sub(state.tick) <= 30
+                        })
+                        .map(|state| state.pos)
+                    {
+                        return Some(pos);
+                    }
+                }
+                {
+                    let snapshots =
+                        AI_ATTACK_TARGET_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+                    if let Some(pos) = snapshots
+                        .lock()
+                        .expect("ai attack target snapshot state poisoned")
+                        .iter()
+                        .find(|state| {
+                            state.entity_id == target_id
+                                && state.hp_current > 0
+                                && tick.saturating_sub(state.tick) <= 30
+                        })
+                        .map(|state| state.pos)
+                    {
+                        return Some(pos);
+                    }
+                }
+                let snapshots = AI_TOWER_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+                snapshots
+                    .lock()
+                    .expect("ai tower snapshot state poisoned")
+                    .iter()
+                    .find(|state| {
+                        state.entity_id == target_id
+                            && state.hp_current > 0
+                            && tick.saturating_sub(state.tick) <= 180
+                    })
+                    .map(|state| state.pos)
+            }
+            _ => None,
+        }
+    }
+
+    fn projected_dash_end(caster_pos: EntityPos, aim_pos: EntityPos, range: u64) -> EntityPos {
+        let dx = aim_pos.x as f64 - caster_pos.x as f64;
+        let dy = aim_pos.y as f64 - caster_pos.y as f64;
+        let len = (dx * dx + dy * dy).sqrt();
+        if len <= 0.0 {
+            return aim_pos;
+        }
+        pos_from_f64(
+            caster_pos.x as f64 + dx / len * range as f64,
+            caster_pos.y as f64 + dy / len * range as f64,
+        )
+    }
+
+    fn dash_end_for_ai(
+        action: PokemonMove,
+        caster_pos: EntityPos,
+        target: InputTarget,
+        tick: usize,
+    ) -> Option<EntityPos> {
+        let target_pos = || Self::target_pos_from_ai_snapshots(target, tick);
+        match action.effect {
+            PokemonMoveEffect::DashEndConeDamage { dash_range, .. }
+            | PokemonMoveEffect::KingdraDragonDance { dash_range, .. } => {
+                let aim_pos = target_pos()?;
+                Some(Self::projected_dash_end(caster_pos, aim_pos, dash_range))
+            }
+            PokemonMoveEffect::DedennePlayRough {
+                empowered_range, ..
+            } => {
+                let aim_pos = target_pos()?;
+                Some(Self::projected_dash_end(
+                    caster_pos,
+                    aim_pos,
+                    empowered_range,
+                ))
+            }
+            PokemonMoveEffect::LineFirstDashDamageFlameTrail { .. }
+            | PokemonMoveEffect::LineFirstDashDamageMissingHp { .. }
+            | PokemonMoveEffect::LineFirstDashDamageDistanceSelfHp { .. }
+            | PokemonMoveEffect::LineDashPierceDamage { .. }
+            | PokemonMoveEffect::LineDashPierceContactDrain { .. } => target_pos(),
+            PokemonMoveEffect::DashDamage { .. }
+            | PokemonMoveEffect::TargetSwapDamage { .. }
+            | PokemonMoveEffect::DashDamageReturn { .. }
+            | PokemonMoveEffect::DashDamageChanceParalysis { .. }
+            | PokemonMoveEffect::DashDamageChanceFreeze { .. }
+            | PokemonMoveEffect::DashDamageChanceDisarm { .. }
+            | PokemonMoveEffect::DashDamageChanceBurn { .. }
+            | PokemonMoveEffect::QuaquavalUpTempo { .. }
+            | PokemonMoveEffect::ArcanineExtremespeed { .. }
+            | PokemonMoveEffect::ChainDashDamage { .. }
+            | PokemonMoveEffect::WishiwashiMassiveCatch { .. }
+            | PokemonMoveEffect::HawluchaFlyingPress { .. }
+            | PokemonMoveEffect::BouffalantHeadCharge { .. }
+            | PokemonMoveEffect::StarmieFlipTurn { .. }
+            | PokemonMoveEffect::DirectDamageSpeedCheckCrit { .. }
+            | PokemonMoveEffect::DirectDamageSplashOnKill { .. }
+            | PokemonMoveEffect::SawkThrohUlt { .. } => target_pos(),
+            _ => None,
+        }
+    }
+
+    fn dash_path_enters_enemy_tower(
+        team: usize,
+        tick: usize,
+        start: EntityPos,
+        end: EntityPos,
+    ) -> bool {
+        let radius_sq =
+            Self::DASH_TOWER_DANGER_RADIUS.saturating_mul(Self::DASH_TOWER_DANGER_RADIUS);
+        let snapshots = AI_TOWER_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+        snapshots
+            .lock()
+            .expect("ai tower snapshot state poisoned")
+            .iter()
+            .any(|tower| {
+                tower.team != team
+                    && tower.hp_current > 0
+                    && tick.saturating_sub(tower.tick) <= 180
+                    && (distance_sq(end, tower.pos) <= radius_sq
+                        || distance_to_segment_sq(tower.pos, start, end) <= radius_sq)
+            })
+    }
+
+    fn input_is_tower_dangerous_dash(
+        ctx: &PlayerAiContext<'_, '_, '_>,
+        action: PokemonMove,
+        input: &Input,
+    ) -> bool {
+        let Some(target) = Self::target_for_input(input) else {
+            return false;
+        };
+        let tick = ctx.tick();
+        let Some(snapshot) = ({
+            let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
+            snapshots
+                .lock()
+                .expect("ai entity snapshot state poisoned")
+                .iter()
+                .copied()
+                .find(|state| {
+                    state.player_id == ctx.player_id() && tick.saturating_sub(state.tick) <= 30
+                })
+        }) else {
+            return false;
+        };
+        let Some(end_pos) = Self::dash_end_for_ai(action, snapshot.pos, target, tick) else {
+            return false;
+        };
+        Self::dash_path_enters_enemy_tower(snapshot.team, tick, snapshot.pos, end_pos)
+    }
+
+    fn input_for_current_champion_is_tower_dangerous_dash(
+        ctx: &PlayerAiContext<'_, '_, '_>,
+        input: &Input,
+    ) -> bool {
+        let Some(champion) = Self::champion_for_ai_name(ctx.champion_name()) else {
+            return false;
+        };
+        let Some(action) = Self::action_for_input(champion, input) else {
+            return false;
+        };
+        Self::input_is_tower_dangerous_dash(ctx, action, input)
     }
 
     fn smeargle_copied_action_score(
@@ -24596,7 +24847,9 @@ impl PokemonMobaInputAi {
                 continue;
             };
             let input = Self::input_for_slot(slot, target);
-            if !ctx.is_valid_input(&input) {
+            if !ctx.is_valid_input(&input)
+                || Self::input_is_tower_dangerous_dash(ctx, copied.action, &input)
+            {
                 continue;
             }
             let score = Self::smeargle_copied_action_score(slot, copied);
@@ -24682,6 +24935,25 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                         }
                     }
                     crate::pokemon_status::note_player_return_input(player_id, tick);
+                }
+
+                if let Some(input) = attach_partner_move_input_for_player(
+                    player_id,
+                    tick,
+                    ctx.champion_name(),
+                    base_input.as_ref(),
+                ) {
+                    return Self::replace_if_valid(ctx, Some(input));
+                }
+
+                if base_input
+                    .as_ref()
+                    .map(|input| {
+                        Self::input_for_current_champion_is_tower_dangerous_dash(ctx, input)
+                    })
+                    .unwrap_or(false)
+                {
+                    return Self::release_channel_input(ctx);
                 }
 
                 if Self::champion_is(ctx, "Eevee")
@@ -24846,15 +25118,6 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                             return Self::replace_if_valid(ctx, Some(input));
                         }
                     }
-                }
-
-                if let Some(input) = attach_partner_move_input_for_player(
-                    player_id,
-                    tick,
-                    ctx.champion_name(),
-                    base_input.as_ref(),
-                ) {
-                    return Self::replace_if_valid(ctx, Some(input));
                 }
 
                 if let Some(input) =
@@ -27964,8 +28227,8 @@ const BLASTOISE: PokemonChampion = PokemonChampion {
         can_use_with_move: false,
         effect: PokemonMoveEffect::MultiHitDamage {
             hits: 2,
-            base_ad: 16,
-            ad_ratio: 58,
+            base_ad: 12,
+            ad_ratio: 48,
             base_ap: 0,
             ap_ratio: 0,
             mega_launcher: true,
@@ -27988,8 +28251,8 @@ const BLASTOISE: PokemonChampion = PokemonChampion {
         effect: PokemonMoveEffect::SelfBuffAreaDamage {
             base_ad: 0,
             ad_ratio: 0,
-            base_ap: 46,
-            ap_ratio: 45,
+            base_ap: 34,
+            ap_ratio: 35,
             radius: 22000,
             buff_ticks: 80,
             move_speed_mult: 35,
@@ -28014,8 +28277,8 @@ const BLASTOISE: PokemonChampion = PokemonChampion {
         effect: PokemonMoveEffect::DirectDamageKnockback {
             base_ad: 0,
             ad_ratio: 0,
-            base_ap: 42,
-            ap_ratio: 35,
+            base_ap: 32,
+            ap_ratio: 28,
             knockback_speed: 8500,
             knockback_ticks: 18,
         },
@@ -28035,8 +28298,8 @@ const BLASTOISE: PokemonChampion = PokemonChampion {
         attack_type: AttackType::Skill,
         can_use_with_move: false,
         effect: PokemonMoveEffect::LinePierceDamage {
-            base_ad: 90,
-            ad_ratio: 125,
+            base_ad: 70,
+            ad_ratio: 100,
             base_ap: 0,
             ap_ratio: 0,
             width: 10000,
@@ -36263,7 +36526,7 @@ const ARCANINE: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Fire),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Range],
-    stat: stat(44, 84, 820, 34, 36, 545, 5),
+    stat: stat(44, 84, 820, 34, 36, 600, 5),
     growth: stat(4, 8, 66, 3, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
