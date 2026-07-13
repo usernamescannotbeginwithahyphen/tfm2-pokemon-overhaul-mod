@@ -31,7 +31,7 @@ $root = (Resolve-Path "$PSScriptRoot\..").Path
 $modRoot = Join-Path $root "mod\$ModId"
 Write-WorkshopIdFile -ModRoot $modRoot -PublishedFileId $WorkshopId
 if ([string]::IsNullOrWhiteSpace($SdkRoot)) {
-  $localSdkRoot = Join-Path $root "downloads\tfm2-sdk\0.4.13"
+  $localSdkRoot = Join-Path $root "downloads\tfm2-sdk\0.5.0_hotfix"
   if (Test-Path -LiteralPath (Join-Path $localSdkRoot "mod-sdk")) {
     $SdkRoot = $localSdkRoot
   } else {
@@ -45,6 +45,11 @@ $nativeDir = Join-Path $sdkDir "native"
 
 if (-not (Test-Path -LiteralPath $buildScript)) {
   throw "SDK build script not found: $buildScript"
+}
+
+$pinned = Select-String -LiteralPath (Join-Path $sdkDir "rust-toolchain.toml") -Pattern '^\s*channel\s*=\s*"([^"]+)"' -ErrorAction SilentlyContinue | ForEach-Object { $_.Matches[0].Groups[1].Value } | Select-Object -First 1
+if ($pinned) {
+  $env:RUSTUP_TOOLCHAIN = $pinned
 }
 
 $modApi = Get-ChildItem -LiteralPath $depsDir -Filter "libmod_api-*.rlib" | Select-Object -First 1
@@ -99,5 +104,6 @@ try {
   Write-Host "Build successful: $outDll"
 } finally {
   Remove-Item Env:\CARGO_ENCODED_RUSTFLAGS -ErrorAction SilentlyContinue
+  Remove-Item Env:\RUSTUP_TOOLCHAIN -ErrorAction SilentlyContinue
   Pop-Location
 }
