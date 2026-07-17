@@ -310,6 +310,8 @@ pub fn deal_pokemon_damage(
     } else {
         (ad_damage, ap_damage)
     };
+    let (ad_damage, ap_damage) =
+        crate::pokemon_status::absorb_light_metal_damage(ctx, target, ad_damage, ap_damage);
     if ad_damage > 0 || ap_damage > 0 {
         crate::pokemon_status::note_light_metal_dealt_damage(ctx, attacker);
         crate::pokemon_status::note_direct_pokemon_damage(

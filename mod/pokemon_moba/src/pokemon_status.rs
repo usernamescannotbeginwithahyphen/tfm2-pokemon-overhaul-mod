@@ -38,7 +38,7 @@ const LEECH_SPREAD_WIDTH: u64 = 9000;
 const TANGLING_AURA_INTERVAL_TICKS: usize = 30;
 const TANGLING_AURA_RADIUS: u64 = 70000;
 const TANGLING_TRIGGER_RADIUS: u64 = 90000;
-const HELPING_HAND_INTERVAL_TICKS: usize = 30;
+const HELPING_HAND_INTERVAL_TICKS: usize = 10;
 const HELPING_HAND_RADIUS: u64 = 65000;
 const INTIMIDATE_INTERVAL_TICKS: usize = 30;
 const INTIMIDATE_RADIUS: u64 = 42000;
@@ -188,6 +188,13 @@ const POKEMON_BASE_STAT_SYNC_LOG_LIMIT: usize = 80;
 const POKEMON_KILL_LEDGER_MAX: usize = 2048;
 const POKEMON_ASSIST_LEDGER_MAX: usize = 2048;
 const POKEMON_PARTICIPATION_LEDGER_MAX: usize = 4096;
+const POKEMON_CUSTOM_KILL_GOLD: usize = 300;
+const GHOLDENGO_DEFAULT_CS_GOLD: usize = 20;
+const GHOLDENGO_BOTTOM_CS_GOLD: usize = 24;
+const GHOLDENGO_CS_BONUS_PERCENT: usize = 50;
+const GHOLDENGO_MAKE_IT_RAIN_MAX_SPEND: usize = 500;
+const GHOLDENGO_MAKE_IT_RAIN_DAMAGE_BONUS_PER_TIER_PERCENT: usize = 10;
+const GHOLDENGO_MAKE_IT_RAIN_RADIUS_BONUS_PER_TIER_PERCENT: usize = 10;
 const STARMIE_ILLUMINATE_CHARGE_INTERVAL_TICKS: usize = 5 * 60;
 const STARMIE_ILLUMINATE_MARK_TICKS: usize = 8 * 60;
 const VFX_FIRE: u32 = 0xffff6b2c;
@@ -450,10 +457,17 @@ struct PlayerEntityState {
 
 #[derive(Clone, Copy, Debug)]
 struct GholdengoGoldState {
+    ctx_id: usize,
     player_id: usize,
-    entity_id: usize,
-    last_seen_gold: usize,
-    earned_gold: usize,
+    last_seen_cs: usize,
+    last_seen_tick: usize,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct GholdengoMakeItRainSpend {
+    pub spent_gold: usize,
+    pub damage_bonus_percent: usize,
+    pub radius_bonus_percent: usize,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -1210,6 +1224,7 @@ struct LightMetalState {
     last_pos: EntityPos,
     distance_without_damage: u64,
     shield_until: usize,
+    shield_amount: usize,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -5677,58 +5692,112 @@ fn visible_player_gold(ctx: &GameCtx, entity_id: usize) -> Option<(usize, usize)
 }
 
 pub fn update_gholdengo_gold_passive(ctx: &GameCtx, entity_id: usize) {
-    let Some((player_id, visible_gold)) = visible_player_gold(ctx, entity_id) else {
+    let player_id = match player_for_entity(entity_id) {
+        Some(player_id) => player_id,
+        None => return,
+    };
+    let Some(player) = ctx.get_player(player_id) else {
         return;
     };
+    let ctx_id = combat_ctx_id(ctx);
+    let tick = ctx.tick();
+    let visible_cs = player.cs();
+    let position = player.position();
     let states = GHOLDENGO_GOLD.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states.lock().expect("gholdengo gold state poisoned");
-    if let Some(state) = states
-        .iter_mut()
-        .find(|state| state.entity_id == entity_id || state.player_id == player_id)
-    {
-        if visible_gold > state.last_seen_gold {
-            let gained = visible_gold.saturating_sub(state.last_seen_gold);
-            state.earned_gold = state.earned_gold.saturating_add(gained);
+    states.retain(|state| {
+        state.ctx_id == ctx_id || tick.saturating_sub(state.last_seen_tick) <= 30 * 60 * 60
+    });
+    let previous_cs = states
+        .iter()
+        .filter(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+        .map(|state| state.last_seen_cs)
+        .max();
+    if let Some(previous_cs) = previous_cs {
+        let cs_delta = visible_cs.saturating_sub(previous_cs);
+        states.retain(|state| !(state.ctx_id == ctx_id && state.player_id == player_id));
+        states.push(GholdengoGoldState {
+            ctx_id,
+            player_id,
+            last_seen_cs: visible_cs.max(previous_cs),
+            last_seen_tick: tick,
+        });
+        drop(states);
+        if cs_delta > 0 {
+            let bonus_gold = gholdengo_cs_bonus_gold(position).saturating_mul(cs_delta);
+            add_pokemon_bonus_gold_for_player(
+                ctx,
+                player_id,
+                bonus_gold,
+                "gholdengo_cs_bonus",
+                &format!(
+                    "entity={} cs_delta={} visible_cs={} position={:?}",
+                    entity_id, cs_delta, visible_cs, position
+                ),
+            );
         }
-        state.player_id = player_id;
-        state.entity_id = entity_id;
-        state.last_seen_gold = visible_gold;
         return;
     }
     states.push(GholdengoGoldState {
+        ctx_id,
         player_id,
-        entity_id,
-        last_seen_gold: visible_gold,
-        earned_gold: 0,
+        last_seen_cs: visible_cs,
+        last_seen_tick: tick,
     });
+    while states.len() > POKEMON_CONTEXT_LEDGER_MAX {
+        states.remove(0);
+    }
 }
 
-pub fn gholdengo_damage_bonus_percent(ctx: &GameCtx, entity_id: usize) -> usize {
-    update_gholdengo_gold_passive(ctx, entity_id);
-    let Some((player_id, visible_gold)) = visible_player_gold(ctx, entity_id) else {
-        return 0;
-    };
-    let states = GHOLDENGO_GOLD.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("gholdengo gold state poisoned");
-    let state_index = if let Some(index) = states
-        .iter()
-        .position(|state| state.entity_id == entity_id || state.player_id == player_id)
-    {
-        index
+fn gholdengo_cs_bonus_gold(position: Position) -> usize {
+    let base_gold = if matches!(position, Position::Bottom) {
+        GHOLDENGO_BOTTOM_CS_GOLD
     } else {
-        states.push(GholdengoGoldState {
-            player_id,
-            entity_id,
-            last_seen_gold: visible_gold,
-            earned_gold: 0,
-        });
-        states.len().saturating_sub(1)
+        GHOLDENGO_DEFAULT_CS_GOLD
     };
-    let state = &mut states[state_index];
-    state.player_id = player_id;
-    state.entity_id = entity_id;
-    state.last_seen_gold = visible_gold;
-    (state.earned_gold / 250).min(20)
+    base_gold.saturating_mul(GHOLDENGO_CS_BONUS_PERCENT) / 100
+}
+
+pub fn spend_gholdengo_make_it_rain_gold(
+    ctx: &GameCtx,
+    entity_id: usize,
+) -> GholdengoMakeItRainSpend {
+    let Some((player_id, visible_gold)) = visible_player_gold(ctx, entity_id) else {
+        return GholdengoMakeItRainSpend::default();
+    };
+    let spend = if visible_gold == 0 {
+        0
+    } else {
+        visible_gold.min(GHOLDENGO_MAKE_IT_RAIN_MAX_SPEND) / 100 * 100
+    };
+    let spend = if spend == 0 && visible_gold > 0 {
+        visible_gold
+    } else {
+        spend
+    };
+    if spend == 0 {
+        return GholdengoMakeItRainSpend::default();
+    }
+
+    let spent_gold = spend_pokemon_live_gold_for_player(
+        ctx,
+        player_id,
+        spend,
+        "gholdengo_make_it_rain",
+        &format!("entity={} visible_gold={}", entity_id, visible_gold),
+    )
+    .unwrap_or(0);
+    if spent_gold == 0 {
+        return GholdengoMakeItRainSpend::default();
+    }
+    let tier = spent_gold.saturating_add(99) / 100;
+    GholdengoMakeItRainSpend {
+        spent_gold,
+        damage_bonus_percent: tier
+            .saturating_mul(GHOLDENGO_MAKE_IT_RAIN_DAMAGE_BONUS_PER_TIER_PERCENT),
+        radius_bonus_percent: tier
+            .saturating_mul(GHOLDENGO_MAKE_IT_RAIN_RADIUS_BONUS_PER_TIER_PERCENT),
+    }
 }
 
 pub fn has_shell_armor(ctx: &GameCtx, entity_id: usize) -> bool {
@@ -7509,6 +7578,7 @@ pub fn update_helping_hand_aura(ctx: &mut GameCtx, eevee_id: usize) {
         .filter_map(|index| ctx.entity_at(index))
         .filter(|entity| {
             entity.team() == eevee_team
+                && entity.id() != eevee_id
                 && entity.is_champion()
                 && entity.is_alive()
                 && distance_sq(entity.pos(), eevee_pos)
@@ -7518,10 +7588,14 @@ pub fn update_helping_hand_aura(ctx: &mut GameCtx, eevee_id: usize) {
         .collect();
 
     for ally_id in ally_ids {
-        ctx.add_buff(
+        add_beneficial_buff(
+            ctx,
+            eevee_id,
             ally_id,
             BuffState {
-                duration: BuffType::Time { tick: 45 },
+                duration: BuffType::Time {
+                    tick: HELPING_HAND_INTERVAL_TICKS,
+                },
                 attack_mult: 10,
                 magic_power_mult: 10,
                 defence_mult: 10,
@@ -7532,7 +7606,7 @@ pub fn update_helping_hand_aura(ctx: &mut GameCtx, eevee_id: usize) {
                 ..Default::default()
             },
         );
-        note_ally_buff_received(ctx, eevee_id, ally_id, 45);
+        note_ally_buff_received(ctx, eevee_id, ally_id, HELPING_HAND_INTERVAL_TICKS);
     }
 }
 
@@ -15372,9 +15446,14 @@ pub fn update_light_metal_passive(ctx: &mut GameCtx, entity_id: usize) {
             last_pos: pos,
             distance_without_damage: 0,
             shield_until: 0,
+            shield_amount: 0,
         });
         return;
     };
+
+    if state.shield_until <= tick {
+        state.shield_amount = 0;
+    }
 
     let distance = state
         .last_pos
@@ -15390,20 +15469,13 @@ pub fn update_light_metal_passive(ctx: &mut GameCtx, entity_id: usize) {
 
     state.distance_without_damage = 0;
     state.shield_until = tick.saturating_add(SHIELD_TICKS);
+    let shield = move_speed.saturating_mul(SHIELD_MOVE_SPEED_PERCENT) / 100;
+    state.shield_amount = shield;
     drop(states);
 
-    let shield = move_speed.saturating_mul(SHIELD_MOVE_SPEED_PERCENT) / 100;
-    if shield == 0 {
-        return;
+    if shield > 0 {
+        ctx.debug_draw_circle(pos.x, pos.y, 15000, VFX_STEEL);
     }
-    ctx.add_buff(
-        entity_id,
-        BuffState {
-            duration: BuffType::Time { tick: SHIELD_TICKS },
-            hp: shield.min(i32::MAX as usize) as i32,
-            ..Default::default()
-        },
-    );
 }
 
 pub fn update_swift_swim_passive(ctx: &mut GameCtx, entity_id: usize) {
@@ -15687,13 +15759,65 @@ pub fn reset_light_metal(ctx: &GameCtx, entity_id: usize) {
         state.last_pos = pos;
         state.distance_without_damage = 0;
         state.shield_until = tick;
+        state.shield_amount = 0;
     } else {
         states.push(LightMetalState {
             entity_id,
             last_pos: pos,
             distance_without_damage: 0,
             shield_until: tick,
+            shield_amount: 0,
         });
+    }
+}
+
+pub fn absorb_light_metal_damage(
+    ctx: &GameCtx,
+    entity_id: usize,
+    ad_damage: usize,
+    ap_damage: usize,
+) -> (usize, usize) {
+    let incoming = ad_damage.saturating_add(ap_damage);
+    if incoming == 0 {
+        return (ad_damage, ap_damage);
+    }
+
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return (ad_damage, ap_damage);
+    };
+    let pos = entity.pos();
+    let tick = ctx.tick();
+    drop(entity);
+
+    let states = LIGHT_METALS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("light metal state poisoned");
+    let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
+        return (ad_damage, ap_damage);
+    };
+
+    let absorbed = if state.shield_until > tick {
+        state.shield_amount.min(incoming)
+    } else {
+        0
+    };
+    state.last_pos = pos;
+    state.distance_without_damage = 0;
+    state.shield_until = tick;
+    state.shield_amount = 0;
+
+    if absorbed == 0 {
+        return (ad_damage, ap_damage);
+    }
+
+    let remaining = incoming.saturating_sub(absorbed);
+    if remaining == 0 {
+        return (0, 0);
+    }
+    if ad_damage >= absorbed {
+        (ad_damage.saturating_sub(absorbed), ap_damage)
+    } else {
+        let ap_absorb = absorbed.saturating_sub(ad_damage);
+        (0, ap_damage.saturating_sub(ap_absorb))
     }
 }
 
@@ -17661,6 +17785,16 @@ fn record_pokemon_kill_credit(
     }
 
     add_pokemon_kill_for_player(ctx, killer_player_id);
+    if origin != "native_on_kill" {
+        award_pokemon_custom_kill_gold(
+            ctx,
+            killer_player_id,
+            killed_player_id,
+            killed_generation,
+            origin,
+            POKEMON_CUSTOM_KILL_GOLD,
+        );
+    }
     refresh_pokemon_combat_stat_identity(
         ctx,
         killer_player_id,
@@ -18231,6 +18365,266 @@ fn award_pokemon_assist_once(
             Some(assist_player_id)
         )),
     ));
+}
+
+fn award_pokemon_custom_kill_gold(
+    ctx: &GameCtx,
+    killer_player_id: usize,
+    killed_player_id: usize,
+    killed_generation: usize,
+    origin: &str,
+    amount: usize,
+) {
+    if amount == 0 {
+        return;
+    }
+    let ctx_id = combat_ctx_id(ctx);
+    let Some(player) = ctx.get_player(killer_player_id) else {
+        crate::crash_probe::log_stat_probe_event(&format!(
+            "event=custom_kill_gold_skip reason=missing_player tick={} ctx={} origin={} killer_player={} killed_player={} killed_life={} amount={}",
+            ctx.tick(),
+            ctx_id,
+            crate::crash_probe::sanitize_log_field(origin),
+            killer_player_id,
+            killed_player_id,
+            killed_generation,
+            amount
+        ));
+        return;
+    };
+    let expected_team = player.team();
+    let expected_position = player.position();
+    let handle = player.handle();
+    if handle.is_null() {
+        crate::crash_probe::log_stat_probe_event(&format!(
+            "event=custom_kill_gold_skip reason=null_handle tick={} ctx={} origin={} killer_player={} killed_player={} killed_life={} amount={} team={} pos={:?}",
+            ctx.tick(),
+            ctx_id,
+            crate::crash_probe::sanitize_log_field(origin),
+            killer_player_id,
+            killed_player_id,
+            killed_generation,
+            amount,
+            expected_team,
+            expected_position
+        ));
+        return;
+    }
+
+    unsafe {
+        let player_state = &mut *(handle.as_ptr() as *mut PlayerState);
+        if player_state.info.id != killer_player_id
+            || player_state.info.team != expected_team
+            || player_state.info.position != expected_position
+        {
+            crate::crash_probe::log_stat_probe_event(&format!(
+                "event=custom_kill_gold_skip reason=identity_mismatch tick={} ctx={} origin={} killer_player={} killed_player={} killed_life={} amount={} handle_id={} expected_team={} handle_team={} expected_pos={:?} handle_pos={:?}",
+                ctx.tick(),
+                ctx_id,
+                crate::crash_probe::sanitize_log_field(origin),
+                killer_player_id,
+                killed_player_id,
+                killed_generation,
+                amount,
+                player_state.info.id,
+                expected_team,
+                player_state.info.team,
+                expected_position,
+                player_state.info.position
+            ));
+            return;
+        }
+
+        let before_gold = player_state.info.gold;
+        let before_stat_gold = player_state.info.statistics.gold;
+        let before_last_stat_gold = player_state.info.last_statistics.gold;
+        player_state.info.gold = player_state.info.gold.saturating_add(amount);
+        player_state.info.statistics.gold =
+            player_state.info.statistics.gold.saturating_add(amount);
+        player_state.info.last_statistics.gold = player_state
+            .info
+            .last_statistics
+            .gold
+            .saturating_add(amount);
+        crate::crash_probe::log_stat_probe_event(&format!(
+            "event=custom_kill_gold_apply tick={} ctx={} origin={} killer_player={} killed_player={} killed_life={} amount={} gold_before={} gold_after={} stat_gold_before={} stat_gold_after={} last_stat_gold_before={} last_stat_gold_after={}",
+            ctx.tick(),
+            ctx_id,
+            crate::crash_probe::sanitize_log_field(origin),
+            killer_player_id,
+            killed_player_id,
+            killed_generation,
+            amount,
+            before_gold,
+            player_state.info.gold,
+            before_stat_gold,
+            player_state.info.statistics.gold,
+            before_last_stat_gold,
+            player_state.info.last_statistics.gold
+        ));
+    }
+}
+
+fn add_pokemon_bonus_gold_for_player(
+    ctx: &GameCtx,
+    player_id: usize,
+    amount: usize,
+    reason: &str,
+    detail: &str,
+) -> bool {
+    if amount == 0 {
+        return false;
+    }
+    let ctx_id = combat_ctx_id(ctx);
+    let Some(player) = ctx.get_player(player_id) else {
+        crate::crash_probe::log_stat_probe_event(&format!(
+            "event=bonus_gold_skip reason=missing_player tick={} ctx={} player={} amount={} source={} detail=\"{}\"",
+            ctx.tick(),
+            ctx_id,
+            player_id,
+            amount,
+            crate::crash_probe::sanitize_log_field(reason),
+            crate::crash_probe::sanitize_log_field(detail)
+        ));
+        return false;
+    };
+    let expected_team = player.team();
+    let expected_position = player.position();
+    let handle = player.handle();
+    if handle.is_null() {
+        crate::crash_probe::log_stat_probe_event(&format!(
+            "event=bonus_gold_skip reason=null_handle tick={} ctx={} player={} amount={} source={} detail=\"{}\"",
+            ctx.tick(),
+            ctx_id,
+            player_id,
+            amount,
+            crate::crash_probe::sanitize_log_field(reason),
+            crate::crash_probe::sanitize_log_field(detail)
+        ));
+        return false;
+    }
+
+    unsafe {
+        let player_state = &mut *(handle.as_ptr() as *mut PlayerState);
+        if player_state.info.id != player_id
+            || player_state.info.team != expected_team
+            || player_state.info.position != expected_position
+        {
+            crate::crash_probe::log_stat_probe_event(&format!(
+                "event=bonus_gold_skip reason=identity_mismatch tick={} ctx={} player={} amount={} source={} detail=\"{}\" handle_id={} expected_team={} handle_team={} expected_pos={:?} handle_pos={:?}",
+                ctx.tick(),
+                ctx_id,
+                player_id,
+                amount,
+                crate::crash_probe::sanitize_log_field(reason),
+                crate::crash_probe::sanitize_log_field(detail),
+                player_state.info.id,
+                expected_team,
+                player_state.info.team,
+                expected_position,
+                player_state.info.position
+            ));
+            return false;
+        }
+
+        let before_gold = player_state.info.gold;
+        let before_stat_gold = player_state.info.statistics.gold;
+        let before_last_stat_gold = player_state.info.last_statistics.gold;
+        player_state.info.gold = player_state.info.gold.saturating_add(amount);
+        player_state.info.statistics.gold =
+            player_state.info.statistics.gold.saturating_add(amount);
+        player_state.info.last_statistics.gold = player_state
+            .info
+            .last_statistics
+            .gold
+            .saturating_add(amount);
+        crate::crash_probe::log_stat_probe_event(&format!(
+            "event=bonus_gold_apply tick={} ctx={} player={} amount={} source={} detail=\"{}\" gold_before={} gold_after={} stat_gold_before={} stat_gold_after={} last_stat_gold_before={} last_stat_gold_after={}",
+            ctx.tick(),
+            ctx_id,
+            player_id,
+            amount,
+            crate::crash_probe::sanitize_log_field(reason),
+            crate::crash_probe::sanitize_log_field(detail),
+            before_gold,
+            player_state.info.gold,
+            before_stat_gold,
+            player_state.info.statistics.gold,
+            before_last_stat_gold,
+            player_state.info.last_statistics.gold
+        ));
+        true
+    }
+}
+
+fn spend_pokemon_live_gold_for_player(
+    ctx: &GameCtx,
+    player_id: usize,
+    amount: usize,
+    reason: &str,
+    detail: &str,
+) -> Option<usize> {
+    if amount == 0 {
+        return Some(0);
+    }
+    let ctx_id = combat_ctx_id(ctx);
+    let player = ctx.get_player(player_id)?;
+    let expected_team = player.team();
+    let expected_position = player.position();
+    let handle = player.handle();
+    if handle.is_null() {
+        crate::crash_probe::log_stat_probe_event(&format!(
+            "event=live_gold_spend_skip reason=null_handle tick={} ctx={} player={} requested={} source={} detail=\"{}\"",
+            ctx.tick(),
+            ctx_id,
+            player_id,
+            amount,
+            crate::crash_probe::sanitize_log_field(reason),
+            crate::crash_probe::sanitize_log_field(detail)
+        ));
+        return None;
+    }
+
+    unsafe {
+        let player_state = &mut *(handle.as_ptr() as *mut PlayerState);
+        if player_state.info.id != player_id
+            || player_state.info.team != expected_team
+            || player_state.info.position != expected_position
+        {
+            crate::crash_probe::log_stat_probe_event(&format!(
+                "event=live_gold_spend_skip reason=identity_mismatch tick={} ctx={} player={} requested={} source={} detail=\"{}\" handle_id={} expected_team={} handle_team={} expected_pos={:?} handle_pos={:?}",
+                ctx.tick(),
+                ctx_id,
+                player_id,
+                amount,
+                crate::crash_probe::sanitize_log_field(reason),
+                crate::crash_probe::sanitize_log_field(detail),
+                player_state.info.id,
+                expected_team,
+                player_state.info.team,
+                expected_position,
+                player_state.info.position
+            ));
+            return None;
+        }
+
+        let before_gold = player_state.info.gold;
+        let spent = amount.min(before_gold);
+        player_state.info.gold = player_state.info.gold.saturating_sub(spent);
+        crate::crash_probe::log_stat_probe_event(&format!(
+            "event=live_gold_spend_apply tick={} ctx={} player={} requested={} spent={} source={} detail=\"{}\" gold_before={} gold_after={}",
+            ctx.tick(),
+            ctx_id,
+            player_id,
+            amount,
+            spent,
+            crate::crash_probe::sanitize_log_field(reason),
+            crate::crash_probe::sanitize_log_field(detail),
+            before_gold,
+            player_state.info.gold
+        ));
+        Some(spent)
+    }
 }
 
 fn add_pokemon_damage_dealt_for_player(ctx: &GameCtx, player_id: usize, amount: usize) {

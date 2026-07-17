@@ -2214,7 +2214,7 @@ impl ModAction for PokemonAction {
     }
 
     fn action_name(&self) -> &str {
-        self.action.slot.action_name()
+        move_display_name_static(self.champion.id, self.action.name_key)
     }
 
     fn duration(&self) -> usize {
@@ -2375,7 +2375,7 @@ fn passive_name(champion: PokemonChampion) -> String {
         .unwrap_or_else(|| "Passive".to_string())
 }
 
-fn move_display_name(champion_id: &str, action_name: &str) -> String {
+fn move_display_name_static<'a>(champion_id: &str, action_name: &'a str) -> &'a str {
     match (champion_id, action_name) {
         ("pokemon_moba_pikachu", "attack") => "Spark",
         ("pokemon_moba_pikachu", "skill") => "Volt Tackle",
@@ -2786,7 +2786,10 @@ fn move_display_name(champion_id: &str, action_name: &str) -> String {
         ("pokemon_moba_zeraora", "ult") => "Wild Charge",
         _ => action_name,
     }
-    .to_string()
+}
+
+fn move_display_name(champion_id: &str, action_name: &str) -> String {
+    move_display_name_static(champion_id, action_name).to_string()
 }
 
 fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name: &str) -> String {
@@ -3154,7 +3157,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
         } = action.effect
         {
             return format!(
-                "Call down coins in an octagonal {} area, dealing {}.",
+                "Call down coins in an octagonal {} area, dealing {}. Spend up to {CONTROL}500 gold{END} to increase damage and area size; partial gold below {CONTROL}100{END} is still spent for the first boost.",
                 range_text(radius),
                 damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name)
             );
@@ -6534,7 +6537,7 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Sharpness: Consecutive damaging hits within {CONTROL}5s{END} grant {PHYSICAL}+5% critical chance{END} per hit after the first, up to {PHYSICAL}+50%{END}. Fury Cutter hits count individually."
         ),
         "pokemon_moba_scizor" => format!(
-            "Light Metal: After traveling a long distance without taking or dealing damage, Scizor gains {SHIELD}temporary HP equal to 20% move speed{END} for {CONTROL}6s{END}."
+            "Light Metal: After traveling a long distance without taking or dealing damage, Scizor gains a {SHIELD}shield equal to 20% move speed{END} for {CONTROL}6s{END}."
         ),
         "pokemon_moba_ursaluna" => format!(
             "Guts: While below {HP_ICON}{CONTROL}50% HP{END}, Ursaluna deals {BUFF}35% increased damage{END}."
@@ -6681,7 +6684,7 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Flash Fire: Taking direct Fire-type Pokemon damage grants {AD_ICON}{BUFF}+12% attack{END} and {AP_ICON}{BUFF}+12% ability power{END} for {CONTROL}6s{END}."
         ),
         "pokemon_moba_gholdengo" => format!(
-            "Good as Gold: Observed gold gains increase Gholdengo's Pokemon damage by {BUFF}+1% per 250 gold earned{END}, up to {BUFF}+20%{END}."
+            "Good as Gold: Gholdengo gains {BUFF}50% bonus gold from CS{END}. This bonus is added to spendable gold and reported gold totals."
         ),
         "pokemon_moba_frosmoth" => format!(
             "Ice Scales: Frosmoth takes {SHIELD}50% reduced Pokemon AP damage{END}."
@@ -9689,7 +9692,13 @@ impl ModEffectType for PokemonEffect {
                         return;
                     };
                     if let PokemonMoveEffect::AreaDamage { radius, .. } = self.action.effect {
-                        Some((center, radius))
+                        let spend = crate::pokemon_status::spend_gholdengo_make_it_rain_gold(
+                            ctx, caster_id,
+                        );
+                        let radius = radius.saturating_add(
+                            radius.saturating_mul(spend.radius_bonus_percent as u64) / 100,
+                        );
+                        Some((center, radius, spend))
                     } else {
                         None
                     }
@@ -10969,19 +10978,25 @@ impl ModEffectType for PokemonEffect {
                     return;
                 }
 
-                let targets = filter_move_damage_targets(
+                let mut raw_targets = targets_for_effect(
                     ctx,
-                    self.champion,
-                    self.action,
-                    targets_for_effect(
-                        ctx,
-                        self.action.effect,
-                        caster_id,
-                        caster_team,
-                        caster_pos,
-                        input,
-                    ),
+                    self.action.effect,
+                    caster_id,
+                    caster_team,
+                    caster_pos,
+                    input,
                 );
+                if let Some((center, radius, _spend)) = make_it_rain_context {
+                    for target_id in collect_enemy_targets(ctx, caster_team, |pos| {
+                        distance_sq(pos, center) <= radius.saturating_mul(radius)
+                    }) {
+                        if !raw_targets.contains(&target_id) {
+                            raw_targets.push(target_id);
+                        }
+                    }
+                }
+                let targets =
+                    filter_move_damage_targets(ctx, self.champion, self.action, raw_targets);
                 for target_id in targets.iter().copied() {
                     crate::pokemon_status::note_smeargle_affected(
                         ctx,
@@ -11371,6 +11386,11 @@ impl ModEffectType for PokemonEffect {
                 }
 
                 draw_skill_visual(ctx, self.action.effect, active_move_type, caster_pos, input);
+                if let Some((center, radius, spend)) = make_it_rain_context {
+                    if spend.spent_gold > 0 {
+                        draw_impact_circle(ctx, center, radius, type_debug_color(active_move_type));
+                    }
+                }
                 if let Some((center, radius)) =
                     fire_web_burn_area(ctx, self.action.effect, caster_pos, input)
                 {
@@ -14324,7 +14344,7 @@ impl ModEffectType for PokemonEffect {
                     };
                 let mut frosmoth_silver_wind_hits = 0usize;
                 for target_id in targets.iter().copied() {
-                    if let Some((center, radius)) = make_it_rain_context {
+                    if let Some((center, radius, _spend)) = make_it_rain_context {
                         let Some(target_pos) = ctx.get_entity(target_id).map(|target| target.pos())
                         else {
                             continue;
@@ -14349,6 +14369,14 @@ impl ModEffectType for PokemonEffect {
                     }
                     let mut ad_damage = base_ad_damage;
                     let mut ap_damage = base_ap_damage;
+                    if let Some((_center, _radius, spend)) = make_it_rain_context {
+                        ad_damage = ad_damage
+                            .saturating_mul(100usize.saturating_add(spend.damage_bonus_percent))
+                            / 100;
+                        ap_damage = ap_damage
+                            .saturating_mul(100usize.saturating_add(spend.damage_bonus_percent))
+                            / 100;
+                    }
                     if let Some((bonus_percent, flat_bonus)) = swanna_tailwind_damage_amp {
                         if ap_damage > 0 {
                             ap_damage = ap_damage
@@ -14612,18 +14640,6 @@ impl ModEffectType for PokemonEffect {
                         } else {
                             10usize.saturating_mul(seen_count)
                         };
-                        ad_damage += ad_damage.saturating_mul(percent) / 100;
-                        ap_damage += ap_damage.saturating_mul(percent) / 100;
-                    }
-
-                    if self.champion.id == "pokemon_moba_gholdengo"
-                        || crate::pokemon_status::receiver_has_copied(
-                            caster_id,
-                            "pokemon_moba_gholdengo",
-                        )
-                    {
-                        let percent =
-                            crate::pokemon_status::gholdengo_damage_bonus_percent(ctx, caster_id);
                         ad_damage += ad_damage.saturating_mul(percent) / 100;
                         ap_damage += ap_damage.saturating_mul(percent) / 100;
                     }

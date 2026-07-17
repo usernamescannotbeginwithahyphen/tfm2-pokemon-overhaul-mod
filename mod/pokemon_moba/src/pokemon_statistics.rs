@@ -11,6 +11,8 @@ use crate::pokemon_status::{
 
 const STAT_MERGE_LOG_PATH: &str =
     "C:\\Users\\james\\Documents\\TFT Pokemon Mod\\logs\\stat-merge.log";
+const STAT_MERGE_FLAG_PATH: &str =
+    "C:\\Users\\james\\Documents\\TFT Pokemon Mod\\logs\\enable-stat-merge.txt";
 
 static STAT_MERGE_PROBE_COUNTS: OnceLock<Mutex<StatMergeProbeCounts>> = OnceLock::new();
 static CLIENT_STAT_APPLIED: OnceLock<Mutex<Vec<ClientAppliedStatState>>> = OnceLock::new();
@@ -35,10 +37,16 @@ pub struct PokemonStatisticsServerExtension;
 
 impl ModServerExtension for PokemonStatisticsServerExtension {
     fn on_server_start(&self, _ctx: &mut ServerModContext<'_>) {
+        if !stat_merge_probe_enabled() {
+            return;
+        }
         write_stat_merge_log("event=stat_merge_server_start");
     }
 
     fn after_management_tick(&self, ctx: &mut ServerModContext<'_>) {
+        if !stat_merge_probe_enabled() {
+            return;
+        }
         crate::crash_probe::catch_unwind_probe(
             "stats_after_management_tick",
             String::new(),
@@ -48,6 +56,10 @@ impl ModServerExtension for PokemonStatisticsServerExtension {
             },
         );
     }
+}
+
+fn stat_merge_probe_enabled() -> bool {
+    Path::new(STAT_MERGE_FLAG_PATH).exists()
 }
 
 fn summarize_custom_combat_stats(ctx: &mut ServerModContext<'_>) {
