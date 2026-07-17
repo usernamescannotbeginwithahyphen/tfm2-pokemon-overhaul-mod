@@ -49,6 +49,10 @@ where
     }
 }
 
+pub const fn damage_probe_enabled() -> bool {
+    false
+}
+
 pub fn log_damage_probe(_line: &str) {}
 
 #[allow(dead_code)]
@@ -58,7 +62,7 @@ pub fn stat_probe_enabled() -> bool {
     Path::new(STAT_PROBE_FLAG_PATH).exists() || stat_probe_damage_enabled()
 }
 
-fn stat_probe_damage_enabled() -> bool {
+pub fn stat_probe_damage_enabled() -> bool {
     Path::new(STAT_PROBE_DAMAGE_FLAG_PATH).exists()
 }
 

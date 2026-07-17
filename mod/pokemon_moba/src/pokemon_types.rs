@@ -336,11 +336,20 @@ pub fn deal_pokemon_damage(
             ad_damage.saturating_add(ap_damage),
         );
     }
-    let attacker_player = crate::pokemon_status::player_for_entity(attacker);
-    let target_player = crate::pokemon_status::player_for_entity(target);
-    let attacker_before_stats = player_probe_stats(ctx, attacker_player);
-    let target_before_stats = player_probe_stats(ctx, target_player);
-    let kill_log_before = ctx.kill_log_count();
+    let stat_probe_enabled = crate::crash_probe::stat_probe_damage_enabled();
+    let stat_probe_before = if stat_probe_enabled {
+        let attacker_player = crate::pokemon_status::player_for_entity(attacker);
+        let target_player = crate::pokemon_status::player_for_entity(target);
+        Some((
+            attacker_player,
+            target_player,
+            player_probe_stats(ctx, attacker_player),
+            player_probe_stats(ctx, target_player),
+            ctx.kill_log_count(),
+        ))
+    } else {
+        None
+    };
     let damage_result = crate::pokemon_status::deal_tracked_damage(
         ctx,
         attacker,
@@ -356,23 +365,32 @@ pub fn deal_pokemon_damage(
     }
     let before = damage_result.before;
     let after = damage_result.after;
-    log_pokemon_stat_probe(
-        ctx,
-        attacker,
-        target,
-        ad_damage,
-        ap_damage,
-        attack_type,
-        move_type,
-        before,
-        after,
-        damage_result.applied_damage,
+    if let Some((
         attacker_player,
         target_player,
         attacker_before_stats,
         target_before_stats,
         kill_log_before,
-    );
+    )) = stat_probe_before
+    {
+        log_pokemon_stat_probe(
+            ctx,
+            attacker,
+            target,
+            ad_damage,
+            ap_damage,
+            attack_type,
+            move_type,
+            before,
+            after,
+            damage_result.applied_damage,
+            attacker_player,
+            target_player,
+            attacker_before_stats,
+            target_before_stats,
+            kill_log_before,
+        );
+    }
     log_pokemon_damage_probe(
         ctx,
         attacker,
@@ -405,6 +423,9 @@ fn log_pokemon_damage_probe(
     before: Option<(usize, usize)>,
     after: Option<(usize, usize)>,
 ) {
+    if !crate::crash_probe::damage_probe_enabled() {
+        return;
+    }
     let (before_hp, before_shield) = before.unwrap_or((0, 0));
     let (after_hp, after_shield) = after.unwrap_or((0, 0));
     let hp_lost = before_hp.saturating_sub(after_hp);

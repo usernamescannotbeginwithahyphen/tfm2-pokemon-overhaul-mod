@@ -22,6 +22,9 @@ const PARALYSIS_DURATION_TICKS: usize = 30 * 60;
 const PARALYSIS_ROLL_INTERVAL_TICKS: usize = 60;
 const PARALYSIS_STUN_TICKS: u64 = 60;
 const PARALYSIS_CHANCE_DEN: u64 = 3;
+const BATTLE_BOND_MAX_STACKS: usize = 12;
+const BATTLE_BOND_ULT_COOLDOWN_PER_STACK: usize = 5;
+const STEADFAST_MOVE_SPEED_PER_STACK: usize = 4;
 const BURN_DURATION_TICKS: usize = 15 * 60;
 const BURN_TICK_INTERVAL: usize = 60;
 const POISON_DURATION_TICKS: usize = 15 * 60;
@@ -61,6 +64,7 @@ const ATTACH_TETHER_TICKS: u64 = 4;
 const ATTACH_RETURN_DETACH_WINDOW_TICKS: usize = 8 * 60;
 const WISH_MOVE_THRESHOLD: u64 = 2500;
 const EEVEELUTION_INTERVAL_TICKS: usize = 30;
+const EEVEELUTION_BUFF_TICKS: usize = 45;
 const AQUA_RING_INTERVAL_TICKS: usize = 30;
 const MISTY_TERRAIN_INTERVAL_TICKS: usize = 30;
 const BRINE_FIELD_INTERVAL_TICKS: usize = 30;
@@ -173,7 +177,7 @@ const HEAL_BLOCK_AURA_RADIUS: u64 = 42000;
 const HAWLUCHA_MOMENTUM_ATTACK_SPEED: i32 = 30;
 const HAWLUCHA_MOMENTUM_MOVE_SPEED: i32 = 15;
 const HAWLUCHA_MOMENTUM_TICKS: usize = 3 * 60;
-const HAWLUCHA_FLYING_PRESS_AD_PER_UNIQUE_CHAMPION: i32 = 6;
+const HAWLUCHA_FLYING_PRESS_AD_PER_UNIQUE_CHAMPION: usize = 6;
 const BOUFFALANT_AFRO_CC_REDUCE_NUM: usize = 2;
 const BOUFFALANT_AFRO_CC_REDUCE_DEN: usize = 3;
 const BOUFFALANT_AFRO_DAMAGE_REDUCE_PERCENT: usize = 30;
@@ -655,6 +659,8 @@ struct OrbeetleAgilityChainState {
 
 #[derive(Clone, Copy, Debug)]
 struct BattleBondState {
+    ctx_id: usize,
+    player_id: usize,
     entity_id: usize,
     stacks: usize,
 }
@@ -687,6 +693,8 @@ struct StickyWebChargeState {
 
 #[derive(Clone, Copy, Debug)]
 struct PorygonTypeState {
+    ctx_id: usize,
+    player_id: usize,
     entity_id: usize,
     current_type: PokemonType,
     seen_mask: u32,
@@ -696,6 +704,8 @@ struct PorygonTypeState {
 struct EeveelutionState {
     entity_id: usize,
     last_tick: usize,
+    last_bonus: i32,
+    last_speed_bonus: i32,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -1296,8 +1306,11 @@ struct ZeraoraWildChargeMarkState {
 
 #[derive(Clone, Debug)]
 struct HawluchaMomentumState {
+    ctx_id: usize,
+    player_id: usize,
     entity_id: usize,
-    flying_press_targets: Vec<usize>,
+    flying_press_target_players: Vec<usize>,
+    flying_press_target_entities: Vec<usize>,
 }
 
 #[derive(Clone, Debug)]
@@ -1812,9 +1825,20 @@ struct SnorlaxGluttonyState {
 
 #[derive(Clone, Copy, Debug)]
 struct ShedinjaKillState {
+    ctx_id: usize,
+    shedinja_player_id: Option<usize>,
     shedinja_id: usize,
+    killer_player_id: Option<usize>,
     killer_id: usize,
     kills: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct SteadfastState {
+    ctx_id: usize,
+    player_id: usize,
+    entity_id: usize,
+    stacks: usize,
 }
 
 static PARALYSIS: OnceLock<Mutex<Vec<ParalysisState>>> = OnceLock::new();
@@ -1976,7 +2000,7 @@ static LIMBERS: OnceLock<Mutex<Vec<usize>>> = OnceLock::new();
 static ENTITY_CHAMPIONS: OnceLock<Mutex<Vec<EntityChampionState>>> = OnceLock::new();
 static RECEIVERS: OnceLock<Mutex<Vec<ReceiverState>>> = OnceLock::new();
 static REVERSALS: OnceLock<Mutex<Vec<ReversalState>>> = OnceLock::new();
-static HITMONTOPS: OnceLock<Mutex<Vec<usize>>> = OnceLock::new();
+static HITMONTOPS: OnceLock<Mutex<Vec<SteadfastState>>> = OnceLock::new();
 static KILOWATTRELS: OnceLock<Mutex<Vec<usize>>> = OnceLock::new();
 static BEEHEEYEMS: OnceLock<Mutex<Vec<usize>>> = OnceLock::new();
 static TECHNICIANS: OnceLock<Mutex<Vec<usize>>> = OnceLock::new();
@@ -3119,13 +3143,48 @@ fn apply_wonder_guard_engine_block(ctx: &mut GameCtx, entity_id: usize) {
     );
 }
 
-pub fn grudge_kill_count(shedinja_id: usize, target_id: usize) -> usize {
+fn shedinja_kill_player_key(ctx: &GameCtx, entity_id: usize) -> Option<usize> {
+    persistent_owner_key(ctx, entity_id).map(|(_, player_id)| player_id)
+}
+
+fn shedinja_kill_state_matches(
+    state: &ShedinjaKillState,
+    ctx_id: usize,
+    shedinja_player_id: Option<usize>,
+    shedinja_id: usize,
+    killer_player_id: Option<usize>,
+    killer_id: usize,
+) -> bool {
+    state.ctx_id == ctx_id
+        && match (state.shedinja_player_id, shedinja_player_id) {
+            (Some(state_player), Some(player)) => state_player == player,
+            _ => state.shedinja_id == shedinja_id,
+        }
+        && match (state.killer_player_id, killer_player_id) {
+            (Some(state_player), Some(player)) => state_player == player,
+            _ => state.killer_id == killer_id,
+        }
+}
+
+pub fn grudge_kill_count(ctx: &GameCtx, shedinja_id: usize, target_id: usize) -> usize {
+    let ctx_id = combat_ctx_id(ctx);
+    let shedinja_player_id = shedinja_kill_player_key(ctx, shedinja_id);
+    let killer_player_id = shedinja_kill_player_key(ctx, target_id);
     SHEDINJA_KILLS
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("shedinja kill state poisoned")
         .iter()
-        .find(|state| state.shedinja_id == shedinja_id && state.killer_id == target_id)
+        .find(|state| {
+            shedinja_kill_state_matches(
+                state,
+                ctx_id,
+                shedinja_player_id,
+                shedinja_id,
+                killer_player_id,
+                target_id,
+            )
+        })
         .map(|state| state.kills)
         .unwrap_or(0)
 }
@@ -3158,7 +3217,7 @@ pub fn try_wonder_guard_damage(
             state.chits = state.chits.saturating_sub(1);
         }
         if state.chits == 0 {
-            note_shedinja_killed_by(target_id, attacker_id);
+            note_shedinja_killed_by(ctx, target_id, attacker_id);
             drop(states);
             crate::pokemon_status::deal_tracked_damage(
                 ctx,
@@ -3230,18 +3289,32 @@ pub fn try_wonder_guard_dot_tick(
     )
 }
 
-fn note_shedinja_killed_by(shedinja_id: usize, killer_id: usize) {
+fn note_shedinja_killed_by(ctx: &GameCtx, shedinja_id: usize, killer_id: usize) {
+    let ctx_id = combat_ctx_id(ctx);
+    let shedinja_player_id = shedinja_kill_player_key(ctx, shedinja_id);
+    let killer_player_id = shedinja_kill_player_key(ctx, killer_id);
     let states = SHEDINJA_KILLS.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states.lock().expect("shedinja kill state poisoned");
-    if let Some(state) = states
-        .iter_mut()
-        .find(|state| state.shedinja_id == shedinja_id && state.killer_id == killer_id)
-    {
+    if let Some(state) = states.iter_mut().find(|state| {
+        shedinja_kill_state_matches(
+            state,
+            ctx_id,
+            shedinja_player_id,
+            shedinja_id,
+            killer_player_id,
+            killer_id,
+        )
+    }) {
+        state.shedinja_id = shedinja_id;
+        state.killer_id = killer_id;
         state.kills = state.kills.saturating_add(1);
         return;
     }
     states.push(ShedinjaKillState {
+        ctx_id,
+        shedinja_player_id,
         shedinja_id,
+        killer_player_id,
         killer_id,
         kills: 1,
     });
@@ -3925,7 +3998,7 @@ pub fn copy_receiver_passive(ctx: &mut GameCtx, receiver_id: usize, killed_entit
         register_delibird_present(ctx, receiver_id);
     }
     if killed_champion_id == "pokemon_moba_porygonz" {
-        register_porygon_type(receiver_id);
+        register_porygon_type(ctx, receiver_id);
     }
     if killed_champion_id == "pokemon_moba_shedinja" {
         register_wonder_guard(receiver_id);
@@ -4701,34 +4774,92 @@ pub fn is_limber(ctx: &GameCtx, entity_id: usize) -> bool {
     explicit || receiver_has_copied(entity_id, "pokemon_moba_hitmonlee")
 }
 
-pub fn register_hitmontop(entity_id: usize) {
+fn persistent_owner_key(ctx: &GameCtx, entity_id: usize) -> Option<(usize, usize)> {
+    owner_for_entity_at_tick_in_ctx(ctx, entity_id, ctx.tick())
+        .map(|owner| (owner.ctx_id, owner.player_id))
+}
+
+fn scaled_stat_percent(stacks: usize, per_stack: usize) -> i32 {
+    stacks.saturating_mul(per_stack).min(i32::MAX as usize) as i32
+}
+
+fn apply_steadfast_buff(ctx: &mut GameCtx, entity_id: usize, stacks: usize) {
+    if stacks == 0 {
+        return;
+    }
+    ctx.add_buff(
+        entity_id,
+        BuffState {
+            duration: BuffType::Permanent,
+            move_speed_mult: scaled_stat_percent(stacks, STEADFAST_MOVE_SPEED_PER_STACK),
+            ..Default::default()
+        },
+    );
+}
+
+pub fn register_hitmontop(ctx: &mut GameCtx, player_id: usize, entity_id: usize) {
     let states = HITMONTOPS.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states.lock().expect("hitmontop state poisoned");
-    if !states.iter().any(|id| *id == entity_id) {
-        states.push(entity_id);
+    let ctx_id = combat_ctx_id(ctx);
+    if let Some(existing) = states
+        .iter_mut()
+        .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+    {
+        existing.entity_id = entity_id;
+        let stacks = existing.stacks;
+        drop(states);
+        apply_steadfast_buff(ctx, entity_id, stacks);
+        return;
     }
+    states.push(SteadfastState {
+        ctx_id,
+        player_id,
+        entity_id,
+        stacks: 0,
+    });
 }
 
 pub fn note_steadfast_cc(ctx: &mut GameCtx, entity_id: usize) {
-    let is_hitmontop = HITMONTOPS
+    let owner_key = persistent_owner_key(ctx, entity_id);
+    let is_registered_hitmontop = HITMONTOPS
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("hitmontop state poisoned")
         .iter()
-        .any(|id| *id == entity_id && entity_is_champion_id(entity_id, "pokemon_moba_hitmontop"))
+        .any(|state| {
+            state.entity_id == entity_id
+                || owner_key
+                    .map(|(ctx_id, player_id)| {
+                        state.ctx_id == ctx_id && state.player_id == player_id
+                    })
+                    .unwrap_or(false)
+        });
+    let is_hitmontop = (is_registered_hitmontop
+        && entity_is_champion_id(entity_id, "pokemon_moba_hitmontop"))
         || receiver_has_copied(entity_id, "pokemon_moba_hitmontop");
     if !is_hitmontop {
         return;
     }
 
-    ctx.add_buff(
-        entity_id,
-        BuffState {
-            duration: BuffType::Permanent,
-            move_speed_mult: 4,
-            ..Default::default()
-        },
-    );
+    if let Some((ctx_id, player_id)) = owner_key {
+        let states = HITMONTOPS.get_or_init(|| Mutex::new(Vec::new()));
+        let mut states = states.lock().expect("hitmontop state poisoned");
+        if let Some(existing) = states
+            .iter_mut()
+            .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+        {
+            existing.entity_id = entity_id;
+            existing.stacks = existing.stacks.saturating_add(1);
+        } else {
+            states.push(SteadfastState {
+                ctx_id,
+                player_id,
+                entity_id,
+                stacks: 1,
+            });
+        }
+    }
+    apply_steadfast_buff(ctx, entity_id, 1);
 }
 
 pub fn register_kilowattrel(entity_id: usize) {
@@ -6109,23 +6240,25 @@ pub fn heal_with_antiheal(
         let target_player = log_player_for_entity(target_id);
         let caster_champion = champion_id_for_entity(caster_id).unwrap_or("unknown");
         let target_champion = champion_id_for_entity(target_id).unwrap_or("unknown");
-        crate::crash_probe::log_damage_probe(&format!(
-            "event=pokemon_heal tick={} caster={} caster_player={} caster_champion=\"{}\" target={} target_player={} target_champion=\"{}\" requested={} adjusted={} native_heal={} anti_heal_percent={} before_hp={} after_hp={} hp_gained={}",
-            ctx.tick(),
-            caster_id,
-            caster_player,
-            crate::crash_probe::sanitize_log_field(caster_champion),
-            target_id,
-            target_player,
-            crate::crash_probe::sanitize_log_field(target_champion),
-            amount,
-            adjusted,
-            heal_amount,
-            percent,
-            before_hp,
-            after_hp,
-            hp_gained,
-        ));
+        if crate::crash_probe::damage_probe_enabled() {
+            crate::crash_probe::log_damage_probe(&format!(
+                "event=pokemon_heal tick={} caster={} caster_player={} caster_champion=\"{}\" target={} target_player={} target_champion=\"{}\" requested={} adjusted={} native_heal={} anti_heal_percent={} before_hp={} after_hp={} hp_gained={}",
+                ctx.tick(),
+                caster_id,
+                caster_player,
+                crate::crash_probe::sanitize_log_field(caster_champion),
+                target_id,
+                target_player,
+                crate::crash_probe::sanitize_log_field(target_champion),
+                amount,
+                adjusted,
+                heal_amount,
+                percent,
+                before_hp,
+                after_hp,
+                hp_gained,
+            ));
+        }
         crate::crash_probe::log_stat_probe(&format!(
             "event=pokemon_heal tick={} caster={} caster_player={} caster_champion=\"{}\" target={} target_player={} target_champion=\"{}\" requested={} adjusted={} native_heal={} anti_heal_percent={} before_hp={} after_hp={} hp_gained={}",
             ctx.tick(),
@@ -6187,29 +6320,33 @@ fn log_dot_absorb_heal(
     healed_entity_id: usize,
     amount: usize,
 ) {
-    let original_caster_player =
-        player_for_entity(original_caster_id).unwrap_or(original_caster_id);
-    let original_target_player =
-        player_for_entity(original_target_id).unwrap_or(original_target_id);
-    let healed_player = player_for_entity(healed_entity_id).unwrap_or(healed_entity_id);
-    let original_caster_champion = champion_id_for_entity(original_caster_id).unwrap_or("unknown");
-    let original_target_champion = champion_id_for_entity(original_target_id).unwrap_or("unknown");
-    let healed_champion = champion_id_for_entity(healed_entity_id).unwrap_or("unknown");
-    crate::crash_probe::log_damage_probe(&format!(
-        "event=dot_absorb_heal dot_type=\"{}\" tick={} original_caster={} original_caster_player={} original_caster_champion=\"{}\" original_target={} original_target_player={} original_target_champion=\"{}\" healed_entity={} healed_player={} healed_champion=\"{}\" amount={}",
-        crate::crash_probe::sanitize_log_field(dot_type),
-        ctx.tick(),
-        original_caster_id,
-        original_caster_player,
-        crate::crash_probe::sanitize_log_field(original_caster_champion),
-        original_target_id,
-        original_target_player,
-        crate::crash_probe::sanitize_log_field(original_target_champion),
-        healed_entity_id,
-        healed_player,
-        crate::crash_probe::sanitize_log_field(healed_champion),
-        amount,
-    ));
+    if crate::crash_probe::damage_probe_enabled() {
+        let original_caster_player =
+            player_for_entity(original_caster_id).unwrap_or(original_caster_id);
+        let original_target_player =
+            player_for_entity(original_target_id).unwrap_or(original_target_id);
+        let healed_player = player_for_entity(healed_entity_id).unwrap_or(healed_entity_id);
+        let original_caster_champion =
+            champion_id_for_entity(original_caster_id).unwrap_or("unknown");
+        let original_target_champion =
+            champion_id_for_entity(original_target_id).unwrap_or("unknown");
+        let healed_champion = champion_id_for_entity(healed_entity_id).unwrap_or("unknown");
+        crate::crash_probe::log_damage_probe(&format!(
+            "event=dot_absorb_heal dot_type=\"{}\" tick={} original_caster={} original_caster_player={} original_caster_champion=\"{}\" original_target={} original_target_player={} original_target_champion=\"{}\" healed_entity={} healed_player={} healed_champion=\"{}\" amount={}",
+            crate::crash_probe::sanitize_log_field(dot_type),
+            ctx.tick(),
+            original_caster_id,
+            original_caster_player,
+            crate::crash_probe::sanitize_log_field(original_caster_champion),
+            original_target_id,
+            original_target_player,
+            crate::crash_probe::sanitize_log_field(original_target_champion),
+            healed_entity_id,
+            healed_player,
+            crate::crash_probe::sanitize_log_field(healed_champion),
+            amount,
+        ));
+    }
 }
 
 pub fn register_snorlax(entity_id: usize) {
@@ -8120,26 +8257,46 @@ pub fn octillery_lock_on_bonus(ctx: &GameCtx, caster_id: usize, target_id: usize
 pub fn update_eeveelution_passive(ctx: &mut GameCtx, entity_id: usize) {
     if !eeveelution_identity_active_in_ctx(ctx, entity_id) {
         let states = EEVEELUTIONS.get_or_init(|| Mutex::new(Vec::new()));
-        states
-            .lock()
-            .expect("eeveelution state poisoned")
-            .retain(|state| state.entity_id != entity_id);
+        let mut states = states.lock().expect("eeveelution state poisoned");
+        let removed = states
+            .iter()
+            .position(|state| state.entity_id == entity_id)
+            .map(|index| states.remove(index));
+        drop(states);
+        if let Some(removed) = removed {
+            neutralize_eeveelution_buff(
+                ctx,
+                entity_id,
+                removed.last_tick,
+                removed.last_bonus,
+                removed.last_speed_bonus,
+            );
+        }
         return;
     }
 
     let tick = ctx.tick();
     let states = EEVEELUTIONS.get_or_init(|| Mutex::new(Vec::new()));
+    let previous_buff;
     {
         let mut states = states.lock().expect("eeveelution state poisoned");
         if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
             if tick.saturating_sub(existing.last_tick) < EEVEELUTION_INTERVAL_TICKS {
                 return;
             }
+            previous_buff = Some((
+                existing.last_tick,
+                existing.last_bonus,
+                existing.last_speed_bonus,
+            ));
             existing.last_tick = tick;
         } else {
+            previous_buff = None;
             states.push(EeveelutionState {
                 entity_id,
                 last_tick: tick,
+                last_bonus: 0,
+                last_speed_bonus: 0,
             });
         }
 
@@ -8147,34 +8304,79 @@ pub fn update_eeveelution_passive(ctx: &mut GameCtx, entity_id: usize) {
     }
 
     let count = (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index).map(|entity| entity.id()))
         .filter(|other_id| {
             *other_id != entity_id && eeveelution_identity_active_in_ctx(ctx, *other_id)
         })
         .count();
+    if let Some((last_tick, last_bonus, last_speed_bonus)) = previous_buff {
+        neutralize_eeveelution_buff(ctx, entity_id, last_tick, last_bonus, last_speed_bonus);
+    }
     if count == 0 {
+        remember_eeveelution_buff(entity_id, 0, 0);
         return;
     }
 
     let bonus = (count.saturating_mul(2)).min(20) as i32;
     let speed_bonus = (count as i32).min(10);
-    add_beneficial_buff(
-        ctx,
-        entity_id,
-        entity_id,
-        BuffState {
-            duration: BuffType::Time { tick: 45 },
-            attack_mult: bonus,
-            magic_power_mult: bonus,
-            defence_mult: bonus,
-            magic_resistance_mult: bonus,
-            hp_mult: bonus,
-            move_speed_mult: speed_bonus,
-            attack_speed_mult: bonus,
-            skill_cooldown_mult: bonus / 2,
-            ult_cooldown_mult: bonus / 2,
-            ..Default::default()
+    ctx.add_buff(entity_id, eeveelution_buff_state(bonus, speed_bonus));
+    remember_eeveelution_buff(entity_id, bonus, speed_bonus);
+}
+
+fn remember_eeveelution_buff(entity_id: usize, bonus: i32, speed_bonus: i32) {
+    let states = EEVEELUTIONS.get_or_init(|| Mutex::new(Vec::new()));
+    if let Some(existing) = states
+        .lock()
+        .expect("eeveelution state poisoned")
+        .iter_mut()
+        .find(|state| state.entity_id == entity_id)
+    {
+        existing.last_bonus = bonus;
+        existing.last_speed_bonus = speed_bonus;
+    }
+}
+
+fn neutralize_eeveelution_buff(
+    ctx: &mut GameCtx,
+    entity_id: usize,
+    last_tick: usize,
+    bonus: i32,
+    speed_bonus: i32,
+) {
+    if bonus == 0 && speed_bonus == 0 {
+        return;
+    }
+    let remaining_ticks = last_tick
+        .saturating_add(EEVEELUTION_BUFF_TICKS)
+        .saturating_sub(ctx.tick());
+    if remaining_ticks == 0 {
+        return;
+    }
+    let old_buff = BuffState {
+        duration: BuffType::Time {
+            tick: remaining_ticks,
         },
-    );
+        ..eeveelution_buff_state(bonus, speed_bonus)
+    };
+    ctx.add_buff(entity_id, inverse_buff(&old_buff));
+}
+
+fn eeveelution_buff_state(bonus: i32, speed_bonus: i32) -> BuffState {
+    BuffState {
+        duration: BuffType::Time {
+            tick: EEVEELUTION_BUFF_TICKS,
+        },
+        attack_mult: bonus,
+        magic_power_mult: bonus,
+        defence_mult: bonus,
+        magic_resistance_mult: bonus,
+        hp_mult: bonus,
+        move_speed_mult: speed_bonus,
+        attack_speed_mult: bonus,
+        skill_cooldown_mult: bonus / 2,
+        ult_cooldown_mult: bonus / 2,
+        ..Default::default()
+    }
 }
 
 fn eeveelution_identity_active_in_ctx(ctx: &GameCtx, entity_id: usize) -> bool {
@@ -8550,29 +8752,45 @@ pub fn register_will_o_wisp_charges(entity_id: usize) {
     });
 }
 
-pub fn register_porygon_type(entity_id: usize) {
+pub fn register_porygon_type(ctx: &GameCtx, entity_id: usize) {
+    let Some((ctx_id, player_id)) = persistent_owner_key(ctx, entity_id) else {
+        return;
+    };
     let states = PORYGON_TYPES.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states.lock().expect("porygon type state poisoned");
-    if states.iter().any(|state| state.entity_id == entity_id) {
+    if let Some(existing) = states
+        .iter_mut()
+        .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+    {
+        existing.entity_id = entity_id;
+        existing.current_type = PokemonType::Normal;
+        existing.seen_mask |= type_bit(PokemonType::Normal);
+        register_entity_types(entity_id, TypeSet::single(PokemonType::Normal));
         return;
     }
     states.push(PorygonTypeState {
+        ctx_id,
+        player_id,
         entity_id,
         current_type: PokemonType::Normal,
         seen_mask: type_bit(PokemonType::Normal),
     });
+    register_entity_types(entity_id, TypeSet::single(PokemonType::Normal));
 }
 
 pub fn porygon_type(ctx: &GameCtx, entity_id: usize) -> PokemonType {
+    let owner_key = persistent_owner_key(ctx, entity_id);
     PORYGON_TYPES
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("porygon type state poisoned")
         .iter()
         .find(|state| {
-            state.entity_id == entity_id
+            owner_key
+                .map(|(ctx_id, player_id)| state.ctx_id == ctx_id && state.player_id == player_id)
+                .unwrap_or(state.entity_id == entity_id)
                 && ctx
-                    .get_entity(state.entity_id)
+                    .get_entity(entity_id)
                     .map(|entity| entity.is_alive())
                     .unwrap_or(false)
         })
@@ -8581,15 +8799,18 @@ pub fn porygon_type(ctx: &GameCtx, entity_id: usize) -> PokemonType {
 }
 
 pub fn porygon_seen_type_count(ctx: &GameCtx, entity_id: usize) -> usize {
+    let owner_key = persistent_owner_key(ctx, entity_id);
     PORYGON_TYPES
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("porygon type state poisoned")
         .iter()
         .find(|state| {
-            state.entity_id == entity_id
+            owner_key
+                .map(|(ctx_id, player_id)| state.ctx_id == ctx_id && state.player_id == player_id)
+                .unwrap_or(state.entity_id == entity_id)
                 && ctx
-                    .get_entity(state.entity_id)
+                    .get_entity(entity_id)
                     .map(|entity| entity.is_alive())
                     .unwrap_or(false)
         })
@@ -8603,13 +8824,23 @@ pub fn set_porygon_type(ctx: &GameCtx, entity_id: usize, new_type: PokemonType) 
         .map(|entity| entity.is_alive())
         .unwrap_or(false)
     {
+        let Some((ctx_id, player_id)) = persistent_owner_key(ctx, entity_id) else {
+            register_entity_types(entity_id, TypeSet::single(new_type));
+            return;
+        };
         let states = PORYGON_TYPES.get_or_init(|| Mutex::new(Vec::new()));
         let mut states = states.lock().expect("porygon type state poisoned");
-        if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
+        if let Some(state) = states
+            .iter_mut()
+            .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+        {
+            state.entity_id = entity_id;
             state.current_type = new_type;
             state.seen_mask |= type_bit(new_type);
         } else {
             states.push(PorygonTypeState {
+                ctx_id,
+                player_id,
                 entity_id,
                 current_type: new_type,
                 seen_mask: type_bit(PokemonType::Normal) | type_bit(new_type),
@@ -9983,7 +10214,43 @@ pub fn begin_orbeetle_agility_chain(
     });
 }
 
-pub fn add_battle_bond_stack(ctx: &GameCtx, entity_id: usize) {
+fn apply_battle_bond_cooldown_buff(ctx: &mut GameCtx, entity_id: usize, stacks: usize) {
+    if stacks == 0 {
+        return;
+    }
+    ctx.add_buff(
+        entity_id,
+        BuffState {
+            duration: BuffType::Permanent,
+            ult_cooldown_mult: scaled_stat_percent(stacks, BATTLE_BOND_ULT_COOLDOWN_PER_STACK),
+            ..Default::default()
+        },
+    );
+}
+
+pub fn register_battle_bond(ctx: &mut GameCtx, player_id: usize, entity_id: usize) {
+    let states = BATTLE_BONDS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("battle bond state poisoned");
+    let ctx_id = combat_ctx_id(ctx);
+    if let Some(existing) = states
+        .iter_mut()
+        .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+    {
+        existing.entity_id = entity_id;
+        let stacks = existing.stacks;
+        drop(states);
+        apply_battle_bond_cooldown_buff(ctx, entity_id, stacks);
+        return;
+    }
+    states.push(BattleBondState {
+        ctx_id,
+        player_id,
+        entity_id,
+        stacks: 0,
+    });
+}
+
+pub fn add_battle_bond_stack(ctx: &mut GameCtx, entity_id: usize) {
     if !ctx
         .get_entity(entity_id)
         .map(|entity| entity.is_alive())
@@ -9992,28 +10259,49 @@ pub fn add_battle_bond_stack(ctx: &GameCtx, entity_id: usize) {
         return;
     }
 
+    let Some((ctx_id, player_id)) = persistent_owner_key(ctx, entity_id) else {
+        return;
+    };
     let states = BATTLE_BONDS.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states.lock().expect("battle bond state poisoned");
-    if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
-        existing.stacks = existing.stacks.saturating_add(1).min(12);
+    if let Some(existing) = states
+        .iter_mut()
+        .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+    {
+        if existing.stacks >= BATTLE_BOND_MAX_STACKS {
+            existing.entity_id = entity_id;
+            return;
+        }
+        existing.entity_id = entity_id;
+        existing.stacks = existing
+            .stacks
+            .saturating_add(1)
+            .min(BATTLE_BOND_MAX_STACKS);
     } else {
         states.push(BattleBondState {
+            ctx_id,
+            player_id,
             entity_id,
             stacks: 1,
         });
     }
+    drop(states);
+    apply_battle_bond_cooldown_buff(ctx, entity_id, 1);
 }
 
 pub fn battle_bond_stacks(ctx: &GameCtx, entity_id: usize) -> usize {
+    let owner_key = persistent_owner_key(ctx, entity_id);
     BATTLE_BONDS
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("battle bond state poisoned")
         .iter()
         .find(|state| {
-            state.entity_id == entity_id
+            owner_key
+                .map(|(ctx_id, player_id)| state.ctx_id == ctx_id && state.player_id == player_id)
+                .unwrap_or(state.entity_id == entity_id)
                 && ctx
-                    .get_entity(state.entity_id)
+                    .get_entity(entity_id)
                     .map(|entity| entity.is_alive())
                     .unwrap_or(false)
         })
@@ -19857,6 +20145,46 @@ pub fn apply_copied_hawlucha_momentum(ctx: &mut GameCtx, entity_id: usize) {
     }
 }
 
+fn apply_hawlucha_unique_ad(ctx: &mut GameCtx, entity_id: usize, stacks: usize) {
+    if stacks == 0 {
+        return;
+    }
+    ctx.add_buff(
+        entity_id,
+        BuffState {
+            duration: BuffType::Permanent,
+            attack: scaled_stat_percent(stacks, HAWLUCHA_FLYING_PRESS_AD_PER_UNIQUE_CHAMPION),
+            ..Default::default()
+        },
+    );
+}
+
+pub fn register_hawlucha_momentum(ctx: &mut GameCtx, player_id: usize, entity_id: usize) {
+    let states = HAWLUCHA_MOMENTUMS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("hawlucha momentum state poisoned");
+    let ctx_id = combat_ctx_id(ctx);
+    if let Some(existing) = states
+        .iter_mut()
+        .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+    {
+        existing.entity_id = entity_id;
+        let stacks = existing
+            .flying_press_target_players
+            .len()
+            .saturating_add(existing.flying_press_target_entities.len());
+        drop(states);
+        apply_hawlucha_unique_ad(ctx, entity_id, stacks);
+        return;
+    }
+    states.push(HawluchaMomentumState {
+        ctx_id,
+        player_id,
+        entity_id,
+        flying_press_target_players: Vec::new(),
+        flying_press_target_entities: Vec::new(),
+    });
+}
+
 pub fn note_hawlucha_flying_press_target(ctx: &mut GameCtx, entity_id: usize, target_id: usize) {
     let target_is_champion = ctx
         .get_entity(target_id)
@@ -19865,36 +20193,48 @@ pub fn note_hawlucha_flying_press_target(ctx: &mut GameCtx, entity_id: usize, ta
     if !target_is_champion {
         return;
     }
+    let Some((ctx_id, player_id)) = persistent_owner_key(ctx, entity_id) else {
+        return;
+    };
+    let target_player_id = persistent_owner_key(ctx, target_id).map(|(_, player_id)| player_id);
     let momentum = HAWLUCHA_MOMENTUMS.get_or_init(|| Mutex::new(Vec::new()));
     let mut momentum = momentum.lock().expect("hawlucha momentum state poisoned");
     let Some(state) = momentum
         .iter_mut()
-        .find(|state| state.entity_id == entity_id)
+        .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
     else {
         momentum.push(HawluchaMomentumState {
+            ctx_id,
+            player_id,
             entity_id,
-            flying_press_targets: vec![target_id],
+            flying_press_target_players: target_player_id.into_iter().collect(),
+            flying_press_target_entities: if target_player_id.is_none() {
+                vec![target_id]
+            } else {
+                Vec::new()
+            },
         });
         drop(momentum);
-        grant_hawlucha_unique_ad(ctx, entity_id);
+        apply_hawlucha_unique_ad(ctx, entity_id, 1);
         return;
     };
-    if state.flying_press_targets.contains(&target_id) {
-        return;
+    state.entity_id = entity_id;
+    if let Some(target_player_id) = target_player_id {
+        if state
+            .flying_press_target_players
+            .contains(&target_player_id)
+        {
+            return;
+        }
+        state.flying_press_target_players.push(target_player_id);
+    } else {
+        if state.flying_press_target_entities.contains(&target_id) {
+            return;
+        }
+        state.flying_press_target_entities.push(target_id);
     }
-    state.flying_press_targets.push(target_id);
     drop(momentum);
-    grant_hawlucha_unique_ad(ctx, entity_id);
-}
-
-fn grant_hawlucha_unique_ad(ctx: &mut GameCtx, entity_id: usize) {
-    ctx.add_buff(
-        entity_id,
-        BuffState {
-            attack: HAWLUCHA_FLYING_PRESS_AD_PER_UNIQUE_CHAMPION,
-            ..Default::default()
-        },
-    );
+    apply_hawlucha_unique_ad(ctx, entity_id, 1);
 }
 
 fn update_sigilyph_gravities(ctx: &GameCtx, tick: usize) {
@@ -20657,16 +20997,6 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
                 .unwrap_or(false)
         });
 
-    HITMONTOPS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
-        .expect("hitmontop state poisoned")
-        .retain(|entity_id| {
-            ctx.get_entity(*entity_id)
-                .map(|entity| entity.is_alive())
-                .unwrap_or(false)
-        });
-
     KILOWATTRELS
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
@@ -20800,16 +21130,6 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
                 .unwrap_or(false)
         });
 
-    BATTLE_BONDS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
-        .expect("battle bond state poisoned")
-        .retain(|state| {
-            ctx.get_entity(state.entity_id)
-                .map(|entity| entity.is_alive())
-                .unwrap_or(false)
-        });
-
     SPIRIT_SHACKLES
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
@@ -20844,16 +21164,6 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("will-o-wisp charge state poisoned")
-        .retain(|state| {
-            ctx.get_entity(state.entity_id)
-                .map(|entity| entity.is_alive())
-                .unwrap_or(false)
-        });
-
-    PORYGON_TYPES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
-        .expect("porygon type state poisoned")
         .retain(|state| {
             ctx.get_entity(state.entity_id)
                 .map(|entity| entity.is_alive())
@@ -22866,6 +23176,19 @@ fn update_power_up_punch_channels(ctx: &mut GameCtx, tick: usize) {
 
         let hit_target = first_enemy_on_line(ctx, caster_team, caster_pos, target_pos, width);
         if let Some(target_id) = hit_target {
+            let hit_pos = ctx.get_entity(target_id).map(|target| target.pos());
+            if let Some(hit_pos) = hit_pos {
+                const POWER_UP_PUNCH_DASH_TICKS: usize = 2;
+                let dash_speed = integer_sqrt(distance_sq(caster_pos, hit_pos)).max(1);
+                force_move_toward_pos(
+                    ctx,
+                    caster_id,
+                    caster_pos,
+                    hit_pos,
+                    dash_speed,
+                    POWER_UP_PUNCH_DASH_TICKS,
+                );
+            }
             let defender_types =
                 crate::neutral_objectives::defender_types_for_target(ctx, target_id);
             crate::pokemon_types::deal_pokemon_damage(
@@ -22880,8 +23203,8 @@ fn update_power_up_punch_channels(ctx: &mut GameCtx, tick: usize) {
                 defender_types,
             );
             set_power_up_punch_ready_at(player_id, tick);
-            if let Some(target_pos) = ctx.get_entity(target_id).map(|target| target.pos()) {
-                draw_status_marker(ctx, target_pos, 14000, VFX_FIGHTING);
+            if let Some(hit_pos) = hit_pos {
+                draw_status_marker(ctx, hit_pos, 14000, VFX_FIGHTING);
             }
         } else {
             set_power_up_punch_ready_at(player_id, tick.saturating_add(full_cooldown_ticks));
@@ -23122,8 +23445,9 @@ fn update_grapploct_submissions(ctx: &mut GameCtx, tick: usize) {
                     .max
                     .saturating_mul(state.execute_threshold_percent)
         {
-            let before_hp = target_hp.current;
-            let before_shield = target_shield;
+            let probe_enabled = crate::crash_probe::damage_probe_enabled();
+            let before_hp = if probe_enabled { target_hp.current } else { 0 };
+            let before_shield = if probe_enabled { target_shield } else { 0 };
             crate::pokemon_status::deal_tracked_damage(
                 ctx,
                 state.caster_id,
@@ -23132,25 +23456,27 @@ fn update_grapploct_submissions(ctx: &mut GameCtx, tick: usize) {
                 0,
                 AttackType::Skill,
             );
-            let (after_hp, after_shield) = ctx
-                .get_entity(state.target_id)
-                .map(|entity| (entity.hp().current, entity.shield()))
-                .unwrap_or((0, 0));
-            crate::crash_probe::log_damage_probe(&format!(
-                "event=native_direct_deal label=\"grapploct_execute_pre_tick\" tick={} attacker={} target={} ad={} ap=0 total={} attack_type={:?} before_hp={} after_hp={} hp_lost={} before_shield={} after_shield={} shield_lost={}",
-                ctx.tick(),
-                state.caster_id,
-                state.target_id,
-                target_hp.current.max(1),
-                target_hp.current.max(1),
-                AttackType::Skill,
-                before_hp,
-                after_hp,
-                before_hp.saturating_sub(after_hp),
-                before_shield,
-                after_shield,
-                before_shield.saturating_sub(after_shield),
-            ));
+            if probe_enabled {
+                let (after_hp, after_shield) = ctx
+                    .get_entity(state.target_id)
+                    .map(|entity| (entity.hp().current, entity.shield()))
+                    .unwrap_or((0, 0));
+                crate::crash_probe::log_damage_probe(&format!(
+                    "event=native_direct_deal label=\"grapploct_execute_pre_tick\" tick={} attacker={} target={} ad={} ap=0 total={} attack_type={:?} before_hp={} after_hp={} hp_lost={} before_shield={} after_shield={} shield_lost={}",
+                    ctx.tick(),
+                    state.caster_id,
+                    state.target_id,
+                    target_hp.current.max(1),
+                    target_hp.current.max(1),
+                    AttackType::Skill,
+                    before_hp,
+                    after_hp,
+                    before_hp.saturating_sub(after_hp),
+                    before_shield,
+                    after_shield,
+                    before_shield.saturating_sub(after_shield),
+                ));
+            }
             draw_status_marker(ctx, target_pos, 14000, VFX_FIGHTING);
             continue;
         }
@@ -23177,7 +23503,8 @@ fn update_grapploct_submissions(ctx: &mut GameCtx, tick: usize) {
                     && hp.current.saturating_mul(100)
                         <= hp.max.saturating_mul(state.execute_threshold_percent)
                 {
-                    let before_hp = hp.current;
+                    let probe_enabled = crate::crash_probe::damage_probe_enabled();
+                    let before_hp = if probe_enabled { hp.current } else { 0 };
                     crate::pokemon_status::deal_tracked_damage(
                         ctx,
                         state.caster_id,
@@ -23186,25 +23513,27 @@ fn update_grapploct_submissions(ctx: &mut GameCtx, tick: usize) {
                         0,
                         AttackType::Skill,
                     );
-                    let (after_hp, after_shield) = ctx
-                        .get_entity(state.target_id)
-                        .map(|entity| (entity.hp().current, entity.shield()))
-                        .unwrap_or((0, 0));
-                    crate::crash_probe::log_damage_probe(&format!(
-                        "event=native_direct_deal label=\"grapploct_execute_post_tick\" tick={} attacker={} target={} ad={} ap=0 total={} attack_type={:?} before_hp={} after_hp={} hp_lost={} before_shield={} after_shield={} shield_lost={}",
-                        ctx.tick(),
-                        state.caster_id,
-                        state.target_id,
-                        hp.current.max(1),
-                        hp.current.max(1),
-                        AttackType::Skill,
-                        before_hp,
-                        after_hp,
-                        before_hp.saturating_sub(after_hp),
-                        before_shield,
-                        after_shield,
-                        before_shield.saturating_sub(after_shield),
-                    ));
+                    if probe_enabled {
+                        let (after_hp, after_shield) = ctx
+                            .get_entity(state.target_id)
+                            .map(|entity| (entity.hp().current, entity.shield()))
+                            .unwrap_or((0, 0));
+                        crate::crash_probe::log_damage_probe(&format!(
+                            "event=native_direct_deal label=\"grapploct_execute_post_tick\" tick={} attacker={} target={} ad={} ap=0 total={} attack_type={:?} before_hp={} after_hp={} hp_lost={} before_shield={} after_shield={} shield_lost={}",
+                            ctx.tick(),
+                            state.caster_id,
+                            state.target_id,
+                            hp.current.max(1),
+                            hp.current.max(1),
+                            AttackType::Skill,
+                            before_hp,
+                            after_hp,
+                            before_hp.saturating_sub(after_hp),
+                            before_shield,
+                            after_shield,
+                            before_shield.saturating_sub(after_shield),
+                        ));
+                    }
                     continue;
                 }
             }

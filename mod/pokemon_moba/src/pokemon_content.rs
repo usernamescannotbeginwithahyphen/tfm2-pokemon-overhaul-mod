@@ -2983,7 +2983,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
         } = action.effect
         {
             return format!(
-                "Only usable while Snorlax is asleep. Snore hits enemies in a {} radius around Snorlax for {} and terrifies them for {}.",
+                "Only usable after Snorlax has stood still for 2 full seconds and fallen asleep. Snore hits enemies in a {} radius around Snorlax for {} and terrifies them for {}.",
                 range_text(radius),
                 damage_text(base_ad, ad_ratio, 0, 0, type_name),
                 seconds_text(terrify_ticks)
@@ -3362,7 +3362,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             terrify_ticks,
             ..
         } => format!(
-            "While asleep, deal {} in a {} radius around Snorlax and terrify enemies for {}.",
+            "Only usable after Snorlax has stood still for 2 full seconds and fallen asleep. Deal {} in a {} radius around Snorlax and terrify enemies for {}.",
             damage_text(base_ad, ad_ratio, 0, 0, type_name),
             range_text(radius),
             seconds_text(terrify_ticks)
@@ -6708,7 +6708,7 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Aftermath: If Electrode is killed by a contact attack, it retaliates for {PHYSICAL}40 + 75% AD physical damage{END} and inflicts Paralysis for {CONTROL}4s{END}. Contact is detected from nearby lethal hits and recent physical basic attacks."
         ),
         "pokemon_moba_snorlax" => format!(
-            "Gluttony: While moving or defeating units, Snorlax gathers Berries, up to {BUFF}15{END}. Each Berry heals {HP_ICON}{HEAL}0.5% max HP every second{END}. At {BUFF}10 Berries{END}, Snorlax ignores Pokemon slows and knockbacks are reduced by {SHIELD}50%{END}. At {BUFF}15 Berries{END}, Full Belly slows Snorlax by {CONTROL}15%{END} but increases Strength's damage."
+            "Gluttony: While moving or defeating units, Snorlax gathers Berries, up to {BUFF}15{END}. Each Berry heals {HP_ICON}{HEAL}0.5% max HP every second{END}. If Snorlax stands still for {CONTROL}2 full seconds{END}, it falls asleep and can cast Snore. At {BUFF}10 Berries{END}, Snorlax ignores Pokemon slows and knockbacks are reduced by {SHIELD}50%{END}. At {BUFF}15 Berries{END}, Full Belly slows Snorlax by {CONTROL}15%{END} but increases Strength's damage."
         ),
         "pokemon_moba_zeraora" => format!(
             "Merciless: Hitting an enemy Pokemon with two different non-basic abilities within {CONTROL}2s{END} triggers an Electric burst around them for {MAGIC}35 + 35% AP magic damage{END} and grants cooldown recovery for up to {CONTROL}3s{END}. Each enemy can trigger Merciless once every {CONTROL}5s{END}."
@@ -14441,7 +14441,8 @@ impl ModEffectType for PokemonEffect {
                         ..
                     } = self.action.effect
                     {
-                        let kills = crate::pokemon_status::grudge_kill_count(caster_id, target_id);
+                        let kills =
+                            crate::pokemon_status::grudge_kill_count(ctx, caster_id, target_id);
                         if kills > 0 {
                             ap_damage = ap_damage.saturating_add(
                                 ap_damage
@@ -16309,7 +16310,7 @@ impl ModEffectType for PokemonEffect {
                             trail_burn_ap_ratio,
                             ..
                         } => {
-                            apply_force_move_toward(
+                            apply_force_move_toward_bounded(
                                 ctx,
                                 caster_id,
                                 target_id,
@@ -16345,7 +16346,7 @@ impl ModEffectType for PokemonEffect {
                             force_move_ticks,
                             ..
                         } => {
-                            apply_force_move_toward(
+                            apply_force_move_toward_bounded(
                                 ctx,
                                 caster_id,
                                 target_id,
@@ -16376,14 +16377,14 @@ impl ModEffectType for PokemonEffect {
                             self_current_hp_percent,
                             ..
                         } => {
-                            apply_force_move_toward(
-                        ctx,
-                        caster_id,
-                        target_id,
-                        force_move_speed
-                            .saturating_add(caster_stat.move_speed.saturating_mul(3) as u64),
-                        force_move_ticks,
-                    );
+                            apply_force_move_toward_bounded(
+                                ctx,
+                                caster_id,
+                                target_id,
+                                force_move_speed
+                                    .saturating_add(caster_stat.move_speed.saturating_mul(3) as u64),
+                                force_move_ticks,
+                            );
                             let recoil =
                                 caster_hp.current.saturating_mul(self_current_hp_percent) / 100;
                             if recoil > 0 {
@@ -20823,7 +20824,9 @@ static LIFE_DEW_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
 static AI_ENTITY_SNAPSHOTS: OnceLock<Mutex<Vec<AiEntitySnapshotState>>> = OnceLock::new();
 static AI_ATTACK_TARGET_SNAPSHOTS: OnceLock<Mutex<Vec<AiAttackTargetSnapshotState>>> =
     OnceLock::new();
+static AI_ATTACK_TARGET_SNAPSHOT_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
 static AI_TOWER_SNAPSHOTS: OnceLock<Mutex<Vec<AiTowerSnapshotState>>> = OnceLock::new();
+static AI_TOWER_SNAPSHOT_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
 static DEDENNE_STATICS: OnceLock<Mutex<Vec<DedenneStaticState>>> = OnceLock::new();
 static DEDENNE_GRIDS: OnceLock<Mutex<Vec<DedenneGridState>>> = OnceLock::new();
 static DEDENNE_GRID_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
@@ -20886,6 +20889,8 @@ fn reset_pokemon_content_runtime_state_for_new_match() {
     reset_usize_store(&RAIN_DANCE_LAST_TICK, usize::MAX);
     reset_usize_store(&DRAGON_CHEER_LAST_TICK, usize::MAX);
     reset_usize_store(&LIFE_DEW_LAST_TICK, usize::MAX);
+    reset_usize_store(&AI_ATTACK_TARGET_SNAPSHOT_LAST_TICK, usize::MAX);
+    reset_usize_store(&AI_TOWER_SNAPSHOT_LAST_TICK, usize::MAX);
     reset_usize_store(&DEDENNE_GRID_LAST_TICK, usize::MAX);
     reset_usize_store(&MAGMORTAR_LAST_TICK, usize::MAX);
 }
@@ -22558,6 +22563,17 @@ fn update_ai_entity_snapshot(ctx: &GameCtx, player_id: usize, entity_id: usize) 
 
 fn update_ai_attack_target_snapshots(ctx: &GameCtx) {
     let tick = ctx.tick();
+    let last_tick = AI_ATTACK_TARGET_SNAPSHOT_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
+    {
+        let mut last_tick = last_tick
+            .lock()
+            .expect("ai attack target snapshot tick state poisoned");
+        if *last_tick == tick {
+            return;
+        }
+        *last_tick = tick;
+    }
+
     let snapshots = AI_ATTACK_TARGET_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
     let mut snapshots = snapshots
         .lock()
@@ -22598,6 +22614,17 @@ fn update_ai_attack_target_snapshots(ctx: &GameCtx) {
 
 fn update_ai_tower_snapshots(ctx: &GameCtx) {
     let tick = ctx.tick();
+    let last_tick = AI_TOWER_SNAPSHOT_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
+    {
+        let mut last_tick = last_tick
+            .lock()
+            .expect("ai tower snapshot tick state poisoned");
+        if *last_tick == tick {
+            return;
+        }
+        *last_tick = tick;
+    }
+
     let snapshots = AI_TOWER_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
     let mut snapshots = snapshots.lock().expect("ai tower snapshot state poisoned");
     snapshots.retain(|state| {
@@ -23855,13 +23882,15 @@ impl ModPassive for PokemonPassive {
                 if crate::pokemon_status::has_status_tick_rolled_back(ctx.tick()) {
                     crate::pokemon_status::reset_pokemon_status_runtime_state_for_new_match();
                     reset_pokemon_content_runtime_state_for_new_match();
-                    crate::crash_probe::log_damage_probe(&format!(
-                        "event=pokemon_runtime_state_reset tick={} champion={} player={} entity={}",
-                        ctx.tick(),
-                        crate::crash_probe::sanitize_log_field(self.champion.id),
-                        _player,
-                        _entity
-                    ));
+                    if crate::crash_probe::damage_probe_enabled() {
+                        crate::crash_probe::log_damage_probe(&format!(
+                            "event=pokemon_runtime_state_reset tick={} champion={} player={} entity={}",
+                            ctx.tick(),
+                            crate::crash_probe::sanitize_log_field(self.champion.id),
+                            _player,
+                            _entity
+                        ));
+                    }
                 }
                 let life_id = ctx.get_player(_player).map(|player| player.deaths());
                 crate::pokemon_status::register_player_entity_life_at_tick(
@@ -24051,15 +24080,17 @@ impl ModPassive for PokemonPassive {
                     if self.champion.id == "pokemon_moba_weavile" {
                         crate::pokemon_status::break_weavile_hunt_stealth(entity);
                     }
-                    crate::crash_probe::log_damage_probe(&format!(
-                        "event=native_on_damaged tick={} champion=\"{}\" player={} entity={} attacker={} damage={}",
-                        ctx.tick(),
-                        crate::crash_probe::sanitize_log_field(self.champion.id),
-                        _player,
-                        entity,
-                        attacker,
-                        damage,
-                    ));
+                    if crate::crash_probe::damage_probe_enabled() {
+                        crate::crash_probe::log_damage_probe(&format!(
+                            "event=native_on_damaged tick={} champion=\"{}\" player={} entity={} attacker={} damage={}",
+                            ctx.tick(),
+                            crate::crash_probe::sanitize_log_field(self.champion.id),
+                            _player,
+                            entity,
+                            attacker,
+                            damage,
+                        ));
+                    }
                     crate::pokemon_status::try_post_damage_endure_heal(ctx, entity);
                     crate::pokemon_status::handle_audino_protect_damage(ctx, entity, damage);
                     crate::pokemon_status::note_stored_power_damage(ctx, entity, damage);
@@ -24275,14 +24306,6 @@ impl ModPassive for PokemonPassive {
 
                 if self.champion.id == "pokemon_moba_greninja" {
                     crate::pokemon_status::add_battle_bond_stack(ctx, killer_id);
-                    ctx.add_buff(
-                        killer_id,
-                        BuffState {
-                            duration: BuffType::Permanent,
-                            ult_cooldown_mult: 5,
-                            ..Default::default()
-                        },
-                    );
                 }
 
                 if self.champion.id == "pokemon_moba_passimian" {
@@ -24292,14 +24315,6 @@ impl ModPassive for PokemonPassive {
                         "pokemon_moba_greninja",
                     ) {
                         crate::pokemon_status::add_battle_bond_stack(ctx, killer_id);
-                        ctx.add_buff(
-                            killer_id,
-                            BuffState {
-                                duration: BuffType::Permanent,
-                                ult_cooldown_mult: 5,
-                                ..Default::default()
-                            },
-                        );
                     }
                 }
             },
@@ -24345,7 +24360,10 @@ impl ModPassive for PokemonPassive {
                     crate::pokemon_status::register_will_o_wisp_charges(entity);
                 }
                 if self.champion.id == "pokemon_moba_porygonz" {
-                    crate::pokemon_status::register_porygon_type(entity);
+                    crate::pokemon_status::register_porygon_type(_ctx, entity);
+                }
+                if self.champion.id == "pokemon_moba_greninja" {
+                    crate::pokemon_status::register_battle_bond(_ctx, _player, entity);
                 }
                 if self.champion.id == "pokemon_moba_blissey" {
                     crate::pokemon_status::register_blissey(entity);
@@ -24360,7 +24378,10 @@ impl ModPassive for PokemonPassive {
                     crate::pokemon_status::register_limber(entity);
                 }
                 if self.champion.id == "pokemon_moba_hitmontop" {
-                    crate::pokemon_status::register_hitmontop(entity);
+                    crate::pokemon_status::register_hitmontop(_ctx, _player, entity);
+                }
+                if self.champion.id == "pokemon_moba_hawlucha" {
+                    crate::pokemon_status::register_hawlucha_momentum(_ctx, _player, entity);
                 }
                 if self.champion.id == "pokemon_moba_kilowattrel" {
                     crate::pokemon_status::register_kilowattrel(entity);
@@ -26983,7 +27004,12 @@ fn execute_non_structure(ctx: &mut GameCtx, caster_id: usize, target_id: usize) 
     }
     let hp = target.hp();
     drop(target);
-    let before = native_damage_probe_snapshot(ctx, target_id);
+    let probe_enabled = crate::crash_probe::damage_probe_enabled();
+    let before = if probe_enabled {
+        native_damage_probe_snapshot(ctx, target_id)
+    } else {
+        None
+    };
     crate::pokemon_status::deal_tracked_damage(
         ctx,
         caster_id,
@@ -26992,18 +27018,20 @@ fn execute_non_structure(ctx: &mut GameCtx, caster_id: usize, target_id: usize) 
         0,
         AttackType::Skill,
     );
-    let after = native_damage_probe_snapshot(ctx, target_id);
-    log_native_damage_probe(
-        ctx,
-        "execute_non_structure",
-        caster_id,
-        target_id,
-        hp.max.saturating_mul(100).max(1),
-        0,
-        AttackType::Skill,
-        before,
-        after,
-    );
+    if probe_enabled {
+        let after = native_damage_probe_snapshot(ctx, target_id);
+        log_native_damage_probe(
+            ctx,
+            "execute_non_structure",
+            caster_id,
+            target_id,
+            hp.max.saturating_mul(100).max(1),
+            0,
+            AttackType::Skill,
+            before,
+            after,
+        );
+    }
 }
 
 fn native_damage_probe_snapshot(ctx: &GameCtx, entity_id: usize) -> Option<(usize, usize)> {
@@ -27023,6 +27051,9 @@ fn log_native_damage_probe(
     before: Option<(usize, usize)>,
     after: Option<(usize, usize)>,
 ) {
+    if !crate::crash_probe::damage_probe_enabled() {
+        return;
+    }
     let (before_hp, before_shield) = before.unwrap_or((0, 0));
     let (after_hp, after_shield) = after.unwrap_or((0, 0));
     let attacker_player = crate::pokemon_status::player_for_entity(attacker).unwrap_or(attacker);
@@ -35247,7 +35278,7 @@ const SNORLAX: PokemonChampion = PokemonChampion {
         move_type: PokemonType::Normal,
         category: MoveCategory::Physical,
         duration: 48,
-        cooldown: 3900,
+        cooldown: 1800,
         start_timing: 12,
         range: 1,
         growth_range: 0,
