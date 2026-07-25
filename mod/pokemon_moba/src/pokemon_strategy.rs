@@ -46,7 +46,7 @@ pub struct PokemonStrategyInfo {
     pub vulnerable_to: &'static [StrategyTrait],
 }
 
-pub const POKEMON_STRATEGIES: [PokemonStrategyInfo; 101] = [
+pub const POKEMON_STRATEGIES: [PokemonStrategyInfo; 103] = [
     PokemonStrategyInfo {
         id: "pokemon_moba_pikachu",
         traits: &[
@@ -2418,6 +2418,55 @@ pub const POKEMON_STRATEGIES: [PokemonStrategyInfo; 101] = [
             StrategyTrait::HardCc,
             StrategyTrait::HighMobility,
             StrategyTrait::BacklineCarry,
+        ],
+    },
+    PokemonStrategyInfo {
+        id: "pokemon_moba_kecleon",
+        traits: &[
+            StrategyTrait::AdDamage,
+            StrategyTrait::SingleTargetAssassin,
+            StrategyTrait::Dive,
+            StrategyTrait::HardCc,
+            StrategyTrait::HighMobility,
+        ],
+        threatens: &[
+            StrategyTrait::Eeveelution,
+            StrategyTrait::BacklineCarry,
+            StrategyTrait::Squishy,
+            StrategyTrait::LowMobility,
+        ],
+        vulnerable_to: &[
+            StrategyTrait::HardCc,
+            StrategyTrait::Frontline,
+            StrategyTrait::TankBuster,
+            StrategyTrait::Poke,
+        ],
+    },
+    PokemonStrategyInfo {
+        id: "pokemon_moba_weezing",
+        traits: &[
+            StrategyTrait::ApDamage,
+            StrategyTrait::Dot,
+            StrategyTrait::Disabler,
+            StrategyTrait::HardCc,
+            StrategyTrait::Debuffer,
+            StrategyTrait::Zoner,
+            StrategyTrait::HighHealth,
+        ],
+        threatens: &[
+            StrategyTrait::Eeveelution,
+            StrategyTrait::TeamBuff,
+            StrategyTrait::HealReliant,
+            StrategyTrait::MeleeThreat,
+            StrategyTrait::Frontline,
+            StrategyTrait::LowMobility,
+        ],
+        vulnerable_to: &[
+            StrategyTrait::Poke,
+            StrategyTrait::BacklineCarry,
+            StrategyTrait::Cleanse,
+            StrategyTrait::HighMobility,
+            StrategyTrait::SingleTargetAssassin,
         ],
     },
     PokemonStrategyInfo {

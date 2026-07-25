@@ -39,7 +39,7 @@ pub struct PokemonPositionInfo {
     pub label: &'static str,
 }
 
-pub const POKEMON_POSITIONS: [PokemonPositionInfo; 101] = [
+pub const POKEMON_POSITIONS: [PokemonPositionInfo; 103] = [
     PokemonPositionInfo {
         id: "pokemon_moba_pikachu",
         positions: &[MID, JUNGLE],
@@ -471,9 +471,19 @@ pub const POKEMON_POSITIONS: [PokemonPositionInfo; 101] = [
         label: "Mid",
     },
     PokemonPositionInfo {
+        id: "pokemon_moba_kecleon",
+        positions: &[JUNGLE],
+        label: "Jungle",
+    },
+    PokemonPositionInfo {
         id: "pokemon_moba_yanmega",
         positions: &[TOP, MID],
         label: "Top / Mid",
+    },
+    PokemonPositionInfo {
+        id: "pokemon_moba_weezing",
+        positions: &[SUPPORT],
+        label: "Support",
     },
     PokemonPositionInfo {
         id: "pokemon_moba_wishiwashi",

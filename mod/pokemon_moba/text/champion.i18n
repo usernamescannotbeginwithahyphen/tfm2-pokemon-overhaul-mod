@@ -648,6 +648,14 @@
         "ult": "Trick Room: Creates a warped arena that scrambles enemy stats, slows enemies, empowers MissingNo. and its allies, and inverts enemy allied buffs and healing handled by the Pokemon layer.",
         "passive": "Old man glitch: Damaging enemies with -- or 'M (00) can speed up MissingNo. and improve cooldown recovery. Non-basic abilities that damage MissingNo. can slow and disrupt their caster."
       },
+      "pokemon_moba_kecleon": {
+        "name": "Kecleon",
+        "attack": "Stretch Tongue: Extends Kecleon's tongue to strike an enemy for physical damage.",
+        "skill": "Double Scratch: Leaps to an enemy, briefly stunning them and rapidly slashing twice.",
+        "skill2": "Chromashift: Changes Kecleon to a random type, releases a typed damage pulse, and briefly increases movement speed.",
+        "ult": "Colorful Whip: Roots Kecleon while lashing a front cone with its current type and a rear cone with a random type weak to the front type.",
+        "passive": "Energy Predator: Kecleon deals increased damage to Eeveelution passive targets, always hits them super effectively, and changes type to one of a killed enemy Pokemon's types."
+      },
       "pokemon_moba_yanmega": {
         "name": "Yanmega",
         "attack": "Linear Beam: Fires a piercing Bug beam that deals special damage to all enemies in the line.",
@@ -655,6 +663,14 @@
         "skill2": "Tinted Lens: For a long duration, resisted Yanmega attacks are treated as super effective. Linear Beam applies anti-heal to Infested enemies during this buff.",
         "ult": "Giga Drain: Channels a life-draining Grass attack on an enemy, rooting both Pokemon and healing Yanmega. The drain is stronger against Infested or Poisoned targets and applies Poison stacks when it ends.",
         "passive": "Ogre Darner's Bug Blood: Yanmega is immune to Bleed. Pokemon-layer lifesteal and drain effects against Yanmega poison the attacker instead of healing them."
+      },
+      "pokemon_moba_weezing": {
+        "name": "Weezing",
+        "attack": "Smog: Puffs a piercing cloud of Poison gas that deals special damage and can Poison enemies it passes through.",
+        "skill": "Stun Gas: Releases a piercing gas cloud that briefly stuns enemies it passes through.",
+        "skill2": "Body Odor: Emits a foul aura that repeatedly Poisons nearby enemies, makes them take increased damage, and Confuses enemies that linger inside.",
+        "ult": "Sludge Whirlpool: Channels a large poisonous whirlpool around Weezing, slowing enemies, stacking Poison, shredding defenses, and increasing Weezing's defenses while channeling.",
+        "passive": "Nullifying Gas: Enemy Pokemon inside Weezing's gas aura have their passives disabled. Comfey's Flower Veil and Clawitzer's Clingy are not disabled."
       },
       "pokemon_moba_wishiwashi": {
         "name": "Wishiwashi",

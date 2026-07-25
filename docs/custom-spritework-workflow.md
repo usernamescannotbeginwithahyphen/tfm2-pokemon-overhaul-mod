@@ -4218,3 +4218,50 @@ ImageGen source for the VFX is preserved as `assets\custom_spritework\references
 - `assets\custom_spritework\vfx\yanmega_ult_giga_drain_tether#sheet.png` / `#anim.fanim`
 
 The VFX were generated on a magenta chroma key to preserve green/yellow Bug and Grass pixels, then cleaned for strict magenta residue. Do not use a green chroma key for future Yanmega VFX because both the body and Giga Drain effects legitimately contain green.
+
+## Kecleon Source Mapping
+
+PMDCollab `sprite/0352` supplies the full body source for this pass. Kecleon is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\kecleon#sheet.png` and `kecleon#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0352\credits.txt`.
+
+Tags:
+
+- `idle`: `Idle`.
+- `run`: `Walk`.
+- `attack` / Stretch Tongue: `Shoot`; no detached VFX staged.
+- `skill` / Double Scratch: `LeapForth`; no detached VFX staged.
+- `skill2` / Chromashift: `Swell`, with separate future-ready centered multitype pulse VFX.
+- `ult` / Colorful Whip: `Trip`, with a held stretched-out channel read and separate future-ready front/rear multitype cone-lash VFX.
+- `dead`: `Hurt+Sleep`.
+- `passive` / Energy Predator: no separate spritework or VFX staged.
+
+ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\kecleon_vfx_source.png`, with row crops preserved beside it. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\kecleon_skill2_chromashift_pulse#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\kecleon_ult_colorful_whip_cones#sheet.png` / `#anim.fanim`
+
+The VFX were generated on a cyan chroma key and packed with per-frame border-flood key removal so the blue Water-type portions of the effect are preserved. Avoid broad cyan deletion if these sheets are regenerated.
+
+## Weezing Source Mapping
+
+PMDCollab `sprite/0110` supplies the full body source for this pass. Weezing is mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\weezing#sheet.png` and `weezing#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0110\credits.txt`.
+
+Tags:
+
+- `idle`: `Idle`.
+- `run`: `Walk`.
+- `attack` / Smog: `Shoot`, with separate future-ready piercing poison cloud projectile VFX.
+- `skill` / Stun Gas: `Shoot`, with separate future-ready yellow-spark stun gas line VFX.
+- `skill2` / Body Odor: `Gas`, with separate future-ready centered toxic aura VFX. The PMD `Gas` body frames already include local puffs around Weezing, so keep any detached aura soft enough that it does not visually double the action too heavily.
+- `ult` / Sludge Whirlpool: `Rotate`, with separate future-ready centered sludge whirlpool radius VFX.
+- `dead`: `Hurt+Sleep`.
+- `passive` / Nullifying Gas: no champion-body tag; use the separate future-ready persistent suppressive gas aura VFX once custom VFX calls are available.
+
+ImageGen source for the VFX is preserved as `assets\custom_spritework\references\imagegen\weezing_vfx_source.png`, with row crops preserved beside it. Packed VFX assets are:
+
+- `assets\custom_spritework\vfx\weezing_basicattack_smog_cloud#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\weezing_skill1_stun_gas_cloud#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\weezing_skill2_body_odor_aura#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\weezing_ult_sludge_whirlpool_aura#sheet.png` / `#anim.fanim`
+- `assets\custom_spritework\vfx\weezing_passive_nullifying_gas_aura#sheet.png` / `#anim.fanim`
+
+The VFX were generated on a cyan chroma key because Weezing effects legitimately use purple and sickly green. The final packed sheets recolor cyan-hued antialias residue into muted violet edge pixels; do not repack these with green chroma because it will cut into the poison highlights.

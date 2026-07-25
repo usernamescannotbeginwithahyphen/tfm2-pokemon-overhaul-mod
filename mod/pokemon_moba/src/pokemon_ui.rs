@@ -16,7 +16,7 @@ const MAX_UI_DUMPS: usize = 120;
 static LAST_UI_HASH: AtomicU64 = AtomicU64::new(0);
 static UI_DUMP_COUNT: AtomicUsize = AtomicUsize::new(0);
 
-const POKEMON_NAMES: [&str; 101] = [
+const POKEMON_NAMES: [&str; 103] = [
     "Pikachu",
     "Charizard",
     "Blastoise",
@@ -103,7 +103,9 @@ const POKEMON_NAMES: [&str; 101] = [
     "Quaquaval",
     "Arcanine",
     "MissingNo.",
+    "Kecleon",
     "Yanmega",
+    "Weezing",
     "Wishiwashi",
     "Comfey",
     "Smeargle",

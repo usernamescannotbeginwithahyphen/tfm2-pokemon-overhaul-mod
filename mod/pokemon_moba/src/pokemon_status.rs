@@ -174,6 +174,7 @@ const SMEARGLE_CANDIDATE_TICKS: usize = 20 * 60;
 const PYUKUMUKU_BARB_STACK_WINDOW_TICKS: usize = 4 * 60;
 const HEAL_BLOCK_AURA_INTERVAL_TICKS: usize = 30;
 const HEAL_BLOCK_AURA_RADIUS: u64 = 42000;
+const NULLIFYING_GAS_RADIUS: u64 = 42000;
 const HAWLUCHA_MOMENTUM_ATTACK_SPEED: i32 = 30;
 const HAWLUCHA_MOMENTUM_MOVE_SPEED: i32 = 15;
 const HAWLUCHA_MOMENTUM_TICKS: usize = 3 * 60;
@@ -337,6 +338,51 @@ struct YanmegaGigaDrainState {
     total_drained: usize,
     last_caster_hp: usize,
     attacker_types: TypeSet,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct WeezingBodyOdorState {
+    caster_id: usize,
+    caster_team: usize,
+    expires_at: usize,
+    next_tick_at: usize,
+    radius: u64,
+    tick_interval: usize,
+    poison_damage: usize,
+    poison_refresh_ticks: usize,
+    confusion_after_ticks: usize,
+    confusion_ticks: usize,
+    damaged_amplify: i32,
+    debuff_ticks: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct WeezingBodyOdorExposureState {
+    caster_id: usize,
+    target_id: usize,
+    entered_at: usize,
+    confused_until: usize,
+    last_seen_at: usize,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct WeezingSludgeWhirlpoolState {
+    caster_id: usize,
+    caster_team: usize,
+    origin: EntityPos,
+    expires_at: usize,
+    next_tick_at: usize,
+    radius: u64,
+    tick_interval: usize,
+    poison_damage: usize,
+    poison_ticks: usize,
+    slow_percent: i32,
+    defence_mult: i32,
+    magic_resistance_mult: i32,
+    enemy_debuff_ticks: usize,
+    self_defence_mult: i32,
+    self_magic_resistance_mult: i32,
+    self_buff_ticks: usize,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -693,6 +739,15 @@ struct StickyWebChargeState {
 
 #[derive(Clone, Copy, Debug)]
 struct PorygonTypeState {
+    ctx_id: usize,
+    player_id: usize,
+    entity_id: usize,
+    current_type: PokemonType,
+    seen_mask: u32,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct KecleonTypeState {
     ctx_id: usize,
     player_id: usize,
     entity_id: usize,
@@ -1850,6 +1905,11 @@ static ARMAROUGE_WEAK_ARMORS: OnceLock<Mutex<Vec<ArmarougeWeakArmorState>>> = On
 static INFESTATIONS: OnceLock<Mutex<Vec<InfestationState>>> = OnceLock::new();
 static YANMEGA_TINTED_LENSES: OnceLock<Mutex<Vec<YanmegaTintedLensState>>> = OnceLock::new();
 static YANMEGA_GIGA_DRAINS: OnceLock<Mutex<Vec<YanmegaGigaDrainState>>> = OnceLock::new();
+static WEEZING_BODY_ODORS: OnceLock<Mutex<Vec<WeezingBodyOdorState>>> = OnceLock::new();
+static WEEZING_BODY_ODOR_EXPOSURES: OnceLock<Mutex<Vec<WeezingBodyOdorExposureState>>> =
+    OnceLock::new();
+static WEEZING_SLUDGE_WHIRLPOOLS: OnceLock<Mutex<Vec<WeezingSludgeWhirlpoolState>>> =
+    OnceLock::new();
 static POKEMON_CC_EVENTS: OnceLock<Mutex<Vec<PokemonCcEvent>>> = OnceLock::new();
 static FROZENS: OnceLock<Mutex<Vec<FrozenState>>> = OnceLock::new();
 static ICE_FIELDS: OnceLock<Mutex<Vec<IceFieldState>>> = OnceLock::new();
@@ -1882,6 +1942,7 @@ static SOAKS: OnceLock<Mutex<Vec<SoakState>>> = OnceLock::new();
 static WILL_O_WISP_CHARGES: OnceLock<Mutex<Vec<WillOWispChargeState>>> = OnceLock::new();
 static STICKY_WEB_CHARGES: OnceLock<Mutex<Vec<StickyWebChargeState>>> = OnceLock::new();
 static PORYGON_TYPES: OnceLock<Mutex<Vec<PorygonTypeState>>> = OnceLock::new();
+static KECLEON_TYPES: OnceLock<Mutex<Vec<KecleonTypeState>>> = OnceLock::new();
 static EEVEELUTIONS: OnceLock<Mutex<Vec<EeveelutionState>>> = OnceLock::new();
 static AQUA_RINGS: OnceLock<Mutex<Vec<AquaRingState>>> = OnceLock::new();
 static MISTY_TERRAINS: OnceLock<Mutex<Vec<MistyTerrainState>>> = OnceLock::new();
@@ -2066,6 +2127,7 @@ pub fn reset_pokemon_status_runtime_state_for_new_match() {
         LEECH_SEEDS,
         BLAZE_CONTACTS,
         ENTITY_TYPES,
+        KECLEON_TYPES,
         ENTITY_OWNERS,
         PLAYER_ENTITIES,
         MEGA_LAUNCHER,
@@ -2125,6 +2187,9 @@ pub fn reset_pokemon_status_runtime_state_for_new_match() {
         MISSINGNO_PENDING_DEBUFFS,
         YANMEGA_TINTED_LENSES,
         YANMEGA_GIGA_DRAINS,
+        WEEZING_BODY_ODORS,
+        WEEZING_BODY_ODOR_EXPOSURES,
+        WEEZING_SLUDGE_WHIRLPOOLS,
         POKEMON_CC_EVENTS,
         SWANNA_TAILWINDS,
         SWANNA_CYCLONES,
@@ -8399,6 +8464,51 @@ fn eeveelution_identity_active_in_ctx(ctx: &GameCtx, entity_id: usize) -> bool {
             .unwrap_or(false)
 }
 
+pub fn enemy_eeveelution_count(ctx: &GameCtx, team: usize) -> usize {
+    (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index).map(|entity| entity.id()))
+        .filter(|entity_id| {
+            ctx.get_entity(*entity_id)
+                .map(|entity| entity.team() != team && entity.is_alive() && entity.is_champion())
+                .unwrap_or(false)
+                && eeveelution_identity_active_in_ctx(ctx, *entity_id)
+        })
+        .count()
+}
+
+pub fn energy_predator_damage_bonus_percent(
+    ctx: &GameCtx,
+    attacker_id: usize,
+    target_id: usize,
+) -> usize {
+    if !has_energy_predator(ctx, attacker_id) || !eeveelution_identity_active_in_ctx(ctx, target_id)
+    {
+        return 0;
+    }
+    let team = ctx
+        .get_entity(attacker_id)
+        .map(|entity| entity.team())
+        .unwrap_or(usize::MAX);
+    if enemy_eeveelution_count(ctx, team) >= 3 {
+        45
+    } else {
+        25
+    }
+}
+
+pub fn energy_predator_forces_super_effective(
+    ctx: &GameCtx,
+    attacker_id: usize,
+    target_id: usize,
+) -> bool {
+    has_energy_predator(ctx, attacker_id) && eeveelution_identity_active_in_ctx(ctx, target_id)
+}
+
+pub fn has_energy_predator(ctx: &GameCtx, entity_id: usize) -> bool {
+    champion_id_for_entity_in_ctx(ctx, entity_id) == Some("pokemon_moba_kecleon")
+        || receiver_has_copied(entity_id, "pokemon_moba_kecleon")
+}
+
 fn is_eeveelution_champion_id(champion_id: &str) -> bool {
     matches!(
         champion_id,
@@ -8839,6 +8949,104 @@ pub fn set_porygon_type(ctx: &GameCtx, entity_id: usize, new_type: PokemonType) 
             state.seen_mask |= type_bit(new_type);
         } else {
             states.push(PorygonTypeState {
+                ctx_id,
+                player_id,
+                entity_id,
+                current_type: new_type,
+                seen_mask: type_bit(PokemonType::Normal) | type_bit(new_type),
+            });
+        }
+        register_entity_types(entity_id, TypeSet::single(new_type));
+    }
+}
+
+pub fn register_kecleon_type(ctx: &GameCtx, entity_id: usize) {
+    let Some((ctx_id, player_id)) = persistent_owner_key(ctx, entity_id) else {
+        return;
+    };
+    let states = KECLEON_TYPES.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("kecleon type state poisoned");
+    if let Some(existing) = states
+        .iter_mut()
+        .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+    {
+        existing.entity_id = entity_id;
+        existing.current_type = PokemonType::Normal;
+        existing.seen_mask |= type_bit(PokemonType::Normal);
+        register_entity_types(entity_id, TypeSet::single(PokemonType::Normal));
+        return;
+    }
+    states.push(KecleonTypeState {
+        ctx_id,
+        player_id,
+        entity_id,
+        current_type: PokemonType::Normal,
+        seen_mask: type_bit(PokemonType::Normal),
+    });
+    register_entity_types(entity_id, TypeSet::single(PokemonType::Normal));
+}
+
+pub fn kecleon_type(ctx: &GameCtx, entity_id: usize) -> PokemonType {
+    let owner_key = persistent_owner_key(ctx, entity_id);
+    KECLEON_TYPES
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("kecleon type state poisoned")
+        .iter()
+        .find(|state| {
+            owner_key
+                .map(|(ctx_id, player_id)| state.ctx_id == ctx_id && state.player_id == player_id)
+                .unwrap_or(state.entity_id == entity_id)
+                && ctx
+                    .get_entity(entity_id)
+                    .map(|entity| entity.is_alive())
+                    .unwrap_or(false)
+        })
+        .map(|state| state.current_type)
+        .unwrap_or(PokemonType::Normal)
+}
+
+pub fn kecleon_has_seen_type(ctx: &GameCtx, entity_id: usize, pokemon_type: PokemonType) -> bool {
+    let owner_key = persistent_owner_key(ctx, entity_id);
+    KECLEON_TYPES
+        .get_or_init(|| Mutex::new(Vec::new()))
+        .lock()
+        .expect("kecleon type state poisoned")
+        .iter()
+        .find(|state| {
+            owner_key
+                .map(|(ctx_id, player_id)| state.ctx_id == ctx_id && state.player_id == player_id)
+                .unwrap_or(state.entity_id == entity_id)
+                && ctx
+                    .get_entity(entity_id)
+                    .map(|entity| entity.is_alive())
+                    .unwrap_or(false)
+        })
+        .map(|state| state.seen_mask & type_bit(pokemon_type) != 0)
+        .unwrap_or(matches!(pokemon_type, PokemonType::Normal))
+}
+
+pub fn set_kecleon_type(ctx: &GameCtx, entity_id: usize, new_type: PokemonType) {
+    if ctx
+        .get_entity(entity_id)
+        .map(|entity| entity.is_alive())
+        .unwrap_or(false)
+    {
+        let Some((ctx_id, player_id)) = persistent_owner_key(ctx, entity_id) else {
+            register_entity_types(entity_id, TypeSet::single(new_type));
+            return;
+        };
+        let states = KECLEON_TYPES.get_or_init(|| Mutex::new(Vec::new()));
+        let mut states = states.lock().expect("kecleon type state poisoned");
+        if let Some(state) = states
+            .iter_mut()
+            .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+        {
+            state.entity_id = entity_id;
+            state.current_type = new_type;
+            state.seen_mask |= type_bit(new_type);
+        } else {
+            states.push(KecleonTypeState {
                 ctx_id,
                 player_id,
                 entity_id,
@@ -9851,6 +10059,359 @@ fn update_yanmega_giga_drains(ctx: &mut GameCtx, tick: usize) {
     for state in finished {
         finalize_yanmega_giga_drain(ctx, state);
     }
+}
+
+pub fn begin_weezing_body_odor(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    duration_ticks: usize,
+    radius: u64,
+    tick_interval: usize,
+    poison_damage: usize,
+    poison_refresh_ticks: usize,
+    confusion_after_ticks: usize,
+    confusion_ticks: usize,
+    damaged_amplify: i32,
+    debuff_ticks: usize,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let caster_pos = caster.pos();
+    drop(caster);
+
+    let tick = ctx.tick();
+    let states = WEEZING_BODY_ODORS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("weezing body odor state poisoned");
+    states.retain(|state| state.caster_id != caster_id && state.expires_at > tick);
+    states.push(WeezingBodyOdorState {
+        caster_id,
+        caster_team,
+        expires_at: tick.saturating_add(duration_ticks),
+        next_tick_at: tick,
+        radius,
+        tick_interval: tick_interval.max(1),
+        poison_damage: poison_damage.max(1),
+        poison_refresh_ticks: poison_refresh_ticks.max(1),
+        confusion_after_ticks,
+        confusion_ticks,
+        damaged_amplify,
+        debuff_ticks: debuff_ticks.max(1),
+    });
+    draw_status_marker(ctx, caster_pos, radius, VFX_POISON);
+}
+
+fn update_weezing_body_odors(ctx: &mut GameCtx, tick: usize) {
+    let states = WEEZING_BODY_ODORS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states.lock().expect("weezing body odor state poisoned");
+    let mut ticks_to_apply = Vec::new();
+    states.retain_mut(|state| {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            return false;
+        };
+        if !caster.is_alive() || state.expires_at <= tick {
+            return false;
+        }
+        drop(caster);
+        while state.next_tick_at <= tick {
+            ticks_to_apply.push(*state);
+            state.next_tick_at = state.next_tick_at.saturating_add(state.tick_interval);
+        }
+        true
+    });
+    drop(states);
+
+    let exposures = WEEZING_BODY_ODOR_EXPOSURES.get_or_init(|| Mutex::new(Vec::new()));
+    exposures
+        .lock()
+        .expect("weezing body odor exposure state poisoned")
+        .retain(|state| tick.saturating_sub(state.last_seen_at) <= 2 * 60);
+
+    for state in ticks_to_apply {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            continue;
+        };
+        if !caster.is_alive() {
+            continue;
+        }
+        let caster_pos = caster.pos();
+        drop(caster);
+
+        let target_ids: Vec<usize> = (0..ctx.entity_count())
+            .filter_map(|index| ctx.entity_at(index))
+            .filter(|entity| {
+                entity.team() != state.caster_team
+                    && entity.is_alive()
+                    && !entity.is_tower()
+                    && distance_sq(entity.pos(), caster_pos)
+                        <= state.radius.saturating_mul(state.radius)
+            })
+            .map(|entity| entity.id())
+            .collect();
+
+        for target_id in target_ids {
+            apply_poison_for(
+                ctx,
+                state.caster_id,
+                target_id,
+                state.poison_damage,
+                state.poison_refresh_ticks,
+            );
+            add_harmful_buff(
+                ctx,
+                state.caster_id,
+                target_id,
+                BuffState {
+                    duration: BuffType::Time {
+                        tick: state.debuff_ticks,
+                    },
+                    damaged_amplify: state.damaged_amplify.max(0) as usize,
+                    ..Default::default()
+                },
+            );
+
+            let mut should_confuse = false;
+            {
+                let exposures = WEEZING_BODY_ODOR_EXPOSURES.get_or_init(|| Mutex::new(Vec::new()));
+                let mut exposures = exposures
+                    .lock()
+                    .expect("weezing body odor exposure state poisoned");
+                if let Some(existing) = exposures.iter_mut().find(|existing| {
+                    existing.caster_id == state.caster_id && existing.target_id == target_id
+                }) {
+                    existing.last_seen_at = tick;
+                    if tick.saturating_sub(existing.entered_at) >= state.confusion_after_ticks
+                        && existing.confused_until <= tick
+                    {
+                        should_confuse = true;
+                        existing.confused_until = tick.saturating_add(state.confusion_ticks);
+                    }
+                } else {
+                    exposures.push(WeezingBodyOdorExposureState {
+                        caster_id: state.caster_id,
+                        target_id,
+                        entered_at: tick,
+                        confused_until: 0,
+                        last_seen_at: tick,
+                    });
+                }
+            }
+            if should_confuse {
+                apply_confusion_from(ctx, state.caster_id, target_id, 1, state.confusion_ticks);
+            }
+        }
+        draw_status_marker(ctx, caster_pos, state.radius, VFX_POISON);
+    }
+}
+
+pub fn begin_weezing_sludge_whirlpool(
+    ctx: &mut GameCtx,
+    caster_id: usize,
+    caster_team: usize,
+    duration_ticks: usize,
+    radius: u64,
+    tick_interval: usize,
+    poison_damage: usize,
+    poison_ticks: usize,
+    slow_percent: i32,
+    defence_mult: i32,
+    magic_resistance_mult: i32,
+    enemy_debuff_ticks: usize,
+    self_defence_mult: i32,
+    self_magic_resistance_mult: i32,
+    self_buff_ticks: usize,
+) {
+    let Some(caster) = ctx.get_entity(caster_id) else {
+        return;
+    };
+    if !caster.is_alive() {
+        return;
+    }
+    let origin = caster.pos();
+    drop(caster);
+
+    let tick = ctx.tick();
+    let states = WEEZING_SLUDGE_WHIRLPOOLS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("weezing sludge whirlpool state poisoned");
+    states.retain(|state| state.caster_id != caster_id && state.expires_at > tick);
+    states.push(WeezingSludgeWhirlpoolState {
+        caster_id,
+        caster_team,
+        origin,
+        expires_at: tick.saturating_add(duration_ticks),
+        next_tick_at: tick,
+        radius,
+        tick_interval: tick_interval.max(1),
+        poison_damage: poison_damage.max(1),
+        poison_ticks: poison_ticks.max(1),
+        slow_percent,
+        defence_mult,
+        magic_resistance_mult,
+        enemy_debuff_ticks: enemy_debuff_ticks.max(1),
+        self_defence_mult,
+        self_magic_resistance_mult,
+        self_buff_ticks: self_buff_ticks.max(1),
+    });
+    drop(states);
+
+    apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: duration_ticks as u64 });
+    apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockSkill { tick: duration_ticks });
+    apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockAttack { tick: duration_ticks });
+    draw_status_marker(ctx, origin, radius, VFX_POISON);
+}
+
+fn update_weezing_sludge_whirlpools(ctx: &mut GameCtx, tick: usize) {
+    const CHANNEL_MOVE_TOLERANCE: u64 = 2500;
+
+    let states = WEEZING_SLUDGE_WHIRLPOOLS.get_or_init(|| Mutex::new(Vec::new()));
+    let mut states = states
+        .lock()
+        .expect("weezing sludge whirlpool state poisoned");
+    let mut ticks_to_apply = Vec::new();
+    states.retain_mut(|state| {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            return false;
+        };
+        if !caster.is_alive()
+            || state.expires_at <= tick
+            || distance_sq(caster.pos(), state.origin)
+                > CHANNEL_MOVE_TOLERANCE.saturating_mul(CHANNEL_MOVE_TOLERANCE)
+        {
+            return false;
+        }
+        drop(caster);
+        while state.next_tick_at <= tick {
+            ticks_to_apply.push(*state);
+            state.next_tick_at = state.next_tick_at.saturating_add(state.tick_interval);
+        }
+        true
+    });
+    drop(states);
+
+    for state in ticks_to_apply {
+        let Some(caster) = ctx.get_entity(state.caster_id) else {
+            continue;
+        };
+        if !caster.is_alive() {
+            continue;
+        }
+        let caster_pos = caster.pos();
+        drop(caster);
+
+        add_beneficial_buff(
+            ctx,
+            state.caster_id,
+            state.caster_id,
+            BuffState {
+                duration: BuffType::Time {
+                    tick: state.self_buff_ticks,
+                },
+                defence_mult: state.self_defence_mult,
+                magic_resistance_mult: state.self_magic_resistance_mult,
+                ..Default::default()
+            },
+        );
+        apply_pokemon_cc(
+            ctx,
+            state.caster_id,
+            state.caster_id,
+            CCState::Bind {
+                tick: state.tick_interval as u64 + 4,
+            },
+        );
+        apply_pokemon_cc(
+            ctx,
+            state.caster_id,
+            state.caster_id,
+            CCState::BlockSkill {
+                tick: state.tick_interval + 4,
+            },
+        );
+        apply_pokemon_cc(
+            ctx,
+            state.caster_id,
+            state.caster_id,
+            CCState::BlockAttack {
+                tick: state.tick_interval + 4,
+            },
+        );
+
+        let target_ids: Vec<usize> = (0..ctx.entity_count())
+            .filter_map(|index| ctx.entity_at(index))
+            .filter(|entity| {
+                entity.team() != state.caster_team
+                    && entity.is_alive()
+                    && !entity.is_tower()
+                    && distance_sq(entity.pos(), caster_pos)
+                        <= state.radius.saturating_mul(state.radius)
+            })
+            .map(|entity| entity.id())
+            .collect();
+
+        for target_id in target_ids {
+            apply_poison_for(
+                ctx,
+                state.caster_id,
+                target_id,
+                state.poison_damage,
+                state.poison_ticks,
+            );
+            add_harmful_buff(
+                ctx,
+                state.caster_id,
+                target_id,
+                BuffState {
+                    duration: BuffType::Time {
+                        tick: state.enemy_debuff_ticks,
+                    },
+                    move_speed_mult: -state.slow_percent.abs(),
+                    defence_mult: state.defence_mult,
+                    magic_resistance_mult: state.magic_resistance_mult,
+                    ..Default::default()
+                },
+            );
+        }
+        draw_status_marker(ctx, caster_pos, state.radius, VFX_POISON);
+    }
+}
+
+pub fn passive_suppressed_by_nullifying_gas(
+    ctx: &GameCtx,
+    entity_id: usize,
+    champion_id: &str,
+) -> bool {
+    if matches!(
+        champion_id,
+        "pokemon_moba_clawitzer" | "pokemon_moba_comfey"
+    ) {
+        return false;
+    }
+    let Some(entity) = ctx.get_entity(entity_id) else {
+        return false;
+    };
+    if !entity.is_alive() || entity.is_tower() {
+        return false;
+    }
+    let entity_team = entity.team();
+    let entity_pos = entity.pos();
+    drop(entity);
+
+    let radius_sq = NULLIFYING_GAS_RADIUS.saturating_mul(NULLIFYING_GAS_RADIUS);
+    (0..ctx.entity_count())
+        .filter_map(|index| ctx.entity_at(index))
+        .any(|entity| {
+            entity.team() != entity_team
+                && entity.is_alive()
+                && (champion_id_for_entity_in_ctx(ctx, entity.id()) == Some("pokemon_moba_weezing")
+                    || receiver_has_copied(entity.id(), "pokemon_moba_weezing"))
+                && distance_sq(entity.pos(), entity_pos) <= radius_sq
+        })
 }
 
 pub fn apply_frozen_for(ctx: &mut GameCtx, target_id: usize, ticks: usize) {
@@ -20419,6 +20980,8 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
     update_missingno_pending_debuffs(ctx, tick);
     update_yanmega_tinted_lenses(ctx, tick);
     update_yanmega_giga_drains(ctx, tick);
+    update_weezing_body_odors(ctx, tick);
+    update_weezing_sludge_whirlpools(ctx, tick);
 
     let delayed_confusions = DELAYED_CONFUSIONS.get_or_init(|| Mutex::new(Vec::new()));
     let mut delayed_confusions = delayed_confusions

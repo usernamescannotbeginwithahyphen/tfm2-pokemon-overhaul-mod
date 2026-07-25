@@ -939,6 +939,22 @@
     "remapping": "asset/pokemon_moba/champions_custom/missingno#anim",
     "type": "override"
   },
+  "asset/base/aseprite_resources/champions/pokemon_moba_weezing#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/weezing#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_weezing#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/weezing#anim",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_kecleon#sheet": {
+    "remapping": "asset/pokemon_moba/champions_custom/kecleon#sheet",
+    "type": "override"
+  },
+  "asset/base/aseprite_resources/champions/pokemon_moba_kecleon#anim": {
+    "remapping": "asset/pokemon_moba/champions_custom/kecleon#anim",
+    "type": "override"
+  },
   "asset/base/aseprite_resources/champions/pokemon_moba_yanmega#sheet": {
     "remapping": "asset/pokemon_moba/champions_custom/yanmega#sheet",
     "type": "override"

@@ -194,6 +194,36 @@ pub fn deal_pokemon_damage(
         apply_damage_modifier(ad_damage, move_type, attacker_types, defender_types);
     let modified_ap_damage =
         apply_damage_modifier(ap_damage, move_type, attacker_types, defender_types);
+    let (modified_ad_damage, modified_ap_damage) =
+        if crate::pokemon_status::energy_predator_forces_super_effective(ctx, attacker, target) {
+            let (stab_num, stab_den) = stab_modifier_ratio(move_type, attacker_types);
+            let forced_num = stab_num.saturating_mul(SUPER_NUM);
+            let forced_den = stab_den.saturating_mul(SUPER_DEN).max(1);
+            let force_damage = |damage: usize| {
+                if damage == 0 {
+                    0
+                } else {
+                    damage
+                        .saturating_mul(forced_num)
+                        .saturating_add(forced_den / 2)
+                        / forced_den
+                }
+            };
+            (
+                if ad_damage == 0 {
+                    0
+                } else {
+                    modified_ad_damage.max(force_damage(ad_damage).max(1))
+                },
+                if ap_damage == 0 {
+                    0
+                } else {
+                    modified_ap_damage.max(force_damage(ap_damage).max(1))
+                },
+            )
+        } else {
+            (modified_ad_damage, modified_ap_damage)
+        };
     let bypass_resistance = crate::pokemon_status::is_blood_moon_active(ctx, attacker)
         || crate::pokemon_status::has_scrappy(ctx, attacker)
         || crate::pokemon_status::thievul_stakeout_bypasses_resistance(ctx, attacker, target);
@@ -204,6 +234,16 @@ pub fn deal_pokemon_damage(
         )
     } else {
         (modified_ad_damage, modified_ap_damage)
+    };
+    let energy_predator_bonus =
+        crate::pokemon_status::energy_predator_damage_bonus_percent(ctx, attacker, target);
+    let (ad_damage, ap_damage) = if energy_predator_bonus > 0 {
+        (
+            ad_damage.saturating_mul(100usize.saturating_add(energy_predator_bonus)) / 100,
+            ap_damage.saturating_mul(100usize.saturating_add(energy_predator_bonus)) / 100,
+        )
+    } else {
+        (ad_damage, ap_damage)
     };
     let aqua_step_bonus = if matches!(move_type, PokemonType::Water) {
         crate::pokemon_status::quaquaval_water_damage_bonus_percent(ctx, attacker)

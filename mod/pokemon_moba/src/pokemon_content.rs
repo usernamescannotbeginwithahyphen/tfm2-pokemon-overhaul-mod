@@ -233,6 +233,33 @@ pub enum PokemonMoveEffect {
         buff_ticks: usize,
         stealth_ticks: usize,
     },
+    KecleonDoubleScratch {
+        base_ad: usize,
+        ad_ratio: usize,
+        hits: usize,
+        stun_ticks: usize,
+        dash_range: u64,
+        force_move_speed: u64,
+        force_move_ticks: u64,
+    },
+    KecleonChromashift {
+        base_ad: usize,
+        ad_ratio: usize,
+        radius: u64,
+        repeated_type_bonus_percent: usize,
+        move_speed_mult: i32,
+        buff_ticks: usize,
+    },
+    KecleonColorfulWhip {
+        base_ad: usize,
+        ad_ratio: usize,
+        front_length: u64,
+        front_width_at_end: u64,
+        rear_length: u64,
+        rear_width_at_end: u64,
+        root_ticks: usize,
+        tick_interval: usize,
+    },
     SwannaFeatheryCyclone {
         duration_ticks: usize,
         radius: u64,
@@ -494,6 +521,31 @@ pub enum PokemonMoveEffect {
         poison_health_unit: usize,
         poison_damage_per_tick: usize,
         poison_ticks: usize,
+    },
+    WeezingBodyOdor {
+        duration_ticks: usize,
+        radius: u64,
+        tick_interval: usize,
+        poison_damage: usize,
+        poison_refresh_ticks: usize,
+        confusion_after_ticks: usize,
+        confusion_ticks: usize,
+        damaged_amplify: i32,
+        debuff_ticks: usize,
+    },
+    WeezingSludgeWhirlpool {
+        duration_ticks: usize,
+        radius: u64,
+        tick_interval: usize,
+        poison_damage: usize,
+        poison_ticks: usize,
+        slow_percent: i32,
+        defence_mult: i32,
+        magic_resistance_mult: i32,
+        enemy_debuff_ticks: usize,
+        self_defence_mult: i32,
+        self_magic_resistance_mult: i32,
+        self_buff_ticks: usize,
     },
     WishiwashiWaveSplash {
         base_ap: usize,
@@ -1302,6 +1354,16 @@ pub enum PokemonMoveEffect {
         burn_ticks: usize,
         burn_base_ap: usize,
         burn_ap_ratio: usize,
+    },
+    LinePierceDamageChancePoison {
+        base_ad: usize,
+        ad_ratio: usize,
+        base_ap: usize,
+        ap_ratio: usize,
+        width: u64,
+        poison_chance_percent: usize,
+        poison_stacks: usize,
+        poison_damage: usize,
     },
     LinePierceDamageSelfDefenseDebuff {
         base_ad: usize,
@@ -2613,10 +2675,18 @@ fn move_display_name_static<'a>(champion_id: &str, action_name: &'a str) -> &'a 
         ("pokemon_moba_missingno", "skill") => "--",
         ("pokemon_moba_missingno", "skill2") => "'M (00)",
         ("pokemon_moba_missingno", "ult") => "Trick Room",
+        ("pokemon_moba_kecleon", "attack") => "Stretch Tongue",
+        ("pokemon_moba_kecleon", "skill") => "Double Scratch",
+        ("pokemon_moba_kecleon", "skill2") => "Chromashift",
+        ("pokemon_moba_kecleon", "ult") => "Colorful Whip",
         ("pokemon_moba_yanmega", "attack") => "Linear Beam",
         ("pokemon_moba_yanmega", "skill") => "Buzzing Boost",
         ("pokemon_moba_yanmega", "skill2") => "Tinted Lens",
         ("pokemon_moba_yanmega", "ult") => "Giga Drain",
+        ("pokemon_moba_weezing", "attack") => "Smog",
+        ("pokemon_moba_weezing", "skill") => "Stun Gas",
+        ("pokemon_moba_weezing", "skill2") => "Body Odor",
+        ("pokemon_moba_weezing", "ult") => "Sludge Whirlpool",
         ("pokemon_moba_wishiwashi", "attack") => "Water Gun",
         ("pokemon_moba_wishiwashi", "skill") => "Wave Splash",
         ("pokemon_moba_wishiwashi", "skill2") => "Cowardice",
@@ -3652,6 +3722,52 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             seconds_text(buff_ticks),
             seconds_text(stealth_ticks)
         ),
+        PokemonMoveEffect::KecleonDoubleScratch {
+            base_ad,
+            ad_ratio,
+            hits,
+            stun_ticks,
+            dash_range,
+            ..
+        } => format!(
+            "Leap up to {} to an enemy, stunning them for {} and slashing {hits} times for {} each.",
+            range_text(dash_range),
+            seconds_text(stun_ticks),
+            damage_text(base_ad, ad_ratio, 0, 0, type_name)
+        ),
+        PokemonMoveEffect::KecleonChromashift {
+            base_ad,
+            ad_ratio,
+            radius,
+            repeated_type_bonus_percent,
+            move_speed_mult,
+            buff_ticks,
+            ..
+        } => format!(
+            "Charge briefly, change Kecleon to a random type, then pulse in a {} radius for {}. The pulse always gains STAB and deals {PHYSICAL}+{repeated_type_bonus_percent}% damage{END} if Kecleon has held that type before this game. Kecleon gains {SPEED_ICON}{BUFF}+{move_speed_mult}% move speed{END} for {}.",
+            range_text(radius),
+            damage_text(base_ad, ad_ratio, 0, 0, "the new type"),
+            seconds_text(buff_ticks)
+        ),
+        PokemonMoveEffect::KecleonColorfulWhip {
+            base_ad,
+            ad_ratio,
+            front_length,
+            front_width_at_end,
+            rear_length,
+            rear_width_at_end,
+            root_ticks,
+            tick_interval,
+        } => format!(
+            "Root Kecleon for {}, lashing a {} by {} front cone with Kecleon's current type and a {} by {} rear cone with a random type weak to the front type. Enemies in either cone take {} every {}.",
+            seconds_text(root_ticks),
+            range_text(front_length),
+            range_text(front_width_at_end),
+            range_text(rear_length),
+            range_text(rear_width_at_end),
+            damage_text(base_ad, ad_ratio, 0, 0, "typed"),
+            seconds_text(tick_interval)
+        ),
         PokemonMoveEffect::SwannaFeatheryCyclone {
             duration_ticks,
             radius,
@@ -4076,6 +4192,47 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             damage_text(0, 0, tick_base_ap, tick_ap_ratio, type_name),
             seconds_text(tick_interval),
             seconds_text(poison_ticks)
+        ),
+        PokemonMoveEffect::WeezingBodyOdor {
+            duration_ticks,
+            radius,
+            tick_interval,
+            poison_refresh_ticks,
+            confusion_after_ticks,
+            confusion_ticks,
+            damaged_amplify,
+            ..
+        } => format!(
+            "Emit a foul {} aura for {}. Every {}, enemies inside are Poisoned briefly and take {CONTROL}+{}% damage{END}; Poison fades shortly after they leave. Enemies that remain inside for {} become Confused for {}.",
+            range_text(radius),
+            seconds_text(duration_ticks),
+            seconds_text(tick_interval),
+            damaged_amplify.unsigned_abs(),
+            seconds_text(confusion_after_ticks),
+            seconds_text(confusion_ticks.max(poison_refresh_ticks.min(confusion_ticks)))
+        ),
+        PokemonMoveEffect::WeezingSludgeWhirlpool {
+            duration_ticks,
+            radius,
+            tick_interval,
+            poison_ticks,
+            slow_percent,
+            defence_mult,
+            magic_resistance_mult,
+            self_defence_mult,
+            self_magic_resistance_mult,
+            ..
+        } => format!(
+            "Channel a {} sludge whirlpool for {}. Every {}, enemies inside gain a Poison stack for {}, are slowed by {CONTROL}{}%{END}, and lose {ARMOR_ICON}{CONTROL}{}% armor{END} and {MR_ICON}{CONTROL}{}% magic resistance{END}. Weezing gains {ARMOR_ICON}{BUFF}+{}% armor{END} and {MR_ICON}{BUFF}+{}% magic resistance{END} while channeling.",
+            range_text(radius),
+            seconds_text(duration_ticks),
+            seconds_text(tick_interval),
+            seconds_text(poison_ticks),
+            slow_percent.unsigned_abs(),
+            defence_mult.unsigned_abs(),
+            magic_resistance_mult.unsigned_abs(),
+            self_defence_mult.unsigned_abs(),
+            self_magic_resistance_mult.unsigned_abs()
         ),
         PokemonMoveEffect::WishiwashiWaveSplash {
             base_ap,
@@ -5300,6 +5457,20 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
             seconds_text(burn_ticks),
             damage_text(0, 0, burn_base_ap, burn_ap_ratio, "Fire")
+        ),
+        PokemonMoveEffect::LinePierceDamageChancePoison {
+            base_ad,
+            ad_ratio,
+            base_ap,
+            ap_ratio,
+            width,
+            poison_chance_percent,
+            poison_stacks,
+            ..
+        } => format!(
+            "Puff a piercing toxic cloud {} wide, dealing {} to enemies it passes through. Has a {CONTROL}{poison_chance_percent}% chance{END} to apply {CONTROL}{poison_stacks} Poison stack{END}.",
+            range_text(width),
+            damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name)
         ),
         PokemonMoveEffect::LinePierceDamageSelfDefenseDebuff {
             base_ad,
@@ -6758,8 +6929,14 @@ fn passive_description(champion: PokemonChampion) -> String {
         "pokemon_moba_missingno" => format!(
             "Old man glitch: When MissingNo. damages an enemy with -- or 'M (00), it has a {CONTROL}25% chance{END} to gain {SPEED_ICON}{BUFF}+20% move speed{END} and {BUFF}+18% cooldown recovery{END} for {CONTROL}2s{END}. Enemies that damage MissingNo. with non-basic abilities have a {CONTROL}25% chance{END} to suffer the opposite debuffs for {CONTROL}2s{END}."
         ),
+        "pokemon_moba_kecleon" => format!(
+            "Energy Predator: Kecleon deals {PHYSICAL}+25% damage{END} to enemies with the Eeveelution passive, increased to {PHYSICAL}+45% damage{END} if the enemy team has {CONTROL}3 or more Eeveelutions{END}. Kecleon's attacks are always Super Effective against Eeveelution targets. When Kecleon kills an enemy Pokemon, Kecleon changes to one of that Pokemon's types."
+        ),
         "pokemon_moba_yanmega" => format!(
             "Ogre Darner's Bug Blood: Yanmega is immune to Bleed. Pokemon lifesteal and drain effects against Yanmega do not heal the attacker; instead, the attacker is Poisoned for {CONTROL}5s{END}."
+        ),
+        "pokemon_moba_weezing" => format!(
+            "Nullifying Gas: Enemy Pokemon inside Weezing's gas aura have their passives disabled. Comfey's Flower Veil and Clawitzer's Clingy are not disabled."
         ),
         "pokemon_moba_comfey" => format!(
             "Flower Veil: After 1.5s, Comfey attaches to a nearby allied Pokemon, becoming untargetable and movement-rooted while granting that ally {BUFF}99% of Comfey's base stats{END}. If the ally dies, Comfey detaches for {CONTROL}5s{END}. Allied Grass Pokemon near Comfey are immune to non-self-inflicted harmful Pokemon statuses."
@@ -6886,6 +7063,9 @@ impl PokemonEffect {
             | PokemonMoveEffect::WeavileScratchAndShuffle { .. }
             | PokemonMoveEffect::WeavilePursuitClaw { .. }
             | PokemonMoveEffect::WeavileAssaultingHunt { .. }
+            | PokemonMoveEffect::KecleonDoubleScratch { .. }
+            | PokemonMoveEffect::KecleonChromashift { .. }
+            | PokemonMoveEffect::KecleonColorfulWhip { .. }
             | PokemonMoveEffect::SwannaFeatheryCyclone { .. }
             | PokemonMoveEffect::SwannaSkyCircus { .. }
             | PokemonMoveEffect::MarowakBonemerang { .. }
@@ -6900,6 +7080,8 @@ impl PokemonEffect {
             | PokemonMoveEffect::YanmegaBuzzingBoost { .. }
             | PokemonMoveEffect::YanmegaTintedLens { .. }
             | PokemonMoveEffect::YanmegaGigaDrain { .. }
+            | PokemonMoveEffect::WeezingBodyOdor { .. }
+            | PokemonMoveEffect::WeezingSludgeWhirlpool { .. }
             | PokemonMoveEffect::WishiwashiCowardice { .. }
             | PokemonMoveEffect::AreaSoak { .. }
             | PokemonMoveEffect::LightScreen { .. }
@@ -7629,6 +7811,13 @@ impl PokemonEffect {
                 ap_ratio,
                 ..
             }
+            | PokemonMoveEffect::LinePierceDamageChancePoison {
+                base_ad,
+                ad_ratio,
+                base_ap,
+                ap_ratio,
+                ..
+            }
             | PokemonMoveEffect::LinePierceDamageSelfDefenseDebuff {
                 base_ad,
                 ad_ratio,
@@ -8163,6 +8352,12 @@ impl PokemonEffect {
                 damage_per_tick.saturating_mul(infestation_ticks / 15)
             }
             PokemonMoveEffect::DirectDamageChancePoison {
+                poison_chance_percent,
+                poison_stacks,
+                poison_damage,
+                ..
+            }
+            | PokemonMoveEffect::LinePierceDamageChancePoison {
                 poison_chance_percent,
                 poison_stacks,
                 poison_damage,
@@ -9165,6 +9360,231 @@ impl ModEffectType for PokemonEffect {
                     && matches!(self.action.slot, ActionSlot::Skill | ActionSlot::Skill2)
                 {
                     crate::pokemon_status::break_weavile_hunt_stealth(caster_id);
+                }
+
+                if let PokemonMoveEffect::KecleonDoubleScratch {
+                    base_ad,
+                    ad_ratio,
+                    hits,
+                    stun_ticks,
+                    dash_range,
+                    force_move_speed,
+                    force_move_ticks,
+                } = self.action.effect
+                {
+                    let Some(target_id) = target_from_input(input) else {
+                        return;
+                    };
+                    let Some(target) = ctx.get_entity(target_id) else {
+                        return;
+                    };
+                    if target.team() == caster_team
+                        || !target.is_alive()
+                        || target.is_tower()
+                        || distance_sq(target.pos(), caster_pos)
+                            > dash_range.saturating_mul(dash_range)
+                    {
+                        return;
+                    }
+                    let target_pos = target.pos();
+                    drop(target);
+
+                    apply_force_move_toward_pos(
+                        ctx,
+                        caster_id,
+                        caster_pos,
+                        target_pos,
+                        force_move_speed,
+                        force_move_ticks,
+                    );
+                    let adjusted =
+                        crate::pokemon_status::adjusted_cc_ticks(ctx, target_id, stun_ticks);
+                    apply_limber_aware_stun(ctx, caster_id, target_id, adjusted as u64);
+                    let damage =
+                        base_ad.saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
+                    let move_type = active_move_type;
+                    for _ in 0..hits.max(1) {
+                        let defender_types = effective_defender_types(ctx, target_id, move_type);
+                        deal_move_or_volt_absorb_pokemon_damage(
+                            ctx,
+                            self.champion,
+                            self.action,
+                            caster_id,
+                            target_id,
+                            damage.max(1),
+                            0,
+                            AttackType::Skill,
+                            move_type,
+                            active_attacker_types,
+                            defender_types,
+                        );
+                    }
+                    draw_line_band(
+                        ctx,
+                        caster_pos,
+                        target_pos,
+                        6500,
+                        type_debug_color(active_move_type),
+                    );
+                    return;
+                }
+
+                if let PokemonMoveEffect::KecleonChromashift {
+                    base_ad,
+                    ad_ratio,
+                    radius,
+                    repeated_type_bonus_percent,
+                    move_speed_mult,
+                    buff_ticks,
+                } = self.action.effect
+                {
+                    let new_type = random_pokemon_type(ctx.seed(), caster_id, ctx.tick());
+                    let had_type =
+                        crate::pokemon_status::kecleon_has_seen_type(ctx, caster_id, new_type);
+                    crate::pokemon_status::set_kecleon_type(ctx, caster_id, new_type);
+                    crate::pokemon_status::add_beneficial_buff(
+                        ctx,
+                        caster_id,
+                        caster_id,
+                        BuffState {
+                            duration: BuffType::Time { tick: buff_ticks },
+                            move_speed_mult,
+                            ..Default::default()
+                        },
+                    );
+                    let mut damage =
+                        base_ad.saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
+                    if had_type {
+                        damage = damage
+                            .saturating_mul(100usize.saturating_add(repeated_type_bonus_percent))
+                            / 100;
+                    }
+                    let attacker_types = TypeSet::single(new_type);
+                    let targets = collect_enemy_targets(ctx, caster_team, |pos| {
+                        distance_sq(pos, caster_pos) <= radius.saturating_mul(radius)
+                    });
+                    for target_id in targets {
+                        let defender_types = effective_defender_types(ctx, target_id, new_type);
+                        deal_move_or_volt_absorb_pokemon_damage(
+                            ctx,
+                            self.champion,
+                            self.action,
+                            caster_id,
+                            target_id,
+                            damage.max(1),
+                            0,
+                            AttackType::Skill,
+                            new_type,
+                            attacker_types,
+                            defender_types,
+                        );
+                    }
+                    draw_impact_circle(ctx, caster_pos, radius, type_debug_color(new_type));
+                    return;
+                }
+
+                if let PokemonMoveEffect::KecleonColorfulWhip {
+                    base_ad,
+                    ad_ratio,
+                    front_length,
+                    front_width_at_end,
+                    rear_length,
+                    rear_width_at_end,
+                    root_ticks,
+                    tick_interval,
+                } = self.action.effect
+                {
+                    let Some(front_pos) = input_position(ctx, input) else {
+                        return;
+                    };
+                    crate::pokemon_status::apply_pokemon_cc(
+                        ctx,
+                        caster_id,
+                        caster_id,
+                        CCState::Bind {
+                            tick: root_ticks as u64,
+                        },
+                    );
+                    let front_type = crate::pokemon_status::kecleon_type(ctx, caster_id);
+                    let rear_type =
+                        random_type_weak_to(front_type, ctx.seed(), caster_id, ctx.tick());
+                    let damage =
+                        base_ad.saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
+                    let ticks = (root_ticks / tick_interval.max(1)).max(1);
+                    let rear_pos = reversed_input(ctx, caster_pos, input)
+                        .and_then(|reversed| input_position(ctx, reversed))
+                        .unwrap_or(caster_pos);
+                    for _ in 0..ticks {
+                        let front_targets = collect_enemy_targets(ctx, caster_team, |pos| {
+                            is_inside_cone(
+                                pos,
+                                caster_pos,
+                                front_pos,
+                                front_length,
+                                front_width_at_end,
+                            )
+                        });
+                        for target_id in front_targets {
+                            let defender_types =
+                                effective_defender_types(ctx, target_id, front_type);
+                            deal_move_or_volt_absorb_pokemon_damage(
+                                ctx,
+                                self.champion,
+                                self.action,
+                                caster_id,
+                                target_id,
+                                damage.max(1),
+                                0,
+                                AttackType::Skill,
+                                front_type,
+                                TypeSet::single(front_type),
+                                defender_types,
+                            );
+                        }
+                        let rear_targets = collect_enemy_targets(ctx, caster_team, |pos| {
+                            is_inside_cone(
+                                pos,
+                                caster_pos,
+                                rear_pos,
+                                rear_length,
+                                rear_width_at_end,
+                            )
+                        });
+                        for target_id in rear_targets {
+                            let defender_types =
+                                effective_defender_types(ctx, target_id, rear_type);
+                            deal_move_or_volt_absorb_pokemon_damage(
+                                ctx,
+                                self.champion,
+                                self.action,
+                                caster_id,
+                                target_id,
+                                damage.max(1),
+                                0,
+                                AttackType::Skill,
+                                rear_type,
+                                TypeSet::single(front_type),
+                                defender_types,
+                            );
+                        }
+                    }
+                    draw_cone(
+                        ctx,
+                        caster_pos,
+                        front_pos,
+                        front_length,
+                        front_width_at_end,
+                        type_debug_color(front_type),
+                    );
+                    draw_cone(
+                        ctx,
+                        caster_pos,
+                        rear_pos,
+                        rear_length,
+                        rear_width_at_end,
+                        type_debug_color(rear_type),
+                    );
+                    return;
                 }
 
                 if let PokemonMoveEffect::ElectrodeMagnetRise {
@@ -14228,6 +14648,68 @@ impl ModEffectType for PokemonEffect {
                     );
                     return;
                 }
+                if let PokemonMoveEffect::WeezingBodyOdor {
+                    duration_ticks,
+                    radius,
+                    tick_interval,
+                    poison_damage,
+                    poison_refresh_ticks,
+                    confusion_after_ticks,
+                    confusion_ticks,
+                    damaged_amplify,
+                    debuff_ticks,
+                } = self.action.effect
+                {
+                    crate::pokemon_status::begin_weezing_body_odor(
+                        ctx,
+                        caster_id,
+                        caster_team,
+                        duration_ticks,
+                        radius,
+                        tick_interval,
+                        poison_damage,
+                        poison_refresh_ticks,
+                        confusion_after_ticks,
+                        confusion_ticks,
+                        damaged_amplify,
+                        debuff_ticks,
+                    );
+                    return;
+                }
+                if let PokemonMoveEffect::WeezingSludgeWhirlpool {
+                    duration_ticks,
+                    radius,
+                    tick_interval,
+                    poison_damage,
+                    poison_ticks,
+                    slow_percent,
+                    defence_mult,
+                    magic_resistance_mult,
+                    enemy_debuff_ticks,
+                    self_defence_mult,
+                    self_magic_resistance_mult,
+                    self_buff_ticks,
+                } = self.action.effect
+                {
+                    crate::pokemon_status::begin_weezing_sludge_whirlpool(
+                        ctx,
+                        caster_id,
+                        caster_team,
+                        duration_ticks,
+                        radius,
+                        tick_interval,
+                        poison_damage,
+                        poison_ticks,
+                        slow_percent,
+                        defence_mult,
+                        magic_resistance_mult,
+                        enemy_debuff_ticks,
+                        self_defence_mult,
+                        self_magic_resistance_mult,
+                        self_buff_ticks,
+                    );
+                    return;
+                }
                 if let PokemonMoveEffect::WishiwashiWaveSplash {
                     base_ap,
                     ap_ratio,
@@ -15890,6 +16372,12 @@ impl ModEffectType for PokemonEffect {
                             }
                         }
                         PokemonMoveEffect::DirectDamageChancePoison {
+                            poison_chance_percent,
+                            poison_stacks,
+                            poison_damage,
+                            ..
+                        }
+                        | PokemonMoveEffect::LinePierceDamageChancePoison {
                             poison_chance_percent,
                             poison_stacks,
                             poison_damage,
@@ -17711,6 +18199,7 @@ impl ModEffectType for PokemonEffect {
                         | PokemonMoveEffect::DirectDamageSpeedCheckCrit { .. }
                         | PokemonMoveEffect::DirectDamageSplashOnKill { .. }
                         | PokemonMoveEffect::SawkThrohUlt { .. }
+                        | PokemonMoveEffect::KecleonDoubleScratch { .. }
                         | PokemonMoveEffect::DashEndConeDamage { .. }
                 )
             },
@@ -17744,6 +18233,7 @@ impl ModEffectType for PokemonEffect {
                 | PokemonMoveEffect::SelfCritAntiHealBuff { .. }
                 | PokemonMoveEffect::SelfHpCostOffenseSpeedBuff { .. }
                 | PokemonMoveEffect::SelfCleanseOffenseBuff { .. }
+                | PokemonMoveEffect::KecleonChromashift { .. }
                 | PokemonMoveEffect::ElectrodeMagnetRise { .. }
                 | PokemonMoveEffect::ElectrodeMagneticFlux { .. }
                 | PokemonMoveEffect::ElectrodeSelfDestruct { .. }
@@ -17770,6 +18260,8 @@ impl ModEffectType for PokemonEffect {
                 | PokemonMoveEffect::DedenneParabolicDischarge { .. }
                 | PokemonMoveEffect::DedenneElectricTerrain { .. }
                 | PokemonMoveEffect::MagmortarHeatWave { .. }
+                | PokemonMoveEffect::WeezingBodyOdor { .. }
+                | PokemonMoveEffect::WeezingSludgeWhirlpool { .. }
                 | PokemonMoveEffect::TrailblazeGrassyTerrain { .. }
                 | PokemonMoveEffect::HealAttachedAllyPercent { .. }
                 | PokemonMoveEffect::EncoreAttachedAlly { .. }
@@ -17804,6 +18296,7 @@ impl ModEffectType for PokemonEffect {
                 | PokemonMoveEffect::SelfCritAntiHealBuff { .. }
                 | PokemonMoveEffect::SelfHpCostOffenseSpeedBuff { .. }
                 | PokemonMoveEffect::SelfCleanseOffenseBuff { .. }
+                | PokemonMoveEffect::KecleonChromashift { .. }
                 | PokemonMoveEffect::ElectrodeMagnetRise { .. }
                 | PokemonMoveEffect::ElectrodeMagneticFlux { .. }
                 | PokemonMoveEffect::ElectrodeSelfDestruct { .. }
@@ -18138,6 +18631,7 @@ fn targets_for_effect(
         | PokemonMoveEffect::LineExecute { width, .. }
         | PokemonMoveEffect::TriAttack { width, .. }
         | PokemonMoveEffect::LinePierceDamageChanceBurn { width, .. }
+        | PokemonMoveEffect::LinePierceDamageChancePoison { width, .. }
         | PokemonMoveEffect::LinePierceDamageSelfDefenseDebuff { width, .. }
         | PokemonMoveEffect::LinePierceDamageChanceFreeze { width, .. }
         | PokemonMoveEffect::LinePierceDamageSlowApToAd { width, .. }
@@ -18229,6 +18723,9 @@ fn targets_for_effect(
         | PokemonMoveEffect::CoalossalMagmaStorm { .. }
         | PokemonMoveEffect::ArcanineExtremespeed { .. }
         | PokemonMoveEffect::ArcanineWhiteFlames { .. }
+        | PokemonMoveEffect::KecleonDoubleScratch { .. }
+        | PokemonMoveEffect::KecleonChromashift { .. }
+        | PokemonMoveEffect::KecleonColorfulWhip { .. }
         | PokemonMoveEffect::MarowakBonemerang { .. }
         | PokemonMoveEffect::MarowakBoneRush { .. }
         | PokemonMoveEffect::MarowakBoneWindmill { .. } => Vec::new(),
@@ -18393,6 +18890,7 @@ fn deals_direct_damage(effect: PokemonMoveEffect) -> bool {
             | PokemonMoveEffect::TriAttack { .. }
             | PokemonMoveEffect::LinePierceDamageSelfRetreat { .. }
             | PokemonMoveEffect::LinePierceDamageChanceBurn { .. }
+            | PokemonMoveEffect::LinePierceDamageChancePoison { .. }
             | PokemonMoveEffect::LinePierceDamageSelfDefenseDebuff { .. }
             | PokemonMoveEffect::LinePierceDamageChanceFreeze { .. }
             | PokemonMoveEffect::LinePierceDamageSlowApToAd { .. }
@@ -18455,6 +18953,13 @@ fn input_position(ctx: &GameCtx, input: InputTarget) -> Option<EntityPos> {
     match input {
         InputTarget::Target { target_id } => ctx.get_entity(target_id).map(|entity| entity.pos()),
         InputTarget::Pos { x, y } => Some(EntityPos { x, y }),
+        _ => None,
+    }
+}
+
+fn target_from_input(input: InputTarget) -> Option<usize> {
+    match input {
+        InputTarget::Target { target_id } => Some(target_id),
         _ => None,
     }
 }
@@ -18609,6 +19114,7 @@ fn is_directional_confusion_effect(effect: PokemonMoveEffect) -> bool {
             | PokemonMoveEffect::TriAttack { .. }
             | PokemonMoveEffect::LinePierceDamageSelfRetreat { .. }
             | PokemonMoveEffect::LinePierceDamageChanceBurn { .. }
+            | PokemonMoveEffect::LinePierceDamageChancePoison { .. }
             | PokemonMoveEffect::LinePierceDamageSelfDefenseDebuff { .. }
             | PokemonMoveEffect::LinePierceDamageChanceFreeze { .. }
             | PokemonMoveEffect::LinePierceDamageSlowApToAd { .. }
@@ -18713,7 +19219,10 @@ fn draw_skill_visual(
         | PokemonMoveEffect::RillaboomDrumRoll { radius, .. }
         | PokemonMoveEffect::SwannaFeatheryCyclone { radius, .. }
         | PokemonMoveEffect::MarowakBoneWindmill { radius, .. }
+        | PokemonMoveEffect::WeezingBodyOdor { radius, .. }
+        | PokemonMoveEffect::WeezingSludgeWhirlpool { radius, .. }
         | PokemonMoveEffect::AmpharosFlash { radius, .. }
+        | PokemonMoveEffect::KecleonChromashift { radius, .. }
         | PokemonMoveEffect::DragonCheerAura { radius, .. }
         | PokemonMoveEffect::MagmortarHeatWave { radius, .. }
         | PokemonMoveEffect::ZeraoraWildCharge { radius, .. } => {
@@ -18983,6 +19492,7 @@ fn draw_skill_visual(
         | PokemonMoveEffect::TriAttack { width, .. }
         | PokemonMoveEffect::LinePierceDamageSelfRetreat { width, .. }
         | PokemonMoveEffect::LinePierceDamageChanceBurn { width, .. }
+        | PokemonMoveEffect::LinePierceDamageChancePoison { width, .. }
         | PokemonMoveEffect::LinePierceDamageSelfDefenseDebuff { width, .. }
         | PokemonMoveEffect::LinePierceDamageChanceFreeze { width, .. }
         | PokemonMoveEffect::LinePierceDamageSlowApToAd { width, .. }
@@ -19223,6 +19733,7 @@ fn draw_skill_visual(
         | PokemonMoveEffect::TargetLockOn { .. }
         | PokemonMoveEffect::TargetPoison { .. }
         | PokemonMoveEffect::PainSplit
+        | PokemonMoveEffect::KecleonDoubleScratch { .. }
         | PokemonMoveEffect::ApplyConfusion { .. }
         | PokemonMoveEffect::ForceSelfCrit { .. }
         | PokemonMoveEffect::FutureSight { .. }
@@ -19250,6 +19761,22 @@ fn draw_skill_visual(
         } => {
             for node in hex_grid_nodes(caster_pos, node_spread) {
                 draw_field_circle(ctx, node, node_radius, color);
+            }
+        }
+        PokemonMoveEffect::KecleonColorfulWhip {
+            front_length,
+            front_width_at_end,
+            rear_length,
+            rear_width_at_end,
+            ..
+        } => {
+            if let Some(front_pos) = target_pos {
+                draw_cone(ctx, caster_pos, front_pos, front_length, front_width_at_end, color);
+            }
+            if let Some(rear_pos) =
+                reversed_input(ctx, caster_pos, input).and_then(|reversed| input_position(ctx, reversed))
+            {
+                draw_cone(ctx, caster_pos, rear_pos, rear_length, rear_width_at_end, color);
             }
         }
         PokemonMoveEffect::AquaRing { radius, .. } => {
@@ -23917,6 +24444,13 @@ impl ModPassive for PokemonPassive {
                 update_grass_power_auras(ctx);
                 update_magmortar_states(ctx, rng_seed);
                 update_electrode_self_destructs(ctx);
+                if crate::pokemon_status::passive_suppressed_by_nullifying_gas(
+                    ctx,
+                    _entity,
+                    self.champion.id,
+                ) {
+                    return;
+                }
                 if self.champion.id == "pokemon_moba_venusaur" {
                     crate::pokemon_status::update_tangling_vines_aura(ctx, _entity);
                 }
@@ -24094,6 +24628,14 @@ impl ModPassive for PokemonPassive {
                     crate::pokemon_status::try_post_damage_endure_heal(ctx, entity);
                     crate::pokemon_status::handle_audino_protect_damage(ctx, entity, damage);
                     crate::pokemon_status::note_stored_power_damage(ctx, entity, damage);
+                }
+
+                if crate::pokemon_status::passive_suppressed_by_nullifying_gas(
+                    ctx,
+                    entity,
+                    self.champion.id,
+                ) {
+                    return;
                 }
 
                 if self.champion.id == "pokemon_moba_blaziken" && damage > 0 {
@@ -24291,6 +24833,14 @@ impl ModPassive for PokemonPassive {
                     return;
                 };
 
+                if crate::pokemon_status::passive_suppressed_by_nullifying_gas(
+                    ctx,
+                    killer_id,
+                    self.champion.id,
+                ) {
+                    return;
+                }
+
                 if self.champion.id == "pokemon_moba_snorlax"
                     || crate::pokemon_status::receiver_has_copied(killer_id, "pokemon_moba_snorlax")
                 {
@@ -24316,6 +24866,18 @@ impl ModPassive for PokemonPassive {
                     ) {
                         crate::pokemon_status::add_battle_bond_stack(ctx, killer_id);
                     }
+                }
+                if self.champion.id == "pokemon_moba_kecleon" {
+                    let killed_types =
+                        crate::neutral_objectives::defender_types_for_target(ctx, killed_entity);
+                    let new_type = random_type_from_type_set(
+                        killed_types,
+                        ctx.seed(),
+                        killer_id,
+                        killed_entity,
+                        ctx.tick(),
+                    );
+                    crate::pokemon_status::set_kecleon_type(ctx, killer_id, new_type);
                 }
             },
         );
@@ -24361,6 +24923,9 @@ impl ModPassive for PokemonPassive {
                 }
                 if self.champion.id == "pokemon_moba_porygonz" {
                     crate::pokemon_status::register_porygon_type(_ctx, entity);
+                }
+                if self.champion.id == "pokemon_moba_kecleon" {
+                    crate::pokemon_status::register_kecleon_type(_ctx, entity);
                 }
                 if self.champion.id == "pokemon_moba_greninja" {
                     crate::pokemon_status::register_battle_bond(_ctx, _player, entity);
@@ -26266,7 +26831,7 @@ fn random_index(seed: u64, len: usize) -> Option<usize> {
     }
 }
 
-pub const POKEMON_CHAMPIONS: [PokemonChampion; 101] = [
+pub const POKEMON_CHAMPIONS: [PokemonChampion; 103] = [
     PIKACHU,
     CHARIZARD,
     BLASTOISE,
@@ -26353,7 +26918,9 @@ pub const POKEMON_CHAMPIONS: [PokemonChampion; 101] = [
     QUAQUAVAL,
     ARCANINE,
     MISSINGNO,
+    KECLEON,
     YANMEGA,
+    WEEZING,
     WISHIWASHI,
     COMFEY,
     SMEARGLE,
@@ -26935,6 +27502,12 @@ fn active_action_typing(
             TypeSet::dual(PokemonType::Water, PokemonType::Grass),
         );
     }
+    if champion.id == "pokemon_moba_kecleon" {
+        return (
+            action.move_type,
+            TypeSet::single(crate::pokemon_status::kecleon_type(ctx, caster_id)),
+        );
+    }
     (action.move_type, champion.types)
 }
 
@@ -26967,6 +27540,66 @@ fn random_super_effective_type(
         candidates.len(),
     ) else {
         return PokemonType::Normal;
+    };
+    candidates[index]
+}
+
+fn random_pokemon_type(seed: u64, caster_id: usize, tick: usize) -> PokemonType {
+    let all_types = all_pokemon_types();
+    let Some(index) = random_index(
+        splitmix64(seed ^ ((caster_id as u64) << 28) ^ tick as u64 ^ 0x0cec_1e0a_u64),
+        all_types.len(),
+    ) else {
+        return PokemonType::Normal;
+    };
+    all_types[index]
+}
+
+fn random_type_weak_to(
+    front_type: PokemonType,
+    seed: u64,
+    caster_id: usize,
+    tick: usize,
+) -> PokemonType {
+    let candidates: Vec<PokemonType> = all_pokemon_types()
+        .iter()
+        .copied()
+        .filter(|candidate| {
+            let (num, den) =
+                crate::pokemon_types::type_modifier_ratio(front_type, TypeSet::single(*candidate));
+            num > den
+        })
+        .collect();
+    if candidates.is_empty() {
+        return random_pokemon_type(seed ^ 0x0bacc_u64, caster_id, tick);
+    }
+    let Some(index) = random_index(
+        splitmix64(seed ^ ((caster_id as u64) << 33) ^ tick as u64 ^ 0x0c01_0f01_u64),
+        candidates.len(),
+    ) else {
+        return PokemonType::Normal;
+    };
+    candidates[index]
+}
+
+fn random_type_from_type_set(
+    types: TypeSet,
+    seed: u64,
+    caster_id: usize,
+    target_id: usize,
+    tick: usize,
+) -> PokemonType {
+    let candidates: Vec<PokemonType> = types.iter().collect();
+    let Some(index) = random_index(
+        splitmix64(
+            seed ^ ((caster_id as u64) << 36)
+                ^ ((target_id as u64) << 12)
+                ^ tick as u64
+                ^ 0x0ce1_ec70_u64,
+        ),
+        candidates.len(),
+    ) else {
+        return types.primary;
     };
     candidates[index]
 }
@@ -36785,6 +37418,109 @@ const MISSINGNO: PokemonChampion = PokemonChampion {
     }),
 };
 
+const KECLEON: PokemonChampion = PokemonChampion {
+    id: "pokemon_moba_kecleon",
+    display_name: "Kecleon",
+    types: TypeSet::single(PokemonType::Normal),
+    category: ChampionCategory::Assassin,
+    tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
+    stat: stat(78, 18, 780, 34, 34, 575, 5),
+    growth: stat(7, 2, 58, 3, 3, 0, 1),
+    attack: PokemonMove {
+        slot: ActionSlot::Attack,
+        name_key: "attack",
+        move_type: PokemonType::Normal,
+        category: MoveCategory::Physical,
+        duration: 24,
+        cooldown: 50,
+        start_timing: 7,
+        range: 26000,
+        growth_range: 0,
+        casting: CastingType::Targeting,
+        target: CastingTarget::Enemy,
+        attack_type: AttackType::BaseAttack,
+        can_use_with_move: true,
+        effect: PokemonMoveEffect::DirectDamage {
+            base_ad: 30,
+            ad_ratio: 45,
+            base_ap: 0,
+            ap_ratio: 0,
+        },
+    },
+    skill: PokemonMove {
+        slot: ActionSlot::Skill,
+        name_key: "skill",
+        move_type: PokemonType::Normal,
+        category: MoveCategory::Physical,
+        duration: 34,
+        cooldown: 660,
+        start_timing: 6,
+        range: 34000,
+        growth_range: 0,
+        casting: CastingType::Targeting,
+        target: CastingTarget::Enemy,
+        attack_type: AttackType::Skill,
+        can_use_with_move: true,
+        effect: PokemonMoveEffect::KecleonDoubleScratch {
+            base_ad: 32,
+            ad_ratio: 38,
+            hits: 2,
+            stun_ticks: 30,
+            dash_range: 34000,
+            force_move_speed: 180000,
+            force_move_ticks: 12,
+        },
+    },
+    skill2: PokemonMove {
+        slot: ActionSlot::Skill2,
+        name_key: "skill2",
+        move_type: PokemonType::Normal,
+        category: MoveCategory::Physical,
+        duration: 42,
+        cooldown: 960,
+        start_timing: 30,
+        range: 0,
+        growth_range: 0,
+        casting: CastingType::None,
+        target: CastingTarget::None,
+        attack_type: AttackType::Skill,
+        can_use_with_move: false,
+        effect: PokemonMoveEffect::KecleonChromashift {
+            base_ad: 58,
+            ad_ratio: 65,
+            radius: 33000,
+            repeated_type_bonus_percent: 35,
+            move_speed_mult: 25,
+            buff_ticks: 5 * 60,
+        },
+    },
+    ult: Some(PokemonMove {
+        slot: ActionSlot::Ult,
+        name_key: "ult",
+        move_type: PokemonType::Normal,
+        category: MoveCategory::Physical,
+        duration: 96,
+        cooldown: 4200,
+        start_timing: 8,
+        range: 56000,
+        growth_range: 0,
+        casting: CastingType::Position,
+        target: CastingTarget::Enemy,
+        attack_type: AttackType::Skill,
+        can_use_with_move: false,
+        effect: PokemonMoveEffect::KecleonColorfulWhip {
+            base_ad: 42,
+            ad_ratio: 45,
+            front_length: 56000,
+            front_width_at_end: 42000,
+            rear_length: 42000,
+            rear_width_at_end: 32000,
+            root_ticks: 90,
+            tick_interval: 30,
+        },
+    }),
+};
+
 const YANMEGA: PokemonChampion = PokemonChampion {
     id: "pokemon_moba_yanmega",
     display_name: "Yanmega",
@@ -36883,6 +37619,124 @@ const YANMEGA: PokemonChampion = PokemonChampion {
             poison_health_unit: 140,
             poison_damage_per_tick: 12,
             poison_ticks: 10 * 60,
+        },
+    }),
+};
+
+const WEEZING: PokemonChampion = PokemonChampion {
+    id: "pokemon_moba_weezing",
+    display_name: "Weezing",
+    types: TypeSet::single(PokemonType::Poison),
+    category: ChampionCategory::Util,
+    tags: &[
+        ChampionTag::AP,
+        ChampionTag::Range,
+        ChampionTag::Tank,
+        ChampionTag::CC,
+    ],
+    stat: stat(26, 58, 980, 42, 45, 500, 4),
+    growth: stat(2, 5, 78, 4, 4, 0, 1),
+    attack: PokemonMove {
+        slot: ActionSlot::Attack,
+        name_key: "attack",
+        move_type: PokemonType::Poison,
+        category: MoveCategory::Special,
+        duration: 32,
+        cooldown: 78,
+        start_timing: 8,
+        range: 48000,
+        growth_range: 0,
+        casting: CastingType::Position,
+        target: CastingTarget::Enemy,
+        attack_type: AttackType::BaseAttack,
+        can_use_with_move: true,
+        effect: PokemonMoveEffect::LinePierceDamageChancePoison {
+            base_ad: 0,
+            ad_ratio: 0,
+            base_ap: 18,
+            ap_ratio: 32,
+            width: 9000,
+            poison_chance_percent: 15,
+            poison_stacks: 1,
+            poison_damage: 7,
+        },
+    },
+    skill: PokemonMove {
+        slot: ActionSlot::Skill,
+        name_key: "skill",
+        move_type: PokemonType::Poison,
+        category: MoveCategory::Status,
+        duration: 32,
+        cooldown: 660,
+        start_timing: 7,
+        range: 52000,
+        growth_range: 0,
+        casting: CastingType::Position,
+        target: CastingTarget::Enemy,
+        attack_type: AttackType::Skill,
+        can_use_with_move: true,
+        effect: PokemonMoveEffect::LinePierceDamageStun {
+            base_ad: 0,
+            ad_ratio: 0,
+            base_ap: 0,
+            ap_ratio: 0,
+            width: 11000,
+            stun_ticks: 45,
+        },
+    },
+    skill2: PokemonMove {
+        slot: ActionSlot::Skill2,
+        name_key: "skill2",
+        move_type: PokemonType::Poison,
+        category: MoveCategory::Status,
+        duration: 26,
+        cooldown: 1080,
+        start_timing: 4,
+        range: 0,
+        growth_range: 0,
+        casting: CastingType::None,
+        target: CastingTarget::None,
+        attack_type: AttackType::Skill,
+        can_use_with_move: true,
+        effect: PokemonMoveEffect::WeezingBodyOdor {
+            duration_ticks: 7 * 60,
+            radius: 38000,
+            tick_interval: 30,
+            poison_damage: 7,
+            poison_refresh_ticks: 70,
+            confusion_after_ticks: 105,
+            confusion_ticks: 75,
+            damaged_amplify: 12,
+            debuff_ticks: 45,
+        },
+    },
+    ult: Some(PokemonMove {
+        slot: ActionSlot::Ult,
+        name_key: "ult",
+        move_type: PokemonType::Poison,
+        category: MoveCategory::Status,
+        duration: 64,
+        cooldown: 4200,
+        start_timing: 8,
+        range: 0,
+        growth_range: 0,
+        casting: CastingType::None,
+        target: CastingTarget::None,
+        attack_type: AttackType::Skill,
+        can_use_with_move: false,
+        effect: PokemonMoveEffect::WeezingSludgeWhirlpool {
+            duration_ticks: 5 * 60,
+            radius: 56000,
+            tick_interval: 30,
+            poison_damage: 12,
+            poison_ticks: 5 * 60,
+            slow_percent: 45,
+            defence_mult: -35,
+            magic_resistance_mult: -35,
+            enemy_debuff_ticks: 40,
+            self_defence_mult: 35,
+            self_magic_resistance_mult: 35,
+            self_buff_ticks: 40,
         },
     }),
 };
