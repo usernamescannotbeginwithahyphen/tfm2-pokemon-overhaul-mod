@@ -1,0 +1,135 @@
+{
+  "id": "pokemon_moba_arboliva",
+  "category": "Range",
+  "tags": ["AD", "Range", "Dot"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/arboliva",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["grass_physical", "grass_physical", "grass_physical"]
+  },
+  "stat": {
+    "attack": 50,
+    "magic_power": 10,
+    "hp": 540,
+    "defence": 18,
+    "magic_resistance": 22,
+    "move_speed": 620,
+    "hp_regen": 3,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 6,
+    "magic_power": 1,
+    "hp": 38,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 34,
+    "cooltime": 58,
+    "start_timing": 10,
+    "range": 47000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 38,
+    "cooltime": 360,
+    "start_timing": 12,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_arboliva_skill1_energy_ball"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 36,
+    "cooltime": 300,
+    "start_timing": 8,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_arboliva_skill2_fiery_terrain"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 68,
+    "cooltime": 3900,
+    "start_timing": 24,
+    "range": 82000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_arboliva_ult_solar_beam"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_arboliva_basic_seed_bomb",
+      "anim": "asset/pokemon_moba_stable/vfx/arboliva_basic_seed_bomb",
+      "tag": "projectile",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_arboliva_passive_grassy_terrain",
+      "anim": "asset/pokemon_moba_stable/vfx/arboliva_passive_grassy_terrain",
+      "tag": "terrain",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_arboliva_skill1_energy_ball",
+      "anim": "asset/pokemon_moba_stable/vfx/arboliva_skill1_energy_ball",
+      "tag": "projectile",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_arboliva_skill2_fiery_terrain",
+      "anim": "asset/pokemon_moba_stable/vfx/arboliva_skill2_fiery_terrain",
+      "tag": "terrain",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_arboliva_ult_solar_beam",
+      "anim": "asset/pokemon_moba_stable/vfx/arboliva_ult_solar_beam",
+      "tag": "beam",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

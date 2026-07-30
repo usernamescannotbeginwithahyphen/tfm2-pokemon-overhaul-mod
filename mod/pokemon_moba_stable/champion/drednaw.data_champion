@@ -1,0 +1,119 @@
+{
+  "id": "pokemon_moba_drednaw",
+  "category": "Melee",
+  "tags": ["AD", "Melee", "Tank", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/drednaw",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["rock_physical", "rock_status", "water_physical"]
+  },
+  "stat": {
+    "attack": 44,
+    "magic_power": 10,
+    "hp": 1180,
+    "defence": 60,
+    "magic_resistance": 44,
+    "move_speed": 560,
+    "hp_regen": 6,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 4,
+    "magic_power": 1,
+    "hp": 108,
+    "defence": 6,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 30,
+    "cooltime": 42,
+    "start_timing": 10,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 34,
+    "cooltime": 420,
+    "start_timing": 10,
+    "range": 34000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_drednaw_skill1_rock_tomb_bind"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 28,
+    "cooltime": 480,
+    "start_timing": 6,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_drednaw_skill2_rock_polish_aura"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 42,
+    "cooltime": 3600,
+    "start_timing": 11,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_drednaw_ult_razor_shell_trail"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_drednaw_skill1_rock_tomb_bind",
+      "anim": "asset/pokemon_moba_stable/vfx/drednaw_skill1_rock_tomb_bind",
+      "tag": "bind",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_drednaw_skill2_rock_polish_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/drednaw_skill2_rock_polish_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_drednaw_ult_razor_shell_trail",
+      "anim": "asset/pokemon_moba_stable/vfx/drednaw_ult_razor_shell_trail",
+      "tag": "trail",
+      "z": 0,
+      "is_follow": true
+    }
+  ]
+}

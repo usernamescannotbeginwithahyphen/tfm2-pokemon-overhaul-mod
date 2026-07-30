@@ -1,0 +1,95 @@
+{
+  "id": "pokemon_moba_electrode",
+  "category": "Assassin",
+  "tags": ["AD", "Melee", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/electrode",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["electric_status", "electric_status", "normal_physical"]
+  },
+  "stat": {
+    "attack": 54,
+    "magic_power": 8,
+    "hp": 560,
+    "defence": 22,
+    "magic_resistance": 22,
+    "move_speed": 1180,
+    "hp_regen": 5,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 5,
+    "magic_power": 1,
+    "hp": 40,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 14,
+    "cooltime": 20,
+    "start_timing": 4,
+    "range": 17000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 28,
+    "cooltime": 420,
+    "start_timing": 4,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 24,
+    "cooltime": 480,
+    "start_timing": 4,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 160,
+    "cooltime": 7200,
+    "start_timing": 1,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_electrode_ult_self_destruct_explosion_aoe"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_electrode_ult_self_destruct_explosion_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/electrode_ult_self_destruct_explosion_aoe",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

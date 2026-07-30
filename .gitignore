@@ -18,3 +18,5 @@ api_probe.*.txt
 dist/
 build/
 mod/pokemon_moba/target/
+mod/pokemon_moba_stable/target/
+mod/pokemon_moba_stable/pokemon_moba_stable.dll

@@ -1,0 +1,81 @@
+{
+  "id": "pokemon_moba_bouffalant",
+  "category": "Melee",
+  "tags": ["AD", "Melee", "Tank"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/bouffalant",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["normal_physical", "ground_physical", "normal_physical"]
+  },
+  "stat": {
+    "attack": 54,
+    "magic_power": 8,
+    "hp": 1120,
+    "defence": 58,
+    "magic_resistance": 44,
+    "move_speed": 520,
+    "hp_regen": 6,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 5,
+    "magic_power": 1,
+    "hp": 104,
+    "defence": 6,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 30,
+    "cooltime": 42,
+    "start_timing": 10,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 180,
+    "cooltime": 420,
+    "start_timing": 1,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 34,
+    "cooltime": 480,
+    "start_timing": 10,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 60,
+    "cooltime": 4500,
+    "start_timing": 8,
+    "range": 70000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  }
+}

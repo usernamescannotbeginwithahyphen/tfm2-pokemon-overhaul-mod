@@ -1,0 +1,127 @@
+{
+  "id": "pokemon_moba_drampa",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Tank", "CC", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/drampa",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["dragon_status", "dragon_special", "dragon_special"]
+  },
+  "stat": {
+    "attack": 28,
+    "magic_power": 58,
+    "hp": 820,
+    "defence": 36,
+    "magic_resistance": 40,
+    "move_speed": 520,
+    "hp_regen": 7,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 6,
+    "hp": 74,
+    "defence": 4,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 28,
+    "cooltime": 62,
+    "start_timing": 9,
+    "range": 48000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 32,
+    "cooltime": 420,
+    "start_timing": 8,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_drampa_skill1_outrage_aura"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 36,
+    "cooltime": 390,
+    "start_timing": 12,
+    "range": 50000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_drampa_skill2_dragon_energy_burst"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 70,
+    "cooltime": 7200,
+    "start_timing": 28,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_drampa_ult_draco_meteor_aoe"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_drampa_basicattack_twister_line",
+      "anim": "asset/pokemon_moba_stable/vfx/drampa_basicattack_twister_line",
+      "tag": "projectile",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_drampa_skill1_outrage_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/drampa_skill1_outrage_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_drampa_skill2_dragon_energy_burst",
+      "anim": "asset/pokemon_moba_stable/vfx/drampa_skill2_dragon_energy_burst",
+      "tag": "burst",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_drampa_ult_draco_meteor_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/drampa_ult_draco_meteor_aoe",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

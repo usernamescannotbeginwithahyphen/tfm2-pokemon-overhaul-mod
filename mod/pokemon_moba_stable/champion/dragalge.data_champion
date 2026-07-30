@@ -1,0 +1,129 @@
+{
+  "id": "pokemon_moba_dragalge",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Dot", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/dragalge",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["poison_physical", "poison_special", "poison_status"]
+  },
+  "stat": {
+    "attack": 34,
+    "magic_power": 80,
+    "hp": 700,
+    "defence": 28,
+    "magic_resistance": 40,
+    "move_speed": 740,
+    "hp_regen": 0,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 8,
+    "hp": 60,
+    "defence": 3,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 0,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 72,
+    "start_timing": 9,
+    "range": 47000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 38,
+    "cooltime": 360,
+    "start_timing": 12,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_dragalge_skill1_poison_tail_aura"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 42,
+    "cooltime": 420,
+    "start_timing": 14,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_dragalge_skill2_sludge_bomb_splashes"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 36,
+    "cooltime": 3900,
+    "start_timing": 12,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_dragalge_ult_toxic_chain_tether"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_dragalge_basicattack_acid_spit_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/dragalge_basicattack_acid_spit_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dragalge_skill1_poison_tail_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/dragalge_skill1_poison_tail_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dragalge_skill2_sludge_bomb_splashes",
+      "anim": "asset/pokemon_moba_stable/vfx/dragalge_skill2_sludge_bomb_splashes",
+      "tag": "splash",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dragalge_ult_toxic_chain_tether",
+      "anim": "asset/pokemon_moba_stable/vfx/dragalge_ult_toxic_chain_tether",
+      "tag": "tether",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

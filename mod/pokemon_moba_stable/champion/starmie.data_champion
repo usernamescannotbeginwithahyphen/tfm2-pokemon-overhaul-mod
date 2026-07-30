@@ -1,0 +1,129 @@
+{
+  "id": "pokemon_moba_starmie",
+  "category": "Magician",
+  "tags": ["AP", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/starmie",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["water_special", "psychic_status", "psychic_special"]
+  },
+  "stat": {
+    "attack": 18,
+    "magic_power": 74,
+    "hp": 650,
+    "defence": 26,
+    "magic_resistance": 34,
+    "move_speed": 780,
+    "hp_regen": 4,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 7,
+    "hp": 48,
+    "defence": 2,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 0,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 28,
+    "cooltime": 50,
+    "start_timing": 9,
+    "range": 43000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 46,
+    "cooltime": 420,
+    "start_timing": 8,
+    "range": 46000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_starmie_skill1_flip_turn_splash"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 32,
+    "cooltime": 480,
+    "start_timing": 8,
+    "range": 46000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_starmie_skill2_heart_swap_shockwave"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 96,
+    "cooltime": 6600,
+    "start_timing": 54,
+    "range": 120000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_starmie_ult_psybeam_line"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_starmie_basicattack_water_spout_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/starmie_basicattack_water_spout_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_starmie_skill1_flip_turn_splash",
+      "anim": "asset/pokemon_moba_stable/vfx/starmie_skill1_flip_turn_splash",
+      "tag": "splash",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_starmie_skill2_heart_swap_shockwave",
+      "anim": "asset/pokemon_moba_stable/vfx/starmie_skill2_heart_swap_shockwave",
+      "tag": "shockwave",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_starmie_ult_psybeam_line",
+      "anim": "asset/pokemon_moba_stable/vfx/starmie_ult_psybeam_line",
+      "tag": "line",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

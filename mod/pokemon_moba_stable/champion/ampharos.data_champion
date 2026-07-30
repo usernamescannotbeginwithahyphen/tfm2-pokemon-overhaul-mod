@@ -1,0 +1,137 @@
+{
+  "id": "pokemon_moba_ampharos",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Range", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/ampharos",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["electric_special", "normal_status", "electric_special"]
+  },
+  "stat": {
+    "attack": 20,
+    "magic_power": 84,
+    "hp": 560,
+    "defence": 20,
+    "magic_resistance": 28,
+    "move_speed": 520,
+    "hp_regen": 5,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 8,
+    "hp": 42,
+    "defence": 2,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 54,
+    "start_timing": 7,
+    "range": 43000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 28,
+    "cooltime": 660,
+    "start_timing": 7,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_ampharos_skill1_flash_aoe"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 26,
+    "cooltime": 780,
+    "start_timing": 5,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_ampharos_skill2_searchlight_tail_aura"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 54,
+    "cooltime": 4800,
+    "start_timing": 8,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_ampharos_ult_gigavolt_strike_zone"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_ampharos_basicattack_cluster_bolt_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/ampharos_basicattack_cluster_bolt_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_ampharos_passive_luminous_pulse_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/ampharos_passive_luminous_pulse_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_ampharos_skill1_flash_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/ampharos_skill1_flash_aoe",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_ampharos_skill2_searchlight_tail_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/ampharos_skill2_searchlight_tail_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_ampharos_ult_gigavolt_strike_zone",
+      "anim": "asset/pokemon_moba_stable/vfx/ampharos_ult_gigavolt_strike_zone",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

@@ -1,0 +1,4639 @@
+{
+  "champions": {
+    "pokemon_moba_ampharos": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ampharos_basicattack_cluster_bolt_projectile",
+        "binding_name": "pokemon_moba_stable_ampharos_basicattack_cluster_bolt_projectile",
+        "champion_id": "pokemon_moba_ampharos",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/ampharos_basicattack_cluster_bolt_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/ampharos_basicattack_cluster_bolt_projectile",
+          "name": "pokemon_moba_stable_ampharos_basicattack_cluster_bolt_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ampharos_passive_luminous_pulse_aura",
+        "binding_name": "pokemon_moba_stable_ampharos_passive_luminous_pulse_aura",
+        "champion_id": "pokemon_moba_ampharos",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/ampharos_passive_luminous_pulse_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ampharos_passive_luminous_pulse_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_ampharos_passive_luminous_pulse_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ampharos_skill1_flash_aoe",
+        "binding_name": "pokemon_moba_stable_ampharos_skill1_flash_aoe",
+        "champion_id": "pokemon_moba_ampharos",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/ampharos_skill1_flash_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ampharos_skill1_flash_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ampharos_skill1_flash_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ampharos_skill2_searchlight_tail_aura",
+        "binding_name": "pokemon_moba_stable_ampharos_skill2_searchlight_tail_aura",
+        "champion_id": "pokemon_moba_ampharos",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/ampharos_skill2_searchlight_tail_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ampharos_skill2_searchlight_tail_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_ampharos_skill2_searchlight_tail_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ampharos_ult_gigavolt_strike_zone",
+        "binding_name": "pokemon_moba_stable_ampharos_ult_gigavolt_strike_zone",
+        "champion_id": "pokemon_moba_ampharos",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/ampharos_ult_gigavolt_strike_zone#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ampharos_ult_gigavolt_strike_zone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ampharos_ult_gigavolt_strike_zone",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_appletun": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/appletun_skill1_projectile",
+        "binding_name": "pokemon_moba_stable_appletun_skill1_projectile",
+        "champion_id": "pokemon_moba_appletun",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/appletun_skill1_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/appletun_skill1_projectile",
+          "name": "pokemon_moba_stable_appletun_skill1_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/appletun_ult_projectile",
+        "binding_name": "pokemon_moba_stable_appletun_ult_projectile",
+        "champion_id": "pokemon_moba_appletun",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/appletun_ult_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/appletun_ult_projectile",
+          "name": "pokemon_moba_stable_appletun_ult_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_arbok": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/arbok_skill2_projectile",
+        "binding_name": "pokemon_moba_stable_arbok_skill2_projectile",
+        "champion_id": "pokemon_moba_arbok",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/arbok_skill2_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/arbok_skill2_projectile",
+          "name": "pokemon_moba_stable_arbok_skill2_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_arboliva": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/arboliva_basic_seed_bomb",
+        "binding_name": "pokemon_moba_stable_arboliva_basic_seed_bomb",
+        "champion_id": "pokemon_moba_arboliva",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/arboliva_basic_seed_bomb#anim.fanim",
+        "tag": "projectile",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/arboliva_basic_seed_bomb",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_arboliva_basic_seed_bomb",
+          "tag": "projectile",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/arboliva_passive_grassy_terrain",
+        "binding_name": "pokemon_moba_stable_arboliva_passive_grassy_terrain",
+        "champion_id": "pokemon_moba_arboliva",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/arboliva_passive_grassy_terrain#anim.fanim",
+        "tag": "terrain",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/arboliva_passive_grassy_terrain",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_arboliva_passive_grassy_terrain",
+          "tag": "terrain",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/arboliva_skill1_energy_ball",
+        "binding_name": "pokemon_moba_stable_arboliva_skill1_energy_ball",
+        "champion_id": "pokemon_moba_arboliva",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/arboliva_skill1_energy_ball#anim.fanim",
+        "tag": "projectile",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/arboliva_skill1_energy_ball",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_arboliva_skill1_energy_ball",
+          "tag": "projectile",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/arboliva_skill2_fiery_terrain",
+        "binding_name": "pokemon_moba_stable_arboliva_skill2_fiery_terrain",
+        "champion_id": "pokemon_moba_arboliva",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/arboliva_skill2_fiery_terrain#anim.fanim",
+        "tag": "terrain",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/arboliva_skill2_fiery_terrain",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_arboliva_skill2_fiery_terrain",
+          "tag": "terrain",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/arboliva_ult_solar_beam",
+        "binding_name": "pokemon_moba_stable_arboliva_ult_solar_beam",
+        "champion_id": "pokemon_moba_arboliva",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/arboliva_ult_solar_beam#anim.fanim",
+        "tag": "beam",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/arboliva_ult_solar_beam",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_arboliva_ult_solar_beam",
+          "tag": "beam",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_arcanine": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/arcanine_basicattack_flare_projectile",
+        "binding_name": "pokemon_moba_stable_arcanine_basicattack_flare_projectile",
+        "champion_id": "pokemon_moba_arcanine",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/arcanine_basicattack_flare_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/arcanine_basicattack_flare_projectile",
+          "name": "pokemon_moba_stable_arcanine_basicattack_flare_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/arcanine_skill2_white_flames_line_aoe",
+        "binding_name": "pokemon_moba_stable_arcanine_skill2_white_flames_line_aoe",
+        "champion_id": "pokemon_moba_arcanine",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/arcanine_skill2_white_flames_line_aoe#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/arcanine_skill2_white_flames_line_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_arcanine_skill2_white_flames_line_aoe",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/arcanine_ult_flames_of_rage_inferno_aura",
+        "binding_name": "pokemon_moba_stable_arcanine_ult_flames_of_rage_inferno_aura",
+        "champion_id": "pokemon_moba_arcanine",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/arcanine_ult_flames_of_rage_inferno_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/arcanine_ult_flames_of_rage_inferno_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_arcanine_ult_flames_of_rage_inferno_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_archaludon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/archaludon_ult_electro_aura",
+        "binding_name": "pokemon_moba_stable_archaludon_ult_electro_aura",
+        "champion_id": "pokemon_moba_archaludon",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/archaludon_ult_electro_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/archaludon_ult_electro_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_archaludon_ult_electro_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_armarouge": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/armarouge_skill1_fire_aura",
+        "binding_name": "pokemon_moba_stable_armarouge_skill1_fire_aura",
+        "champion_id": "pokemon_moba_armarouge",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/armarouge_skill1_fire_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/armarouge_skill1_fire_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_armarouge_skill1_fire_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/armarouge_ult_fire_line",
+        "binding_name": "pokemon_moba_stable_armarouge_ult_fire_line",
+        "champion_id": "pokemon_moba_armarouge",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/armarouge_ult_fire_line#anim.fanim",
+        "tag": "beam",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/armarouge_ult_fire_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_armarouge_ult_fire_line",
+          "tag": "beam",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_banette": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/banette_skill1_shadow_smoke",
+        "binding_name": "pokemon_moba_stable_banette_skill1_shadow_smoke",
+        "champion_id": "pokemon_moba_banette",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/banette_skill1_shadow_smoke#anim.fanim",
+        "tag": "smoke",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/banette_skill1_shadow_smoke",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_banette_skill1_shadow_smoke",
+          "tag": "smoke",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/banette_skill2_night_shade_cone",
+        "binding_name": "pokemon_moba_stable_banette_skill2_night_shade_cone",
+        "champion_id": "pokemon_moba_banette",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/banette_skill2_night_shade_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/banette_skill2_night_shade_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_banette_skill2_night_shade_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/banette_ult_phantom_splash",
+        "binding_name": "pokemon_moba_stable_banette_ult_phantom_splash",
+        "champion_id": "pokemon_moba_banette",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/banette_ult_phantom_splash#anim.fanim",
+        "tag": "phantom",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/banette_ult_phantom_splash",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_banette_ult_phantom_splash",
+          "tag": "phantom",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_beeheeyem": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/beeheeyem_basic_projectile",
+        "binding_name": "pokemon_moba_stable_beeheeyem_basic_projectile",
+        "champion_id": "pokemon_moba_beeheeyem",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/beeheeyem_basic_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/beeheeyem_basic_projectile",
+          "name": "pokemon_moba_stable_beeheeyem_basic_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/beeheeyem_skill2_light_screen",
+        "binding_name": "pokemon_moba_stable_beeheeyem_skill2_light_screen",
+        "champion_id": "pokemon_moba_beeheeyem",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/beeheeyem_skill2_light_screen#anim.fanim",
+        "tag": "screen",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/beeheeyem_skill2_light_screen",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_beeheeyem_skill2_light_screen",
+          "tag": "screen",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/beeheeyem_ult_headbutt_effect",
+        "binding_name": "pokemon_moba_stable_beeheeyem_ult_headbutt_effect",
+        "champion_id": "pokemon_moba_beeheeyem",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/beeheeyem_ult_headbutt_effect#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/beeheeyem_ult_headbutt_effect",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_beeheeyem_ult_headbutt_effect",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_blastoise": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/blastoise_basic_projectile_1",
+        "binding_name": "pokemon_moba_stable_blastoise_basic_projectile_1",
+        "champion_id": "pokemon_moba_blastoise",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/blastoise_basic_projectile_1#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/blastoise_basic_projectile_1",
+          "name": "pokemon_moba_stable_blastoise_basic_projectile_1",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/blastoise_basic_projectile_2",
+        "binding_name": "pokemon_moba_stable_blastoise_basic_projectile_2",
+        "champion_id": "pokemon_moba_blastoise",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/blastoise_basic_projectile_2#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/blastoise_basic_projectile_2",
+          "name": "pokemon_moba_stable_blastoise_basic_projectile_2",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/blastoise_ult_cannon",
+        "binding_name": "pokemon_moba_stable_blastoise_ult_cannon",
+        "champion_id": "pokemon_moba_blastoise",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/blastoise_ult_cannon#anim.fanim",
+        "tag": "cannon",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/blastoise_ult_cannon",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_blastoise_ult_cannon",
+          "tag": "cannon",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/blastoise_ult_hydro_cannon_line",
+        "binding_name": "pokemon_moba_stable_blastoise_ult_hydro_cannon_line",
+        "champion_id": "pokemon_moba_blastoise",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/blastoise_ult_hydro_cannon_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/blastoise_ult_hydro_cannon_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_blastoise_ult_hydro_cannon_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_blaziken": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/blaziken_ult_flame_trail",
+        "binding_name": "pokemon_moba_stable_blaziken_ult_flame_trail",
+        "champion_id": "pokemon_moba_blaziken",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/blaziken_ult_flame_trail#anim.fanim",
+        "tag": "flame_trail",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/blaziken_ult_flame_trail",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_blaziken_ult_flame_trail",
+          "tag": "flame_trail",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_ceruledge": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ceruledge_skill1_flame_trail",
+        "binding_name": "pokemon_moba_stable_ceruledge_skill1_flame_trail",
+        "champion_id": "pokemon_moba_ceruledge",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/ceruledge_skill1_flame_trail#anim.fanim",
+        "tag": "flame_trail",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ceruledge_skill1_flame_trail",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ceruledge_skill1_flame_trail",
+          "tag": "flame_trail",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_charizard": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/charizard_basicattack_flamethrower_cone",
+        "binding_name": "pokemon_moba_stable_charizard_basicattack_flamethrower_cone",
+        "champion_id": "pokemon_moba_charizard",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/charizard_basicattack_flamethrower_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/charizard_basicattack_flamethrower_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_charizard_basicattack_flamethrower_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/charizard_skill1_dragon_breath_cone",
+        "binding_name": "pokemon_moba_stable_charizard_skill1_dragon_breath_cone",
+        "champion_id": "pokemon_moba_charizard",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/charizard_skill1_dragon_breath_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/charizard_skill1_dragon_breath_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_charizard_skill1_dragon_breath_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/charizard_skill2_fire_blast_projectile",
+        "binding_name": "pokemon_moba_stable_charizard_skill2_fire_blast_projectile",
+        "champion_id": "pokemon_moba_charizard",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/charizard_skill2_fire_blast_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/charizard_skill2_fire_blast_projectile",
+          "name": "pokemon_moba_stable_charizard_skill2_fire_blast_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_clawitzer": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/clawitzer_basicattack_aqua_jet_projectile",
+        "binding_name": "pokemon_moba_stable_clawitzer_basicattack_aqua_jet_projectile",
+        "champion_id": "pokemon_moba_clawitzer",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/clawitzer_basicattack_aqua_jet_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/clawitzer_basicattack_aqua_jet_projectile",
+          "name": "pokemon_moba_stable_clawitzer_basicattack_aqua_jet_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/clawitzer_skill1_water_sport_aoe",
+        "binding_name": "pokemon_moba_stable_clawitzer_skill1_water_sport_aoe",
+        "champion_id": "pokemon_moba_clawitzer",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/clawitzer_skill1_water_sport_aoe#anim.fanim",
+        "tag": "area",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/clawitzer_skill1_water_sport_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_clawitzer_skill1_water_sport_aoe",
+          "tag": "area",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/clawitzer_skill2_aqua_cutter_projectile",
+        "binding_name": "pokemon_moba_stable_clawitzer_skill2_aqua_cutter_projectile",
+        "champion_id": "pokemon_moba_clawitzer",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/clawitzer_skill2_aqua_cutter_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/clawitzer_skill2_aqua_cutter_projectile",
+          "name": "pokemon_moba_stable_clawitzer_skill2_aqua_cutter_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/clawitzer_ult_bubble_beam_line",
+        "binding_name": "pokemon_moba_stable_clawitzer_ult_bubble_beam_line",
+        "champion_id": "pokemon_moba_clawitzer",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/clawitzer_ult_bubble_beam_line#anim.fanim",
+        "tag": "beam",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/clawitzer_ult_bubble_beam_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_clawitzer_ult_bubble_beam_line",
+          "tag": "beam",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_cloyster": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/cloyster_basicattack_glaciate_projectile",
+        "binding_name": "pokemon_moba_stable_cloyster_basicattack_glaciate_projectile",
+        "champion_id": "pokemon_moba_cloyster",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/cloyster_basicattack_glaciate_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/cloyster_basicattack_glaciate_projectile",
+          "name": "pokemon_moba_stable_cloyster_basicattack_glaciate_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/cloyster_skill1_icicle_crash_projectile",
+        "binding_name": "pokemon_moba_stable_cloyster_skill1_icicle_crash_projectile",
+        "champion_id": "pokemon_moba_cloyster",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/cloyster_skill1_icicle_crash_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/cloyster_skill1_icicle_crash_projectile",
+          "name": "pokemon_moba_stable_cloyster_skill1_icicle_crash_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/cloyster_ult_aurora_beam_line",
+        "binding_name": "pokemon_moba_stable_cloyster_ult_aurora_beam_line",
+        "champion_id": "pokemon_moba_cloyster",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/cloyster_ult_aurora_beam_line#anim.fanim",
+        "tag": "beam",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/cloyster_ult_aurora_beam_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_cloyster_ult_aurora_beam_line",
+          "tag": "beam",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_coalossal": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/coalossal_basicattack_rock_blast_projectile",
+        "binding_name": "pokemon_moba_stable_coalossal_basicattack_rock_blast_projectile",
+        "champion_id": "pokemon_moba_coalossal",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/coalossal_basicattack_rock_blast_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/coalossal_basicattack_rock_blast_projectile",
+          "name": "pokemon_moba_stable_coalossal_basicattack_rock_blast_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/coalossal_skill1_tar_shot_wave",
+        "binding_name": "pokemon_moba_stable_coalossal_skill1_tar_shot_wave",
+        "champion_id": "pokemon_moba_coalossal",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/coalossal_skill1_tar_shot_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/coalossal_skill1_tar_shot_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_coalossal_skill1_tar_shot_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/coalossal_skill2_smokescreen_field",
+        "binding_name": "pokemon_moba_stable_coalossal_skill2_smokescreen_field",
+        "champion_id": "pokemon_moba_coalossal",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/coalossal_skill2_smokescreen_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/coalossal_skill2_smokescreen_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_coalossal_skill2_smokescreen_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/coalossal_ult_magma_storm_line",
+        "binding_name": "pokemon_moba_stable_coalossal_ult_magma_storm_line",
+        "champion_id": "pokemon_moba_coalossal",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/coalossal_ult_magma_storm_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/coalossal_ult_magma_storm_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_coalossal_ult_magma_storm_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_comfey": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/comfey_skill2_petal_dance_aura",
+        "binding_name": "pokemon_moba_stable_comfey_skill2_petal_dance_aura",
+        "champion_id": "pokemon_moba_comfey",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/comfey_skill2_petal_dance_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/comfey_skill2_petal_dance_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_comfey_skill2_petal_dance_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_cryogonal": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/cryogonal_basicattack_ice_shard_projectile",
+        "binding_name": "pokemon_moba_stable_cryogonal_basicattack_ice_shard_projectile",
+        "champion_id": "pokemon_moba_cryogonal",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/cryogonal_basicattack_ice_shard_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/cryogonal_basicattack_ice_shard_projectile",
+          "name": "pokemon_moba_stable_cryogonal_basicattack_ice_shard_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/cryogonal_skill1_icy_wind_wave",
+        "binding_name": "pokemon_moba_stable_cryogonal_skill1_icy_wind_wave",
+        "champion_id": "pokemon_moba_cryogonal",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/cryogonal_skill1_icy_wind_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/cryogonal_skill1_icy_wind_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_cryogonal_skill1_icy_wind_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/cryogonal_skill2_freeze_dry_burst",
+        "binding_name": "pokemon_moba_stable_cryogonal_skill2_freeze_dry_burst",
+        "champion_id": "pokemon_moba_cryogonal",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/cryogonal_skill2_freeze_dry_burst#anim.fanim",
+        "tag": "burst",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/cryogonal_skill2_freeze_dry_burst",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_cryogonal_skill2_freeze_dry_burst",
+          "tag": "burst",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/cryogonal_ult_ice_beam_line",
+        "binding_name": "pokemon_moba_stable_cryogonal_ult_ice_beam_line",
+        "champion_id": "pokemon_moba_cryogonal",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/cryogonal_ult_ice_beam_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/cryogonal_ult_ice_beam_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_cryogonal_ult_ice_beam_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_decidueye": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/decidueye_basicattack_leafage_triple_arc",
+        "binding_name": "pokemon_moba_stable_decidueye_basicattack_leafage_triple_arc",
+        "champion_id": "pokemon_moba_decidueye",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/decidueye_basicattack_leafage_triple_arc#anim.fanim",
+        "tag": "triple_arc",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/decidueye_basicattack_leafage_triple_arc",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_decidueye_basicattack_leafage_triple_arc",
+          "tag": "triple_arc",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/decidueye_skill1_phantom_force_impact",
+        "binding_name": "pokemon_moba_stable_decidueye_skill1_phantom_force_impact",
+        "champion_id": "pokemon_moba_decidueye",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/decidueye_skill1_phantom_force_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/decidueye_skill1_phantom_force_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_decidueye_skill1_phantom_force_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/decidueye_skill2_leaf_storm_line",
+        "binding_name": "pokemon_moba_stable_decidueye_skill2_leaf_storm_line",
+        "champion_id": "pokemon_moba_decidueye",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/decidueye_skill2_leaf_storm_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/decidueye_skill2_leaf_storm_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_decidueye_skill2_leaf_storm_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/decidueye_ult_spirit_shackle_projectile",
+        "binding_name": "pokemon_moba_stable_decidueye_ult_spirit_shackle_projectile",
+        "champion_id": "pokemon_moba_decidueye",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/decidueye_ult_spirit_shackle_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/decidueye_ult_spirit_shackle_projectile",
+          "name": "pokemon_moba_stable_decidueye_ult_spirit_shackle_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_dedenne": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dedenne_basicattack_nuzzle_spark",
+        "binding_name": "pokemon_moba_stable_dedenne_basicattack_nuzzle_spark",
+        "champion_id": "pokemon_moba_dedenne",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dedenne_basicattack_nuzzle_spark#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dedenne_basicattack_nuzzle_spark",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dedenne_basicattack_nuzzle_spark",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dedenne_skill1_play_rough_dash",
+        "binding_name": "pokemon_moba_stable_dedenne_skill1_play_rough_dash",
+        "champion_id": "pokemon_moba_dedenne",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dedenne_skill1_play_rough_dash#anim.fanim",
+        "tag": "dash",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dedenne_skill1_play_rough_dash",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dedenne_skill1_play_rough_dash",
+          "tag": "dash",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dedenne_skill2_double_shock_ring",
+        "binding_name": "pokemon_moba_stable_dedenne_skill2_double_shock_ring",
+        "champion_id": "pokemon_moba_dedenne",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dedenne_skill2_double_shock_ring#anim.fanim",
+        "tag": "ring",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dedenne_skill2_double_shock_ring",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dedenne_skill2_double_shock_ring",
+          "tag": "ring",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_chain",
+        "binding_name": "pokemon_moba_stable_dedenne_ult_spark_grid_chain",
+        "champion_id": "pokemon_moba_dedenne",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_chain#anim.fanim",
+        "tag": "chain",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_chain",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dedenne_ult_spark_grid_chain",
+          "tag": "chain",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_consume_heal",
+        "binding_name": "pokemon_moba_stable_dedenne_ult_spark_grid_consume_heal",
+        "champion_id": "pokemon_moba_dedenne",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_consume_heal#anim.fanim",
+        "tag": "consume_heal",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_consume_heal",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dedenne_ult_spark_grid_consume_heal",
+          "tag": "consume_heal",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_nodes",
+        "binding_name": "pokemon_moba_stable_dedenne_ult_spark_grid_nodes",
+        "champion_id": "pokemon_moba_dedenne",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_nodes#anim.fanim",
+        "tag": "grid",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_nodes",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dedenne_ult_spark_grid_nodes",
+          "tag": "grid",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_overload",
+        "binding_name": "pokemon_moba_stable_dedenne_ult_spark_grid_overload",
+        "champion_id": "pokemon_moba_dedenne",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_overload#anim.fanim",
+        "tag": "overload",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_overload",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dedenne_ult_spark_grid_overload",
+          "tag": "overload",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_delibird": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/delibird_present_projectile",
+        "binding_name": "pokemon_moba_stable_delibird_present_projectile",
+        "champion_id": "pokemon_moba_delibird",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/delibird_present_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/delibird_present_projectile",
+          "name": "pokemon_moba_stable_delibird_present_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/delibird_ult_drill_peck_flourish",
+        "binding_name": "pokemon_moba_stable_delibird_ult_drill_peck_flourish",
+        "champion_id": "pokemon_moba_delibird",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/delibird_ult_drill_peck_flourish#anim.fanim",
+        "tag": "flourish",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/delibird_ult_drill_peck_flourish",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_delibird_ult_drill_peck_flourish",
+          "tag": "flourish",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_dragalge": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dragalge_basicattack_acid_spit_projectile",
+        "binding_name": "pokemon_moba_stable_dragalge_basicattack_acid_spit_projectile",
+        "champion_id": "pokemon_moba_dragalge",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/dragalge_basicattack_acid_spit_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/dragalge_basicattack_acid_spit_projectile",
+          "name": "pokemon_moba_stable_dragalge_basicattack_acid_spit_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dragalge_skill1_poison_tail_aura",
+        "binding_name": "pokemon_moba_stable_dragalge_skill1_poison_tail_aura",
+        "champion_id": "pokemon_moba_dragalge",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/dragalge_skill1_poison_tail_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dragalge_skill1_poison_tail_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_dragalge_skill1_poison_tail_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dragalge_skill2_sludge_bomb_splashes",
+        "binding_name": "pokemon_moba_stable_dragalge_skill2_sludge_bomb_splashes",
+        "champion_id": "pokemon_moba_dragalge",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dragalge_skill2_sludge_bomb_splashes#anim.fanim",
+        "tag": "splash",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dragalge_skill2_sludge_bomb_splashes",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dragalge_skill2_sludge_bomb_splashes",
+          "tag": "splash",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dragalge_ult_toxic_chain_tether",
+        "binding_name": "pokemon_moba_stable_dragalge_ult_toxic_chain_tether",
+        "champion_id": "pokemon_moba_dragalge",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dragalge_ult_toxic_chain_tether#anim.fanim",
+        "tag": "tether",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dragalge_ult_toxic_chain_tether",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dragalge_ult_toxic_chain_tether",
+          "tag": "tether",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_dragapult": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dragapult_basicattack_shred_projectile",
+        "binding_name": "pokemon_moba_stable_dragapult_basicattack_shred_projectile",
+        "champion_id": "pokemon_moba_dragapult",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/dragapult_basicattack_shred_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/dragapult_basicattack_shred_projectile",
+          "name": "pokemon_moba_stable_dragapult_basicattack_shred_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dragapult_passive_dragon_launcher_dreepy",
+        "binding_name": "pokemon_moba_stable_dragapult_passive_dragon_launcher_dreepy",
+        "champion_id": "pokemon_moba_dragapult",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/dragapult_passive_dragon_launcher_dreepy#anim.fanim",
+        "tag": "projectile",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dragapult_passive_dragon_launcher_dreepy",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_dragapult_passive_dragon_launcher_dreepy",
+          "tag": "projectile",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dragapult_skill1_dragon_darts_projectile",
+        "binding_name": "pokemon_moba_stable_dragapult_skill1_dragon_darts_projectile",
+        "champion_id": "pokemon_moba_dragapult",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/dragapult_skill1_dragon_darts_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/dragapult_skill1_dragon_darts_projectile",
+          "name": "pokemon_moba_stable_dragapult_skill1_dragon_darts_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dragapult_skill2_diving_swipe_ghost_dash",
+        "binding_name": "pokemon_moba_stable_dragapult_skill2_diving_swipe_ghost_dash",
+        "champion_id": "pokemon_moba_dragapult",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/dragapult_skill2_diving_swipe_ghost_dash#anim.fanim",
+        "tag": "dash",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/dragapult_skill2_diving_swipe_ghost_dash",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_dragapult_skill2_diving_swipe_ghost_dash",
+          "tag": "dash",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/dragapult_ult_spooky_shot_projectile",
+        "binding_name": "pokemon_moba_stable_dragapult_ult_spooky_shot_projectile",
+        "champion_id": "pokemon_moba_dragapult",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/dragapult_ult_spooky_shot_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/dragapult_ult_spooky_shot_projectile",
+          "name": "pokemon_moba_stable_dragapult_ult_spooky_shot_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_drampa": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/drampa_basicattack_twister_line",
+        "binding_name": "pokemon_moba_stable_drampa_basicattack_twister_line",
+        "champion_id": "pokemon_moba_drampa",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/drampa_basicattack_twister_line#anim.fanim",
+        "tag": "projectile",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/drampa_basicattack_twister_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_drampa_basicattack_twister_line",
+          "tag": "projectile",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/drampa_skill1_outrage_aura",
+        "binding_name": "pokemon_moba_stable_drampa_skill1_outrage_aura",
+        "champion_id": "pokemon_moba_drampa",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/drampa_skill1_outrage_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/drampa_skill1_outrage_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_drampa_skill1_outrage_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/drampa_skill2_dragon_energy_burst",
+        "binding_name": "pokemon_moba_stable_drampa_skill2_dragon_energy_burst",
+        "champion_id": "pokemon_moba_drampa",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/drampa_skill2_dragon_energy_burst#anim.fanim",
+        "tag": "burst",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/drampa_skill2_dragon_energy_burst",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_drampa_skill2_dragon_energy_burst",
+          "tag": "burst",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/drampa_ult_draco_meteor_aoe",
+        "binding_name": "pokemon_moba_stable_drampa_ult_draco_meteor_aoe",
+        "champion_id": "pokemon_moba_drampa",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/drampa_ult_draco_meteor_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/drampa_ult_draco_meteor_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_drampa_ult_draco_meteor_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_drednaw": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/drednaw_skill1_rock_tomb_bind",
+        "binding_name": "pokemon_moba_stable_drednaw_skill1_rock_tomb_bind",
+        "champion_id": "pokemon_moba_drednaw",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/drednaw_skill1_rock_tomb_bind#anim.fanim",
+        "tag": "bind",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/drednaw_skill1_rock_tomb_bind",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_drednaw_skill1_rock_tomb_bind",
+          "tag": "bind",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/drednaw_skill2_rock_polish_aura",
+        "binding_name": "pokemon_moba_stable_drednaw_skill2_rock_polish_aura",
+        "champion_id": "pokemon_moba_drednaw",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/drednaw_skill2_rock_polish_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/drednaw_skill2_rock_polish_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_drednaw_skill2_rock_polish_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/drednaw_ult_razor_shell_trail",
+        "binding_name": "pokemon_moba_stable_drednaw_ult_razor_shell_trail",
+        "champion_id": "pokemon_moba_drednaw",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/drednaw_ult_razor_shell_trail#anim.fanim",
+        "tag": "trail",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/drednaw_ult_razor_shell_trail",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_drednaw_ult_razor_shell_trail",
+          "tag": "trail",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_eevee": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/eevee_skill1_babydoll_eyes_charm",
+        "binding_name": "pokemon_moba_stable_eevee_skill1_babydoll_eyes_charm",
+        "champion_id": "pokemon_moba_eevee",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/eevee_skill1_babydoll_eyes_charm#anim.fanim",
+        "tag": "charm",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/eevee_skill1_babydoll_eyes_charm",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_eevee_skill1_babydoll_eyes_charm",
+          "tag": "charm",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/eevee_skill2_wish_heal_ring",
+        "binding_name": "pokemon_moba_stable_eevee_skill2_wish_heal_ring",
+        "champion_id": "pokemon_moba_eevee",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/eevee_skill2_wish_heal_ring#anim.fanim",
+        "tag": "heal",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/eevee_skill2_wish_heal_ring",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_eevee_skill2_wish_heal_ring",
+          "tag": "heal",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/eevee_ult_baton_pass_tether",
+        "binding_name": "pokemon_moba_stable_eevee_ult_baton_pass_tether",
+        "champion_id": "pokemon_moba_eevee",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/eevee_ult_baton_pass_tether#anim.fanim",
+        "tag": "tether",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/eevee_ult_baton_pass_tether",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_eevee_ult_baton_pass_tether",
+          "tag": "tether",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_electrode": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/electrode_ult_self_destruct_explosion_aoe",
+        "binding_name": "pokemon_moba_stable_electrode_ult_self_destruct_explosion_aoe",
+        "champion_id": "pokemon_moba_electrode",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/electrode_ult_self_destruct_explosion_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/electrode_ult_self_destruct_explosion_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_electrode_ult_self_destruct_explosion_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_espeon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/espeon_skill2_confuse_ray_projectile",
+        "binding_name": "pokemon_moba_stable_espeon_skill2_confuse_ray_projectile",
+        "champion_id": "pokemon_moba_espeon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/espeon_skill2_confuse_ray_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/espeon_skill2_confuse_ray_projectile",
+          "name": "pokemon_moba_stable_espeon_skill2_confuse_ray_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/espeon_ult_future_sight_marker",
+        "binding_name": "pokemon_moba_stable_espeon_ult_future_sight_marker",
+        "champion_id": "pokemon_moba_espeon",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/espeon_ult_future_sight_marker#anim.fanim",
+        "tag": "marker",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/espeon_ult_future_sight_marker",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_espeon_ult_future_sight_marker",
+          "tag": "marker",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_feraligatr": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/feraligatr_ult_muddy_water_line",
+        "binding_name": "pokemon_moba_stable_feraligatr_ult_muddy_water_line",
+        "champion_id": "pokemon_moba_feraligatr",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/feraligatr_ult_muddy_water_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/feraligatr_ult_muddy_water_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_feraligatr_ult_muddy_water_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_flareon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/flareon_basic_ember_projectile",
+        "binding_name": "pokemon_moba_stable_flareon_basic_ember_projectile",
+        "champion_id": "pokemon_moba_flareon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/flareon_basic_ember_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/flareon_basic_ember_projectile",
+          "name": "pokemon_moba_stable_flareon_basic_ember_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/flareon_skill1_fire_spin_aura",
+        "binding_name": "pokemon_moba_stable_flareon_skill1_fire_spin_aura",
+        "champion_id": "pokemon_moba_flareon",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/flareon_skill1_fire_spin_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/flareon_skill1_fire_spin_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_flareon_skill1_fire_spin_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/flareon_skill2_flame_wheel_line",
+        "binding_name": "pokemon_moba_stable_flareon_skill2_flame_wheel_line",
+        "champion_id": "pokemon_moba_flareon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/flareon_skill2_flame_wheel_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/flareon_skill2_flame_wheel_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_flareon_skill2_flame_wheel_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/flareon_ult_fire_fang_impact",
+        "binding_name": "pokemon_moba_stable_flareon_ult_fire_fang_impact",
+        "champion_id": "pokemon_moba_flareon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/flareon_ult_fire_fang_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/flareon_ult_fire_fang_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_flareon_ult_fire_fang_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_frosmoth": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/frosmoth_basic_powder_snow_impact",
+        "binding_name": "pokemon_moba_stable_frosmoth_basic_powder_snow_impact",
+        "champion_id": "pokemon_moba_frosmoth",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/frosmoth_basic_powder_snow_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/frosmoth_basic_powder_snow_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_frosmoth_basic_powder_snow_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/frosmoth_skill1_avalanche_wave",
+        "binding_name": "pokemon_moba_stable_frosmoth_skill1_avalanche_wave",
+        "champion_id": "pokemon_moba_frosmoth",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/frosmoth_skill1_avalanche_wave#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/frosmoth_skill1_avalanche_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_frosmoth_skill1_avalanche_wave",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/frosmoth_skill2_sleep_powder_field",
+        "binding_name": "pokemon_moba_stable_frosmoth_skill2_sleep_powder_field",
+        "champion_id": "pokemon_moba_frosmoth",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/frosmoth_skill2_sleep_powder_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/frosmoth_skill2_sleep_powder_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_frosmoth_skill2_sleep_powder_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/frosmoth_ult_silver_wind_wave",
+        "binding_name": "pokemon_moba_stable_frosmoth_ult_silver_wind_wave",
+        "champion_id": "pokemon_moba_frosmoth",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/frosmoth_ult_silver_wind_wave#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/frosmoth_ult_silver_wind_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_frosmoth_ult_silver_wind_wave",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_gallade": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/gallade_ult_psycho_cut_cone",
+        "binding_name": "pokemon_moba_stable_gallade_ult_psycho_cut_cone",
+        "champion_id": "pokemon_moba_gallade",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/gallade_ult_psycho_cut_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/gallade_ult_psycho_cut_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_gallade_ult_psycho_cut_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_garganacl": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/garganacl_passive_salt_cure_patch",
+        "binding_name": "pokemon_moba_stable_garganacl_passive_salt_cure_patch",
+        "champion_id": "pokemon_moba_garganacl",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/garganacl_passive_salt_cure_patch#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/garganacl_passive_salt_cure_patch",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_garganacl_passive_salt_cure_patch",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/garganacl_skill1_land_crush_shockwave",
+        "binding_name": "pokemon_moba_stable_garganacl_skill1_land_crush_shockwave",
+        "champion_id": "pokemon_moba_garganacl",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/garganacl_skill1_land_crush_shockwave#anim.fanim",
+        "tag": "projectile",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/garganacl_skill1_land_crush_shockwave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_garganacl_skill1_land_crush_shockwave",
+          "tag": "projectile",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/garganacl_ult_blessed_salt_spire_ring",
+        "binding_name": "pokemon_moba_stable_garganacl_ult_blessed_salt_spire_ring",
+        "champion_id": "pokemon_moba_garganacl",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/garganacl_ult_blessed_salt_spire_ring#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/garganacl_ult_blessed_salt_spire_ring",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_garganacl_ult_blessed_salt_spire_ring",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_gholdengo": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/gholdengo_basic_flash_cannon_projectile",
+        "binding_name": "pokemon_moba_stable_gholdengo_basic_flash_cannon_projectile",
+        "champion_id": "pokemon_moba_gholdengo",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/gholdengo_basic_flash_cannon_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/gholdengo_basic_flash_cannon_projectile",
+          "name": "pokemon_moba_stable_gholdengo_basic_flash_cannon_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/gholdengo_skill1_ominous_wind_wave",
+        "binding_name": "pokemon_moba_stable_gholdengo_skill1_ominous_wind_wave",
+        "champion_id": "pokemon_moba_gholdengo",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/gholdengo_skill1_ominous_wind_wave#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/gholdengo_skill1_ominous_wind_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_gholdengo_skill1_ominous_wind_wave",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/gholdengo_skill2_metal_sound_aura",
+        "binding_name": "pokemon_moba_stable_gholdengo_skill2_metal_sound_aura",
+        "champion_id": "pokemon_moba_gholdengo",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/gholdengo_skill2_metal_sound_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/gholdengo_skill2_metal_sound_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_gholdengo_skill2_metal_sound_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/gholdengo_ult_make_it_rain_aoe",
+        "binding_name": "pokemon_moba_stable_gholdengo_ult_make_it_rain_aoe",
+        "champion_id": "pokemon_moba_gholdengo",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/gholdengo_ult_make_it_rain_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/gholdengo_ult_make_it_rain_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_gholdengo_ult_make_it_rain_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_glaceon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/glaceon_basic_ice_shard_projectile",
+        "binding_name": "pokemon_moba_stable_glaceon_basic_ice_shard_projectile",
+        "champion_id": "pokemon_moba_glaceon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/glaceon_basic_ice_shard_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/glaceon_basic_ice_shard_projectile",
+          "name": "pokemon_moba_stable_glaceon_basic_ice_shard_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/glaceon_skill1_snowscape_field",
+        "binding_name": "pokemon_moba_stable_glaceon_skill1_snowscape_field",
+        "champion_id": "pokemon_moba_glaceon",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/glaceon_skill1_snowscape_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/glaceon_skill1_snowscape_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_glaceon_skill1_snowscape_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/glaceon_skill2_ice_fang_impact",
+        "binding_name": "pokemon_moba_stable_glaceon_skill2_ice_fang_impact",
+        "champion_id": "pokemon_moba_glaceon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/glaceon_skill2_ice_fang_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/glaceon_skill2_ice_fang_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_glaceon_skill2_ice_fang_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/glaceon_ult_blizzard_field",
+        "binding_name": "pokemon_moba_stable_glaceon_ult_blizzard_field",
+        "champion_id": "pokemon_moba_glaceon",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/glaceon_ult_blizzard_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/glaceon_ult_blizzard_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_glaceon_ult_blizzard_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_goodra": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/goodra_basic_dizzy_punch_impact",
+        "binding_name": "pokemon_moba_stable_goodra_basic_dizzy_punch_impact",
+        "champion_id": "pokemon_moba_goodra",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/goodra_basic_dizzy_punch_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/goodra_basic_dizzy_punch_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_goodra_basic_dizzy_punch_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/goodra_skill1_rain_dance_field",
+        "binding_name": "pokemon_moba_stable_goodra_skill1_rain_dance_field",
+        "champion_id": "pokemon_moba_goodra",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/goodra_skill1_rain_dance_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/goodra_skill1_rain_dance_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_goodra_skill1_rain_dance_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/goodra_skill2_dragon_cheer_aura",
+        "binding_name": "pokemon_moba_stable_goodra_skill2_dragon_cheer_aura",
+        "champion_id": "pokemon_moba_goodra",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/goodra_skill2_dragon_cheer_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/goodra_skill2_dragon_cheer_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_goodra_skill2_dragon_cheer_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/goodra_ult_life_dew_heal_burst",
+        "binding_name": "pokemon_moba_stable_goodra_ult_life_dew_heal_burst",
+        "champion_id": "pokemon_moba_goodra",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/goodra_ult_life_dew_heal_burst#anim.fanim",
+        "tag": "burst",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/goodra_ult_life_dew_heal_burst",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_goodra_ult_life_dew_heal_burst",
+          "tag": "burst",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/goodra_ult_life_dew_pickup",
+        "binding_name": "pokemon_moba_stable_goodra_ult_life_dew_pickup",
+        "champion_id": "pokemon_moba_goodra",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/goodra_ult_life_dew_pickup#anim.fanim",
+        "tag": "pickup",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/goodra_ult_life_dew_pickup",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_goodra_ult_life_dew_pickup",
+          "tag": "pickup",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_greninja": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/greninja_basic_night_slash_impact",
+        "binding_name": "pokemon_moba_stable_greninja_basic_night_slash_impact",
+        "champion_id": "pokemon_moba_greninja",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/greninja_basic_night_slash_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/greninja_basic_night_slash_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_greninja_basic_night_slash_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/greninja_skill1_quick_attack_streak",
+        "binding_name": "pokemon_moba_stable_greninja_skill1_quick_attack_streak",
+        "champion_id": "pokemon_moba_greninja",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/greninja_skill1_quick_attack_streak#anim.fanim",
+        "tag": "streak",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/greninja_skill1_quick_attack_streak",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_greninja_skill1_quick_attack_streak",
+          "tag": "streak",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/greninja_skill2_water_pledge_aoe",
+        "binding_name": "pokemon_moba_stable_greninja_skill2_water_pledge_aoe",
+        "champion_id": "pokemon_moba_greninja",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/greninja_skill2_water_pledge_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/greninja_skill2_water_pledge_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_greninja_skill2_water_pledge_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/greninja_ult_water_shuriken_projectile",
+        "binding_name": "pokemon_moba_stable_greninja_ult_water_shuriken_projectile",
+        "champion_id": "pokemon_moba_greninja",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/greninja_ult_water_shuriken_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/greninja_ult_water_shuriken_projectile",
+          "name": "pokemon_moba_stable_greninja_ult_water_shuriken_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_gyarados": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/gyarados_basic_whirlpool_field",
+        "binding_name": "pokemon_moba_stable_gyarados_basic_whirlpool_field",
+        "champion_id": "pokemon_moba_gyarados",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/gyarados_basic_whirlpool_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/gyarados_basic_whirlpool_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_gyarados_basic_whirlpool_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/gyarados_skill1_scald_projectile",
+        "binding_name": "pokemon_moba_stable_gyarados_skill1_scald_projectile",
+        "champion_id": "pokemon_moba_gyarados",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/gyarados_skill1_scald_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/gyarados_skill1_scald_projectile",
+          "name": "pokemon_moba_stable_gyarados_skill1_scald_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/gyarados_skill2_hurricane_wave",
+        "binding_name": "pokemon_moba_stable_gyarados_skill2_hurricane_wave",
+        "champion_id": "pokemon_moba_gyarados",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/gyarados_skill2_hurricane_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/gyarados_skill2_hurricane_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_gyarados_skill2_hurricane_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/gyarados_ult_hyper_beam_line",
+        "binding_name": "pokemon_moba_stable_gyarados_ult_hyper_beam_line",
+        "champion_id": "pokemon_moba_gyarados",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/gyarados_ult_hyper_beam_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/gyarados_ult_hyper_beam_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_gyarados_ult_hyper_beam_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_hawlucha": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/hawlucha_skill1_air_slash_wave",
+        "binding_name": "pokemon_moba_stable_hawlucha_skill1_air_slash_wave",
+        "champion_id": "pokemon_moba_hawlucha",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/hawlucha_skill1_air_slash_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/hawlucha_skill1_air_slash_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_hawlucha_skill1_air_slash_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_heliolisk": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/heliolisk_passive_discharge_aura",
+        "binding_name": "pokemon_moba_stable_heliolisk_passive_discharge_aura",
+        "champion_id": "pokemon_moba_heliolisk",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/heliolisk_passive_discharge_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/heliolisk_passive_discharge_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_heliolisk_passive_discharge_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/heliolisk_skill2_shed_tail_decoy",
+        "binding_name": "pokemon_moba_stable_heliolisk_skill2_shed_tail_decoy",
+        "champion_id": "pokemon_moba_heliolisk",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/heliolisk_skill2_shed_tail_decoy#anim.fanim",
+        "tag": "decoy",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/heliolisk_skill2_shed_tail_decoy",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_heliolisk_skill2_shed_tail_decoy",
+          "tag": "decoy",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_houndoom": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/houndoom_basic_ember_projectile",
+        "binding_name": "pokemon_moba_stable_houndoom_basic_ember_projectile",
+        "champion_id": "pokemon_moba_houndoom",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/houndoom_basic_ember_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/houndoom_basic_ember_projectile",
+          "name": "pokemon_moba_stable_houndoom_basic_ember_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/houndoom_skill1_foul_play_projectile",
+        "binding_name": "pokemon_moba_stable_houndoom_skill1_foul_play_projectile",
+        "champion_id": "pokemon_moba_houndoom",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/houndoom_skill1_foul_play_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/houndoom_skill1_foul_play_projectile",
+          "name": "pokemon_moba_stable_houndoom_skill1_foul_play_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/houndoom_skill2_howl_debuff_pulse",
+        "binding_name": "pokemon_moba_stable_houndoom_skill2_howl_debuff_pulse",
+        "champion_id": "pokemon_moba_houndoom",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/houndoom_skill2_howl_debuff_pulse#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/houndoom_skill2_howl_debuff_pulse",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_houndoom_skill2_howl_debuff_pulse",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/houndoom_ult_inferno_field",
+        "binding_name": "pokemon_moba_stable_houndoom_ult_inferno_field",
+        "champion_id": "pokemon_moba_houndoom",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/houndoom_ult_inferno_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/houndoom_ult_inferno_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_houndoom_ult_inferno_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_inteleon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/inteleon_basic_water_gun_projectile",
+        "binding_name": "pokemon_moba_stable_inteleon_basic_water_gun_projectile",
+        "champion_id": "pokemon_moba_inteleon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/inteleon_basic_water_gun_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/inteleon_basic_water_gun_projectile",
+          "name": "pokemon_moba_stable_inteleon_basic_water_gun_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/inteleon_skill1_rain_dance_aura",
+        "binding_name": "pokemon_moba_stable_inteleon_skill1_rain_dance_aura",
+        "champion_id": "pokemon_moba_inteleon",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/inteleon_skill1_rain_dance_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/inteleon_skill1_rain_dance_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_inteleon_skill1_rain_dance_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/inteleon_skill2_soak_field",
+        "binding_name": "pokemon_moba_stable_inteleon_skill2_soak_field",
+        "champion_id": "pokemon_moba_inteleon",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/inteleon_skill2_soak_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/inteleon_skill2_soak_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_inteleon_skill2_soak_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/inteleon_ult_snipe_shot_line",
+        "binding_name": "pokemon_moba_stable_inteleon_ult_snipe_shot_line",
+        "champion_id": "pokemon_moba_inteleon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/inteleon_ult_snipe_shot_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/inteleon_ult_snipe_shot_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_inteleon_ult_snipe_shot_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_jolteon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/jolteon_basic_pin_missile_projectile",
+        "binding_name": "pokemon_moba_stable_jolteon_basic_pin_missile_projectile",
+        "champion_id": "pokemon_moba_jolteon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/jolteon_basic_pin_missile_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/jolteon_basic_pin_missile_projectile",
+          "name": "pokemon_moba_stable_jolteon_basic_pin_missile_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/jolteon_skill1_sand_attack_cloud",
+        "binding_name": "pokemon_moba_stable_jolteon_skill1_sand_attack_cloud",
+        "champion_id": "pokemon_moba_jolteon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/jolteon_skill1_sand_attack_cloud#anim.fanim",
+        "tag": "cloud",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/jolteon_skill1_sand_attack_cloud",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_jolteon_skill1_sand_attack_cloud",
+          "tag": "cloud",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/jolteon_skill2_thunder_shock_projectile",
+        "binding_name": "pokemon_moba_stable_jolteon_skill2_thunder_shock_projectile",
+        "champion_id": "pokemon_moba_jolteon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/jolteon_skill2_thunder_shock_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/jolteon_skill2_thunder_shock_projectile",
+          "name": "pokemon_moba_stable_jolteon_skill2_thunder_shock_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/jolteon_ult_thunder_fang_impact",
+        "binding_name": "pokemon_moba_stable_jolteon_ult_thunder_fang_impact",
+        "champion_id": "pokemon_moba_jolteon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/jolteon_ult_thunder_fang_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/jolteon_ult_thunder_fang_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_jolteon_ult_thunder_fang_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_kecleon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kecleon_skill2_chromashift_pulse",
+        "binding_name": "pokemon_moba_stable_kecleon_skill2_chromashift_pulse",
+        "champion_id": "pokemon_moba_kecleon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/kecleon_skill2_chromashift_pulse#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/kecleon_skill2_chromashift_pulse",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_kecleon_skill2_chromashift_pulse",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kecleon_ult_colorful_whip_cones",
+        "binding_name": "pokemon_moba_stable_kecleon_ult_colorful_whip_cones",
+        "champion_id": "pokemon_moba_kecleon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/kecleon_ult_colorful_whip_cones#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/kecleon_ult_colorful_whip_cones",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_kecleon_ult_colorful_whip_cones",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_kilowattrel": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kilowattrel_basicattack_spark_projectile",
+        "binding_name": "pokemon_moba_stable_kilowattrel_basicattack_spark_projectile",
+        "champion_id": "pokemon_moba_kilowattrel",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/kilowattrel_basicattack_spark_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/kilowattrel_basicattack_spark_projectile",
+          "name": "pokemon_moba_stable_kilowattrel_basicattack_spark_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kilowattrel_skill1_electro_ball_projectile",
+        "binding_name": "pokemon_moba_stable_kilowattrel_skill1_electro_ball_projectile",
+        "champion_id": "pokemon_moba_kilowattrel",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/kilowattrel_skill1_electro_ball_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/kilowattrel_skill1_electro_ball_projectile",
+          "name": "pokemon_moba_stable_kilowattrel_skill1_electro_ball_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kilowattrel_skill2_gust_line",
+        "binding_name": "pokemon_moba_stable_kilowattrel_skill2_gust_line",
+        "champion_id": "pokemon_moba_kilowattrel",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/kilowattrel_skill2_gust_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/kilowattrel_skill2_gust_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_kilowattrel_skill2_gust_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kilowattrel_ult_charge_aura",
+        "binding_name": "pokemon_moba_stable_kilowattrel_ult_charge_aura",
+        "champion_id": "pokemon_moba_kilowattrel",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/kilowattrel_ult_charge_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/kilowattrel_ult_charge_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_kilowattrel_ult_charge_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_kingdra": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kingdra_basicattack_scale_shot_projectile",
+        "binding_name": "pokemon_moba_stable_kingdra_basicattack_scale_shot_projectile",
+        "champion_id": "pokemon_moba_kingdra",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/kingdra_basicattack_scale_shot_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/kingdra_basicattack_scale_shot_projectile",
+          "name": "pokemon_moba_stable_kingdra_basicattack_scale_shot_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kingdra_skill1_waterfall_aoe",
+        "binding_name": "pokemon_moba_stable_kingdra_skill1_waterfall_aoe",
+        "champion_id": "pokemon_moba_kingdra",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/kingdra_skill1_waterfall_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/kingdra_skill1_waterfall_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_kingdra_skill1_waterfall_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kingdra_skill2_dragon_dance_aura",
+        "binding_name": "pokemon_moba_stable_kingdra_skill2_dragon_dance_aura",
+        "champion_id": "pokemon_moba_kingdra",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/kingdra_skill2_dragon_dance_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/kingdra_skill2_dragon_dance_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_kingdra_skill2_dragon_dance_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kingdra_ult_dragon_energy_projectile",
+        "binding_name": "pokemon_moba_stable_kingdra_ult_dragon_energy_projectile",
+        "champion_id": "pokemon_moba_kingdra",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/kingdra_ult_dragon_energy_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/kingdra_ult_dragon_energy_projectile",
+          "name": "pokemon_moba_stable_kingdra_ult_dragon_energy_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_kricketune": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/kricketune_skill1_sticky_web_deployable",
+        "binding_name": "pokemon_moba_stable_kricketune_skill1_sticky_web_deployable",
+        "champion_id": "pokemon_moba_kricketune",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/kricketune_skill1_sticky_web_deployable#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/kricketune_skill1_sticky_web_deployable",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_kricketune_skill1_sticky_web_deployable",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_leafeon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/leafeon_basicattack_razor_leaf_projectile",
+        "binding_name": "pokemon_moba_stable_leafeon_basicattack_razor_leaf_projectile",
+        "champion_id": "pokemon_moba_leafeon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/leafeon_basicattack_razor_leaf_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/leafeon_basicattack_razor_leaf_projectile",
+          "name": "pokemon_moba_stable_leafeon_basicattack_razor_leaf_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/leafeon_skill1_magical_leaf_projectile",
+        "binding_name": "pokemon_moba_stable_leafeon_skill1_magical_leaf_projectile",
+        "champion_id": "pokemon_moba_leafeon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/leafeon_skill1_magical_leaf_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/leafeon_skill1_magical_leaf_projectile",
+          "name": "pokemon_moba_stable_leafeon_skill1_magical_leaf_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/leafeon_skill2_leaf_blade_slash",
+        "binding_name": "pokemon_moba_stable_leafeon_skill2_leaf_blade_slash",
+        "champion_id": "pokemon_moba_leafeon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/leafeon_skill2_leaf_blade_slash#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/leafeon_skill2_leaf_blade_slash",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_leafeon_skill2_leaf_blade_slash",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/leafeon_ult_leaf_storm_aoe",
+        "binding_name": "pokemon_moba_stable_leafeon_ult_leaf_storm_aoe",
+        "champion_id": "pokemon_moba_leafeon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/leafeon_ult_leaf_storm_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/leafeon_ult_leaf_storm_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_leafeon_ult_leaf_storm_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_ludicolo": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ludicolo_basicattack_facade_impact",
+        "binding_name": "pokemon_moba_stable_ludicolo_basicattack_facade_impact",
+        "champion_id": "pokemon_moba_ludicolo",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/ludicolo_basicattack_facade_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ludicolo_basicattack_facade_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ludicolo_basicattack_facade_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ludicolo_passive_rain_dish_aura",
+        "binding_name": "pokemon_moba_stable_ludicolo_passive_rain_dish_aura",
+        "champion_id": "pokemon_moba_ludicolo",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/ludicolo_passive_rain_dish_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ludicolo_passive_rain_dish_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_ludicolo_passive_rain_dish_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ludicolo_skill1_teeter_dance_cone",
+        "binding_name": "pokemon_moba_stable_ludicolo_skill1_teeter_dance_cone",
+        "champion_id": "pokemon_moba_ludicolo",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/ludicolo_skill1_teeter_dance_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ludicolo_skill1_teeter_dance_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ludicolo_skill1_teeter_dance_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ludicolo_skill2_grass_whistle_aura",
+        "binding_name": "pokemon_moba_stable_ludicolo_skill2_grass_whistle_aura",
+        "champion_id": "pokemon_moba_ludicolo",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/ludicolo_skill2_grass_whistle_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ludicolo_skill2_grass_whistle_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_ludicolo_skill2_grass_whistle_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ludicolo_ult_ivy_cudgel_impact",
+        "binding_name": "pokemon_moba_stable_ludicolo_ult_ivy_cudgel_impact",
+        "champion_id": "pokemon_moba_ludicolo",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/ludicolo_ult_ivy_cudgel_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ludicolo_ult_ivy_cudgel_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ludicolo_ult_ivy_cudgel_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_magmortar": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/magmortar_basicattack_lava_plume_projectile",
+        "binding_name": "pokemon_moba_stable_magmortar_basicattack_lava_plume_projectile",
+        "champion_id": "pokemon_moba_magmortar",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/magmortar_basicattack_lava_plume_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/magmortar_basicattack_lava_plume_projectile",
+          "name": "pokemon_moba_stable_magmortar_basicattack_lava_plume_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/magmortar_skill1_temper_flare_projectile_splash",
+        "binding_name": "pokemon_moba_stable_magmortar_skill1_temper_flare_projectile_splash",
+        "champion_id": "pokemon_moba_magmortar",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/magmortar_skill1_temper_flare_projectile_splash#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/magmortar_skill1_temper_flare_projectile_splash",
+          "name": "pokemon_moba_stable_magmortar_skill1_temper_flare_projectile_splash",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/magmortar_skill2_heat_wave_ring",
+        "binding_name": "pokemon_moba_stable_magmortar_skill2_heat_wave_ring",
+        "champion_id": "pokemon_moba_magmortar",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/magmortar_skill2_heat_wave_ring#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/magmortar_skill2_heat_wave_ring",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_magmortar_skill2_heat_wave_ring",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/magmortar_ult_eruption_cannonball",
+        "binding_name": "pokemon_moba_stable_magmortar_ult_eruption_cannonball",
+        "champion_id": "pokemon_moba_magmortar",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/magmortar_ult_eruption_cannonball#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/magmortar_ult_eruption_cannonball",
+          "name": "pokemon_moba_stable_magmortar_ult_eruption_cannonball",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_mantine": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/mantine_basicattack_bubble_projectile",
+        "binding_name": "pokemon_moba_stable_mantine_basicattack_bubble_projectile",
+        "champion_id": "pokemon_moba_mantine",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/mantine_basicattack_bubble_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/mantine_basicattack_bubble_projectile",
+          "name": "pokemon_moba_stable_mantine_basicattack_bubble_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/mantine_skill1_brine_water_field",
+        "binding_name": "pokemon_moba_stable_mantine_skill1_brine_water_field",
+        "champion_id": "pokemon_moba_mantine",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/mantine_skill1_brine_water_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/mantine_skill1_brine_water_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_mantine_skill1_brine_water_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/mantine_skill2_dive_splash",
+        "binding_name": "pokemon_moba_stable_mantine_skill2_dive_splash",
+        "champion_id": "pokemon_moba_mantine",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/mantine_skill2_dive_splash#anim.fanim",
+        "tag": "splash",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/mantine_skill2_dive_splash",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_mantine_skill2_dive_splash",
+          "tag": "splash",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/mantine_ult_surf_wave",
+        "binding_name": "pokemon_moba_stable_mantine_ult_surf_wave",
+        "champion_id": "pokemon_moba_mantine",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/mantine_ult_surf_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/mantine_ult_surf_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_mantine_ult_surf_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_marowak": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/marowak_basicattack_bonemerang_projectile",
+        "binding_name": "pokemon_moba_stable_marowak_basicattack_bonemerang_projectile",
+        "champion_id": "pokemon_moba_marowak",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/marowak_basicattack_bonemerang_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/marowak_basicattack_bonemerang_projectile",
+          "name": "pokemon_moba_stable_marowak_basicattack_bonemerang_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/marowak_ult_bone_windmill_aura",
+        "binding_name": "pokemon_moba_stable_marowak_ult_bone_windmill_aura",
+        "champion_id": "pokemon_moba_marowak",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/marowak_ult_bone_windmill_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/marowak_ult_bone_windmill_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_marowak_ult_bone_windmill_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_missingno": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/missingno_basicattack_glitch_data_projectile",
+        "binding_name": "pokemon_moba_stable_missingno_basicattack_glitch_data_projectile",
+        "champion_id": "pokemon_moba_missingno",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/missingno_basicattack_glitch_data_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/missingno_basicattack_glitch_data_projectile",
+          "name": "pokemon_moba_stable_missingno_basicattack_glitch_data_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/missingno_basicattack_stray_glitch_line",
+        "binding_name": "pokemon_moba_stable_missingno_basicattack_stray_glitch_line",
+        "champion_id": "pokemon_moba_missingno",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/missingno_basicattack_stray_glitch_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/missingno_basicattack_stray_glitch_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_missingno_basicattack_stray_glitch_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/missingno_skill1_random_status_corruption",
+        "binding_name": "pokemon_moba_stable_missingno_skill1_random_status_corruption",
+        "champion_id": "pokemon_moba_missingno",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/missingno_skill1_random_status_corruption#anim.fanim",
+        "tag": "burst",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/missingno_skill1_random_status_corruption",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_missingno_skill1_random_status_corruption",
+          "tag": "burst",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/missingno_skill2_chain_spark_arc",
+        "binding_name": "pokemon_moba_stable_missingno_skill2_chain_spark_arc",
+        "champion_id": "pokemon_moba_missingno",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/missingno_skill2_chain_spark_arc#anim.fanim",
+        "tag": "chain",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/missingno_skill2_chain_spark_arc",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_missingno_skill2_chain_spark_arc",
+          "tag": "chain",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/missingno_skill2_glitch_storm_aura",
+        "binding_name": "pokemon_moba_stable_missingno_skill2_glitch_storm_aura",
+        "champion_id": "pokemon_moba_missingno",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/missingno_skill2_glitch_storm_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/missingno_skill2_glitch_storm_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_missingno_skill2_glitch_storm_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/missingno_ult_trick_room_field",
+        "binding_name": "pokemon_moba_stable_missingno_ult_trick_room_field",
+        "champion_id": "pokemon_moba_missingno",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/missingno_ult_trick_room_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/missingno_ult_trick_room_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_missingno_ult_trick_room_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_noivern": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/noivern_basicattack_screech_soundwave",
+        "binding_name": "pokemon_moba_stable_noivern_basicattack_screech_soundwave",
+        "champion_id": "pokemon_moba_noivern",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/noivern_basicattack_screech_soundwave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/noivern_basicattack_screech_soundwave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_noivern_basicattack_screech_soundwave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/noivern_skill1_whirlwind_line",
+        "binding_name": "pokemon_moba_stable_noivern_skill1_whirlwind_line",
+        "champion_id": "pokemon_moba_noivern",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/noivern_skill1_whirlwind_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/noivern_skill1_whirlwind_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_noivern_skill1_whirlwind_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/noivern_skill2_tailwind_line",
+        "binding_name": "pokemon_moba_stable_noivern_skill2_tailwind_line",
+        "champion_id": "pokemon_moba_noivern",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/noivern_skill2_tailwind_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/noivern_skill2_tailwind_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_noivern_skill2_tailwind_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/noivern_ult_dragon_pulse_projectile",
+        "binding_name": "pokemon_moba_stable_noivern_ult_dragon_pulse_projectile",
+        "champion_id": "pokemon_moba_noivern",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/noivern_ult_dragon_pulse_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/noivern_ult_dragon_pulse_projectile",
+          "name": "pokemon_moba_stable_noivern_ult_dragon_pulse_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_octillery": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/octillery_basicattack_bullet_seed_projectile",
+        "binding_name": "pokemon_moba_stable_octillery_basicattack_bullet_seed_projectile",
+        "champion_id": "pokemon_moba_octillery",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/octillery_basicattack_bullet_seed_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/octillery_basicattack_bullet_seed_projectile",
+          "name": "pokemon_moba_stable_octillery_basicattack_bullet_seed_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/octillery_skill1_lock_on_reticle",
+        "binding_name": "pokemon_moba_stable_octillery_skill1_lock_on_reticle",
+        "champion_id": "pokemon_moba_octillery",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/octillery_skill1_lock_on_reticle#anim.fanim",
+        "tag": "reticle",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/octillery_skill1_lock_on_reticle",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_octillery_skill1_lock_on_reticle",
+          "tag": "reticle",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/octillery_skill2_bouncy_bubble_path",
+        "binding_name": "pokemon_moba_stable_octillery_skill2_bouncy_bubble_path",
+        "champion_id": "pokemon_moba_octillery",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/octillery_skill2_bouncy_bubble_path#anim.fanim",
+        "tag": "bounce",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/octillery_skill2_bouncy_bubble_path",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_octillery_skill2_bouncy_bubble_path",
+          "tag": "bounce",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/octillery_ult_octazooka_projectile",
+        "binding_name": "pokemon_moba_stable_octillery_ult_octazooka_projectile",
+        "champion_id": "pokemon_moba_octillery",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/octillery_ult_octazooka_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/octillery_ult_octazooka_projectile",
+          "name": "pokemon_moba_stable_octillery_ult_octazooka_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_oranguru": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/oranguru_basicattack_simple_beam_projectile",
+        "binding_name": "pokemon_moba_stable_oranguru_basicattack_simple_beam_projectile",
+        "champion_id": "pokemon_moba_oranguru",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/oranguru_basicattack_simple_beam_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/oranguru_basicattack_simple_beam_projectile",
+          "name": "pokemon_moba_stable_oranguru_basicattack_simple_beam_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/oranguru_skill1_nasty_plot_mark",
+        "binding_name": "pokemon_moba_stable_oranguru_skill1_nasty_plot_mark",
+        "champion_id": "pokemon_moba_oranguru",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/oranguru_skill1_nasty_plot_mark#anim.fanim",
+        "tag": "mark",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/oranguru_skill1_nasty_plot_mark",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_oranguru_skill1_nasty_plot_mark",
+          "tag": "mark",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/oranguru_skill2_stored_power_burst",
+        "binding_name": "pokemon_moba_stable_oranguru_skill2_stored_power_burst",
+        "champion_id": "pokemon_moba_oranguru",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/oranguru_skill2_stored_power_burst#anim.fanim",
+        "tag": "burst",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/oranguru_skill2_stored_power_burst",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_oranguru_skill2_stored_power_burst",
+          "tag": "burst",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/oranguru_ult_instruct_command",
+        "binding_name": "pokemon_moba_stable_oranguru_ult_instruct_command",
+        "champion_id": "pokemon_moba_oranguru",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/oranguru_ult_instruct_command#anim.fanim",
+        "tag": "command",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/oranguru_ult_instruct_command",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_oranguru_ult_instruct_command",
+          "tag": "command",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_orbeetle": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/orbeetle_skill2_infestation_wave",
+        "binding_name": "pokemon_moba_stable_orbeetle_skill2_infestation_wave",
+        "champion_id": "pokemon_moba_orbeetle",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/orbeetle_skill2_infestation_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/orbeetle_skill2_infestation_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_orbeetle_skill2_infestation_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/orbeetle_ult_psyshock_cone",
+        "binding_name": "pokemon_moba_stable_orbeetle_ult_psyshock_cone",
+        "champion_id": "pokemon_moba_orbeetle",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/orbeetle_ult_psyshock_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/orbeetle_ult_psyshock_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_orbeetle_ult_psyshock_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_passimian": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/passimian_basicattack_fling_melon_projectile",
+        "binding_name": "pokemon_moba_stable_passimian_basicattack_fling_melon_projectile",
+        "champion_id": "pokemon_moba_passimian",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/passimian_basicattack_fling_melon_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/passimian_basicattack_fling_melon_projectile",
+          "name": "pokemon_moba_stable_passimian_basicattack_fling_melon_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/passimian_ult_focus_blast_projectile",
+        "binding_name": "pokemon_moba_stable_passimian_ult_focus_blast_projectile",
+        "champion_id": "pokemon_moba_passimian",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/passimian_ult_focus_blast_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/passimian_ult_focus_blast_projectile",
+          "name": "pokemon_moba_stable_passimian_ult_focus_blast_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_pikachu": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/pikachu_basicattack_spark_projectile",
+        "binding_name": "pokemon_moba_stable_pikachu_basicattack_spark_projectile",
+        "champion_id": "pokemon_moba_pikachu",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/pikachu_basicattack_spark_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/pikachu_basicattack_spark_projectile",
+          "name": "pokemon_moba_stable_pikachu_basicattack_spark_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/pikachu_skill1_volt_tackle_dash_trail",
+        "binding_name": "pokemon_moba_stable_pikachu_skill1_volt_tackle_dash_trail",
+        "champion_id": "pokemon_moba_pikachu",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/pikachu_skill1_volt_tackle_dash_trail#anim.fanim",
+        "tag": "trail",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/pikachu_skill1_volt_tackle_dash_trail",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_pikachu_skill1_volt_tackle_dash_trail",
+          "tag": "trail",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/pikachu_skill2_thunder_wave_wall",
+        "binding_name": "pokemon_moba_stable_pikachu_skill2_thunder_wave_wall",
+        "champion_id": "pokemon_moba_pikachu",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/pikachu_skill2_thunder_wave_wall#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/pikachu_skill2_thunder_wave_wall",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_pikachu_skill2_thunder_wave_wall",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/pikachu_ult_thunder_strike_aoe",
+        "binding_name": "pokemon_moba_stable_pikachu_ult_thunder_strike_aoe",
+        "champion_id": "pokemon_moba_pikachu",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/pikachu_ult_thunder_strike_aoe#anim.fanim",
+        "tag": "strike",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/pikachu_ult_thunder_strike_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_pikachu_ult_thunder_strike_aoe",
+          "tag": "strike",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_porygonz": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/porygonz_basicattack_conversion_projectile",
+        "binding_name": "pokemon_moba_stable_porygonz_basicattack_conversion_projectile",
+        "champion_id": "pokemon_moba_porygonz",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/porygonz_basicattack_conversion_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/porygonz_basicattack_conversion_projectile",
+          "name": "pokemon_moba_stable_porygonz_basicattack_conversion_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/porygonz_skill1_conversion2_projectile",
+        "binding_name": "pokemon_moba_stable_porygonz_skill1_conversion2_projectile",
+        "champion_id": "pokemon_moba_porygonz",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/porygonz_skill1_conversion2_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/porygonz_skill1_conversion2_projectile",
+          "name": "pokemon_moba_stable_porygonz_skill1_conversion2_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/porygonz_skill2_recover_aura",
+        "binding_name": "pokemon_moba_stable_porygonz_skill2_recover_aura",
+        "champion_id": "pokemon_moba_porygonz",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/porygonz_skill2_recover_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/porygonz_skill2_recover_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_porygonz_skill2_recover_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/porygonz_ult_tri_attack_line",
+        "binding_name": "pokemon_moba_stable_porygonz_ult_tri_attack_line",
+        "champion_id": "pokemon_moba_porygonz",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/porygonz_ult_tri_attack_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/porygonz_ult_tri_attack_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_porygonz_ult_tri_attack_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_quaquaval": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/quaquaval_basicattack_hydro_kick_splash",
+        "binding_name": "pokemon_moba_stable_quaquaval_basicattack_hydro_kick_splash",
+        "champion_id": "pokemon_moba_quaquaval",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/quaquaval_basicattack_hydro_kick_splash#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/quaquaval_basicattack_hydro_kick_splash",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_quaquaval_basicattack_hydro_kick_splash",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_empowered_trail",
+        "binding_name": "pokemon_moba_stable_quaquaval_passive_aqua_step_empowered_trail",
+        "champion_id": "pokemon_moba_quaquaval",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_empowered_trail#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_empowered_trail",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_quaquaval_passive_aqua_step_empowered_trail",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_trail",
+        "binding_name": "pokemon_moba_stable_quaquaval_passive_aqua_step_trail",
+        "champion_id": "pokemon_moba_quaquaval",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_trail#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_trail",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_quaquaval_passive_aqua_step_trail",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/quaquaval_skill1_spiral_shot_projectile",
+        "binding_name": "pokemon_moba_stable_quaquaval_skill1_spiral_shot_projectile",
+        "champion_id": "pokemon_moba_quaquaval",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/quaquaval_skill1_spiral_shot_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/quaquaval_skill1_spiral_shot_projectile",
+          "name": "pokemon_moba_stable_quaquaval_skill1_spiral_shot_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/quaquaval_skill2_up_tempo_impact",
+        "binding_name": "pokemon_moba_stable_quaquaval_skill2_up_tempo_impact",
+        "champion_id": "pokemon_moba_quaquaval",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/quaquaval_skill2_up_tempo_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/quaquaval_skill2_up_tempo_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_quaquaval_skill2_up_tempo_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_ribombee": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ribombee_basicattack_pollen_puff_projectile",
+        "binding_name": "pokemon_moba_stable_ribombee_basicattack_pollen_puff_projectile",
+        "champion_id": "pokemon_moba_ribombee",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/ribombee_basicattack_pollen_puff_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/ribombee_basicattack_pollen_puff_projectile",
+          "name": "pokemon_moba_stable_ribombee_basicattack_pollen_puff_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ribombee_skill1_draining_kiss_line",
+        "binding_name": "pokemon_moba_stable_ribombee_skill1_draining_kiss_line",
+        "champion_id": "pokemon_moba_ribombee",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/ribombee_skill1_draining_kiss_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ribombee_skill1_draining_kiss_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ribombee_skill1_draining_kiss_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ribombee_skill2_u_turn_trail",
+        "binding_name": "pokemon_moba_stable_ribombee_skill2_u_turn_trail",
+        "champion_id": "pokemon_moba_ribombee",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/ribombee_skill2_u_turn_trail#anim.fanim",
+        "tag": "trail",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ribombee_skill2_u_turn_trail",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ribombee_skill2_u_turn_trail",
+          "tag": "trail",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ribombee_ult_alluring_voice_aura",
+        "binding_name": "pokemon_moba_stable_ribombee_ult_alluring_voice_aura",
+        "champion_id": "pokemon_moba_ribombee",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/ribombee_ult_alluring_voice_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ribombee_ult_alluring_voice_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_ribombee_ult_alluring_voice_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_rillaboom": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/rillaboom_skill1_drum_beating_aura",
+        "binding_name": "pokemon_moba_stable_rillaboom_skill1_drum_beating_aura",
+        "champion_id": "pokemon_moba_rillaboom",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/rillaboom_skill1_drum_beating_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/rillaboom_skill1_drum_beating_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_rillaboom_skill1_drum_beating_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/rillaboom_skill2_drum_roll_aura",
+        "binding_name": "pokemon_moba_stable_rillaboom_skill2_drum_roll_aura",
+        "champion_id": "pokemon_moba_rillaboom",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/rillaboom_skill2_drum_roll_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/rillaboom_skill2_drum_roll_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_rillaboom_skill2_drum_roll_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/rillaboom_ult_grassy_surge_wave",
+        "binding_name": "pokemon_moba_stable_rillaboom_ult_grassy_surge_wave",
+        "champion_id": "pokemon_moba_rillaboom",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/rillaboom_ult_grassy_surge_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/rillaboom_ult_grassy_surge_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_rillaboom_ult_grassy_surge_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_scizor": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/scizor_skill1_swords_dance_aura",
+        "binding_name": "pokemon_moba_stable_scizor_skill1_swords_dance_aura",
+        "champion_id": "pokemon_moba_scizor",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/scizor_skill1_swords_dance_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/scizor_skill1_swords_dance_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_scizor_skill1_swords_dance_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_shedinja": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/shedinja_basicattack_shadow_force_projectile",
+        "binding_name": "pokemon_moba_stable_shedinja_basicattack_shadow_force_projectile",
+        "champion_id": "pokemon_moba_shedinja",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/shedinja_basicattack_shadow_force_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/shedinja_basicattack_shadow_force_projectile",
+          "name": "pokemon_moba_stable_shedinja_basicattack_shadow_force_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/shedinja_passive_wonder_guard_chits",
+        "binding_name": "pokemon_moba_stable_shedinja_passive_wonder_guard_chits",
+        "champion_id": "pokemon_moba_shedinja",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/shedinja_passive_wonder_guard_chits#anim.fanim",
+        "tag": "chits_5",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/shedinja_passive_wonder_guard_chits",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_shedinja_passive_wonder_guard_chits",
+          "tag": "chits_5",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/shedinja_skill1_skitter_smack_cone",
+        "binding_name": "pokemon_moba_stable_shedinja_skill1_skitter_smack_cone",
+        "champion_id": "pokemon_moba_shedinja",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/shedinja_skill1_skitter_smack_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/shedinja_skill1_skitter_smack_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_shedinja_skill1_skitter_smack_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/shedinja_skill2_grudge_projectile",
+        "binding_name": "pokemon_moba_stable_shedinja_skill2_grudge_projectile",
+        "champion_id": "pokemon_moba_shedinja",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/shedinja_skill2_grudge_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/shedinja_skill2_grudge_projectile",
+          "name": "pokemon_moba_stable_shedinja_skill2_grudge_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/shedinja_ult_astral_barrage_wave",
+        "binding_name": "pokemon_moba_stable_shedinja_ult_astral_barrage_wave",
+        "champion_id": "pokemon_moba_shedinja",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/shedinja_ult_astral_barrage_wave#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/shedinja_ult_astral_barrage_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_shedinja_ult_astral_barrage_wave",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_shiftry": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/shiftry_skill1_fan_away_cone",
+        "binding_name": "pokemon_moba_stable_shiftry_skill1_fan_away_cone",
+        "champion_id": "pokemon_moba_shiftry",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/shiftry_skill1_fan_away_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/shiftry_skill1_fan_away_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_shiftry_skill1_fan_away_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/shiftry_ult_fan_tornado_field",
+        "binding_name": "pokemon_moba_stable_shiftry_ult_fan_tornado_field",
+        "champion_id": "pokemon_moba_shiftry",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/shiftry_ult_fan_tornado_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/shiftry_ult_fan_tornado_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_shiftry_ult_fan_tornado_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_sigilyph": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sigilyph_basicattack_psychic_sphere_projectile",
+        "binding_name": "pokemon_moba_stable_sigilyph_basicattack_psychic_sphere_projectile",
+        "champion_id": "pokemon_moba_sigilyph",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/sigilyph_basicattack_psychic_sphere_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/sigilyph_basicattack_psychic_sphere_projectile",
+          "name": "pokemon_moba_stable_sigilyph_basicattack_psychic_sphere_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sigilyph_passive_glypher_explosion_aoe",
+        "binding_name": "pokemon_moba_stable_sigilyph_passive_glypher_explosion_aoe",
+        "champion_id": "pokemon_moba_sigilyph",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/sigilyph_passive_glypher_explosion_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/sigilyph_passive_glypher_explosion_aoe",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_sigilyph_passive_glypher_explosion_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sigilyph_passive_glypher_mark",
+        "binding_name": "pokemon_moba_stable_sigilyph_passive_glypher_mark",
+        "champion_id": "pokemon_moba_sigilyph",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/sigilyph_passive_glypher_mark#anim.fanim",
+        "tag": "mark",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/sigilyph_passive_glypher_mark",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_sigilyph_passive_glypher_mark",
+          "tag": "mark",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sigilyph_skill1_sonic_wing_cone",
+        "binding_name": "pokemon_moba_stable_sigilyph_skill1_sonic_wing_cone",
+        "champion_id": "pokemon_moba_sigilyph",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/sigilyph_skill1_sonic_wing_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/sigilyph_skill1_sonic_wing_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_sigilyph_skill1_sonic_wing_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sigilyph_ult_psychic_assault_projectile",
+        "binding_name": "pokemon_moba_stable_sigilyph_ult_psychic_assault_projectile",
+        "champion_id": "pokemon_moba_sigilyph",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/sigilyph_ult_psychic_assault_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/sigilyph_ult_psychic_assault_projectile",
+          "name": "pokemon_moba_stable_sigilyph_ult_psychic_assault_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_sirfetchd": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sirfetchd_skill2_vacuum_wave_projectile",
+        "binding_name": "pokemon_moba_stable_sirfetchd_skill2_vacuum_wave_projectile",
+        "champion_id": "pokemon_moba_sirfetchd",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/sirfetchd_skill2_vacuum_wave_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/sirfetchd_skill2_vacuum_wave_projectile",
+          "name": "pokemon_moba_stable_sirfetchd_skill2_vacuum_wave_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_skeledirge": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/skeledirge_basicattack_shadow_ball_projectile",
+        "binding_name": "pokemon_moba_stable_skeledirge_basicattack_shadow_ball_projectile",
+        "champion_id": "pokemon_moba_skeledirge",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/skeledirge_basicattack_shadow_ball_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/skeledirge_basicattack_shadow_ball_projectile",
+          "name": "pokemon_moba_stable_skeledirge_basicattack_shadow_ball_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/skeledirge_skill1_hex_curse",
+        "binding_name": "pokemon_moba_stable_skeledirge_skill1_hex_curse",
+        "champion_id": "pokemon_moba_skeledirge",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/skeledirge_skill1_hex_curse#anim.fanim",
+        "tag": "curse",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/skeledirge_skill1_hex_curse",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_skeledirge_skill1_hex_curse",
+          "tag": "curse",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/skeledirge_skill2_will_o_wisp_projectile",
+        "binding_name": "pokemon_moba_stable_skeledirge_skill2_will_o_wisp_projectile",
+        "champion_id": "pokemon_moba_skeledirge",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/skeledirge_skill2_will_o_wisp_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/skeledirge_skill2_will_o_wisp_projectile",
+          "name": "pokemon_moba_stable_skeledirge_skill2_will_o_wisp_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/skeledirge_ult_torch_song_aoe",
+        "binding_name": "pokemon_moba_stable_skeledirge_ult_torch_song_aoe",
+        "champion_id": "pokemon_moba_skeledirge",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/skeledirge_ult_torch_song_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/skeledirge_ult_torch_song_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_skeledirge_ult_torch_song_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_starmie": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/starmie_basicattack_water_spout_projectile",
+        "binding_name": "pokemon_moba_stable_starmie_basicattack_water_spout_projectile",
+        "champion_id": "pokemon_moba_starmie",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/starmie_basicattack_water_spout_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/starmie_basicattack_water_spout_projectile",
+          "name": "pokemon_moba_stable_starmie_basicattack_water_spout_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/starmie_skill1_flip_turn_splash",
+        "binding_name": "pokemon_moba_stable_starmie_skill1_flip_turn_splash",
+        "champion_id": "pokemon_moba_starmie",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/starmie_skill1_flip_turn_splash#anim.fanim",
+        "tag": "splash",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/starmie_skill1_flip_turn_splash",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_starmie_skill1_flip_turn_splash",
+          "tag": "splash",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/starmie_skill2_heart_swap_shockwave",
+        "binding_name": "pokemon_moba_stable_starmie_skill2_heart_swap_shockwave",
+        "champion_id": "pokemon_moba_starmie",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/starmie_skill2_heart_swap_shockwave#anim.fanim",
+        "tag": "shockwave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/starmie_skill2_heart_swap_shockwave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_starmie_skill2_heart_swap_shockwave",
+          "tag": "shockwave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/starmie_ult_psybeam_line",
+        "binding_name": "pokemon_moba_stable_starmie_ult_psybeam_line",
+        "champion_id": "pokemon_moba_starmie",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/starmie_ult_psybeam_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/starmie_ult_psybeam_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_starmie_ult_psybeam_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_swanna": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/swanna_basicattack_flap_gust_projectile",
+        "binding_name": "pokemon_moba_stable_swanna_basicattack_flap_gust_projectile",
+        "champion_id": "pokemon_moba_swanna",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/swanna_basicattack_flap_gust_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/swanna_basicattack_flap_gust_projectile",
+          "name": "pokemon_moba_stable_swanna_basicattack_flap_gust_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/swanna_skill2_feathery_cyclone_aura",
+        "binding_name": "pokemon_moba_stable_swanna_skill2_feathery_cyclone_aura",
+        "champion_id": "pokemon_moba_swanna",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/swanna_skill2_feathery_cyclone_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/swanna_skill2_feathery_cyclone_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_swanna_skill2_feathery_cyclone_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/swanna_ult_sky_circus_aoe",
+        "binding_name": "pokemon_moba_stable_swanna_ult_sky_circus_aoe",
+        "champion_id": "pokemon_moba_swanna",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/swanna_ult_sky_circus_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/swanna_ult_sky_circus_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_swanna_ult_sky_circus_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_sylveon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sylveon_basicattack_disarming_voice_aoe",
+        "binding_name": "pokemon_moba_stable_sylveon_basicattack_disarming_voice_aoe",
+        "champion_id": "pokemon_moba_sylveon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/sylveon_basicattack_disarming_voice_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/sylveon_basicattack_disarming_voice_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_sylveon_basicattack_disarming_voice_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sylveon_skill1_misty_terrain_field",
+        "binding_name": "pokemon_moba_stable_sylveon_skill1_misty_terrain_field",
+        "champion_id": "pokemon_moba_sylveon",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/sylveon_skill1_misty_terrain_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/sylveon_skill1_misty_terrain_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_sylveon_skill1_misty_terrain_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sylveon_skill2_charm_heal",
+        "binding_name": "pokemon_moba_stable_sylveon_skill2_charm_heal",
+        "champion_id": "pokemon_moba_sylveon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/sylveon_skill2_charm_heal#anim.fanim",
+        "tag": "heal",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/sylveon_skill2_charm_heal",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_sylveon_skill2_charm_heal",
+          "tag": "heal",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/sylveon_ult_dazzling_gleam_aoe",
+        "binding_name": "pokemon_moba_stable_sylveon_ult_dazzling_gleam_aoe",
+        "champion_id": "pokemon_moba_sylveon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/sylveon_ult_dazzling_gleam_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/sylveon_ult_dazzling_gleam_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_sylveon_ult_dazzling_gleam_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_thievul": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/thievul_skill2_hone_claws_aura",
+        "binding_name": "pokemon_moba_stable_thievul_skill2_hone_claws_aura",
+        "champion_id": "pokemon_moba_thievul",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/thievul_skill2_hone_claws_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/thievul_skill2_hone_claws_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_thievul_skill2_hone_claws_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/thievul_ult_stakeout_field",
+        "binding_name": "pokemon_moba_stable_thievul_ult_stakeout_field",
+        "champion_id": "pokemon_moba_thievul",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/thievul_ult_stakeout_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/thievul_ult_stakeout_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_thievul_ult_stakeout_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_turtonator": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/turtonator_basicattack_ember_projectile",
+        "binding_name": "pokemon_moba_stable_turtonator_basicattack_ember_projectile",
+        "champion_id": "pokemon_moba_turtonator",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/turtonator_basicattack_ember_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/turtonator_basicattack_ember_projectile",
+          "name": "pokemon_moba_stable_turtonator_basicattack_ember_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/turtonator_passive_burning_jealousy_overlay",
+        "binding_name": "pokemon_moba_stable_turtonator_passive_burning_jealousy_overlay",
+        "champion_id": "pokemon_moba_turtonator",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/turtonator_passive_burning_jealousy_overlay#anim.fanim",
+        "tag": "overlay",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/turtonator_passive_burning_jealousy_overlay",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_turtonator_passive_burning_jealousy_overlay",
+          "tag": "overlay",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/turtonator_skill1_shell_trap_field",
+        "binding_name": "pokemon_moba_stable_turtonator_skill1_shell_trap_field",
+        "champion_id": "pokemon_moba_turtonator",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/turtonator_skill1_shell_trap_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/turtonator_skill1_shell_trap_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_turtonator_skill1_shell_trap_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/turtonator_skill2_sunny_day_field",
+        "binding_name": "pokemon_moba_stable_turtonator_skill2_sunny_day_field",
+        "champion_id": "pokemon_moba_turtonator",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/turtonator_skill2_sunny_day_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/turtonator_skill2_sunny_day_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_turtonator_skill2_sunny_day_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/turtonator_ult_clanging_scales_burst",
+        "binding_name": "pokemon_moba_stable_turtonator_ult_clanging_scales_burst",
+        "champion_id": "pokemon_moba_turtonator",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/turtonator_ult_clanging_scales_burst#anim.fanim",
+        "tag": "burst",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/turtonator_ult_clanging_scales_burst",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_turtonator_ult_clanging_scales_burst",
+          "tag": "burst",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_umbreon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/umbreon_skill1_snarl_aoe",
+        "binding_name": "pokemon_moba_stable_umbreon_skill1_snarl_aoe",
+        "champion_id": "pokemon_moba_umbreon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/umbreon_skill1_snarl_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/umbreon_skill1_snarl_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_umbreon_skill1_snarl_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/umbreon_skill2_dark_pulse_line",
+        "binding_name": "pokemon_moba_stable_umbreon_skill2_dark_pulse_line",
+        "champion_id": "pokemon_moba_umbreon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/umbreon_skill2_dark_pulse_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/umbreon_skill2_dark_pulse_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_umbreon_skill2_dark_pulse_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/umbreon_ult_crunch_impact",
+        "binding_name": "pokemon_moba_stable_umbreon_ult_crunch_impact",
+        "champion_id": "pokemon_moba_umbreon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/umbreon_ult_crunch_impact#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/umbreon_ult_crunch_impact",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_umbreon_ult_crunch_impact",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_ursaluna": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ursaluna_skill1_scary_face_terrify",
+        "binding_name": "pokemon_moba_stable_ursaluna_skill1_scary_face_terrify",
+        "champion_id": "pokemon_moba_ursaluna",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/ursaluna_skill1_scary_face_terrify#anim.fanim",
+        "tag": "overlay",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ursaluna_skill1_scary_face_terrify",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ursaluna_skill1_scary_face_terrify",
+          "tag": "overlay",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ursaluna_skill2_earthquake_aura",
+        "binding_name": "pokemon_moba_stable_ursaluna_skill2_earthquake_aura",
+        "champion_id": "pokemon_moba_ursaluna",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/ursaluna_skill2_earthquake_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ursaluna_skill2_earthquake_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_ursaluna_skill2_earthquake_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/ursaluna_ult_blood_moon_transformation",
+        "binding_name": "pokemon_moba_stable_ursaluna_ult_blood_moon_transformation",
+        "champion_id": "pokemon_moba_ursaluna",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/ursaluna_ult_blood_moon_transformation#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/ursaluna_ult_blood_moon_transformation",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_ursaluna_ult_blood_moon_transformation",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_vanilluxe": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/vanilluxe_basicattack_icicle_spear_projectile",
+        "binding_name": "pokemon_moba_stable_vanilluxe_basicattack_icicle_spear_projectile",
+        "champion_id": "pokemon_moba_vanilluxe",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/vanilluxe_basicattack_icicle_spear_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/vanilluxe_basicattack_icicle_spear_projectile",
+          "name": "pokemon_moba_stable_vanilluxe_basicattack_icicle_spear_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/vanilluxe_skill1_chilling_water_wave",
+        "binding_name": "pokemon_moba_stable_vanilluxe_skill1_chilling_water_wave",
+        "champion_id": "pokemon_moba_vanilluxe",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/vanilluxe_skill1_chilling_water_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/vanilluxe_skill1_chilling_water_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_vanilluxe_skill1_chilling_water_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/vanilluxe_skill2_frost_breath_cone",
+        "binding_name": "pokemon_moba_stable_vanilluxe_skill2_frost_breath_cone",
+        "champion_id": "pokemon_moba_vanilluxe",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/vanilluxe_skill2_frost_breath_cone#anim.fanim",
+        "tag": "cone",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/vanilluxe_skill2_frost_breath_cone",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_vanilluxe_skill2_frost_breath_cone",
+          "tag": "cone",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/vanilluxe_ult_sheer_cold_aoe",
+        "binding_name": "pokemon_moba_stable_vanilluxe_ult_sheer_cold_aoe",
+        "champion_id": "pokemon_moba_vanilluxe",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/vanilluxe_ult_sheer_cold_aoe#anim.fanim",
+        "tag": "aoe",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/vanilluxe_ult_sheer_cold_aoe",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_vanilluxe_ult_sheer_cold_aoe",
+          "tag": "aoe",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_vaporeon": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/vaporeon_basicattack_water_gun_projectile",
+        "binding_name": "pokemon_moba_stable_vaporeon_basicattack_water_gun_projectile",
+        "champion_id": "pokemon_moba_vaporeon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/vaporeon_basicattack_water_gun_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/vaporeon_basicattack_water_gun_projectile",
+          "name": "pokemon_moba_stable_vaporeon_basicattack_water_gun_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/vaporeon_skill1_growl_wave",
+        "binding_name": "pokemon_moba_stable_vaporeon_skill1_growl_wave",
+        "champion_id": "pokemon_moba_vaporeon",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/vaporeon_skill1_growl_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/vaporeon_skill1_growl_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_vaporeon_skill1_growl_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/vaporeon_skill2_water_pulse_projectile",
+        "binding_name": "pokemon_moba_stable_vaporeon_skill2_water_pulse_projectile",
+        "champion_id": "pokemon_moba_vaporeon",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/vaporeon_skill2_water_pulse_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/vaporeon_skill2_water_pulse_projectile",
+          "name": "pokemon_moba_stable_vaporeon_skill2_water_pulse_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/vaporeon_ult_aqua_ring_aura",
+        "binding_name": "pokemon_moba_stable_vaporeon_ult_aqua_ring_aura",
+        "champion_id": "pokemon_moba_vaporeon",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/vaporeon_ult_aqua_ring_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/vaporeon_ult_aqua_ring_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_vaporeon_ult_aqua_ring_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_venusaur": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/venusaur_skill1_vine_whip_line",
+        "binding_name": "pokemon_moba_stable_venusaur_skill1_vine_whip_line",
+        "champion_id": "pokemon_moba_venusaur",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/venusaur_skill1_vine_whip_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/venusaur_skill1_vine_whip_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_venusaur_skill1_vine_whip_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/venusaur_skill2_leech_seed_projectile",
+        "binding_name": "pokemon_moba_stable_venusaur_skill2_leech_seed_projectile",
+        "champion_id": "pokemon_moba_venusaur",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/venusaur_skill2_leech_seed_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/venusaur_skill2_leech_seed_projectile",
+          "name": "pokemon_moba_stable_venusaur_skill2_leech_seed_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/venusaur_ult_sludge_wave",
+        "binding_name": "pokemon_moba_stable_venusaur_ult_sludge_wave",
+        "champion_id": "pokemon_moba_venusaur",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/venusaur_ult_sludge_wave#anim.fanim",
+        "tag": "wave",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/venusaur_ult_sludge_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_venusaur_ult_sludge_wave",
+          "tag": "wave",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_weezing": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/weezing_basicattack_smog_cloud",
+        "binding_name": "pokemon_moba_stable_weezing_basicattack_smog_cloud",
+        "champion_id": "pokemon_moba_weezing",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/weezing_basicattack_smog_cloud#anim.fanim",
+        "tag": "projectile",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/weezing_basicattack_smog_cloud",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_weezing_basicattack_smog_cloud",
+          "tag": "projectile",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/weezing_passive_nullifying_gas_aura",
+        "binding_name": "pokemon_moba_stable_weezing_passive_nullifying_gas_aura",
+        "champion_id": "pokemon_moba_weezing",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/weezing_passive_nullifying_gas_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/weezing_passive_nullifying_gas_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_weezing_passive_nullifying_gas_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/weezing_skill1_stun_gas_cloud",
+        "binding_name": "pokemon_moba_stable_weezing_skill1_stun_gas_cloud",
+        "champion_id": "pokemon_moba_weezing",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/weezing_skill1_stun_gas_cloud#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/weezing_skill1_stun_gas_cloud",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_weezing_skill1_stun_gas_cloud",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/weezing_skill2_body_odor_aura",
+        "binding_name": "pokemon_moba_stable_weezing_skill2_body_odor_aura",
+        "champion_id": "pokemon_moba_weezing",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/weezing_skill2_body_odor_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/weezing_skill2_body_odor_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_weezing_skill2_body_odor_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/weezing_ult_sludge_whirlpool_aura",
+        "binding_name": "pokemon_moba_stable_weezing_ult_sludge_whirlpool_aura",
+        "champion_id": "pokemon_moba_weezing",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/weezing_ult_sludge_whirlpool_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/weezing_ult_sludge_whirlpool_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_weezing_ult_sludge_whirlpool_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_wishiwashi": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/wishiwashi_basicattack_splash_projectile",
+        "binding_name": "pokemon_moba_stable_wishiwashi_basicattack_splash_projectile",
+        "champion_id": "pokemon_moba_wishiwashi",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/wishiwashi_basicattack_splash_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/wishiwashi_basicattack_splash_projectile",
+          "name": "pokemon_moba_stable_wishiwashi_basicattack_splash_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/wishiwashi_skill1_wave_splash_wave",
+        "binding_name": "pokemon_moba_stable_wishiwashi_skill1_wave_splash_wave",
+        "champion_id": "pokemon_moba_wishiwashi",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/wishiwashi_skill1_wave_splash_wave#anim.fanim",
+        "tag": "projectile",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/wishiwashi_skill1_wave_splash_wave",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_wishiwashi_skill1_wave_splash_wave",
+          "tag": "projectile",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/wishiwashi_ult_massive_catch_water_burst",
+        "binding_name": "pokemon_moba_stable_wishiwashi_ult_massive_catch_water_burst",
+        "champion_id": "pokemon_moba_wishiwashi",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/wishiwashi_ult_massive_catch_water_burst#anim.fanim",
+        "tag": "impact",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/wishiwashi_ult_massive_catch_water_burst",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_wishiwashi_ult_massive_catch_water_burst",
+          "tag": "impact",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/wishiwashi_ult_schooling_channel_aura",
+        "binding_name": "pokemon_moba_stable_wishiwashi_ult_schooling_channel_aura",
+        "champion_id": "pokemon_moba_wishiwashi",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/wishiwashi_ult_schooling_channel_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/wishiwashi_ult_schooling_channel_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_wishiwashi_ult_schooling_channel_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_xatu": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/xatu_basicattack_energy_singe_projectile",
+        "binding_name": "pokemon_moba_stable_xatu_basicattack_energy_singe_projectile",
+        "champion_id": "pokemon_moba_xatu",
+        "kind": "projectile",
+        "source": "mod/pokemon_moba_stable/vfx/xatu_basicattack_energy_singe_projectile#anim.fanim",
+        "tag": "projectile",
+        "view_projectile": {
+          "anim": "asset/pokemon_moba_stable/vfx/xatu_basicattack_energy_singe_projectile",
+          "name": "pokemon_moba_stable_xatu_basicattack_energy_singe_projectile",
+          "repeat": true,
+          "tag": "projectile",
+          "type": "Animated",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/xatu_skill1_mind_bend_aura",
+        "binding_name": "pokemon_moba_stable_xatu_skill1_mind_bend_aura",
+        "champion_id": "pokemon_moba_xatu",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/xatu_skill1_mind_bend_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/xatu_skill1_mind_bend_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_xatu_skill1_mind_bend_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/xatu_skill2_pain_amplifier_aura",
+        "binding_name": "pokemon_moba_stable_xatu_skill2_pain_amplifier_aura",
+        "champion_id": "pokemon_moba_xatu",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/xatu_skill2_pain_amplifier_aura#anim.fanim",
+        "tag": "aura",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/xatu_skill2_pain_amplifier_aura",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_xatu_skill2_pain_amplifier_aura",
+          "tag": "aura",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/xatu_ult_super_psy_beam",
+        "binding_name": "pokemon_moba_stable_xatu_ult_super_psy_beam",
+        "champion_id": "pokemon_moba_xatu",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/xatu_ult_super_psy_beam#anim.fanim",
+        "tag": "beam",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/xatu_ult_super_psy_beam",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_xatu_ult_super_psy_beam",
+          "tag": "beam",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_yanmega": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/yanmega_basicattack_linear_beam",
+        "binding_name": "pokemon_moba_stable_yanmega_basicattack_linear_beam",
+        "champion_id": "pokemon_moba_yanmega",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/yanmega_basicattack_linear_beam#anim.fanim",
+        "tag": "projectile",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/yanmega_basicattack_linear_beam",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_yanmega_basicattack_linear_beam",
+          "tag": "projectile",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/yanmega_skill1_buzzing_boost_line",
+        "binding_name": "pokemon_moba_stable_yanmega_skill1_buzzing_boost_line",
+        "champion_id": "pokemon_moba_yanmega",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/yanmega_skill1_buzzing_boost_line#anim.fanim",
+        "tag": "line",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/yanmega_skill1_buzzing_boost_line",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_yanmega_skill1_buzzing_boost_line",
+          "tag": "line",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/yanmega_ult_giga_drain_tether",
+        "binding_name": "pokemon_moba_stable_yanmega_ult_giga_drain_tether",
+        "champion_id": "pokemon_moba_yanmega",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/yanmega_ult_giga_drain_tether#anim.fanim",
+        "tag": "beam",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/yanmega_ult_giga_drain_tether",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_yanmega_ult_giga_drain_tether",
+          "tag": "beam",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ],
+    "pokemon_moba_zeraora": [
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/zeraora_passive_merciless_overlay",
+        "binding_name": "pokemon_moba_stable_zeraora_passive_merciless_overlay",
+        "champion_id": "pokemon_moba_zeraora",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/zeraora_passive_merciless_overlay#anim.fanim",
+        "tag": "overlay",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/zeraora_passive_merciless_overlay",
+          "is_follow": true,
+          "name": "pokemon_moba_stable_zeraora_passive_merciless_overlay",
+          "tag": "overlay",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/zeraora_skill1_thunder_cage_field",
+        "binding_name": "pokemon_moba_stable_zeraora_skill1_thunder_cage_field",
+        "champion_id": "pokemon_moba_zeraora",
+        "kind": "buff_or_effect",
+        "source": "mod/pokemon_moba_stable/vfx/zeraora_skill1_thunder_cage_field#anim.fanim",
+        "tag": "field",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/zeraora_skill1_thunder_cage_field",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_zeraora_skill1_thunder_cage_field",
+          "tag": "field",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/zeraora_skill2_zing_zap_counter",
+        "binding_name": "pokemon_moba_stable_zeraora_skill2_zing_zap_counter",
+        "champion_id": "pokemon_moba_zeraora",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/zeraora_skill2_zing_zap_counter#anim.fanim",
+        "tag": "counter",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/zeraora_skill2_zing_zap_counter",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_zeraora_skill2_zing_zap_counter",
+          "tag": "counter",
+          "type": "Animation",
+          "z": 0
+        }
+      },
+      {
+        "asset": "asset/pokemon_moba_stable/vfx/zeraora_ult_wild_charge_bolts",
+        "binding_name": "pokemon_moba_stable_zeraora_ult_wild_charge_bolts",
+        "champion_id": "pokemon_moba_zeraora",
+        "kind": "effect",
+        "source": "mod/pokemon_moba_stable/vfx/zeraora_ult_wild_charge_bolts#anim.fanim",
+        "tag": "bolts",
+        "view_effect": {
+          "anim": "asset/pokemon_moba_stable/vfx/zeraora_ult_wild_charge_bolts",
+          "is_follow": false,
+          "name": "pokemon_moba_stable_zeraora_ult_wild_charge_bolts",
+          "tag": "bolts",
+          "type": "Animation",
+          "z": 0
+        }
+      }
+    ]
+  },
+  "count": 279,
+  "mod_id": "pokemon_moba_stable",
+  "note": "Generated VFX binding candidates. Do not load directly as .data_champion files until the matching stable Rust champion is registered."
+}

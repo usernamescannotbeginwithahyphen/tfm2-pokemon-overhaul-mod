@@ -1,0 +1,129 @@
+{
+  "id": "pokemon_moba_pikachu",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "CC", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/pikachu",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["electric_physical", "electric_status", "electric_special"]
+  },
+  "stat": {
+    "attack": 32,
+    "magic_power": 72,
+    "hp": 520,
+    "defence": 18,
+    "magic_resistance": 24,
+    "move_speed": 1180,
+    "hp_regen": 2,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 8,
+    "hp": 55,
+    "defence": 2,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 0,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 42,
+    "start_timing": 12,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 18,
+    "cooltime": 110,
+    "start_timing": 4,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_pikachu_skill1_volt_tackle_dash_trail"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 36,
+    "cooltime": 420,
+    "start_timing": 18,
+    "range": 62000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_pikachu_skill2_thunder_wave_wall"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 50,
+    "cooltime": 4500,
+    "start_timing": 28,
+    "range": 88000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_pikachu_ult_thunder_strike_aoe"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_pikachu_basicattack_spark_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/pikachu_basicattack_spark_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_pikachu_skill1_volt_tackle_dash_trail",
+      "anim": "asset/pokemon_moba_stable/vfx/pikachu_skill1_volt_tackle_dash_trail",
+      "tag": "trail",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_pikachu_skill2_thunder_wave_wall",
+      "anim": "asset/pokemon_moba_stable/vfx/pikachu_skill2_thunder_wave_wall",
+      "tag": "wave",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_pikachu_ult_thunder_strike_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/pikachu_ult_thunder_strike_aoe",
+      "tag": "strike",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

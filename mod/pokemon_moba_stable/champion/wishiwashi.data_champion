@@ -1,0 +1,125 @@
+{
+  "id": "pokemon_moba_wishiwashi",
+  "category": "Util",
+  "tags": ["Heal", "Shield", "CC", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/wishiwashi",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["water_special", "normal_status", "water_physical"]
+  },
+  "stat": {
+    "attack": 34,
+    "magic_power": 58,
+    "hp": 900,
+    "defence": 38,
+    "magic_resistance": 38,
+    "move_speed": 515,
+    "hp_regen": 4,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 3,
+    "magic_power": 5,
+    "hp": 78,
+    "defence": 4,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 56,
+    "start_timing": 7,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 34,
+    "cooltime": 720,
+    "start_timing": 8,
+    "range": 54000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_wishiwashi_skill1_wave_splash_wave"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 28,
+    "cooltime": 720,
+    "start_timing": 6,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 70,
+    "cooltime": 6000,
+    "start_timing": 10,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_wishiwashi_ult_massive_catch_water_burst"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_wishiwashi_basicattack_splash_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/wishiwashi_basicattack_splash_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_wishiwashi_skill1_wave_splash_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/wishiwashi_skill1_wave_splash_wave",
+      "tag": "projectile",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_wishiwashi_ult_massive_catch_water_burst",
+      "anim": "asset/pokemon_moba_stable/vfx/wishiwashi_ult_massive_catch_water_burst",
+      "tag": "impact",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_wishiwashi_ult_schooling_channel_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/wishiwashi_ult_schooling_channel_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "id": "pokemon_moba_beeheeyem",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/beeheeyem",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["psychic_status", "psychic_status", "psychic_special"]
+  },
+  "stat": {
+    "attack": 36,
+    "magic_power": 92,
+    "hp": 660,
+    "defence": 25,
+    "magic_resistance": 36,
+    "move_speed": 620,
+    "hp_regen": 4,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 9,
+    "hp": 66,
+    "defence": 2,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 28,
+    "cooltime": 54,
+    "start_timing": 10,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 30,
+    "cooltime": 300,
+    "start_timing": 10,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 24,
+    "cooltime": 600,
+    "start_timing": 8,
+    "range": 43000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_beeheeyem_skill2_light_screen"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 48,
+    "cooltime": 3900,
+    "start_timing": 18,
+    "range": 62000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_beeheeyem_ult_headbutt_effect"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_beeheeyem_basic_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/beeheeyem_basic_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_beeheeyem_skill2_light_screen",
+      "anim": "asset/pokemon_moba_stable/vfx/beeheeyem_skill2_light_screen",
+      "tag": "screen",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_beeheeyem_ult_headbutt_effect",
+      "anim": "asset/pokemon_moba_stable/vfx/beeheeyem_ult_headbutt_effect",
+      "tag": "impact",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

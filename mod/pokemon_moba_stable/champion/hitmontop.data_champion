@@ -1,0 +1,81 @@
+{
+  "id": "pokemon_moba_hitmontop",
+  "category": "Assassin",
+  "tags": ["AD", "Melee"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/hitmontop",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["fighting_physical", "normal_status", "fighting_physical"]
+  },
+  "stat": {
+    "attack": 86,
+    "magic_power": 8,
+    "hp": 650,
+    "defence": 27,
+    "magic_resistance": 24,
+    "move_speed": 1120,
+    "hp_regen": 3,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 10,
+    "magic_power": 1,
+    "hp": 66,
+    "defence": 3,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 22,
+    "cooltime": 28,
+    "start_timing": 7,
+    "range": 17500,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 26,
+    "cooltime": 240,
+    "start_timing": 8,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 26,
+    "cooltime": 360,
+    "start_timing": 8,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 42,
+    "cooltime": 3600,
+    "start_timing": 9,
+    "range": 18500,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  }
+}

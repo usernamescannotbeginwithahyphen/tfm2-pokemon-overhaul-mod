@@ -1,0 +1,125 @@
+{
+  "id": "pokemon_moba_vaporeon",
+  "category": "Util",
+  "tags": ["Tank", "AP", "Magic", "Heal"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/vaporeon",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["normal_special", "water_special", "water_special"]
+  },
+  "stat": {
+    "attack": 32,
+    "magic_power": 54,
+    "hp": 980,
+    "defence": 48,
+    "magic_resistance": 44,
+    "move_speed": 870,
+    "hp_regen": 8,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 5,
+    "hp": 118,
+    "defence": 6,
+    "magic_resistance": 5,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 30,
+    "cooltime": 36,
+    "start_timing": 14,
+    "range": 76000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 28,
+    "cooltime": 270,
+    "start_timing": 12,
+    "range": 38000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_vaporeon_skill1_growl_wave"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 34,
+    "cooltime": 330,
+    "start_timing": 16,
+    "range": 58000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 240,
+    "cooltime": 3800,
+    "start_timing": 8,
+    "range": 30000,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_vaporeon_ult_aqua_ring_aura"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_vaporeon_basicattack_water_gun_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/vaporeon_basicattack_water_gun_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    },
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_vaporeon_skill2_water_pulse_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/vaporeon_skill2_water_pulse_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_vaporeon_skill1_growl_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/vaporeon_skill1_growl_wave",
+      "tag": "wave",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_vaporeon_ult_aqua_ring_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/vaporeon_ult_aqua_ring_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    }
+  ]
+}

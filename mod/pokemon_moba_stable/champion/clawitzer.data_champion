@@ -1,0 +1,125 @@
+{
+  "id": "pokemon_moba_clawitzer",
+  "category": "Range",
+  "tags": ["AD", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/clawitzer",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["water_physical", "water_physical", "water_physical"]
+  },
+  "stat": {
+    "attack": 70,
+    "magic_power": 10,
+    "hp": 480,
+    "defence": 16,
+    "magic_resistance": 16,
+    "move_speed": 860,
+    "hp_regen": 5,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 8,
+    "magic_power": 1,
+    "hp": 45,
+    "defence": 1,
+    "magic_resistance": 1,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 32,
+    "start_timing": 9,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 40,
+    "cooltime": 360,
+    "start_timing": 14,
+    "range": 54000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_clawitzer_skill1_water_sport_aoe"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 30,
+    "cooltime": 250,
+    "start_timing": 10,
+    "range": 62000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 118,
+    "cooltime": 3250,
+    "start_timing": 12,
+    "range": 70000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_clawitzer_ult_bubble_beam_line"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_clawitzer_basicattack_aqua_jet_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/clawitzer_basicattack_aqua_jet_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    },
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_clawitzer_skill2_aqua_cutter_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/clawitzer_skill2_aqua_cutter_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_clawitzer_skill1_water_sport_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/clawitzer_skill1_water_sport_aoe",
+      "tag": "area",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_clawitzer_ult_bubble_beam_line",
+      "anim": "asset/pokemon_moba_stable/vfx/clawitzer_ult_bubble_beam_line",
+      "tag": "beam",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "id": "pokemon_moba_skeledirge",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Range", "Tank", "Dot"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/skeledirge",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["ghost_status", "fire_status", "fire_special"]
+  },
+  "stat": {
+    "attack": 44,
+    "magic_power": 72,
+    "hp": 820,
+    "defence": 36,
+    "magic_resistance": 34,
+    "move_speed": 760,
+    "hp_regen": 6,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 3,
+    "magic_power": 8,
+    "hp": 88,
+    "defence": 4,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 29,
+    "cooltime": 25,
+    "start_timing": 10,
+    "range": 46000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 32,
+    "cooltime": 480,
+    "start_timing": 12,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_skeledirge_skill1_hex_curse"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 24,
+    "cooltime": 45,
+    "start_timing": 8,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 54,
+    "cooltime": 3900,
+    "start_timing": 18,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_skeledirge_ult_torch_song_aoe"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_skeledirge_basicattack_shadow_ball_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/skeledirge_basicattack_shadow_ball_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    },
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_skeledirge_skill2_will_o_wisp_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/skeledirge_skill2_will_o_wisp_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_skeledirge_skill1_hex_curse",
+      "anim": "asset/pokemon_moba_stable/vfx/skeledirge_skill1_hex_curse",
+      "tag": "curse",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_skeledirge_ult_torch_song_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/skeledirge_ult_torch_song_aoe",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

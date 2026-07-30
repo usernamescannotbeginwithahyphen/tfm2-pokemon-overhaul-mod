@@ -1,0 +1,125 @@
+{
+  "id": "pokemon_moba_porygonz",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/porygonz",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["normal_special", "normal_status", "normal_special"]
+  },
+  "stat": {
+    "attack": 36,
+    "magic_power": 86,
+    "hp": 560,
+    "defence": 17,
+    "magic_resistance": 22,
+    "move_speed": 1120,
+    "hp_regen": 2,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 10,
+    "hp": 50,
+    "defence": 1,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 28,
+    "cooltime": 25,
+    "start_timing": 9,
+    "range": 47000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 34,
+    "cooltime": 300,
+    "start_timing": 12,
+    "range": 38000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 32,
+    "cooltime": 390,
+    "start_timing": 10,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_porygonz_skill2_recover_aura"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 46,
+    "cooltime": 3600,
+    "start_timing": 16,
+    "range": 78000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_porygonz_ult_tri_attack_line"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_porygonz_basicattack_conversion_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/porygonz_basicattack_conversion_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    },
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_porygonz_skill1_conversion2_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/porygonz_skill1_conversion2_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_porygonz_skill2_recover_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/porygonz_skill2_recover_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_porygonz_ult_tri_attack_line",
+      "anim": "asset/pokemon_moba_stable/vfx/porygonz_ult_tri_attack_line",
+      "tag": "line",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

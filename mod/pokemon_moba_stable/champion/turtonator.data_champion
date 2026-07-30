@@ -1,0 +1,137 @@
+{
+  "id": "pokemon_moba_turtonator",
+  "category": "Util",
+  "tags": ["AD", "Range", "Tank", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/turtonator",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["fire_physical", "fire_status", "dragon_physical"]
+  },
+  "stat": {
+    "attack": 54,
+    "magic_power": 9,
+    "hp": 890,
+    "defence": 40,
+    "magic_resistance": 34,
+    "move_speed": 520,
+    "hp_regen": 7,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 4,
+    "magic_power": 1,
+    "hp": 76,
+    "defence": 4,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 58,
+    "start_timing": 8,
+    "range": 33000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 28,
+    "cooltime": 300,
+    "start_timing": 9,
+    "range": 39000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_turtonator_skill1_shell_trap_field"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 36,
+    "cooltime": 540,
+    "start_timing": 10,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_turtonator_skill2_sunny_day_field"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 54,
+    "cooltime": 4200,
+    "start_timing": 18,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_turtonator_ult_clanging_scales_burst"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_turtonator_basicattack_ember_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/turtonator_basicattack_ember_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_turtonator_passive_burning_jealousy_overlay",
+      "anim": "asset/pokemon_moba_stable/vfx/turtonator_passive_burning_jealousy_overlay",
+      "tag": "overlay",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_turtonator_skill1_shell_trap_field",
+      "anim": "asset/pokemon_moba_stable/vfx/turtonator_skill1_shell_trap_field",
+      "tag": "field",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_turtonator_skill2_sunny_day_field",
+      "anim": "asset/pokemon_moba_stable/vfx/turtonator_skill2_sunny_day_field",
+      "tag": "field",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_turtonator_ult_clanging_scales_burst",
+      "anim": "asset/pokemon_moba_stable/vfx/turtonator_ult_clanging_scales_burst",
+      "tag": "burst",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

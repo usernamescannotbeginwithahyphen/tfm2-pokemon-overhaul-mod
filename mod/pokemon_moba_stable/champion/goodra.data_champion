@@ -1,0 +1,135 @@
+{
+  "id": "pokemon_moba_goodra",
+  "category": "Util",
+  "tags": ["AD", "Melee", "Tank", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/goodra",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["water_status", "dragon_status", "water_status"]
+  },
+  "stat": {
+    "attack": 52,
+    "magic_power": 14,
+    "hp": 1040,
+    "defence": 48,
+    "magic_resistance": 50,
+    "move_speed": 560,
+    "hp_regen": 7,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 5,
+    "magic_power": 1,
+    "hp": 88,
+    "defence": 4,
+    "magic_resistance": 5,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 34,
+    "cooltime": 44,
+    "start_timing": 12,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 36,
+    "cooltime": 420,
+    "start_timing": 10,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_goodra_skill1_rain_dance_field"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 36,
+    "cooltime": 600,
+    "start_timing": 8,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_goodra_skill2_dragon_cheer_aura"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 54,
+    "cooltime": 5400,
+    "start_timing": 16,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_goodra_ult_life_dew_heal_burst"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_goodra_basic_dizzy_punch_impact",
+      "anim": "asset/pokemon_moba_stable/vfx/goodra_basic_dizzy_punch_impact",
+      "tag": "impact",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_goodra_skill1_rain_dance_field",
+      "anim": "asset/pokemon_moba_stable/vfx/goodra_skill1_rain_dance_field",
+      "tag": "field",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_goodra_skill2_dragon_cheer_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/goodra_skill2_dragon_cheer_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_goodra_ult_life_dew_heal_burst",
+      "anim": "asset/pokemon_moba_stable/vfx/goodra_ult_life_dew_heal_burst",
+      "tag": "burst",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_goodra_ult_life_dew_pickup",
+      "anim": "asset/pokemon_moba_stable/vfx/goodra_ult_life_dew_pickup",
+      "tag": "pickup",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

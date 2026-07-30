@@ -1,0 +1,95 @@
+{
+  "id": "pokemon_moba_comfey",
+  "category": "Util",
+  "tags": ["Heal", "Shield", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/comfey",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["fairy_status", "grass_status", "normal_status"]
+  },
+  "stat": {
+    "attack": 6,
+    "magic_power": 48,
+    "hp": 340,
+    "defence": 14,
+    "magic_resistance": 24,
+    "move_speed": 390,
+    "hp_regen": 4,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 0,
+    "magic_power": 4,
+    "hp": 30,
+    "defence": 1,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 22,
+    "cooltime": 180,
+    "start_timing": 5,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 26,
+    "cooltime": 210,
+    "start_timing": 6,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 34,
+    "cooltime": 480,
+    "start_timing": 8,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_comfey_skill2_petal_dance_aura"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 32,
+    "cooltime": 7200,
+    "start_timing": 6,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_comfey_skill2_petal_dance_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/comfey_skill2_petal_dance_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "id": "pokemon_moba_rillaboom",
+  "category": "Util",
+  "tags": ["AP", "Magic", "Heal", "Tank", "CC", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/rillaboom",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["grass_status", "grass_status", "grass_special"]
+  },
+  "stat": {
+    "attack": 42,
+    "magic_power": 58,
+    "hp": 890,
+    "defence": 42,
+    "magic_resistance": 38,
+    "move_speed": 570,
+    "hp_regen": 6,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 3,
+    "magic_power": 4,
+    "hp": 82,
+    "defence": 4,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 34,
+    "cooltime": 92,
+    "start_timing": 10,
+    "range": 17000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 38,
+    "cooltime": 420,
+    "start_timing": 8,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_rillaboom_skill1_drum_beating_aura"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 46,
+    "cooltime": 660,
+    "start_timing": 10,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_rillaboom_skill2_drum_roll_aura"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 58,
+    "cooltime": 4200,
+    "start_timing": 14,
+    "range": 68000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_rillaboom_ult_grassy_surge_wave"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_rillaboom_skill1_drum_beating_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/rillaboom_skill1_drum_beating_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_rillaboom_skill2_drum_roll_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/rillaboom_skill2_drum_roll_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_rillaboom_ult_grassy_surge_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/rillaboom_ult_grassy_surge_wave",
+      "tag": "wave",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

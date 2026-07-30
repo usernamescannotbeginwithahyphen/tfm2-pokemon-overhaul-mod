@@ -1,0 +1,81 @@
+{
+  "id": "pokemon_moba_audino",
+  "category": "Util",
+  "tags": ["AD", "Melee", "Heal"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/audino",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["normal_status", "normal_special", "normal_status"]
+  },
+  "stat": {
+    "attack": 38,
+    "magic_power": 24,
+    "hp": 980,
+    "defence": 38,
+    "magic_resistance": 36,
+    "move_speed": 760,
+    "hp_regen": 6,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 3,
+    "magic_power": 2,
+    "hp": 98,
+    "defence": 4,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 26,
+    "cooltime": 38,
+    "start_timing": 9,
+    "range": 17500,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 30,
+    "cooltime": 360,
+    "start_timing": 8,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "AllyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 34,
+    "cooltime": 480,
+    "start_timing": 10,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "AllyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 32,
+    "cooltime": 5400,
+    "start_timing": 8,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "AllyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  }
+}

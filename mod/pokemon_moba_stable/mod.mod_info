@@ -1,0 +1,13 @@
+{
+  "name": "Pokemon MOBA Overhaul Stable Port",
+  "author": "Sirvalkyerie",
+  "version": "0.1.0",
+  "description": "Stable SDK migration build for the Pokemon MOBA overhaul. This parallel package targets the 0.5.3 stable SDK and preserves the classic Rust gameplay layer through a stable compatibility adapter.\n\nThis mod is a complete overhaul and is not meant to be compatible or balanced with either base game champions or other mods. This stable port currently registers 103 Pokemon. While creating a new game click Custom for the Champion Pool, deselect all base game champions, and select only the Pokemon champions. Including base game champs in your game may cause crashes.\n\nThe stable SDK allows Rust-owned champion logic to bridge into asset-driven custom VFX through companion data view bindings and named projectile bindings. This package now includes generated companion data for the full roster and staged VFX declarations; traveling projectile visuals still need targeted runtime spawn_projectile wiring where the old resolver used direct-hit logic.\n\nThis is a Beta version of a mod that's in active development. Some intended mechanics are still being revisited as the stable SDK unlocks better primitives for gold mutation, teleports, summons, deployables, AI, and kill-log reads.\n\nThere is an active Discord for the mod here ( https://discord.gg/mB8dyd4Qw ) where you can get faster updates than are provided to the Steam Workshop and report bugs or balance issues.\n\nA guide is included inside the mod folder in a folder called guide. Please read the guide to learn about the Pokemon, their moves, synergies, counters, and passives before reporting bugs.\n\n[Code Mod Notice]\nThis package contains native/executable code files. Enabling it allows code to run inside the game process. Use only mods from creators you trust.\nFiles: pokemon_moba_stable.dll.",
+  "last_updated": "2026-07-30",
+  "dependencies": [
+    {
+      "mod_id": "base",
+      "version": ">=0.5.0"
+    }
+  ]
+}

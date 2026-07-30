@@ -1,0 +1,107 @@
+{
+  "id": "pokemon_moba_kecleon",
+  "category": "Assassin",
+  "tags": ["AD", "Melee", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/kecleon",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["normal_physical", "normal_physical", "normal_physical"]
+  },
+  "stat": {
+    "attack": 78,
+    "magic_power": 18,
+    "hp": 780,
+    "defence": 34,
+    "magic_resistance": 34,
+    "move_speed": 575,
+    "hp_regen": 5,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 7,
+    "magic_power": 2,
+    "hp": 58,
+    "defence": 3,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 50,
+    "start_timing": 7,
+    "range": 26000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 34,
+    "cooltime": 660,
+    "start_timing": 6,
+    "range": 34000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 42,
+    "cooltime": 960,
+    "start_timing": 30,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_kecleon_skill2_chromashift_pulse"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 96,
+    "cooltime": 4200,
+    "start_timing": 8,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_kecleon_ult_colorful_whip_cones"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_kecleon_skill2_chromashift_pulse",
+      "anim": "asset/pokemon_moba_stable/vfx/kecleon_skill2_chromashift_pulse",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_kecleon_ult_colorful_whip_cones",
+      "anim": "asset/pokemon_moba_stable/vfx/kecleon_ult_colorful_whip_cones",
+      "tag": "cone",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

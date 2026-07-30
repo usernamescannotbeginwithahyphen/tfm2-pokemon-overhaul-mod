@@ -1,0 +1,129 @@
+{
+  "id": "pokemon_moba_xatu",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Range", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/xatu",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["psychic_special", "psychic_status", "psychic_special"]
+  },
+  "stat": {
+    "attack": 18,
+    "magic_power": 88,
+    "hp": 540,
+    "defence": 18,
+    "magic_resistance": 30,
+    "move_speed": 500,
+    "hp_regen": 5,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 9,
+    "hp": 40,
+    "defence": 2,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 54,
+    "start_timing": 7,
+    "range": 43000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 30,
+    "cooltime": 660,
+    "start_timing": 7,
+    "range": 48000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_xatu_skill1_mind_bend_aura"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 30,
+    "cooltime": 780,
+    "start_timing": 7,
+    "range": 50000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_xatu_skill2_pain_amplifier_aura"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 56,
+    "cooltime": 7200,
+    "start_timing": 8,
+    "range": 900000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_xatu_ult_super_psy_beam"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_xatu_basicattack_energy_singe_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/xatu_basicattack_energy_singe_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_xatu_skill1_mind_bend_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/xatu_skill1_mind_bend_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_xatu_skill2_pain_amplifier_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/xatu_skill2_pain_amplifier_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_xatu_ult_super_psy_beam",
+      "anim": "asset/pokemon_moba_stable/vfx/xatu_ult_super_psy_beam",
+      "tag": "beam",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

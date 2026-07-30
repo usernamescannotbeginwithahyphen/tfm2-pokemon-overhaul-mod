@@ -1,0 +1,24 @@
+{
+  "en": {
+    "notice": {
+      "ingame": {
+        "red_epic": "<#f7b1b8ff>Red Team<> has slain Xerneas!",
+        "blue_epic": "<#adb9ffff>Blue Team<> has slain Xerneas!",
+        "red_serpen": "<#f7b1b8ff>Red Team<> has slain Eternatus and gained the Eternal Buff!",
+        "blue_serpen": "<#adb9ffff>Blue Team<> has slain Eternatus and gained the Eternal Buff!"
+      }
+    },
+    "ingame": {
+      "epic": "Xerneas Slain",
+      "serpen": "Eternatus Slain"
+    },
+    "set_result": {
+      "epic": "Xerneas",
+      "serpen": "Eternatus",
+      "graph_blue_epic": "Blue Team Xerneas Kill",
+      "graph_red_epic": "Red Team Xerneas Kill",
+      "graph_blue_serpen": "Blue Team Eternatus Kill",
+      "graph_red_serpen": "Red Team Eternatus Kill"
+    }
+  }
+}

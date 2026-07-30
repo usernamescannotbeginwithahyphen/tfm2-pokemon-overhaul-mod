@@ -1,0 +1,127 @@
+{
+  "id": "pokemon_moba_frosmoth",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Range", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/frosmoth",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["ice_special", "bug_status", "bug_special"]
+  },
+  "stat": {
+    "attack": 18,
+    "magic_power": 46,
+    "hp": 600,
+    "defence": 22,
+    "magic_resistance": 34,
+    "move_speed": 690,
+    "hp_regen": 4,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 1,
+    "magic_power": 5,
+    "hp": 48,
+    "defence": 2,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 30,
+    "cooltime": 58,
+    "start_timing": 10,
+    "range": 43000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 40,
+    "cooltime": 480,
+    "start_timing": 12,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_frosmoth_skill1_avalanche_wave"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 52,
+    "cooltime": 540,
+    "start_timing": 8,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_frosmoth_skill2_sleep_powder_field"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 42,
+    "cooltime": 3600,
+    "start_timing": 12,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_frosmoth_ult_silver_wind_wave"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_frosmoth_basic_powder_snow_impact",
+      "anim": "asset/pokemon_moba_stable/vfx/frosmoth_basic_powder_snow_impact",
+      "tag": "impact",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_frosmoth_skill1_avalanche_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/frosmoth_skill1_avalanche_wave",
+      "tag": "line",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_frosmoth_skill2_sleep_powder_field",
+      "anim": "asset/pokemon_moba_stable/vfx/frosmoth_skill2_sleep_powder_field",
+      "tag": "field",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_frosmoth_ult_silver_wind_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/frosmoth_ult_silver_wind_wave",
+      "tag": "line",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

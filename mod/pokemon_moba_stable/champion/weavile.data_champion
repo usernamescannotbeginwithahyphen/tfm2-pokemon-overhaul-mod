@@ -1,0 +1,81 @@
+{
+  "id": "pokemon_moba_weavile",
+  "category": "Assassin",
+  "tags": ["AD", "Melee", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/weavile",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["dark_physical", "dark_physical", "dark_status"]
+  },
+  "stat": {
+    "attack": 74,
+    "magic_power": 12,
+    "hp": 610,
+    "defence": 24,
+    "magic_resistance": 22,
+    "move_speed": 1160,
+    "hp_regen": 4,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 7,
+    "magic_power": 1,
+    "hp": 58,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 18,
+    "cooltime": 32,
+    "start_timing": 6,
+    "range": 19000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 24,
+    "cooltime": 360,
+    "start_timing": 4,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 26,
+    "cooltime": 540,
+    "start_timing": 7,
+    "range": 26000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 30,
+    "cooltime": 4200,
+    "start_timing": 4,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  }
+}

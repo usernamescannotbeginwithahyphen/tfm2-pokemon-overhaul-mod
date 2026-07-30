@@ -1,0 +1,125 @@
+{
+  "id": "pokemon_moba_leafeon",
+  "category": "Assassin",
+  "tags": ["AD", "Range", "Dot"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/leafeon",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["grass_physical", "grass_physical", "grass_physical"]
+  },
+  "stat": {
+    "attack": 78,
+    "magic_power": 28,
+    "hp": 480,
+    "defence": 16,
+    "magic_resistance": 20,
+    "move_speed": 1280,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 8,
+    "magic_power": 2,
+    "hp": 50,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 0,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 28,
+    "start_timing": 8,
+    "range": 50000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 30,
+    "cooltime": 270,
+    "start_timing": 10,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 34,
+    "cooltime": 460,
+    "start_timing": 12,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_leafeon_skill2_leaf_blade_slash"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 78,
+    "cooltime": 4500,
+    "start_timing": 42,
+    "range": 60000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_leafeon_ult_leaf_storm_aoe"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_leafeon_basicattack_razor_leaf_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/leafeon_basicattack_razor_leaf_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    },
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_leafeon_skill1_magical_leaf_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/leafeon_skill1_magical_leaf_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_leafeon_skill2_leaf_blade_slash",
+      "anim": "asset/pokemon_moba_stable/vfx/leafeon_skill2_leaf_blade_slash",
+      "tag": "impact",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_leafeon_ult_leaf_storm_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/leafeon_ult_leaf_storm_aoe",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

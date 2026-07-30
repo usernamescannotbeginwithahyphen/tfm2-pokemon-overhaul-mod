@@ -1,0 +1,95 @@
+{
+  "id": "pokemon_moba_hawlucha",
+  "category": "Assassin",
+  "tags": ["AD", "Melee", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/hawlucha",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["flying_physical", "fighting_physical", "fighting_physical"]
+  },
+  "stat": {
+    "attack": 58,
+    "magic_power": 10,
+    "hp": 610,
+    "defence": 27,
+    "magic_resistance": 24,
+    "move_speed": 980,
+    "hp_regen": 7,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 6,
+    "magic_power": 1,
+    "hp": 44,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 22,
+    "cooltime": 34,
+    "start_timing": 7,
+    "range": 17000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 28,
+    "cooltime": 300,
+    "start_timing": 8,
+    "range": 28000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_hawlucha_skill1_air_slash_wave"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 60,
+    "cooltime": 480,
+    "start_timing": 1,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 46,
+    "cooltime": 4500,
+    "start_timing": 10,
+    "range": 48000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_hawlucha_skill1_air_slash_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/hawlucha_skill1_air_slash_wave",
+      "tag": "wave",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

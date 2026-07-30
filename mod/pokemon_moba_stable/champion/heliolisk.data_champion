@@ -1,0 +1,103 @@
+{
+  "id": "pokemon_moba_heliolisk",
+  "category": "Assassin",
+  "tags": ["AD", "Melee", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/heliolisk",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["normal_physical", "normal_status", "electric_physical"]
+  },
+  "stat": {
+    "attack": 58,
+    "magic_power": 16,
+    "hp": 610,
+    "defence": 24,
+    "magic_resistance": 27,
+    "move_speed": 980,
+    "hp_regen": 8,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 6,
+    "magic_power": 1,
+    "hp": 48,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 18,
+    "cooltime": 28,
+    "start_timing": 5,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 18,
+    "cooltime": 210,
+    "start_timing": 4,
+    "range": 70000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 20,
+    "cooltime": 420,
+    "start_timing": 4,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_heliolisk_skill2_shed_tail_decoy"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 44,
+    "cooltime": 3900,
+    "start_timing": 15,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_heliolisk_passive_discharge_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/heliolisk_passive_discharge_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_heliolisk_skill2_shed_tail_decoy",
+      "anim": "asset/pokemon_moba_stable/vfx/heliolisk_skill2_shed_tail_decoy",
+      "tag": "decoy",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

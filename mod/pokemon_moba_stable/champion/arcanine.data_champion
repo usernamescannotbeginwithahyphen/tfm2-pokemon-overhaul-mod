@@ -1,0 +1,117 @@
+{
+  "id": "pokemon_moba_arcanine",
+  "category": "Magician",
+  "tags": ["AP", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/arcanine",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["normal_physical", "fire_special", "fire_special"]
+  },
+  "stat": {
+    "attack": 44,
+    "magic_power": 84,
+    "hp": 820,
+    "defence": 34,
+    "magic_resistance": 36,
+    "move_speed": 600,
+    "hp_regen": 5,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 4,
+    "magic_power": 8,
+    "hp": 66,
+    "defence": 3,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 54,
+    "start_timing": 7,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 26,
+    "cooltime": 720,
+    "start_timing": 5,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 32,
+    "cooltime": 780,
+    "start_timing": 8,
+    "range": 54000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_arcanine_skill2_white_flames_line_aoe"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 42,
+    "cooltime": 4200,
+    "start_timing": 10,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_arcanine_ult_flames_of_rage_inferno_aura"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_arcanine_basicattack_flare_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/arcanine_basicattack_flare_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_arcanine_skill2_white_flames_line_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/arcanine_skill2_white_flames_line_aoe",
+      "tag": "line",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_arcanine_ult_flames_of_rage_inferno_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/arcanine_ult_flames_of_rage_inferno_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    }
+  ]
+}

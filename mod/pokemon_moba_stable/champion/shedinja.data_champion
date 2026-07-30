@@ -1,0 +1,133 @@
+{
+  "id": "pokemon_moba_shedinja",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Range", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/shedinja",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["bug_special", "ghost_special", "ghost_special"]
+  },
+  "stat": {
+    "attack": 8,
+    "magic_power": 86,
+    "hp": 1,
+    "defence": 5,
+    "magic_resistance": 5,
+    "move_speed": 720,
+    "hp_regen": 4,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 0,
+    "magic_power": 8,
+    "hp": 0,
+    "defence": 0,
+    "magic_resistance": 0,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 30,
+    "cooltime": 52,
+    "start_timing": 10,
+    "range": 46000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 34,
+    "cooltime": 330,
+    "start_timing": 8,
+    "range": 50000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_shedinja_skill1_skitter_smack_cone"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 34,
+    "cooltime": 520,
+    "start_timing": 12,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 46,
+    "cooltime": 3900,
+    "start_timing": 14,
+    "range": 62000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_shedinja_ult_astral_barrage_wave"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_shedinja_basicattack_shadow_force_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/shedinja_basicattack_shadow_force_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    },
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_shedinja_skill2_grudge_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/shedinja_skill2_grudge_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_shedinja_passive_wonder_guard_chits",
+      "anim": "asset/pokemon_moba_stable/vfx/shedinja_passive_wonder_guard_chits",
+      "tag": "chits_5",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_shedinja_skill1_skitter_smack_cone",
+      "anim": "asset/pokemon_moba_stable/vfx/shedinja_skill1_skitter_smack_cone",
+      "tag": "cone",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_shedinja_ult_astral_barrage_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/shedinja_ult_astral_barrage_wave",
+      "tag": "line",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

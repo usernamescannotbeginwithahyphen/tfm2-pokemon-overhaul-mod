@@ -1,0 +1,105 @@
+{
+  "id": "pokemon_moba_espeon",
+  "category": "Util",
+  "tags": ["AP", "Magic", "CC", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/espeon",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["psychic_status", "psychic_status", "psychic_status"]
+  },
+  "stat": {
+    "attack": 36,
+    "magic_power": 72,
+    "hp": 720,
+    "defence": 32,
+    "magic_resistance": 42,
+    "move_speed": 1150,
+    "hp_regen": 4,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 3,
+    "magic_power": 6,
+    "hp": 76,
+    "defence": 3,
+    "magic_resistance": 4,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 30,
+    "start_timing": 10,
+    "range": 24000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 30,
+    "cooltime": 360,
+    "start_timing": 12,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 28,
+    "cooltime": 210,
+    "start_timing": 10,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 34,
+    "cooltime": 3000,
+    "start_timing": 12,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_espeon_ult_future_sight_marker"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_espeon_skill2_confuse_ray_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/espeon_skill2_confuse_ray_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_espeon_ult_future_sight_marker",
+      "anim": "asset/pokemon_moba_stable/vfx/espeon_ult_future_sight_marker",
+      "tag": "marker",
+      "z": 0,
+      "is_follow": true
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "id": "pokemon_moba_quaquaval",
+  "category": "Range",
+  "tags": ["AD", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/quaquaval",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["water_physical", "fighting_physical", "normal_status"]
+  },
+  "stat": {
+    "attack": 82,
+    "magic_power": 24,
+    "hp": 650,
+    "defence": 24,
+    "magic_resistance": 22,
+    "move_speed": 555,
+    "hp_regen": 6,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 9,
+    "magic_power": 2,
+    "hp": 48,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 22,
+    "cooltime": 48,
+    "start_timing": 6,
+    "range": 44000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 28,
+    "cooltime": 660,
+    "start_timing": 7,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 32,
+    "cooltime": 780,
+    "start_timing": 6,
+    "range": 50000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_quaquaval_skill2_up_tempo_impact"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 30,
+    "cooltime": 4800,
+    "start_timing": 5,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_quaquaval_skill1_spiral_shot_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/quaquaval_skill1_spiral_shot_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_quaquaval_basicattack_hydro_kick_splash",
+      "anim": "asset/pokemon_moba_stable/vfx/quaquaval_basicattack_hydro_kick_splash",
+      "tag": "impact",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_quaquaval_passive_aqua_step_empowered_trail",
+      "anim": "asset/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_empowered_trail",
+      "tag": "field",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_quaquaval_passive_aqua_step_trail",
+      "anim": "asset/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_trail",
+      "tag": "field",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_quaquaval_skill2_up_tempo_impact",
+      "anim": "asset/pokemon_moba_stable/vfx/quaquaval_skill2_up_tempo_impact",
+      "tag": "impact",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

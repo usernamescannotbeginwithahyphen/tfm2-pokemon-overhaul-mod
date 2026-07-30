@@ -1,0 +1,129 @@
+{
+  "id": "pokemon_moba_flareon",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Range", "Dot"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/flareon",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["fire_special", "fire_special", "fire_special"]
+  },
+  "stat": {
+    "attack": 28,
+    "magic_power": 78,
+    "hp": 500,
+    "defence": 16,
+    "magic_resistance": 26,
+    "move_speed": 900,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 2,
+    "magic_power": 9,
+    "hp": 52,
+    "defence": 2,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 0,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 28,
+    "start_timing": 12,
+    "range": 38000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 54,
+    "cooltime": 330,
+    "start_timing": 10,
+    "range": 22000,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_flareon_skill1_fire_spin_aura"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 36,
+    "cooltime": 390,
+    "start_timing": 16,
+    "range": 64000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_flareon_skill2_flame_wheel_line"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 34,
+    "cooltime": 3800,
+    "start_timing": 8,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_flareon_ult_fire_fang_impact"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_flareon_basic_ember_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/flareon_basic_ember_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_flareon_skill1_fire_spin_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/flareon_skill1_fire_spin_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_flareon_skill2_flame_wheel_line",
+      "anim": "asset/pokemon_moba_stable/vfx/flareon_skill2_flame_wheel_line",
+      "tag": "line",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_flareon_ult_fire_fang_impact",
+      "anim": "asset/pokemon_moba_stable/vfx/flareon_ult_fire_fang_impact",
+      "tag": "impact",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

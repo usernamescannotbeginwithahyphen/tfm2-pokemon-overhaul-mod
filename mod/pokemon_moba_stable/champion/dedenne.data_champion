@@ -1,0 +1,151 @@
+{
+  "id": "pokemon_moba_dedenne",
+  "category": "Assassin",
+  "tags": ["AD", "Melee", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/dedenne",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["fairy_physical", "electric_physical", "electric_physical"]
+  },
+  "stat": {
+    "attack": 48,
+    "magic_power": 18,
+    "hp": 570,
+    "defence": 24,
+    "magic_resistance": 25,
+    "move_speed": 1190,
+    "hp_regen": 7,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 4,
+    "magic_power": 1,
+    "hp": 42,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 20,
+    "cooltime": 34,
+    "start_timing": 7,
+    "range": 17000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 28,
+    "cooltime": 300,
+    "start_timing": 6,
+    "range": 62000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_dedenne_skill1_play_rough_dash"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 64,
+    "cooltime": 420,
+    "start_timing": 45,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_dedenne_skill2_double_shock_ring"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 24,
+    "cooltime": 120,
+    "start_timing": 8,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_dedenne_ult_spark_grid_chain"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dedenne_basicattack_nuzzle_spark",
+      "anim": "asset/pokemon_moba_stable/vfx/dedenne_basicattack_nuzzle_spark",
+      "tag": "impact",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dedenne_skill1_play_rough_dash",
+      "anim": "asset/pokemon_moba_stable/vfx/dedenne_skill1_play_rough_dash",
+      "tag": "dash",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dedenne_skill2_double_shock_ring",
+      "anim": "asset/pokemon_moba_stable/vfx/dedenne_skill2_double_shock_ring",
+      "tag": "ring",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dedenne_ult_spark_grid_chain",
+      "anim": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_chain",
+      "tag": "chain",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dedenne_ult_spark_grid_consume_heal",
+      "anim": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_consume_heal",
+      "tag": "consume_heal",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dedenne_ult_spark_grid_nodes",
+      "anim": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_nodes",
+      "tag": "grid",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_dedenne_ult_spark_grid_overload",
+      "anim": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_overload",
+      "tag": "overload",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

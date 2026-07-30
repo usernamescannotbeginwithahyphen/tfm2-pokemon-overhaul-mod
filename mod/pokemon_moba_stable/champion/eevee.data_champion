@@ -1,0 +1,119 @@
+{
+  "id": "pokemon_moba_eevee",
+  "category": "Util",
+  "tags": ["Heal", "Shield", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/eevee",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["fairy_status", "normal_status", "normal_status"]
+  },
+  "stat": {
+    "attack": 22,
+    "magic_power": 48,
+    "hp": 500,
+    "defence": 18,
+    "magic_resistance": 24,
+    "move_speed": 1210,
+    "hp_regen": 3,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 1,
+    "magic_power": 5,
+    "hp": 48,
+    "defence": 2,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 22,
+    "cooltime": 32,
+    "start_timing": 10,
+    "range": 24000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 30,
+    "cooltime": 270,
+    "start_timing": 14,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_eevee_skill1_babydoll_eyes_charm"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 120,
+    "cooltime": 360,
+    "start_timing": 1,
+    "range": 62000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "AllyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_eevee_skill2_wish_heal_ring"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 42,
+    "cooltime": 3000,
+    "start_timing": 20,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "AllyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_eevee_ult_baton_pass_tether"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_eevee_skill1_babydoll_eyes_charm",
+      "anim": "asset/pokemon_moba_stable/vfx/eevee_skill1_babydoll_eyes_charm",
+      "tag": "charm",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_eevee_skill2_wish_heal_ring",
+      "anim": "asset/pokemon_moba_stable/vfx/eevee_skill2_wish_heal_ring",
+      "tag": "heal",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_eevee_ult_baton_pass_tether",
+      "anim": "asset/pokemon_moba_stable/vfx/eevee_ult_baton_pass_tether",
+      "tag": "tether",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "id": "pokemon_moba_hitmonlee",
+  "category": "Melee",
+  "tags": ["AD", "Melee"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/hitmonlee",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["fighting_physical", "fighting_physical", "fighting_physical"]
+  },
+  "stat": {
+    "attack": 96,
+    "magic_power": 8,
+    "hp": 620,
+    "defence": 24,
+    "magic_resistance": 22,
+    "move_speed": 860,
+    "hp_regen": 3,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 11,
+    "magic_power": 1,
+    "hp": 64,
+    "defence": 3,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 24,
+    "cooltime": 32,
+    "start_timing": 7,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 32,
+    "cooltime": 360,
+    "start_timing": 10,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 42,
+    "cooltime": 420,
+    "start_timing": 14,
+    "range": 19000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 46,
+    "cooltime": 3900,
+    "start_timing": 16,
+    "range": 18500,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  }
+}

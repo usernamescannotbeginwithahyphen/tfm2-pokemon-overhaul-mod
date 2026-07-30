@@ -1,0 +1,129 @@
+{
+  "id": "pokemon_moba_coalossal",
+  "category": "Range",
+  "tags": ["AD", "Range", "Tank"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/coalossal",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["rock_physical", "normal_status", "fire_physical"]
+  },
+  "stat": {
+    "attack": 72,
+    "magic_power": 8,
+    "hp": 900,
+    "defence": 46,
+    "magic_resistance": 34,
+    "move_speed": 430,
+    "hp_regen": 5,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 8,
+    "magic_power": 0,
+    "hp": 72,
+    "defence": 4,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 26,
+    "cooltime": 38,
+    "start_timing": 8,
+    "range": 43000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 38,
+    "cooltime": 480,
+    "start_timing": 10,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_coalossal_skill1_tar_shot_wave"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 30,
+    "cooltime": 540,
+    "start_timing": 7,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_coalossal_skill2_smokescreen_field"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 50,
+    "cooltime": 6000,
+    "start_timing": 12,
+    "range": 68000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_coalossal_ult_magma_storm_line"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_coalossal_basicattack_rock_blast_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/coalossal_basicattack_rock_blast_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_coalossal_skill1_tar_shot_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/coalossal_skill1_tar_shot_wave",
+      "tag": "wave",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_coalossal_skill2_smokescreen_field",
+      "anim": "asset/pokemon_moba_stable/vfx/coalossal_skill2_smokescreen_field",
+      "tag": "field",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_coalossal_ult_magma_storm_line",
+      "anim": "asset/pokemon_moba_stable/vfx/coalossal_ult_magma_storm_line",
+      "tag": "line",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

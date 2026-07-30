@@ -1,0 +1,129 @@
+{
+  "id": "pokemon_moba_sigilyph",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "Range", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/sigilyph",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["flying_special", "flying_status", "psychic_special"]
+  },
+  "stat": {
+    "attack": 18,
+    "magic_power": 82,
+    "hp": 620,
+    "defence": 22,
+    "magic_resistance": 30,
+    "move_speed": 630,
+    "hp_regen": 6,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 1,
+    "magic_power": 8,
+    "hp": 50,
+    "defence": 2,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 28,
+    "cooltime": 62,
+    "start_timing": 8,
+    "range": 47000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 34,
+    "cooltime": 480,
+    "start_timing": 8,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_sigilyph_skill1_sonic_wing_cone"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 30,
+    "cooltime": 660,
+    "start_timing": 6,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 44,
+    "cooltime": 4200,
+    "start_timing": 12,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_sigilyph_basicattack_psychic_sphere_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/sigilyph_basicattack_psychic_sphere_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    },
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_sigilyph_ult_psychic_assault_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/sigilyph_ult_psychic_assault_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_sigilyph_passive_glypher_explosion_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/sigilyph_passive_glypher_explosion_aoe",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_sigilyph_passive_glypher_mark",
+      "anim": "asset/pokemon_moba_stable/vfx/sigilyph_passive_glypher_mark",
+      "tag": "mark",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_sigilyph_skill1_sonic_wing_cone",
+      "anim": "asset/pokemon_moba_stable/vfx/sigilyph_skill1_sonic_wing_cone",
+      "tag": "cone",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

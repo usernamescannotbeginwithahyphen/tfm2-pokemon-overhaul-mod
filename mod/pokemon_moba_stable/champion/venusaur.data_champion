@@ -1,0 +1,117 @@
+{
+  "id": "pokemon_moba_venusaur",
+  "category": "Util",
+  "tags": ["Tank", "CC", "Dot", "Melee"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/venusaur",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["grass_physical", "grass_physical", "poison_special"]
+  },
+  "stat": {
+    "attack": 42,
+    "magic_power": 44,
+    "hp": 920,
+    "defence": 42,
+    "magic_resistance": 42,
+    "move_speed": 930,
+    "hp_regen": 6,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 3,
+    "magic_power": 4,
+    "hp": 105,
+    "defence": 5,
+    "magic_resistance": 5,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 28,
+    "cooltime": 28,
+    "start_timing": 12,
+    "range": 22000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": false
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 34,
+    "cooltime": 300,
+    "start_timing": 16,
+    "range": 62000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_venusaur_skill1_vine_whip_line"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 36,
+    "cooltime": 360,
+    "start_timing": 18,
+    "range": 66000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 48,
+    "cooltime": 3800,
+    "start_timing": 22,
+    "range": 90000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_venusaur_ult_sludge_wave"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_venusaur_skill2_leech_seed_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/venusaur_skill2_leech_seed_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_venusaur_skill1_vine_whip_line",
+      "anim": "asset/pokemon_moba_stable/vfx/venusaur_skill1_vine_whip_line",
+      "tag": "line",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_venusaur_ult_sludge_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/venusaur_ult_sludge_wave",
+      "tag": "wave",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

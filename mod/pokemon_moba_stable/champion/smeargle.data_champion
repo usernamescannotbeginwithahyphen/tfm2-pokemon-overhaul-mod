@@ -1,0 +1,81 @@
+{
+  "id": "pokemon_moba_smeargle",
+  "category": "Util",
+  "tags": ["Melee", "Range", "Magic"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/smeargle",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["normal_status", "normal_status", "normal_status"]
+  },
+  "stat": {
+    "attack": 52,
+    "magic_power": 52,
+    "hp": 760,
+    "defence": 34,
+    "magic_resistance": 34,
+    "move_speed": 660,
+    "hp_regen": 5,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 5,
+    "magic_power": 5,
+    "hp": 72,
+    "defence": 3,
+    "magic_resistance": 3,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 16,
+    "cooltime": 90,
+    "start_timing": 4,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 16,
+    "cooltime": 90,
+    "start_timing": 4,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 16,
+    "cooltime": 90,
+    "start_timing": 4,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 16,
+    "cooltime": 90,
+    "start_timing": 4,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  }
+}

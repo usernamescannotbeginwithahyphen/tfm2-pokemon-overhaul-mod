@@ -1,0 +1,115 @@
+{
+  "id": "pokemon_moba_garganacl",
+  "category": "Melee",
+  "tags": ["Tank", "AD", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/garganacl",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["rock_physical", "rock_status", "rock_physical"]
+  },
+  "stat": {
+    "attack": 58,
+    "magic_power": 8,
+    "hp": 1180,
+    "defence": 64,
+    "magic_resistance": 55,
+    "move_speed": 420,
+    "hp_regen": 3,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 5,
+    "magic_power": 1,
+    "hp": 112,
+    "defence": 6,
+    "magic_resistance": 5,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 44,
+    "cooltime": 96,
+    "start_timing": 14,
+    "range": 17000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 42,
+    "cooltime": 720,
+    "start_timing": 12,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_garganacl_skill1_land_crush_shockwave"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 28,
+    "cooltime": 780,
+    "start_timing": 6,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 40,
+    "cooltime": 4800,
+    "start_timing": 10,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_garganacl_ult_blessed_salt_spire_ring"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_garganacl_passive_salt_cure_patch",
+      "anim": "asset/pokemon_moba_stable/vfx/garganacl_passive_salt_cure_patch",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_garganacl_skill1_land_crush_shockwave",
+      "anim": "asset/pokemon_moba_stable/vfx/garganacl_skill1_land_crush_shockwave",
+      "tag": "projectile",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_garganacl_ult_blessed_salt_spire_ring",
+      "anim": "asset/pokemon_moba_stable/vfx/garganacl_ult_blessed_salt_spire_ring",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

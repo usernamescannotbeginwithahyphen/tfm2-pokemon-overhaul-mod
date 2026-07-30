@@ -1,0 +1,81 @@
+{
+  "id": "pokemon_moba_kleavor",
+  "category": "Melee",
+  "tags": ["AD", "Melee", "Tank", "Dot"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/kleavor",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["bug_physical", "rock_status", "rock_physical"]
+  },
+  "stat": {
+    "attack": 76,
+    "magic_power": 16,
+    "hp": 790,
+    "defence": 38,
+    "magic_resistance": 25,
+    "move_speed": 850,
+    "hp_regen": 5,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 8,
+    "magic_power": 1,
+    "hp": 78,
+    "defence": 4,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 20,
+    "cooltime": 26,
+    "start_timing": 7,
+    "range": 17000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 42,
+    "cooltime": 260,
+    "start_timing": 9,
+    "range": 19000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 26,
+    "cooltime": 420,
+    "start_timing": 8,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 46,
+    "cooltime": 3300,
+    "start_timing": 18,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  }
+}

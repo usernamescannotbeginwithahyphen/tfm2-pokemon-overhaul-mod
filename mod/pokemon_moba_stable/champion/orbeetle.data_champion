@@ -1,0 +1,107 @@
+{
+  "id": "pokemon_moba_orbeetle",
+  "category": "Assassin",
+  "tags": ["AD", "Melee", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/orbeetle",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["psychic_physical", "bug_physical", "psychic_physical"]
+  },
+  "stat": {
+    "attack": 58,
+    "magic_power": 12,
+    "hp": 610,
+    "defence": 28,
+    "magic_resistance": 28,
+    "move_speed": 930,
+    "hp_regen": 7,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 6,
+    "magic_power": 1,
+    "hp": 46,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 22,
+    "cooltime": 34,
+    "start_timing": 7,
+    "range": 18000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 34,
+    "cooltime": 450,
+    "start_timing": 7,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 38,
+    "cooltime": 480,
+    "start_timing": 10,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_orbeetle_skill2_infestation_wave"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 42,
+    "cooltime": 4200,
+    "start_timing": 11,
+    "range": 46000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_orbeetle_ult_psyshock_cone"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_orbeetle_skill2_infestation_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/orbeetle_skill2_infestation_wave",
+      "tag": "wave",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_orbeetle_ult_psyshock_cone",
+      "anim": "asset/pokemon_moba_stable/vfx/orbeetle_ult_psyshock_cone",
+      "tag": "cone",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

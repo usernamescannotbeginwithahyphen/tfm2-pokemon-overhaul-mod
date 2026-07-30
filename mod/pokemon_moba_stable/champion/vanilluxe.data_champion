@@ -1,0 +1,129 @@
+{
+  "id": "pokemon_moba_vanilluxe",
+  "category": "Magician",
+  "tags": ["AP", "Magic", "CC", "Range"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/vanilluxe",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["water_special", "ice_special", "ice_special"]
+  },
+  "stat": {
+    "attack": 24,
+    "magic_power": 135,
+    "hp": 430,
+    "defence": 12,
+    "magic_resistance": 22,
+    "move_speed": 840,
+    "hp_regen": 2,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 1,
+    "magic_power": 16,
+    "hp": 42,
+    "defence": 1,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 26,
+    "cooltime": 60,
+    "start_timing": 10,
+    "range": 62000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 40,
+    "cooltime": 420,
+    "start_timing": 14,
+    "range": 56000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_vanilluxe_skill1_chilling_water_wave"
+    }
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 42,
+    "cooltime": 460,
+    "start_timing": 14,
+    "range": 52000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_vanilluxe_skill2_frost_breath_cone"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 58,
+    "cooltime": 5400,
+    "start_timing": 22,
+    "range": 36000,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_vanilluxe_ult_sheer_cold_aoe"
+    }
+  },
+  "view_projectiles": [
+    {
+      "type": "Animated",
+      "name": "pokemon_moba_stable_vanilluxe_basicattack_icicle_spear_projectile",
+      "anim": "asset/pokemon_moba_stable/vfx/vanilluxe_basicattack_icicle_spear_projectile",
+      "tag": "projectile",
+      "z": 0,
+      "repeat": true
+    }
+  ],
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_vanilluxe_skill1_chilling_water_wave",
+      "anim": "asset/pokemon_moba_stable/vfx/vanilluxe_skill1_chilling_water_wave",
+      "tag": "wave",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_vanilluxe_skill2_frost_breath_cone",
+      "anim": "asset/pokemon_moba_stable/vfx/vanilluxe_skill2_frost_breath_cone",
+      "tag": "cone",
+      "z": 0,
+      "is_follow": false
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_vanilluxe_ult_sheer_cold_aoe",
+      "anim": "asset/pokemon_moba_stable/vfx/vanilluxe_ult_sheer_cold_aoe",
+      "tag": "aoe",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}

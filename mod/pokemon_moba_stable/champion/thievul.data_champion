@@ -1,0 +1,107 @@
+{
+  "id": "pokemon_moba_thievul",
+  "category": "Assassin",
+  "tags": ["AD", "Melee", "CC"],
+  "sprite": "asset/pokemon_moba_stable/champions_custom/thievul",
+  "anim_prefix": "",
+  "skill_icon": {
+    "source": "asset/pokemon_moba_stable/icons/move_categories/move_categories",
+    "tags": ["dark_physical", "dark_status", "dark_physical"]
+  },
+  "stat": {
+    "attack": 62,
+    "magic_power": 12,
+    "hp": 610,
+    "defence": 22,
+    "magic_resistance": 27,
+    "move_speed": 940,
+    "hp_regen": 7,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "growth": {
+    "attack": 6,
+    "magic_power": 1,
+    "hp": 48,
+    "defence": 2,
+    "magic_resistance": 2,
+    "move_speed": 0,
+    "hp_regen": 1,
+    "stack": 0,
+    "crit_chance": 0
+  },
+  "attack": {
+    "action_name": "attack",
+    "duration": 22,
+    "cooltime": 34,
+    "start_timing": 7,
+    "range": 19000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "Enemy",
+    "attack_type": "BaseAttack",
+    "can_use_with_move": true
+  },
+  "skill": {
+    "action_name": "skill",
+    "duration": 32,
+    "cooltime": 420,
+    "start_timing": 9,
+    "range": 30000,
+    "growth_range": 1,
+    "casting_type": "Targeting",
+    "casting_target": "EnemyChampion",
+    "attack_type": "Skill",
+    "can_use_with_move": false
+  },
+  "skill2": {
+    "action_name": "skill2",
+    "duration": 24,
+    "cooltime": 480,
+    "start_timing": 6,
+    "range": 1,
+    "growth_range": 1,
+    "casting_type": "None",
+    "casting_target": "None",
+    "attack_type": "Skill",
+    "can_use_with_move": true,
+    "effect": {
+      "type": "CasterViewEffect",
+      "name": "pokemon_moba_stable_thievul_skill2_hone_claws_aura"
+    }
+  },
+  "ult": {
+    "action_name": "ult",
+    "duration": 34,
+    "cooltime": 3600,
+    "start_timing": 10,
+    "range": 42000,
+    "growth_range": 1,
+    "casting_type": "Position",
+    "casting_target": "Enemy",
+    "attack_type": "Skill",
+    "can_use_with_move": false,
+    "effect": {
+      "type": "ViewEffect",
+      "name": "pokemon_moba_stable_thievul_ult_stakeout_field"
+    }
+  },
+  "view_effects": [
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_thievul_skill2_hone_claws_aura",
+      "anim": "asset/pokemon_moba_stable/vfx/thievul_skill2_hone_claws_aura",
+      "tag": "aura",
+      "z": 0,
+      "is_follow": true
+    },
+    {
+      "type": "Animation",
+      "name": "pokemon_moba_stable_thievul_ult_stakeout_field",
+      "anim": "asset/pokemon_moba_stable/vfx/thievul_ult_stakeout_field",
+      "tag": "field",
+      "z": 0,
+      "is_follow": false
+    }
+  ]
+}
