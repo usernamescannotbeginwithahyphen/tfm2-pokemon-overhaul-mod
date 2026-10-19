@@ -1,21 +1,21 @@
-use std::sync::{Mutex, OnceLock};
+use std::sync::Mutex;
+use crate::runtime_state::SimOnceLock as OnceLock;
+use crate::stable_legacy_api::InputTarget;
 
 use crate::stable_legacy_api::{
-    AttackType, BuffState, BuffType, CCState, EntityPos, GameCtx, PlayerState, Position,
+    AttackType, BuffState, BuffType, CCState, EntityPos, GameCtx, Position,
 };
+#[cfg(any())]
+use crate::stable_legacy_api::PlayerState;
 
 use crate::legacy::pokemon_content::{
-    champion_base_stat_for_level, ActionSlot, PokemonChampion, PokemonMove, PokemonMoveEffect,
+    ActionSlot, PokemonChampion, PokemonMove, PokemonMoveEffect,
 };
 use crate::legacy::pokemon_types::{PokemonType, TypeSet};
 
 fn combat_ctx_id(ctx: &GameCtx) -> usize {
-    let seed = ctx.seed() as usize;
-    if seed != 0 {
-        return seed;
-    }
-
-    ctx as *const GameCtx as usize
+    // The enclosing store is already partitioned by simulation origin and seed.
+    ctx.seed() as usize
 }
 
 #[allow(dead_code)]
@@ -72,7 +72,6 @@ const BRINE_FIELD_INTERVAL_TICKS: usize = 30;
 const STICKY_WEB_INTERVAL_TICKS: usize = 30;
 const WEB_WALKER_SPOT_TICKS: usize = 2 * 60;
 const GRASSY_TERRAIN_INTERVAL_TICKS: usize = 30;
-const SHIFTRY_BUSH_PROBE_RADIUS: u64 = 42000;
 const SHIFTRY_BUSH_REQUIRED_TICKS: usize = 90;
 const SHIFTRY_BUSH_LINGER_TICKS: usize = 2 * 60;
 const SHIFTRY_BUSH_BUFF_REFRESH_TICKS: usize = 10;
@@ -256,6 +255,7 @@ pub enum PokemonBuffPolarity {
 
 #[derive(Clone, Debug)]
 struct TrackedBuffState {
+    refresh_name: Option<String>,
     source_id: usize,
     target_id: usize,
     buff: BuffState,
@@ -430,6 +430,7 @@ struct ArmarougeMysticalFireAuraState {
 
 #[derive(Clone, Copy, Debug)]
 struct IceFieldState {
+    visual_stem: &'static str,
     caster_id: usize,
     caster_team: usize,
     center: EntityPos,
@@ -586,6 +587,7 @@ struct AudinoRegeneratorState {
 
 #[derive(Clone, Copy, Debug)]
 struct SymbiosisState {
+    ctx_id: usize,
     oranguru_id: usize,
     last_tick: usize,
 }
@@ -791,6 +793,7 @@ struct MistyTerrainState {
 
 #[derive(Clone, Copy, Debug)]
 struct BrineFieldState {
+    caster_id: usize,
     center: EntityPos,
     radius: u64,
     expires_at: usize,
@@ -1126,6 +1129,9 @@ struct SwannaCycloneState {
 struct SwannaSkyCircusState {
     caster_id: usize,
     start_pos: EntityPos,
+    previous_pos: EntityPos,
+    pending_contacts: Vec<usize>,
+    reached_area: bool,
     center: EntityPos,
     radius: u64,
     waypoints: Vec<EntityPos>,
@@ -1230,6 +1236,7 @@ pub struct WebWalkerSpot {
     pub team: usize,
     pub target_id: usize,
     pub target_pos: EntityPos,
+    pub observed_at: usize,
     pub expires_at: usize,
 }
 
@@ -1509,6 +1516,7 @@ struct RoostState {
 #[derive(Clone, Copy, Debug)]
 struct FlameTrailState {
     caster_id: usize,
+    visual_stem: Option<&'static str>,
     caster_team: usize,
     start: EntityPos,
     end: EntityPos,
@@ -1740,6 +1748,7 @@ pub struct PokemonCombatStatSnapshot {
 
 #[derive(Clone, Copy, Debug)]
 struct LightScreenState {
+    caster_id: usize,
     start: EntityPos,
     end: EntityPos,
     expires_at: usize,
@@ -1747,6 +1756,7 @@ struct LightScreenState {
 
 #[derive(Clone, Copy, Debug)]
 struct SmokeScreenState {
+    caster_id: usize,
     start: EntityPos,
     end: EntityPos,
     expires_at: usize,
@@ -2297,10 +2307,21 @@ pub fn reset_pokemon_status_runtime_state_for_new_match() {
 
 pub fn add_tracked_buff(
     ctx: &mut GameCtx,
+    source_id: usize,
+    target_id: usize,
+    buff: BuffState,
+    polarity: PokemonBuffPolarity,
+) {
+    write_tracked_buff(ctx, source_id, target_id, buff, polarity, None);
+}
+
+fn write_tracked_buff(
+    ctx: &mut GameCtx,
     mut source_id: usize,
     target_id: usize,
     mut buff: BuffState,
     mut polarity: PokemonBuffPolarity,
+    refresh_name: Option<String>,
 ) {
     if is_shedinja_entity(target_id) {
         buff.hp = 0;
@@ -2317,7 +2338,11 @@ pub fn add_tracked_buff(
     }
     let duration_ticks = buff_duration_ticks(&buff);
     let transferable = can_transfer_buff(&buff);
-    ctx.add_buff(target_id, buff.clone());
+    if let Some(name) = &refresh_name {
+        ctx.refresh_stat_buff(target_id, name, buff.clone());
+    } else {
+        ctx.add_buff(target_id, buff.clone());
+    }
 
     if polarity == PokemonBuffPolarity::Neutral {
         return;
@@ -2353,7 +2378,11 @@ pub fn add_tracked_buff(
 
     let states = TRACKED_BUFFS.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states.lock().expect("tracked buff ledger poisoned");
+    if let Some(name) = &refresh_name {
+        states.retain(|state| state.target_id != target_id || state.refresh_name.as_ref() != Some(name));
+    }
     states.push(TrackedBuffState {
+        refresh_name,
         source_id,
         target_id,
         buff,
@@ -2371,6 +2400,16 @@ pub fn add_beneficial_buff(ctx: &mut GameCtx, source_id: usize, target_id: usize
         buff,
         PokemonBuffPolarity::Beneficial,
     );
+}
+
+pub fn refresh_beneficial_buff(name: &str, ctx: &mut GameCtx, source_id: usize, target_id: usize, buff: BuffState) {
+    write_tracked_buff(ctx, source_id, target_id, buff, PokemonBuffPolarity::Beneficial,
+        Some(format!("{name}_{source_id}")));
+}
+
+pub fn refresh_harmful_buff(name: &str, ctx: &mut GameCtx, source_id: usize, target_id: usize, buff: BuffState) {
+    write_tracked_buff(ctx, source_id, target_id, buff, PokemonBuffPolarity::Harmful,
+        Some(format!("{name}_{source_id}")));
 }
 
 pub fn add_harmful_buff(ctx: &mut GameCtx, source_id: usize, target_id: usize, buff: BuffState) {
@@ -2448,12 +2487,14 @@ pub fn heart_swap_tracked_buffs(
 
     for state in &moved_harmful {
         let moved = buff_with_remaining_duration(state.buff.clone(), state.expires_at, tick);
-        neutralize_tracked_buff(ctx, state.target_id, &moved);
+        if let Some(name) = &state.refresh_name { ctx.entity_remove_buff(state.target_id, name); }
+        else { neutralize_tracked_buff(ctx, state.target_id, &moved); }
         add_harmful_buff(ctx, caster_id, target_id, moved);
     }
     for state in &moved_beneficial {
         let moved = buff_with_remaining_duration(state.buff.clone(), state.expires_at, tick);
-        neutralize_tracked_buff(ctx, state.target_id, &moved);
+        if let Some(name) = &state.refresh_name { ctx.entity_remove_buff(state.target_id, name); }
+        else { neutralize_tracked_buff(ctx, state.target_id, &moved); }
         add_beneficial_buff(ctx, caster_id, caster_id, moved);
     }
 
@@ -3297,8 +3338,9 @@ pub fn try_wonder_guard_damage(
         return true;
     }
 
-    let super_effective = crate::legacy::pokemon_types::type_modifier_ratio(move_type, defender_types).0
-        > crate::legacy::pokemon_types::type_modifier_ratio(move_type, defender_types).1;
+    let super_effective =
+        crate::legacy::pokemon_types::type_modifier_ratio(move_type, defender_types).0
+            > crate::legacy::pokemon_types::type_modifier_ratio(move_type, defender_types).1;
     if matches!(attack_type, AttackType::BaseAttack) || !super_effective {
         return true;
     }
@@ -3331,7 +3373,8 @@ pub fn try_wonder_guard_dot_tick(
     target_id: usize,
     move_type: PokemonType,
 ) -> bool {
-    let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+    let defender_types =
+        crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
     if is_shedinja_entity(target_id) && move_type != PokemonType::Fire {
         let tick = ctx.tick();
         let states = WONDER_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
@@ -3781,7 +3824,7 @@ pub fn update_kingdra_dragon_dance_passive(ctx: &mut GameCtx, entity_id: usize) 
     } else {
         base_bonus
     };
-    add_beneficial_buff(
+    refresh_beneficial_buff("pm_kingdra_dragon_dance_passive_0",
         ctx,
         entity_id,
         entity_id,
@@ -3893,7 +3936,7 @@ pub fn update_cloyster_overcoat(ctx: &mut GameCtx, entity_id: usize) {
     if bonus_armor == 0 {
         return;
     }
-    add_beneficial_buff(
+    refresh_beneficial_buff("pm_cloyster_overcoat_0",
         ctx,
         entity_id,
         entity_id,
@@ -4258,6 +4301,7 @@ pub fn note_smeargle_affected(
     source_champion: PokemonChampion,
     action: PokemonMove,
 ) {
+    let action = crate::projectiles::original_action().unwrap_or(action);
     if !is_smeargle_copyable(action) {
         return;
     }
@@ -4634,6 +4678,17 @@ pub fn audino_protect_redirect(ctx: &GameCtx, target_id: usize) -> Option<usize>
 
 fn audino_protect_blocks_new_damage_status(ctx: &GameCtx, target_id: usize) -> bool {
     audino_protect_redirect(ctx, target_id).is_some()
+}
+
+// These effects consume/clamp pre-engine damage and must see the critical amount.
+pub fn requires_resolved_crit(ctx: &GameCtx, target_id: usize) -> bool {
+    audino_protect_redirect(ctx, target_id).is_some()
+        || champion_id_for_entity(target_id) == Some("pokemon_moba_skarmory")
+        || receiver_has_copied(target_id, "pokemon_moba_skarmory")
+        || ENDURES.get().map_or(false, |states| states.lock().expect("endure state poisoned")
+            .iter().any(|state| state.target_id == target_id && state.expires_at > ctx.tick()))
+        || LIGHT_METALS.get().map_or(false, |states| states.lock().expect("light metal state poisoned")
+            .iter().any(|state| state.entity_id == target_id && state.shield_until > ctx.tick()))
 }
 
 pub fn begin_endure(ctx: &GameCtx, target_id: usize, ticks: usize) {
@@ -5336,6 +5391,13 @@ pub fn is_sawk_form(ctx: &GameCtx, entity_id: usize) -> bool {
     sawk_throh_form(ctx, entity_id) == SawkThrohForm::Sawk
 }
 
+pub(crate) fn ai_is_sawk_form(entity_id: usize) -> bool {
+    SAWK_THROH_FORMS.get_or_init(|| Mutex::new(Vec::new())).lock()
+        .expect("sawk/throh stance state poisoned").iter()
+        .find(|state| state.entity_id == entity_id)
+        .map_or(true, |state| state.form == SawkThrohForm::Sawk)
+}
+
 pub fn toggle_sawk_throh_form(ctx: &mut GameCtx, entity_id: usize) -> SawkThrohForm {
     register_sawk_throh(entity_id);
     let states = SAWK_THROH_FORMS.get_or_init(|| Mutex::new(Vec::new()));
@@ -5888,6 +5950,8 @@ fn visible_player_gold(ctx: &GameCtx, entity_id: usize) -> Option<(usize, usize)
     Some((player_id, gold))
 }
 
+// Retained for reference only. Stable credited-kill callbacks now own this reward.
+#[cfg(any())]
 pub fn update_gholdengo_gold_passive(ctx: &GameCtx, entity_id: usize) {
     let player_id = match player_for_entity(entity_id) {
         Some(player_id) => player_id,
@@ -6212,11 +6276,12 @@ pub fn apply_anti_heal(
     }
     drop(states);
 
-    ctx.add_buff(
+    ctx.refresh_stat_buff(
         target_id,
+        "pokemon_moba_anti_heal",
         BuffState {
             duration: BuffType::Time { tick: ticks },
-            heal_reduce: percent,
+            heal_reduce: anti_heal_percent(ctx, target_id),
             ..Default::default()
         },
     );
@@ -6228,14 +6293,31 @@ pub fn apply_anti_heal(
 pub fn anti_heal_percent(ctx: &GameCtx, target_id: usize) -> usize {
     let tick = ctx.tick();
     let states = ANTI_HEALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("anti-heal state poisoned");
-    states.retain(|state| state.expires_at > tick);
+    let states = states.lock().expect("anti-heal state poisoned");
     states
         .iter()
-        .filter(|state| state.target_id == target_id)
+        .filter(|state| state.target_id == target_id && state.expires_at > tick)
         .map(|state| state.percent)
         .max()
         .unwrap_or(0)
+}
+
+fn refresh_native_anti_heal(ctx: &GameCtx) {
+    let mut active = std::collections::BTreeMap::<usize, usize>::new();
+    let mut expired = Vec::new();
+    let mut states = ANTI_HEALS.get_or_init(|| Mutex::new(Vec::new())).lock().expect("anti-heal state poisoned");
+    states.retain(|state| {
+        if state.expires_at <= ctx.tick() { expired.push(state.target_id); return false; }
+        active.entry(state.target_id).and_modify(|percent| *percent = (*percent).max(state.percent)).or_insert(state.percent);
+        true
+    });
+    drop(states);
+    for target in expired { if !active.contains_key(&target) { ctx.entity_remove_buff(target, "pokemon_moba_anti_heal"); } }
+    for (target, percent) in active {
+        ctx.refresh_stat_buff(target, "pokemon_moba_anti_heal", BuffState {
+            duration: BuffType::Time { tick: 2 }, heal_reduce: percent, ..Default::default()
+        });
+    }
 }
 
 pub fn heal_with_antiheal(
@@ -6266,17 +6348,20 @@ pub fn heal_with_antiheal(
         log_pokemon_heal_skip(ctx, caster_id, target_id, amount, "non_champion_target");
         return 0;
     }
+    refresh_native_anti_heal(ctx);
     let percent = anti_heal_percent(ctx, target_id).min(100);
-    let mut adjusted = amount.saturating_mul(100usize.saturating_sub(percent)) / 100;
+    // Native heal applies the named heal_reduce buff. Do not reduce twice or
+    // cap to missing HP before the engine applies that reduction.
+    let mut adjusted = amount;
     if has_ripen(ctx, target_id) {
         adjusted = adjusted.saturating_mul(2);
     }
     if adjusted > 0 {
         let before_hp_state = ctx.get_entity(target_id).map(|entity| entity.hp());
         let before_hp = before_hp_state.map(|hp| hp.current).unwrap_or(0);
-        let heal_amount = before_hp_state
-            .map(|hp| hp.max.saturating_sub(hp.current).min(adjusted))
-            .unwrap_or(0);
+        let heal_amount = if before_hp_state.map_or(false, |hp| hp.current < hp.max) {
+            adjusted
+        } else { 0 };
         if heal_amount > 0 {
             ctx.heal(caster_id, target_id, heal_amount);
         }
@@ -6518,7 +6603,7 @@ pub fn update_snorlax_gluttony(ctx: &mut GameCtx, entity_id: usize) {
         heal_with_antiheal(ctx, entity_id, entity_id, sleep_heal.max(1));
     }
     if slow_offset > 0 {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_snorlax_gluttony_0",
             entity_id,
             BuffState {
                 duration: BuffType::Time { tick: 35 },
@@ -6528,7 +6613,7 @@ pub fn update_snorlax_gluttony(ctx: &mut GameCtx, entity_id: usize) {
         );
     }
     if draw_full_belly {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_snorlax_gluttony_1",
             entity_id,
             BuffState {
                 duration: BuffType::Time {
@@ -7004,6 +7089,22 @@ pub fn clear_soft_untargetable(entity_id: usize) {
         .retain(|state| state.entity_id != entity_id);
 }
 
+pub(crate) fn ai_soft_untargetable(world: &crate::ai_world::World, entity_id: usize) -> bool {
+    let tick = world.tick;
+    let hidden_by_weavile = is_weavile_hidden_from_pokemon_ai_at(entity_id, tick);
+    let revealed = hidden_by_weavile && world.get(entity_id).map_or(false, |target| {
+        target.detected || AMPHAROS_TRUE_SIGHTS.get_or_init(|| Mutex::new(Vec::new())).lock()
+            .expect("ampharos true sight state poisoned").iter().any(|state| {
+                state.expires_at > tick && state.team != target.team
+                    && world.get(state.source_id).map_or(false, |source|
+                        crate::ai_world::distance_sq(source.pos, target.pos) <= u128::from(state.radius).pow(2))
+            })
+    });
+    SOFT_UNTARGETABLES.get_or_init(|| Mutex::new(Vec::new())).lock()
+        .expect("soft untargetable state poisoned").iter()
+        .any(|state| state.entity_id == entity_id && state.expires_at > tick && !revealed)
+}
+
 pub fn is_soft_untargetable(ctx: &GameCtx, entity_id: usize) -> bool {
     let Some(entity) = ctx.get_entity(entity_id) else {
         return false;
@@ -7022,7 +7123,7 @@ pub fn is_soft_untargetable(ctx: &GameCtx, entity_id: usize) -> bool {
         .any(|state| {
             state.entity_id == entity_id
                 && state.expires_at > tick
-                && !(hidden_by_weavile && ampharos_true_sight_reveals(ctx, entity_id))
+                && !(hidden_by_weavile && shared_detection_reveals_stealth(ctx, entity_id))
         })
 }
 
@@ -7052,15 +7153,34 @@ pub fn begin_weavile_hunt_stealth(ctx: &GameCtx, entity_id: usize, stealth_ticks
     drop(states);
 
     apply_soft_untargetable(ctx, entity_id, stealth_ticks);
+    // Short native leases keep custom break/reveal rules authoritative even if
+    // a host does not shorten an existing invisibility timer on a zero-tick call.
+    ctx.entity_set_invisible(entity_id, if shared_detection_reveals_stealth(ctx, entity_id) { 0 } else { stealth_ticks.min(2) });
 }
 
-pub fn break_weavile_hunt_stealth(entity_id: usize) {
+fn refresh_native_stealth(ctx: &GameCtx) {
+    let hunts = {
+        let mut states = WEAVILE_HUNTS.get_or_init(|| Mutex::new(Vec::new())).lock()
+            .expect("weavile hunt state poisoned");
+        let hunts = states.clone();
+        states.retain(|hunt| hunt.stealth_expires_at > ctx.tick());
+        hunts
+    };
+    for hunt in hunts {
+        let remaining = hunt.stealth_expires_at.saturating_sub(ctx.tick());
+        ctx.entity_set_invisible(hunt.entity_id,
+            if shared_detection_reveals_stealth(ctx, hunt.entity_id) { 0 } else { remaining.min(2) });
+    }
+}
+
+pub fn break_weavile_hunt_stealth(ctx: &GameCtx, entity_id: usize) {
     WEAVILE_HUNTS
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("weavile hunt state poisoned")
         .retain(|state| state.entity_id != entity_id);
     clear_soft_untargetable(entity_id);
+    ctx.entity_set_invisible(entity_id, 0);
 }
 
 pub fn is_weavile_hidden_from_pokemon_ai_at(entity_id: usize, tick: usize) -> bool {
@@ -7078,7 +7198,17 @@ pub fn is_weavile_hidden_from_pokemon_ai(ctx: &GameCtx, entity_id: usize) -> boo
     };
     entity.is_alive()
         && is_weavile_hidden_from_pokemon_ai_at(entity_id, ctx.tick())
-        && !ampharos_true_sight_reveals(ctx, entity_id)
+        && !shared_detection_reveals_stealth(ctx, entity_id)
+}
+
+fn shared_detection_reveals_stealth(ctx: &GameCtx, entity_id: usize) -> bool {
+    if ampharos_true_sight_reveals(ctx, entity_id) { return true; }
+    let Some(target) = ctx.get_entity(entity_id) else { return false; };
+    let tick = ctx.tick();
+    WEB_WALKER_SPOTS.get_or_init(|| Mutex::new(Vec::new())).lock()
+        .expect("web walker spot state poisoned").iter().any(|spot|
+            spot.target_id == entity_id && spot.team != target.team() && spot.expires_at > tick
+                && spot.observed_at <= tick && tick - spot.observed_at <= 8)
 }
 
 fn has_ampharos_luminous_pulse(entity_id: usize) -> bool {
@@ -7121,6 +7251,7 @@ fn refresh_ampharos_true_sight(ctx: &GameCtx, entity_id: usize) {
         return;
     }
     let team = entity.team();
+    let pos = entity.pos();
     drop(entity);
 
     let tick = ctx.tick();
@@ -7133,6 +7264,15 @@ fn refresh_ampharos_true_sight(ctx: &GameCtx, entity_id: usize) {
         radius: AMPHAROS_LUMINOUS_RADIUS,
         expires_at: tick.saturating_add(AMPHAROS_TRUE_SIGHT_REFRESH_TICKS),
     });
+    drop(states);
+    // Detection is continuous; the damage pulse still runs every five seconds.
+    for index in 0..ctx.entity_count() {
+        let Some(target) = ctx.entity_at(index) else { continue; };
+        if target.is_alive() && target.is_champion() && target.team() != team
+            && distance_sq(pos, target.pos()) <= AMPHAROS_LUMINOUS_RADIUS.pow(2) {
+            note_web_walker_spot(tick, entity_id, team, target.id(), target.pos());
+        }
+    }
 }
 
 fn active_searchlight_tail(entity_id: usize, tick: usize) -> Option<AmpharosSearchlightTailState> {
@@ -7264,7 +7404,8 @@ pub fn apply_ampharos_flash(
         .collect();
 
     for target_id in targets {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -7346,6 +7487,8 @@ pub fn update_ampharos_luminous_pulse(ctx: &mut GameCtx, entity_id: usize) {
     drop(states);
 
     let searchlight = active_searchlight_tail(entity_id, tick);
+    crate::native_vfx::burst(ctx, "ampharos_passive_luminous_pulse_aura", entity_id,
+        InputTarget::Pos { x: pos.x, y: pos.y }, AMPHAROS_LUMINOUS_RADIUS);
     let mut damage = AMPHAROS_LUMINOUS_BASE_AP
         .saturating_add(magic_power.saturating_mul(AMPHAROS_LUMINOUS_AP_RATIO) / 100);
     if let Some(state) = searchlight {
@@ -7382,7 +7525,8 @@ pub fn update_ampharos_luminous_pulse(ctx: &mut GameCtx, entity_id: usize) {
                 .map(|target| target.pos())
                 .unwrap_or(pos),
         );
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             entity_id,
@@ -7730,7 +7874,7 @@ pub fn update_tangling_vines_aura(ctx: &mut GameCtx, venusaur_id: usize) {
         .collect();
 
     for ally_id in ally_ids {
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_tangling_vines_aura_0",
             ctx,
             venusaur_id,
             ally_id,
@@ -7791,7 +7935,7 @@ pub fn update_helping_hand_aura(ctx: &mut GameCtx, eevee_id: usize) {
         .collect();
 
     for ally_id in ally_ids {
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_helping_hand_aura_0",
             ctx,
             eevee_id,
             ally_id,
@@ -7888,7 +8032,7 @@ pub fn update_intimidate_aura(ctx: &mut GameCtx, houndoom_id: usize) {
         .collect();
 
     for enemy_id in enemy_ids {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_intimidate_aura_0",
             enemy_id,
             BuffState {
                 duration: BuffType::Time { tick: 45 },
@@ -8034,7 +8178,7 @@ pub fn update_flower_veil_passive(ctx: &mut GameCtx, comfey_id: usize) {
     };
 
     if should_refresh {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_flower_veil_passive_0",
             ally_id,
             BuffState {
                 duration: BuffType::Time {
@@ -8130,7 +8274,7 @@ pub fn update_clingy_passive(ctx: &mut GameCtx, clawitzer_id: usize) {
         states[index].last_ally_hp = 0;
         states[index].last_tick = tick;
         drop(states);
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_clingy_passive_0",
             clawitzer_id,
             BuffState {
                 duration: BuffType::Time {
@@ -8163,7 +8307,7 @@ pub fn update_clingy_passive(ctx: &mut GameCtx, clawitzer_id: usize) {
     };
 
     if should_refresh {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_clingy_passive_1",
             ally_id,
             BuffState {
                 duration: BuffType::Time {
@@ -9109,19 +9253,18 @@ pub fn will_o_wisp_ready_for_player(
     player_id: usize,
     tick: usize,
     max_charges: usize,
-    recharge_ticks: usize,
+    _recharge_ticks: usize,
 ) -> bool {
     let Some(entity_id) = entity_for_player(player_id) else {
         return true;
     };
-    refill_will_o_wisp_charge(tick, entity_id, max_charges, recharge_ticks);
     WILL_O_WISP_CHARGES
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("will-o-wisp charge state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
-        .map(|state| state.charges > 0)
+        .map(|state| state.charges > 0 || (max_charges > 0 && state.next_charge_at <= tick))
         .unwrap_or(true)
 }
 
@@ -9164,19 +9307,18 @@ pub fn sticky_web_ready_for_player(
     player_id: usize,
     tick: usize,
     max_charges: usize,
-    recharge_ticks: usize,
+    _recharge_ticks: usize,
 ) -> bool {
     let Some(entity_id) = entity_for_player(player_id) else {
         return true;
     };
-    refill_sticky_web_charge(tick, entity_id, max_charges, recharge_ticks);
     STICKY_WEB_CHARGES
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
         .expect("sticky web charge state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
-        .map(|state| state.charges > 0)
+        .map(|state| state.charges > 0 || (max_charges > 0 && state.next_charge_at <= tick))
         .unwrap_or(true)
 }
 
@@ -9221,6 +9363,7 @@ fn refill_will_o_wisp_charge(
 pub fn begin_flame_trail(
     ctx: &GameCtx,
     caster_id: usize,
+    visual_stem: Option<&'static str>,
     start: EntityPos,
     end: EntityPos,
     width: u64,
@@ -9247,6 +9390,7 @@ pub fn begin_flame_trail(
         .expect("flame trail state poisoned")
         .push(FlameTrailState {
             caster_id,
+            visual_stem,
             caster_team,
             start,
             end,
@@ -9322,7 +9466,7 @@ pub fn update_speed_boost_passive(ctx: &mut GameCtx, entity_id: usize) {
         return;
     }
 
-    ctx.add_buff(
+    ctx.refresh_periodic_buff("pm_speed_boost_passive_0",
         entity_id,
         BuffState {
             duration: BuffType::Time {
@@ -9371,7 +9515,7 @@ fn refresh_sawk_throh_buff(ctx: &mut GameCtx, entity_id: usize, form: SawkThrohF
 
     match form {
         SawkThrohForm::Sawk => {
-            add_beneficial_buff(
+            refresh_beneficial_buff("pm_sawk_throh_stance",
                 ctx,
                 entity_id,
                 entity_id,
@@ -9388,7 +9532,9 @@ fn refresh_sawk_throh_buff(ctx: &mut GameCtx, entity_id: usize, form: SawkThrohF
             draw_status_marker(ctx, pos, 9000, VFX_FIGHTING);
         }
         SawkThrohForm::Throh => {
-            ctx.add_buff(
+            refresh_beneficial_buff("pm_sawk_throh_stance",
+                ctx,
+                entity_id,
                 entity_id,
                 BuffState {
                     duration: BuffType::Time { tick: 45 },
@@ -10008,6 +10154,8 @@ fn update_yanmega_giga_drains(ctx: &mut GameCtx, tick: usize) {
         );
         let heal = result.applied_damage.max(1);
         heal_from_damage_or_poison_yanmega(ctx, state.caster_id, state.target_id, heal);
+        crate::native_vfx::line_pulse(ctx, "yanmega_ult_giga_drain_tether", state.caster_id,
+            caster_pos, target_pos, 5500);
         draw_line_band(ctx, caster_pos, target_pos, 5500, VFX_GRASS);
 
         if let Some(caster) = ctx.get_entity(state.caster_id) {
@@ -10162,7 +10310,7 @@ fn update_weezing_body_odors(ctx: &mut GameCtx, tick: usize) {
                 state.poison_damage,
                 state.poison_refresh_ticks,
             );
-            add_harmful_buff(
+            refresh_harmful_buff("pm_weezing_body_odors_0",
                 ctx,
                 state.caster_id,
                 target_id,
@@ -10261,9 +10409,30 @@ pub fn begin_weezing_sludge_whirlpool(
     });
     drop(states);
 
-    apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: duration_ticks as u64 });
-    apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockSkill { tick: duration_ticks });
-    apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockAttack { tick: duration_ticks });
+    apply_pokemon_cc(
+        ctx,
+        caster_id,
+        caster_id,
+        CCState::Bind {
+            tick: duration_ticks as u64,
+        },
+    );
+    apply_pokemon_cc(
+        ctx,
+        caster_id,
+        caster_id,
+        CCState::BlockSkill {
+            tick: duration_ticks,
+        },
+    );
+    apply_pokemon_cc(
+        ctx,
+        caster_id,
+        caster_id,
+        CCState::BlockAttack {
+            tick: duration_ticks,
+        },
+    );
     draw_status_marker(ctx, origin, radius, VFX_POISON);
 }
 
@@ -10305,7 +10474,7 @@ fn update_weezing_sludge_whirlpools(ctx: &mut GameCtx, tick: usize) {
         let caster_pos = caster.pos();
         drop(caster);
 
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_weezing_sludge_whirlpools_0",
             ctx,
             state.caster_id,
             state.caster_id,
@@ -10363,7 +10532,7 @@ fn update_weezing_sludge_whirlpools(ctx: &mut GameCtx, tick: usize) {
                 state.poison_damage,
                 state.poison_ticks,
             );
-            add_harmful_buff(
+            refresh_harmful_buff("pm_weezing_sludge_whirlpools_1",
                 ctx,
                 state.caster_id,
                 target_id,
@@ -10490,6 +10659,7 @@ pub fn is_frozen(ctx: &GameCtx, entity_id: usize) -> bool {
 pub fn begin_ice_field(
     ctx: &GameCtx,
     caster_id: usize,
+    visual_stem: &'static str,
     center: EntityPos,
     radius: u64,
     duration_ticks: usize,
@@ -10509,6 +10679,7 @@ pub fn begin_ice_field(
         .lock()
         .expect("ice field state poisoned")
         .push(IceFieldState {
+            visual_stem,
             caster_id,
             caster_team: caster.team(),
             center,
@@ -11059,6 +11230,7 @@ pub fn begin_misty_terrain(
 
 pub fn begin_brine_field(
     ctx: &GameCtx,
+    caster_id: usize,
     center: EntityPos,
     duration_ticks: usize,
     radius: u64,
@@ -11069,6 +11241,7 @@ pub fn begin_brine_field(
     let mut fields = fields.lock().expect("brine field state poisoned");
     let tick = ctx.tick();
     fields.push(BrineFieldState {
+        caster_id,
         center,
         radius,
         expires_at: tick.saturating_add(duration_ticks),
@@ -11538,6 +11711,9 @@ pub fn begin_swanna_sky_circus(
         .push(SwannaSkyCircusState {
             caster_id,
             start_pos,
+            previous_pos: start_pos,
+            pending_contacts: Vec::new(),
+            reached_area: false,
             center,
             radius,
             waypoints,
@@ -11626,7 +11802,7 @@ pub fn update_swanna_tailwind(ctx: &mut GameCtx, entity_id: usize) {
     drop(states);
 
     if should_refresh {
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_swanna_tailwind_0",
             ctx,
             entity_id,
             entity_id,
@@ -11722,7 +11898,7 @@ fn update_swanna_cyclones(ctx: &mut GameCtx, tick: usize) {
                 attacker_types,
                 defender_types,
             );
-            ctx.add_buff(
+            ctx.refresh_periodic_buff("pm_swanna_cyclones_0",
                 target_id,
                 BuffState {
                     duration: BuffType::Time { tick: slow_ticks },
@@ -11753,7 +11929,21 @@ fn update_swanna_sky_circuses(ctx: &mut GameCtx, tick: usize) {
         let caster_pos = caster.pos();
         drop(caster);
         protections.push(state.caster_id);
-        visuals.push((state.center, state.radius, caster_pos));
+        visuals.push((state.caster_id,state.center, state.radius, caster_pos));
+        state.reached_area |= distance_sq(caster_pos,state.center)<=state.radius.saturating_mul(state.radius);
+        if caster_pos != state.previous_pos {
+            let mut touched=false;
+            for target_id in state.targets.iter().copied() {
+                if !state.pending_contacts.contains(&target_id) && ctx.get_entity(target_id).is_some_and(|e|
+                    e.is_alive() && distance_to_segment_sq(e.pos(),state.previous_pos,caster_pos)
+                        <=SWANNA_SKY_CIRCUS_HIT_RADIUS.saturating_mul(SWANNA_SKY_CIRCUS_HIT_RADIUS)) {
+                    state.pending_contacts.push(target_id); touched=true;
+                }
+            }
+            if touched {crate::native_vfx::line_pulse(ctx,"swanna_ult_sky_circus_slash",state.caster_id,
+                state.previous_pos,caster_pos,SWANNA_SKY_CIRCUS_HIT_RADIUS);}
+            state.previous_pos=caster_pos;
+        }
 
         if tick >= state.next_waypoint_at && state.waypoint_index + 1 < state.waypoints.len() {
             state.waypoint_index += 1;
@@ -11769,31 +11959,8 @@ fn update_swanna_sky_circuses(ctx: &mut GameCtx, tick: usize) {
         }
 
         if tick >= state.next_hit_at && state.hits_remaining > 0 {
-            let segment_start = if state.waypoint_index == 0 {
-                state.start_pos
-            } else {
-                state.waypoints[state.waypoint_index - 1]
-            };
-            let segment_end = state
-                .waypoints
-                .get(state.waypoint_index)
-                .copied()
-                .unwrap_or(caster_pos);
-            let hit_targets: Vec<usize> = state
-                .targets
-                .iter()
-                .copied()
-                .filter(|target_id| {
-                    ctx.get_entity(*target_id)
-                        .map(|entity| {
-                            entity.is_alive()
-                                && distance_to_segment_sq(entity.pos(), segment_start, segment_end)
-                                    <= SWANNA_SKY_CIRCUS_HIT_RADIUS
-                                        .saturating_mul(SWANNA_SKY_CIRCUS_HIT_RADIUS)
-                        })
-                        .unwrap_or(false)
-                })
-                .collect();
+            let hit_targets: Vec<usize> = std::mem::take(&mut state.pending_contacts).into_iter()
+                .filter(|id|ctx.get_entity(*id).is_some_and(|e|e.is_alive())).collect();
             if !hit_targets.is_empty() {
                 hit_batches.push((
                     state.caster_id,
@@ -11823,7 +11990,9 @@ fn update_swanna_sky_circuses(ctx: &mut GameCtx, tick: usize) {
                         .unwrap_or(false)
                 })
                 .collect();
-            if !live_targets.is_empty() {
+            if state.reached_area && !live_targets.is_empty() {
+                crate::native_vfx::burst(ctx,"swanna_ult_sky_circus_landing",state.caster_id,
+                    InputTarget::Pos{x:state.center.x,y:state.center.y},state.radius);
                 landing_batches.push((
                     state.caster_id,
                     state
@@ -11852,7 +12021,7 @@ fn update_swanna_sky_circuses(ctx: &mut GameCtx, tick: usize) {
 
     for caster_id in protections {
         apply_soft_untargetable(ctx, caster_id, 8);
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_swanna_sky_circuses_0",
             caster_id,
             BuffState {
                 duration: BuffType::Time { tick: 8 },
@@ -11861,7 +12030,8 @@ fn update_swanna_sky_circuses(ctx: &mut GameCtx, tick: usize) {
             },
         );
     }
-    for (center, radius, caster_pos) in visuals {
+    for (caster,center, radius, caster_pos) in visuals {
+        crate::native_vfx::field(ctx,"swanna_ult_sky_circus_aoe",caster,center,radius);
         draw_field_circle(ctx, center, radius, VFX_FLYING);
         draw_status_marker(ctx, caster_pos, 12000, VFX_FLYING);
     }
@@ -12002,7 +12172,7 @@ fn update_marowak_bone_windmills(ctx: &mut GameCtx, tick: usize) {
     for caster_id in protections {
         apply_pokemon_cc(ctx, caster_id, caster_id, CCState::Bind { tick: 8 });
         apply_pokemon_cc(ctx, caster_id, caster_id, CCState::BlockSkill { tick: 8 });
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_marowak_bone_windmills_0",
             ctx,
             caster_id,
             caster_id,
@@ -12257,7 +12427,8 @@ fn salt_damage_for_target(
     base_damage: usize,
     water_steel_bonus_percent: usize,
 ) -> usize {
-    let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+    let defender_types =
+        crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
     let vulnerable = defender_types
         .iter()
         .any(|ty| matches!(ty, PokemonType::Water | PokemonType::Steel));
@@ -12405,7 +12576,7 @@ fn update_garganacl_salt(ctx: &mut GameCtx, tick: usize) {
             TypeSet::single(PokemonType::Rock),
             crate::legacy::neutral_objectives::defender_types_for_target(ctx, actual_target_id),
         );
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_garganacl_salt_0",
             actual_target_id,
             BuffState {
                 duration: BuffType::Time { tick: slow_ticks },
@@ -12436,7 +12607,7 @@ fn update_garganacl_salt(ctx: &mut GameCtx, tick: usize) {
             TypeSet::single(PokemonType::Rock),
             crate::legacy::neutral_objectives::defender_types_for_target(ctx, actual_target_id),
         );
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_garganacl_salt_1",
             actual_target_id,
             BuffState {
                 duration: BuffType::Time { tick: slow_ticks },
@@ -12467,6 +12638,7 @@ fn update_ampharos_gigavolts(ctx: &mut GameCtx, tick: usize) {
 
     let mut initial_strikes = Vec::new();
     let mut zone_ticks = Vec::new();
+    let mut zone_visuals = Vec::new();
     for state in states.iter_mut() {
         if !state.triggered && tick >= state.trigger_at {
             state.triggered = true;
@@ -12477,10 +12649,17 @@ fn update_ampharos_gigavolts(ctx: &mut GameCtx, tick: usize) {
             state.next_tick_at = tick.saturating_add(state.zone_tick_interval.max(1));
             zone_ticks.push(*state);
         }
+        if state.triggered { zone_visuals.push((state.caster_id,state.center,state.radius)); }
     }
     drop(states);
 
+    for (caster,center,radius) in zone_visuals {
+        crate::native_vfx::field(ctx,"ampharos_ult_gigavolt_zone",caster,center,radius);
+    }
+
     for state in initial_strikes {
+        crate::native_vfx::burst(ctx, "ampharos_ult_gigavolt_strike_zone", state.caster_id,
+            InputTarget::Pos { x: state.center.x, y: state.center.y }, state.radius);
         let radius_sq = state.radius.saturating_mul(state.radius);
         let targets: Vec<usize> = (0..ctx.entity_count())
             .filter_map(|index| ctx.entity_at(index))
@@ -12633,7 +12812,8 @@ pub fn apply_xatu_mind_bend(
 
     apply_confusion_from(ctx, caster_id, target_id, 1, confusion_ticks);
     if xatu_stood_still_for(ctx, caster_id, still_ticks_required) {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -12922,7 +13102,7 @@ fn update_xatu_super_psys(ctx: &mut GameCtx, tick: usize) {
                 state.caster_id,
                 CCState::Bind { tick: 8 },
             );
-            ctx.add_buff(
+            ctx.refresh_periodic_buff("pm_xatu_super_psys_0",
                 state.caster_id,
                 BuffState {
                     duration: BuffType::Time { tick: 8 },
@@ -12957,6 +13137,8 @@ fn update_xatu_super_psys(ctx: &mut GameCtx, tick: usize) {
         drop(caster);
         let aim_end = xatu_super_psy_aim_end(ctx, state, caster_pos);
         let width_sq = state.width.saturating_mul(state.width);
+        crate::native_vfx::line_pulse(ctx, "xatu_ult_super_psy_beam", state.caster_id,
+            caster_pos, aim_end, state.width);
         let targets: Vec<(usize, EntityPos)> = (0..ctx.entity_count())
             .filter_map(|index| ctx.entity_at(index))
             .filter(|entity| {
@@ -13229,7 +13411,7 @@ fn update_quaquaval_aqua_step_segments(ctx: &mut GameCtx, tick: usize) {
         );
     }
     for (caster_id, target_id, move_speed_mult) in ally_buffs {
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_quaquaval_aqua_step_segments_0",
             ctx,
             caster_id,
             target_id,
@@ -13243,7 +13425,7 @@ fn update_quaquaval_aqua_step_segments(ctx: &mut GameCtx, tick: usize) {
         );
     }
     for (caster_id, target_id, slow_percent) in enemy_slows {
-        add_harmful_buff(
+        refresh_harmful_buff("pm_quaquaval_aqua_step_segments_1",
             ctx,
             caster_id,
             target_id,
@@ -13324,7 +13506,8 @@ pub fn apply_quaquaval_spiral_shot(
     let target_pos = target.pos();
     drop(target);
 
-    let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+    let defender_types =
+        crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
     crate::legacy::pokemon_types::deal_pokemon_damage(
         ctx,
         caster_id,
@@ -13408,7 +13591,7 @@ pub fn apply_quaquaval_up_tempo(
     if !caster.is_alive() {
         return;
     }
-    let caster_pos = caster.pos();
+    let caster_pos = crate::motion::origin(caster_id).unwrap_or_else(|| caster.pos());
     drop(caster);
     let Some(target) = ctx.get_entity(target_id) else {
         return;
@@ -13426,15 +13609,16 @@ pub fn apply_quaquaval_up_tempo(
         target_pos,
         trail_check_width,
     );
-    force_move_toward_pos(
-        ctx, caster_id, caster_pos, target_pos, dash_speed, dash_ticks,
-    );
+    if !crate::motion::resolving(caster_id) {
+        force_move_toward_pos(ctx, caster_id, caster_pos, target_pos, dash_speed, dash_ticks);
+    }
     let damage = if empowered {
         base_damage.saturating_mul(100usize.saturating_add(empowered_bonus_percent)) / 100
     } else {
         base_damage
     };
-    let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+    let defender_types =
+        crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
     crate::legacy::pokemon_types::deal_pokemon_damage(
         ctx,
         caster_id,
@@ -13518,7 +13702,8 @@ pub fn apply_arcanine_extremespeed(
         .collect();
 
     for target_id in targets {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -13588,14 +13773,17 @@ pub fn apply_arcanine_white_flames(
             entity.team() != caster_team
                 && entity.is_alive()
                 && !entity.is_tower()
-                && (distance_to_segment_sq(entity.pos(), left_start, left_end) <= width_sq
-                    || distance_to_segment_sq(entity.pos(), right_start, right_end) <= width_sq)
+                && crate::motion::contact_target(caster_id).map_or_else(||
+                    distance_to_segment_sq(entity.pos(), left_start, left_end) <= width_sq
+                    || distance_to_segment_sq(entity.pos(), right_start, right_end) <= width_sq,
+                    |contact|entity.id()==contact)
         })
         .map(|entity| entity.id())
         .collect();
 
     for target_id in targets {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         let result = crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -13670,7 +13858,8 @@ pub fn apply_arcanine_flames_of_rage(
         if is_burned(ctx, target_id) {
             damage = damage.saturating_mul(100 + burned_bonus_percent) / 100;
         }
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         let result = crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -13947,7 +14136,7 @@ pub fn update_wishiwashi_schooling(ctx: &mut GameCtx, entity_id: usize) {
         let ally_count = nearby_allies.max(1) as i32;
         let defence_bonus = WISHIWASHI_SCHOOLING_DEFENCE_PER_ALLY.saturating_mul(ally_count);
         let cooldown_bonus = WISHIWASHI_SCHOOLING_COOLDOWN_PER_ALLY.saturating_mul(ally_count);
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_wishiwashi_schooling_0",
             ctx,
             entity_id,
             entity_id,
@@ -13964,7 +14153,7 @@ pub fn update_wishiwashi_schooling(ctx: &mut GameCtx, entity_id: usize) {
         );
         draw_status_marker(ctx, pos, 18000, VFX_WATER);
     } else {
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_wishiwashi_schooling_0",
             ctx,
             entity_id,
             entity_id,
@@ -14004,7 +14193,9 @@ pub fn apply_wishiwashi_wave_splash(
         if !entity.is_alive() || entity.is_tower() {
             continue;
         }
-        if distance_to_segment_sq(entity.pos(), start, end) > width_sq {
+        if let Some(contact) = crate::motion::contact_target(caster_id) {
+            if entity.id() != contact { continue; }
+        } else if distance_to_segment_sq(entity.pos(), start, end) > width_sq {
             continue;
         }
         if entity.team() == caster_team && entity.is_champion() {
@@ -14032,7 +14223,8 @@ pub fn apply_wishiwashi_wave_splash(
     }
 
     for target_id in enemy_hits {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -14315,6 +14507,8 @@ fn update_wishiwashi_massive_catches(ctx: &mut GameCtx, tick: usize) {
     drop(states);
 
     for state in outbound {
+        crate::native_vfx::burst(ctx, "wishiwashi_ult_massive_catch_water_burst", state.caster_id,
+            InputTarget::Pos { x: state.target_pos.x, y: state.target_pos.y }, state.line_width);
         force_move_toward_pos(
             ctx,
             state.caster_id,
@@ -14471,7 +14665,8 @@ pub fn apply_missingno_glitch_basic(
     stray_width: u64,
     attacker_types: TypeSet,
 ) {
-    let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+    let defender_types =
+        crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
     crate::legacy::pokemon_types::deal_pokemon_damage(
         ctx,
         caster_id,
@@ -14503,6 +14698,8 @@ pub fn apply_missingno_glitch_basic(
         caster_pos.y as f64 + angle.sin() * stray_range as f64,
     );
     draw_line_band(ctx, caster_pos, end, stray_width, VFX_PSYCHIC);
+    crate::native_vfx::burst(ctx, "missingno_basicattack_stray_glitch_line", caster_id,
+        InputTarget::Pos { x: end.x, y: end.y }, stray_width);
     let Some(stray_target) =
         first_target_on_line_any_team(ctx, caster_id, caster_pos, end, stray_width)
     else {
@@ -14799,7 +14996,7 @@ fn update_missingno_trick_rooms(ctx: &mut GameCtx, tick: usize) {
             drop(entity);
 
             if entity_id == state.caster_id {
-                add_beneficial_buff(
+                refresh_beneficial_buff("pm_missingno_trick_rooms_0",
                     ctx,
                     state.caster_id,
                     entity_id,
@@ -14815,7 +15012,7 @@ fn update_missingno_trick_rooms(ctx: &mut GameCtx, tick: usize) {
                     },
                 );
             } else if team == state.caster_team {
-                add_beneficial_buff(
+                refresh_beneficial_buff("pm_missingno_trick_rooms_1",
                     ctx,
                     state.caster_id,
                     entity_id,
@@ -14843,7 +15040,7 @@ fn update_missingno_trick_rooms(ctx: &mut GameCtx, tick: usize) {
                 let ap_flip = percent_delta_for_swap(stat.magic_power, stat.attack);
                 let defence_flip = percent_delta_for_swap(stat.defence, stat.magic_resistance);
                 let mr_flip = percent_delta_for_swap(stat.magic_resistance, stat.defence);
-                add_harmful_buff(
+                refresh_harmful_buff("pm_missingno_trick_rooms_2",
                     ctx,
                     state.caster_id,
                     entity_id,
@@ -14998,6 +15195,8 @@ fn missingno_chain_damage(
         let target_team = target.team();
         let target_pos = target.pos();
         drop(target);
+        crate::native_vfx::burst(ctx, "missingno_skill2_chain_spark_arc", caster_id,
+            InputTarget::Pos { x: target_pos.x, y: target_pos.y }, chain_radius);
         if target_team == caster_team {
             deal_tracked_damage(
                 ctx,
@@ -15331,7 +15530,7 @@ fn double_positive_buff_state(buff: &mut BuffState) {
     }
 }
 
-fn shiftry_inferred_in_bush(ctx: &GameCtx, entity_id: usize) -> bool {
+fn shiftry_in_bush(ctx: &GameCtx, entity_id: usize) -> bool {
     if ampharos_true_sight_reveals(ctx, entity_id) {
         return false;
     }
@@ -15341,36 +15540,13 @@ fn shiftry_inferred_in_bush(ctx: &GameCtx, entity_id: usize) -> bool {
     if !shiftry.is_alive() {
         return false;
     }
-    let shiftry_team = shiftry.team();
     let shiftry_pos = shiftry.pos();
-    let radius_sq = SHIFTRY_BUSH_PROBE_RADIUS.saturating_mul(SHIFTRY_BUSH_PROBE_RADIUS);
-    drop(shiftry);
-
-    for index in 0..ctx.entity_count() {
-        let Some(observer) = ctx.entity_at(index) else {
-            continue;
-        };
-        if !observer.is_alive() || observer.team() == shiftry_team {
-            continue;
-        }
-        if !(observer.is_champion() || observer.is_minion() || observer.is_tower()) {
-            continue;
-        }
-        let observer_team = observer.team();
-        if distance_sq(observer.pos(), shiftry_pos) > radius_sq {
-            continue;
-        }
-        if !ctx.is_visible(observer_team, entity_id) {
-            return true;
-        }
-    }
-
-    false
+    crate::map_terrain::in_bush(shiftry_pos.x, shiftry_pos.y).unwrap_or(false)
 }
 
 pub fn update_shiftry_forest_camouflage(ctx: &mut GameCtx, entity_id: usize) {
     let tick = ctx.tick();
-    let in_bush = shiftry_inferred_in_bush(ctx, entity_id);
+    let in_bush = shiftry_in_bush(ctx, entity_id);
     let states = SHIFTRY_FOREST_CAMOUFLAGES.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states
         .lock()
@@ -15404,7 +15580,7 @@ pub fn update_shiftry_forest_camouflage(ctx: &mut GameCtx, entity_id: usize) {
         state.in_bush = false;
     }
 
-    let active = in_bush || tick <= state.linger_until;
+    let active = in_bush || tick < state.linger_until;
     let should_refresh = active
         && (state.last_buff_at == 0
             || tick.saturating_sub(state.last_buff_at) >= SHIFTRY_BUSH_BUFF_REFRESH_TICKS);
@@ -15414,7 +15590,7 @@ pub fn update_shiftry_forest_camouflage(ctx: &mut GameCtx, entity_id: usize) {
     drop(states);
 
     if should_refresh {
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_shiftry_forest_camouflage_0",
             ctx,
             entity_id,
             entity_id,
@@ -15620,6 +15796,10 @@ pub fn detonate_grassy_terrains_near(
     if detonated.is_empty() {
         return;
     }
+    for field in &detonated {
+        crate::native_vfx::burst(ctx, "arboliva_skill2_fiery_terrain", caster_id,
+            InputTarget::Pos { x: field.center.x, y: field.center.y }, field.radius);
+    }
 
     let mut hits: Vec<(usize, EntityPos)> = Vec::new();
     for index in 0..ctx.entity_count() {
@@ -15811,6 +15991,7 @@ fn note_team_spot_for_ticks(
     {
         existing.source_id = source_id;
         existing.target_pos = target_pos;
+        existing.observed_at = tick;
         existing.expires_at = expires_at;
         return;
     }
@@ -15820,6 +16001,7 @@ fn note_team_spot_for_ticks(
         team,
         target_id,
         target_pos,
+        observed_at: tick,
         expires_at,
     });
 }
@@ -15894,33 +16076,12 @@ fn update_web_walker_spots(ctx: &GameCtx, tick: usize, webs: &[StickyWebState]) 
     }
 }
 
-pub fn best_web_walker_spotted_target(
-    team: usize,
-    origin_pos: EntityPos,
-    max_radius: u64,
-    tick: usize,
-) -> Option<WebWalkerSpot> {
-    let max_radius_sq = max_radius.saturating_mul(max_radius);
+pub fn team_spotted_targets(team: usize, tick: usize) -> Vec<WebWalkerSpot> {
     let spots = WEB_WALKER_SPOTS.get_or_init(|| Mutex::new(Vec::new()));
     let mut spots = spots.lock().expect("web walker spot state poisoned");
     spots.retain(|spot| spot.expires_at > tick);
 
-    let mut best: Option<(u64, WebWalkerSpot)> = None;
-    for spot in spots.iter().filter(|spot| spot.team == team) {
-        let distance = distance_sq(origin_pos, spot.target_pos);
-        if distance > max_radius_sq {
-            continue;
-        }
-        let current = *spot;
-        if best
-            .map(|(best_distance, _)| distance < best_distance)
-            .unwrap_or(true)
-        {
-            best = Some((distance, current));
-        }
-    }
-
-    best.map(|(_, spot)| spot)
+    spots.iter().filter(|spot| spot.team == team && spot.observed_at <= tick).copied().collect()
 }
 
 pub fn begin_sing_aura(
@@ -16266,9 +16427,9 @@ pub fn begin_stealth_rock(
 }
 
 pub fn update_light_metal_passive(ctx: &mut GameCtx, entity_id: usize) {
-    const DISTANCE_THRESHOLD: u64 = 120_000;
+    const DISTANCE_THRESHOLD: u64 = 76_000;
     const SHIELD_TICKS: usize = 6 * 60;
-    const SHIELD_MOVE_SPEED_PERCENT: usize = 20;
+    const SHIELD_MOVE_SPEED_PERCENT: usize = 32;
 
     let Some(entity) = ctx.get_entity(entity_id) else {
         return;
@@ -16324,6 +16485,7 @@ pub fn update_light_metal_passive(ctx: &mut GameCtx, entity_id: usize) {
     drop(states);
 
     if shield > 0 {
+        ctx.add_shield(entity_id, shield, SHIELD_TICKS);
         ctx.debug_draw_circle(pos.x, pos.y, 15000, VFX_STEEL);
     }
 }
@@ -16339,7 +16501,7 @@ pub fn update_swift_swim_passive(ctx: &mut GameCtx, entity_id: usize) {
     drop(entity);
 
     if is_in_water_aoe(ctx, pos) {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_swift_swim_passive_0",
             entity_id,
             BuffState {
                 duration: BuffType::Time { tick: 35 },
@@ -16608,8 +16770,7 @@ pub fn reset_light_metal(ctx: &GameCtx, entity_id: usize) {
     if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         state.last_pos = pos;
         state.distance_without_damage = 0;
-        state.shield_until = tick;
-        state.shield_amount = 0;
+        // Combat resets charge distance, not unrelated native shield layers.
     } else {
         states.push(LightMetalState {
             entity_id,
@@ -16627,48 +16788,10 @@ pub fn absorb_light_metal_damage(
     ad_damage: usize,
     ap_damage: usize,
 ) -> (usize, usize) {
-    let incoming = ad_damage.saturating_add(ap_damage);
-    if incoming == 0 {
-        return (ad_damage, ap_damage);
-    }
-
-    let Some(entity) = ctx.get_entity(entity_id) else {
-        return (ad_damage, ap_damage);
-    };
-    let pos = entity.pos();
-    let tick = ctx.tick();
-    drop(entity);
-
-    let states = LIGHT_METALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("light metal state poisoned");
-    let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
-        return (ad_damage, ap_damage);
-    };
-
-    let absorbed = if state.shield_until > tick {
-        state.shield_amount.min(incoming)
-    } else {
-        0
-    };
-    state.last_pos = pos;
-    state.distance_without_damage = 0;
-    state.shield_until = tick;
-    state.shield_amount = 0;
-
-    if absorbed == 0 {
-        return (ad_damage, ap_damage);
-    }
-
-    let remaining = incoming.saturating_sub(absorbed);
-    if remaining == 0 {
-        return (0, 0);
-    }
-    if ad_damage >= absorbed {
-        (ad_damage.saturating_sub(absorbed), ap_damage)
-    } else {
-        let ap_absorb = absorbed.saturating_sub(ad_damage);
-        (0, ap_damage.saturating_sub(ap_absorb))
-    }
+    // Native shield layers absorb once, for Pokemon and engine-origin hits alike.
+    // Do not subtract damage here before the engine consumes the same shield.
+    if ad_damage.saturating_add(ap_damage) > 0 { reset_light_metal(ctx, entity_id); }
+    (ad_damage, ap_damage)
 }
 
 pub fn note_light_metal_dealt_damage(ctx: &GameCtx, entity_id: usize) {
@@ -16795,7 +16918,7 @@ pub fn update_armarouge_weak_armor(ctx: &mut GameCtx, entity_id: usize) {
     drop(states);
 
     if let Some((defence_mult, magic_resistance_mult, color)) = penalty {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_armarouge_weak_armor_0",
             entity_id,
             BuffState {
                 duration: BuffType::Time { tick: 35 },
@@ -16827,6 +16950,7 @@ pub fn update_receiver_copied_passive(ctx: &mut GameCtx, entity_id: usize) {
         Some("pokemon_moba_blaziken") => update_speed_boost_passive(ctx, entity_id),
         Some("pokemon_moba_scizor") => update_light_metal_passive(ctx, entity_id),
         Some("pokemon_moba_mantine") => update_swift_swim_passive(ctx, entity_id),
+        Some("pokemon_moba_shiftry") => update_shiftry_forest_camouflage(ctx, entity_id),
         Some("pokemon_moba_drednaw") => update_wide_guard_passive(ctx, entity_id),
         Some("pokemon_moba_bouffalant") => update_afro_passive(ctx, entity_id),
         Some("pokemon_moba_houndoom") => update_intimidate_aura(ctx, entity_id),
@@ -16836,7 +16960,7 @@ pub fn update_receiver_copied_passive(ctx: &mut GameCtx, entity_id: usize) {
         Some("pokemon_moba_drampa") => update_drampa_berserk_passive(ctx, entity_id),
         Some("pokemon_moba_shedinja") => update_wonder_guard(ctx, entity_id),
         Some("pokemon_moba_noivern") => update_infiltrator_placeholder(ctx, entity_id),
-        Some("pokemon_moba_octillery") => update_suction_cups_placeholder(ctx, entity_id),
+        Some("pokemon_moba_octillery") => update_suction_cups(ctx, entity_id),
         Some("pokemon_moba_armarouge") => update_armarouge_weak_armor(ctx, entity_id),
         Some("pokemon_moba_delibird") => update_delibird_hustle(ctx, entity_id),
         Some("pokemon_moba_cloyster") => update_cloyster_overcoat(ctx, entity_id),
@@ -16844,7 +16968,7 @@ pub fn update_receiver_copied_passive(ctx: &mut GameCtx, entity_id: usize) {
         Some("pokemon_moba_swanna") => update_swanna_tailwind(ctx, entity_id),
         Some("pokemon_moba_ampharos") => update_ampharos_luminous_pulse(ctx, entity_id),
         Some("pokemon_moba_quaquaval") => update_quaquaval_aqua_step(ctx, entity_id),
-        Some("pokemon_moba_inteleon") => ctx.add_buff(
+        Some("pokemon_moba_inteleon") => ctx.refresh_periodic_buff("pm_receiver_copied_passive_0",
             entity_id,
             BuffState {
                 duration: BuffType::Time { tick: 45 },
@@ -16852,7 +16976,7 @@ pub fn update_receiver_copied_passive(ctx: &mut GameCtx, entity_id: usize) {
                 ..Default::default()
             },
         ),
-        Some("pokemon_moba_emboar") => ctx.add_buff(
+        Some("pokemon_moba_emboar") => ctx.refresh_periodic_buff("pm_receiver_copied_passive_1",
             entity_id,
             BuffState {
                 duration: BuffType::Time { tick: 45 },
@@ -16869,7 +16993,14 @@ pub fn update_receiver_copied_passive(ctx: &mut GameCtx, entity_id: usize) {
 
 pub fn update_infiltrator_placeholder(_ctx: &mut GameCtx, _entity_id: usize) {}
 
-pub fn update_suction_cups_placeholder(_ctx: &mut GameCtx, _entity_id: usize) {}
+pub fn update_suction_cups(ctx: &mut GameCtx, entity_id: usize) {
+    ctx.refresh_stat_buff(entity_id, "pokemon_moba_suction_cups", BuffState {
+        duration: BuffType::Time { tick: 2 },
+        ignore_wall: true,
+        move_speed_mult: -15,
+        ..Default::default()
+    });
+}
 
 pub fn update_ludicolo_rain_dish(ctx: &mut GameCtx, entity_id: usize) {
     let Some(entity) = ctx.get_entity(entity_id) else {
@@ -16904,6 +17035,7 @@ pub fn update_ludicolo_rain_dish(ctx: &mut GameCtx, entity_id: usize) {
         }
     }
 
+    crate::native_vfx::attached(ctx, "ludicolo_passive_rain_dish_aura", entity_id);
     draw_field_circle(ctx, pos, LUDICOLO_RAIN_DISH_RADIUS, VFX_WATER);
     if should_heal {
         heal_with_antiheal(ctx, entity_id, entity_id, LUDICOLO_RAIN_DISH_HEAL);
@@ -17001,7 +17133,7 @@ pub fn update_drampa_berserk_passive(ctx: &mut GameCtx, entity_id: usize) {
         }
     }
 
-    ctx.add_buff(
+    ctx.refresh_periodic_buff("pm_drampa_berserk_passive_0",
         entity_id,
         BuffState {
             duration: BuffType::Time { tick: BUFF_TICKS },
@@ -17037,12 +17169,13 @@ pub fn note_receiver_copied_damage_taken(ctx: &GameCtx, entity_id: usize, damage
 
 pub fn update_symbiosis_passive(ctx: &mut GameCtx, oranguru_id: usize) {
     let tick = ctx.tick();
+    let ctx_id = combat_ctx_id(ctx);
     let states = SYMBIOSIS_AURAS.get_or_init(|| Mutex::new(Vec::new()));
     {
         let mut states = states.lock().expect("symbiosis state poisoned");
         if let Some(existing) = states
             .iter_mut()
-            .find(|state| state.oranguru_id == oranguru_id)
+            .find(|state| state.ctx_id == ctx_id && state.oranguru_id == oranguru_id)
         {
             if tick.saturating_sub(existing.last_tick) < SYMBIOSIS_INTERVAL_TICKS {
                 return;
@@ -17050,6 +17183,7 @@ pub fn update_symbiosis_passive(ctx: &mut GameCtx, oranguru_id: usize) {
             existing.last_tick = tick;
         } else {
             states.push(SymbiosisState {
+                ctx_id,
                 oranguru_id,
                 last_tick: tick,
             });
@@ -17064,11 +17198,8 @@ pub fn update_symbiosis_passive(ctx: &mut GameCtx, oranguru_id: usize) {
     }
     let team = oranguru.team();
     let pos = oranguru.pos();
-    let stat = oranguru.stat();
-    let level = oranguru.level();
     drop(oranguru);
-    let base_champion_id = champion_id_for_entity(oranguru_id).unwrap_or("pokemon_moba_oranguru");
-    let Some(base_stat) = champion_base_stat_for_level(base_champion_id, level) else {
+    let Some(equipment) = crate::equipment::for_entity(ctx, oranguru_id) else {
         return;
     };
 
@@ -17100,40 +17231,13 @@ pub fn update_symbiosis_passive(ctx: &mut GameCtx, oranguru_id: usize) {
         return;
     };
 
-    let buff = symbiosis_item_share_buff(stat, base_stat, 45);
-    if buff.attack == 0
-        && buff.magic_power == 0
-        && buff.hp == 0
-        && buff.defence == 0
-        && buff.magic_resistance == 0
-        && buff.crit_chance == 0
-    {
+    if equipment.is_empty() {
         return;
     }
 
-    ctx.add_buff(ally_id, buff);
+    let buff = equipment.buff(50, 45);
+    ctx.refresh_stat_buff(ally_id, &format!("pokemon_symbiosis_{oranguru_id}"), buff);
     note_ally_buff_received(ctx, oranguru_id, ally_id, 45);
-}
-
-fn symbiosis_item_share_buff(
-    current: crate::stable_legacy_api::EntityStat,
-    base: crate::stable_legacy_api::EntityStat,
-    ticks: usize,
-) -> BuffState {
-    BuffState {
-        duration: BuffType::Time { tick: ticks },
-        attack: stat_surplus_share(current.attack, base.attack),
-        magic_power: stat_surplus_share(current.magic_power, base.magic_power),
-        hp: stat_surplus_share(current.hp, base.hp),
-        defence: stat_surplus_share(current.defence, base.defence),
-        magic_resistance: stat_surplus_share(current.magic_resistance, base.magic_resistance),
-        crit_chance: stat_surplus_share(current.crit_chance, base.crit_chance),
-        ..Default::default()
-    }
-}
-
-fn stat_surplus_share(current: usize, base: usize) -> i32 {
-    (current.saturating_sub(base) / 2).min(i32::MAX as usize) as i32
 }
 
 pub fn begin_nasty_plot(
@@ -17210,8 +17314,9 @@ pub fn note_stored_power_damage(ctx: &GameCtx, entity_id: usize, damage: usize) 
     let tick = ctx.tick();
     let states = STORED_POWERS.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states.lock().expect("stored power state poisoned");
-    states.retain(|state| state.resolves_at > tick);
-    if let Some(state) = states.iter_mut().find(|state| state.caster_id == entity_id) {
+    // The update loop owns release/removal; a hit on the release tick must not
+    // silently discard the stored burst before that loop gets to resolve it.
+    if let Some(state) = states.iter_mut().find(|state| state.caster_id == entity_id && state.resolves_at > tick) {
         state.stored_damage = state.stored_damage.saturating_add(damage);
     }
 }
@@ -17531,6 +17636,11 @@ pub fn cleanse_harmful_statuses(ctx: &mut GameCtx, target_id: usize) {
         return;
     }
 
+    ctx.entity_clear_cc(target_id);
+    ANTI_HEALS.get_or_init(|| Mutex::new(Vec::new())).lock()
+        .expect("anti-heal state poisoned").retain(|state| state.target_id != target_id);
+    ctx.entity_remove_buff(target_id, "pokemon_moba_anti_heal");
+
     PARALYSIS
         .get_or_init(|| Mutex::new(Vec::new()))
         .lock()
@@ -17723,7 +17833,9 @@ pub fn deal_tracked_damage(
     let death_after = combat_player_death_snapshot(ctx);
     let kill_log_after = ctx.kill_log_count();
     let after = combat_stat_damage_snapshot(ctx, target_id);
-    let damage_credit = pokemon_damage_credit(ad_damage, ap_damage);
+    // Engine mitigation/shields now run inside deal_damage. Credit the observed loss,
+    // not the pre-mitigation request (which also overcounts overkill).
+    let damage_credit = applied_damage_between(before, after);
     let applied_damage = damage_credit;
     note_pokemon_damage_result_with_info(
         ctx,
@@ -18211,6 +18323,23 @@ fn pokemon_damage_credit(ad_damage: usize, ap_damage: usize) -> usize {
     ad_damage.saturating_add(ap_damage)
 }
 
+#[cfg(test)]
+mod damage_accounting_tests {
+    use super::applied_damage_between;
+
+    #[test]
+    fn resolved_damage_counts_mitigation_shields_and_overkill() {
+        assert_eq!(applied_damage_between(Some((500, 0)), Some((450, 0))), 50);
+        assert_eq!(
+            applied_damage_between(Some((500, 100)), Some((500, 25))),
+            75
+        );
+        assert_eq!(applied_damage_between(Some((30, 10)), Some((0, 0))), 40);
+        assert_eq!(applied_damage_between(Some((500, 0)), Some((500, 0))), 0);
+        assert_eq!(applied_damage_between(None, Some((500, 0))), 0);
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
 struct CombatStatEntityInfo {
     is_champion: bool,
@@ -18635,16 +18764,7 @@ fn record_pokemon_kill_credit(
     }
 
     add_pokemon_kill_for_player(ctx, killer_player_id);
-    if origin != "native_on_kill" {
-        award_pokemon_custom_kill_gold(
-            ctx,
-            killer_player_id,
-            killed_player_id,
-            killed_generation,
-            origin,
-            POKEMON_CUSTOM_KILL_GOLD,
-        );
-    }
+    // The engine damage pipeline awards kill gold; the ledger must not award it again.
     refresh_pokemon_combat_stat_identity(
         ctx,
         killer_player_id,
@@ -19380,28 +19500,29 @@ fn add_pokemon_damage_dealt_for_player(ctx: &GameCtx, player_id: usize, amount: 
     with_pokemon_combat_stat_for_player_mut(ctx, player_id, |state| {
         state.damage_dealt = state.damage_dealt.saturating_add(amount);
     });
-    sync_pokemon_player_stats_to_base_player(ctx, player_id);
+    // Retired: the engine damage pipeline owns statistics; do not inject them twice.
+    // sync_pokemon_player_stats_to_base_player(ctx, player_id);
 }
 
 fn add_pokemon_damage_taken_for_player(ctx: &GameCtx, player_id: usize, amount: usize) {
     with_pokemon_combat_stat_for_player_mut(ctx, player_id, |state| {
         state.damage_taken = state.damage_taken.saturating_add(amount);
     });
-    sync_pokemon_player_stats_to_base_player(ctx, player_id);
+    // sync_pokemon_player_stats_to_base_player(ctx, player_id);
 }
 
 fn add_pokemon_healing_for_player(ctx: &GameCtx, player_id: usize, amount: usize) {
     with_pokemon_combat_stat_for_player_mut(ctx, player_id, |state| {
         state.healing_done = state.healing_done.saturating_add(amount);
     });
-    sync_pokemon_player_stats_to_base_player(ctx, player_id);
+    // sync_pokemon_player_stats_to_base_player(ctx, player_id);
 }
 
 fn add_pokemon_kill_for_player(ctx: &GameCtx, player_id: usize) {
     with_pokemon_combat_stat_for_player_mut(ctx, player_id, |state| {
         state.kills = state.kills.saturating_add(1);
     });
-    sync_pokemon_player_stats_to_base_player(ctx, player_id);
+    // sync_pokemon_player_stats_to_base_player(ctx, player_id);
 }
 
 fn add_pokemon_death_for_player(ctx: &GameCtx, player_id: usize) {
@@ -19414,9 +19535,12 @@ fn add_pokemon_assist_for_player(ctx: &GameCtx, player_id: usize) {
     with_pokemon_combat_stat_for_player_mut(ctx, player_id, |state| {
         state.assists = state.assists.saturating_add(1);
     });
-    sync_pokemon_player_stats_to_base_player(ctx, player_id);
+    // sync_pokemon_player_stats_to_base_player(ctx, player_id);
 }
 
+// Historical injector only. Its private PlayerState layout is NOT a stable SDK contract.
+// Keep the implementation for reference, but never compile it into the stable DLL.
+#[cfg(any())]
 fn sync_pokemon_player_stats_to_base_player(ctx: &GameCtx, player_id: usize) {
     let ctx_id = combat_ctx_id(ctx);
     let Some(custom_stats) = pokemon_combat_stats_for_ctx_player(ctx_id, player_id) else {
@@ -19564,6 +19688,7 @@ fn sync_pokemon_player_stats_to_base_player(ctx: &GameCtx, player_id: usize) {
     ));
 }
 
+#[cfg(any())]
 fn apply_pokemon_stat_deltas_to_base_player(
     player_state: &mut PlayerState,
     damage_dealt: usize,
@@ -20156,7 +20281,8 @@ pub fn try_trigger_hawlucha_counter(
         .map(|entity| entity.id())
         .collect();
     for target_id in target_ids {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             entity_id,
@@ -20278,7 +20404,10 @@ pub fn try_consume_zeraora_zing_zap(
         );
     }
 
-    let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, attacker_id);
+    let defender_types =
+        crate::legacy::neutral_objectives::defender_types_for_target(ctx, attacker_id);
+    crate::native_vfx::burst(ctx, "zeraora_skill2_zing_zap_counter", entity_id,
+        InputTarget::Pos { x: attacker_pos.x, y: attacker_pos.y }, 10000);
     crate::legacy::pokemon_types::deal_pokemon_damage(
         ctx,
         entity_id,
@@ -20372,7 +20501,8 @@ pub fn update_zeraora_thunder_cages(ctx: &mut GameCtx) {
     drop(states);
 
     for (caster_id, target_id, damage) in exit_hits {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -20386,7 +20516,8 @@ pub fn update_zeraora_thunder_cages(ctx: &mut GameCtx) {
         );
     }
     for (caster_id, target_id, damage, slow_percent) in tick_hits {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -20398,7 +20529,7 @@ pub fn update_zeraora_thunder_cages(ctx: &mut GameCtx) {
             TypeSet::single(PokemonType::Electric),
             defender_types,
         );
-        add_harmful_buff(
+        refresh_harmful_buff("pm_zeraora_thunder_cages_0",
             ctx,
             caster_id,
             target_id,
@@ -20529,6 +20660,8 @@ pub fn note_zeraora_ability_hit(
 
 fn trigger_zeraora_merciless(ctx: &mut GameCtx, caster_id: usize, target_id: usize) {
     const RADIUS: u64 = 24000;
+    crate::native_vfx::burst(ctx, "zeraora_passive_merciless_overlay", caster_id,
+        InputTarget::Target { target_id }, RADIUS);
     let Some(target) = ctx.get_entity(target_id) else {
         return;
     };
@@ -20554,7 +20687,8 @@ fn trigger_zeraora_merciless(ctx: &mut GameCtx, caster_id: usize, target_id: usi
         .unwrap_or(35)
         .max(1);
     for hit_id in hits.iter().copied() {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, hit_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, hit_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -20802,7 +20936,10 @@ fn explode_sigilyph_glyph(ctx: &mut GameCtx, caster_id: usize, target_id: usize)
 
     let primary_damage = SIGILYPH_GLYPH_EXPLOSION_BASE_AP
         + caster_ap.saturating_mul(SIGILYPH_GLYPH_EXPLOSION_AP_RATIO) / 100;
-    let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+    crate::native_vfx::burst(ctx, "sigilyph_passive_glypher_explosion_aoe", caster_id,
+        InputTarget::Pos { x: target_pos.x, y: target_pos.y }, SIGILYPH_GLYPH_EXPLOSION_RADIUS);
+    let defender_types =
+        crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
     crate::legacy::pokemon_types::deal_pokemon_damage(
         ctx,
         caster_id,
@@ -20853,6 +20990,137 @@ fn explode_sigilyph_glyph(ctx: &mut GameCtx, caster_id: usize, target_id: usize)
     );
 }
 
+fn update_native_status_visuals(ctx: &GameCtx) {
+    let tick = ctx.tick();
+    // Copy before emitting SDK events: never hold a gameplay-state mutex across a host call.
+    macro_rules! snapshot {
+        ($states:ident) => { $states.get().and_then(|s| s.lock().ok()).map(|s| s.clone()).unwrap_or_default() };
+    }
+    macro_rules! fields {
+        ($states:ident, $stem:literal) => {
+            for s in snapshot!($states) {
+                if s.expires_at > tick {
+                    crate::native_vfx::field(ctx, $stem, s.caster_id, s.center, s.radius);
+                }
+            }
+        };
+    }
+    macro_rules! auras {
+        ($states:ident, $stem:literal) => {
+            for s in snapshot!($states) {
+                if s.expires_at > tick && ctx.get_entity(s.caster_id).map_or(false, |e| e.is_alive()) {
+                    crate::native_vfx::attached(ctx, $stem, s.caster_id);
+                }
+            }
+        };
+    }
+    auras!(AQUA_RINGS, "vaporeon_ult_aqua_ring_aura");
+    auras!(SWANNA_CYCLONES, "swanna_skill2_feathery_cyclone_aura");
+    auras!(MAROWAK_BONE_WINDMILLS, "marowak_ult_bone_windmill_aura");
+    auras!(ARMAROUGE_MYSTICAL_FIRE_AURAS, "armarouge_skill1_fire_aura");
+    auras!(WEEZING_BODY_ODORS, "weezing_skill2_body_odor_aura");
+    auras!(WEEZING_SLUDGE_WHIRLPOOLS, "weezing_ult_sludge_whirlpool_aura");
+    auras!(ALLURING_VOICE_AURAS, "ribombee_ult_alluring_voice_aura");
+    auras!(SING_AURAS, "ludicolo_skill2_grass_whistle_aura");
+    auras!(EARTHQUAKES, "ursaluna_skill2_earthquake_aura");
+    auras!(MISSINGNO_GLITCH_STORMS, "missingno_skill2_glitch_storm_aura");
+    for s in snapshot!(AMPHAROS_SEARCHLIGHT_TAILS) {
+        if s.expires_at > tick { crate::native_vfx::attached(ctx, "ampharos_skill2_searchlight_tail_aura", s.entity_id); }
+    }
+    for s in snapshot!(BLOOD_MOONS) {
+        if s.expires_at > tick { crate::native_vfx::attached(ctx, "ursaluna_ult_blood_moon_transformation", s.entity_id); }
+    }
+    for s in snapshot!(KINGDRA_DRAGON_DANCES) {
+        if s.boosted_until > tick { crate::native_vfx::attached(ctx, "kingdra_skill2_dragon_dance_aura", s.entity_id); }
+    }
+    for s in snapshot!(RILLABOOM_DRUM_AURAS) {
+        if s.expires_at > tick {
+            let stem = if s.enemy_slow_percent != 0 { "rillaboom_skill2_drum_roll_aura" }
+                else { "rillaboom_skill1_drum_beating_aura" };
+            crate::native_vfx::attached(ctx, stem, s.caster_id);
+        }
+    }
+    fields!(GRASSY_TERRAINS, "arboliva_passive_grassy_terrain");
+    fields!(WHIRLPOOLS, "gyarados_basic_whirlpool_field");
+    fields!(MISTY_TERRAINS, "sylveon_skill1_misty_terrain_field");
+    fields!(BRINE_FIELDS, "mantine_skill1_brine_water_field");
+    fields!(FROSMOTH_SLEEP_CIRCLES, "frosmoth_skill2_sleep_powder_field");
+    fields!(SHIFTRY_TORNADOES, "shiftry_ult_fan_tornado_field");
+    fields!(GARGANACL_SALT_PATCHES, "garganacl_passive_salt_cure_patch");
+    fields!(ZERAORA_THUNDER_CAGES, "zeraora_skill1_thunder_cage_field");
+    fields!(THIEVUL_STAKEOUTS, "thievul_ult_stakeout_field");
+    for s in snapshot!(SMOKE_SCREENS) {
+        if s.expires_at > tick {
+            crate::native_vfx::segment(ctx, "coalossal_skill2_smokescreen_field", s.caster_id, s.start, s.end, 6500);
+        }
+    }
+    for s in snapshot!(MISSINGNO_TRICK_ROOMS) {
+        if s.expires_at > tick {
+            crate::native_vfx::rectangle(ctx, "missingno_ult_trick_room_field", s.caster_id, s.start, s.end, s.length, s.width);
+        }
+    }
+    for s in snapshot!(RILLABOOM_GRASSY_SURGES) {
+        if s.expires_at > tick {
+            crate::native_vfx::segment(ctx, "rillaboom_ult_grassy_surge_wave", s.caster_id, s.start, s.end, s.width);
+        }
+    }
+    for s in snapshot!(FLAME_TRAILS) {
+        if s.expires_at > tick {
+            if let Some(stem) = s.visual_stem {
+                crate::native_vfx::segment(ctx, stem, s.caster_id, s.start, s.end, s.width);
+            }
+        }
+    }
+    for s in snapshot!(GARGANACL_BLESSED_SALTS) {
+        if s.expires_at > tick {
+            crate::native_vfx::field(ctx, "garganacl_ult_blessed_salt_spire_ring", s.caster_id, s.center, s.outer_radius);
+        }
+    }
+    for s in snapshot!(GARGANACL_PERMANENT_SALTS) {
+        crate::native_vfx::field(ctx, "garganacl_passive_salt_cure_patch", s.caster_id, s.center, s.outer_radius);
+    }
+    for s in snapshot!(STICKY_WEBS) {
+        crate::native_vfx::field(ctx, "kricketune_skill1_sticky_web_deployable", s.caster_id, s.center, s.radius);
+    }
+    for s in snapshot!(ICE_FIELDS) {
+        if s.expires_at > tick {
+            crate::native_vfx::field(ctx, s.visual_stem, s.caster_id, s.center, s.radius);
+        }
+    }
+    for s in snapshot!(QUAQUAVAL_AQUA_STEP_SEGMENTS) {
+        if s.expires_at > tick {
+            let stem = if s.empowered { "quaquaval_passive_aqua_step_empowered_trail" }
+                       else { "quaquaval_passive_aqua_step_trail" };
+            crate::native_vfx::segment(ctx, stem, s.caster_id, s.start, s.end, s.width / 2);
+        }
+    }
+    for s in snapshot!(WONDER_GUARDS) {
+        // shedinja_passive_wonder_guard_chits has one tag per remaining chit count.
+        crate::native_vfx::wonder_guard_chits(ctx, s.shedinja_id,
+            (s.knocked_until > tick && s.chits > 0).then_some(s.chits.min(5)));
+    }
+    for s in snapshot!(LIGHT_SCREENS) {
+        if s.expires_at > tick {
+            crate::native_vfx::segment(ctx, "beeheeyem_skill2_light_screen", s.caster_id, s.start, s.end, 5500);
+        }
+    }
+    for s in snapshot!(NASTY_PLOTS) {
+        if s.resolves_at > tick {
+            crate::native_vfx::attached(ctx, "oranguru_skill1_nasty_plot_mark", s.target_id);
+        }
+    }
+    for s in snapshot!(OCTILLERY_LOCK_ONS) {
+        if s.expires_at > tick {
+            crate::native_vfx::attached(ctx, "octillery_skill1_lock_on_reticle", s.target_id);
+        }
+    }
+    for s in snapshot!(SIGILYPH_GLYPHS) {
+        if s.expires_at > tick {
+            crate::native_vfx::attached(ctx, "sigilyph_passive_glypher_mark", s.target_id);
+        }
+    }
+}
+
 pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
     let tick = ctx.tick();
     let last_update = LAST_UPDATE_TICK.get_or_init(|| Mutex::new(usize::MAX));
@@ -20865,6 +21133,8 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
     }
 
     prune_tracked_buffs(ctx);
+    refresh_native_anti_heal(ctx);
+    refresh_native_stealth(ctx);
     update_zeraora_thunder_cages(ctx);
     update_sigilyph_gravities(ctx, tick);
     update_sigilyph_glyphs(ctx, tick);
@@ -20993,6 +21263,9 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         }
         let caster_pos = caster.pos();
         drop(caster);
+
+        crate::native_vfx::burst(ctx, "oranguru_skill2_stored_power_burst", state.caster_id,
+            InputTarget::Pos { x: caster_pos.x, y: caster_pos.y }, state.radius);
 
         let targets: Vec<usize> = (0..ctx.entity_count())
             .filter_map(|index| ctx.entity_at(index))
@@ -21638,6 +21911,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         .lock()
         .expect("whirlpool state poisoned")
         .retain(|state| state.expires_at > tick);
+    update_native_status_visuals(ctx);
 }
 
 fn update_whirlpools(ctx: &mut GameCtx, tick: usize) {
@@ -21728,7 +22002,8 @@ fn update_whirlpools(ctx: &mut GameCtx, tick: usize) {
     }
 
     for (caster_id, target_id, damage, slow_percent, slow_ticks, attacker_types) in hits {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -21740,7 +22015,7 @@ fn update_whirlpools(ctx: &mut GameCtx, tick: usize) {
             attacker_types,
             defender_types,
         );
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_whirlpools_0",
             target_id,
             BuffState {
                 duration: BuffType::Time { tick: slow_ticks },
@@ -21754,7 +22029,7 @@ fn update_whirlpools(ctx: &mut GameCtx, tick: usize) {
         if heal > 0 {
             heal_with_antiheal(ctx, caster_id, caster_id, heal);
         }
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_whirlpools_1",
             caster_id,
             BuffState {
                 duration: BuffType::Time { tick: buff_ticks },
@@ -21832,7 +22107,8 @@ fn update_flame_trails(ctx: &mut GameCtx, tick: usize) {
         burn_damage,
     ) in hits
     {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -21911,7 +22187,7 @@ fn update_blissey_heal_auras(ctx: &mut GameCtx, tick: usize) {
         }
         let caster_pos = caster.pos();
         drop(caster);
-        visuals.push((caster_pos, state.radius));
+        visuals.push((state.caster_id, caster_pos, state.radius));
         if state.next_tick_at > tick {
             return true;
         }
@@ -21936,7 +22212,8 @@ fn update_blissey_heal_auras(ctx: &mut GameCtx, tick: usize) {
     });
     drop(auras);
 
-    for (center, radius) in visuals {
+    for (caster, center, radius) in visuals {
+        crate::native_vfx::attached(ctx, "blissey_skill1_heal_pulse_aura", caster);
         draw_field_circle(ctx, center, radius, VFX_PSYCHIC);
     }
     for (caster_id, target_id, heal) in heals {
@@ -22002,7 +22279,7 @@ fn update_misty_terrains(ctx: &mut GameCtx, tick: usize) {
         after_blissey_heal(ctx, caster_id, target_id);
     }
     for (target_id, slow_percent, ticks) in slows {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_misty_terrains_0",
             target_id,
             BuffState {
                 duration: BuffType::Time { tick: ticks },
@@ -22052,7 +22329,7 @@ fn update_brine_fields(ctx: &mut GameCtx, tick: usize) {
         draw_field_circle(ctx, center, radius, VFX_WATER);
     }
     for (target_id, slow_percent, ticks) in slows {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_brine_fields_0",
             target_id,
             BuffState {
                 duration: BuffType::Time { tick: ticks },
@@ -22148,7 +22425,7 @@ fn update_rillaboom_drum_auras(ctx: &mut GameCtx, tick: usize) {
         let _ = heal_with_antiheal(ctx, caster_id, target_id, amount);
     }
     for (caster_id, target_id, move_speed_mult, ticks) in ally_speeds {
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_rillaboom_drum_auras_0",
             ctx,
             caster_id,
             target_id,
@@ -22160,7 +22437,7 @@ fn update_rillaboom_drum_auras(ctx: &mut GameCtx, tick: usize) {
         );
     }
     for (target_id, slow_percent, ticks) in enemy_slows {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_rillaboom_drum_auras_1",
             target_id,
             BuffState {
                 duration: BuffType::Time { tick: ticks },
@@ -22263,7 +22540,7 @@ fn update_rillaboom_grassy_surges(ctx: &mut GameCtx, tick: usize) {
             TypeSet::single(PokemonType::Grass),
             defender_types,
         );
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_rillaboom_grassy_surges_0",
             actual_target_id,
             BuffState {
                 duration: BuffType::Time { tick: slow_ticks },
@@ -22391,7 +22668,7 @@ fn update_grassy_terrains(ctx: &mut GameCtx, tick: usize) {
         draw_field_circle(ctx, center, radius, VFX_GRASS);
     }
     for (target_id, attack_speed_mult, ticks) in buffs {
-        add_beneficial_buff(
+        refresh_beneficial_buff("pm_grassy_terrains_0",
             ctx,
             target_id,
             target_id,
@@ -22459,7 +22736,7 @@ fn update_sticky_webs(ctx: &mut GameCtx, tick: usize) {
         draw_field_circle(ctx, center, radius, VFX_BUG);
     }
     for (target_id, move_speed_mult, ticks) in buffs {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_sticky_webs_0",
             target_id,
             BuffState {
                 duration: BuffType::Time { tick: ticks },
@@ -22710,7 +22987,8 @@ fn update_bug_buzz_auras(ctx: &mut GameCtx, tick: usize) {
         draw_field_circle(ctx, center, radius, VFX_BUG);
     }
     for (caster_id, target_id, damage, confusion_stacks, confusion_ticks, attacker_types) in hits {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -23036,7 +23314,7 @@ fn update_aqua_rings(ctx: &mut GameCtx, tick: usize) {
         after_blissey_heal(ctx, caster_id, target_id);
     }
     for (target_id, attack_mult, ticks) in debuffs {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_aqua_rings_0",
             target_id,
             BuffState {
                 duration: BuffType::Time { tick: ticks },
@@ -23219,7 +23497,8 @@ fn update_orbeetle_agility_chains(ctx: &mut GameCtx, tick: usize) {
         );
         draw_line_band(ctx, caster_pos, target_pos, 6500, VFX_PSYCHIC);
 
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -23312,7 +23591,8 @@ fn update_earthquakes(ctx: &mut GameCtx, tick: usize) {
     }
 
     for (caster_id, target_id, damage, slow_percent, slow_ticks, attacker_types) in hits {
-        let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+        let defender_types =
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
         crate::legacy::pokemon_types::deal_pokemon_damage(
             ctx,
             caster_id,
@@ -23324,7 +23604,7 @@ fn update_earthquakes(ctx: &mut GameCtx, tick: usize) {
             attacker_types,
             defender_types,
         );
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_earthquakes_0",
             target_id,
             BuffState {
                 duration: BuffType::Time { tick: slow_ticks },
@@ -23506,7 +23786,7 @@ fn update_ice_fields(ctx: &mut GameCtx, tick: usize, rng_seed: u64) {
                 tick: control_ticks,
             },
         );
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_ice_fields_0",
             target_id,
             BuffState {
                 duration: BuffType::Time {
@@ -23562,6 +23842,8 @@ fn update_wish_channels(ctx: &mut GameCtx, tick: usize) {
     }
     for (caster_id, target_id, heal) in heals {
         heal_with_antiheal(ctx, caster_id, target_id, heal);
+        crate::native_vfx::burst(ctx, "eevee_skill2_wish_heal_ring", caster_id,
+            InputTarget::Target { target_id }, 9000);
     }
 }
 
@@ -24012,6 +24294,8 @@ fn coalossal_magma_storm_targets(ctx: &mut GameCtx, pulse: CoalossalMagmaStormPu
         let chunk_end = segment_point(pulse.start, pulse.end, pulse.stage.saturating_add(1), 3);
         let (left_start, left_end, right_start, right_end) =
             parallel_line_segments(chunk_start, chunk_end, pulse.side_offset);
+        crate::native_vfx::line_pulse(ctx,"coalossal_ult_magma_segment",pulse.caster_id,left_start,left_end,pulse.line_width);
+        crate::native_vfx::line_pulse(ctx,"coalossal_ult_magma_segment",pulse.caster_id,right_start,right_end,pulse.line_width);
         let width_sq = pulse.line_width.saturating_mul(pulse.line_width);
         for index in 0..ctx.entity_count() {
             let Some(entity) = ctx.entity_at(index) else {
@@ -24035,6 +24319,8 @@ fn coalossal_magma_storm_targets(ctx: &mut GameCtx, pulse: CoalossalMagmaStormPu
         draw_line_band(ctx, right_start, right_end, pulse.line_width, VFX_FIRE);
     } else {
         let radius_sq = pulse.center_radius.saturating_mul(pulse.center_radius);
+        crate::native_vfx::burst(ctx,"coalossal_ult_magma_burst",pulse.caster_id,
+            InputTarget::Pos{x:pulse.end.x,y:pulse.end.y},pulse.center_radius);
         for index in 0..ctx.entity_count() {
             let Some(entity) = ctx.entity_at(index) else {
                 continue;
@@ -24083,6 +24369,7 @@ fn push_leech_seed(
 
 pub fn begin_light_screen(
     ctx: &mut GameCtx,
+    caster_id: usize,
     caster_pos: EntityPos,
     target_pos: EntityPos,
     duration_ticks: usize,
@@ -24096,6 +24383,7 @@ pub fn begin_light_screen(
         .expect("light screen state poisoned");
     screens.retain(|screen| screen.expires_at > tick);
     screens.push(LightScreenState {
+        caster_id,
         start,
         end,
         expires_at: tick.saturating_add(duration_ticks),
@@ -24132,6 +24420,7 @@ pub fn light_screen_blocks(
 
 pub fn begin_smoke_screen(
     ctx: &mut GameCtx,
+    caster_id: usize,
     caster_pos: EntityPos,
     target_pos: EntityPos,
     duration_ticks: usize,
@@ -24145,6 +24434,7 @@ pub fn begin_smoke_screen(
         .expect("smoke screen state poisoned");
     screens.retain(|screen| screen.expires_at > tick);
     screens.push(SmokeScreenState {
+        caster_id,
         start,
         end,
         expires_at: tick.saturating_add(duration_ticks),
@@ -24564,7 +24854,10 @@ fn on_segment(a: EntityPos, b: EntityPos, c: EntityPos) -> bool {
     b.x >= a.x.min(c.x) && b.x <= a.x.max(c.x) && b.y >= a.y.min(c.y) && b.y <= a.y.max(c.y)
 }
 
-fn distance_sq(a: crate::stable_legacy_api::EntityPos, b: crate::stable_legacy_api::EntityPos) -> u64 {
+fn distance_sq(
+    a: crate::stable_legacy_api::EntityPos,
+    b: crate::stable_legacy_api::EntityPos,
+) -> u64 {
     let dx = a.x as i128 - b.x as i128;
     let dy = a.y as i128 - b.y as i128;
     squared_len_i128(dx, dy).min(u64::MAX as i128) as u64

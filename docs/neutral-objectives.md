@@ -4,12 +4,12 @@ Initial visual replacement pass:
 
 | Base asset | Pokemon replacement | Notes |
 | --- | --- | --- |
-| `asset/base/aseprite_resources/ingame/epic` | `asset/pokemon_moba/ingame/xerneas` | Big epic objective. Replaces the previous Mew visual pass; gameplay logic remains tied to the base epic objective. |
-| `asset/base/aseprite_resources/ingame/bee` | `asset/pokemon_moba/ingame/beedrill` | Neutral camp visual. |
-| `asset/base/aseprite_resources/ingame/mushroom` | `asset/pokemon_moba/ingame/amoonguss` | Neutral camp visual. PMDCollab has no usable Amoonguss source, so this sheet is generated from imagegen using the prior in-mod Amoonguss as reference. |
-| `asset/base/aseprite_resources/ingame/rhino` | `asset/pokemon_moba/ingame/rhyperior` | Neutral camp visual. |
-| `asset/base/aseprite_resources/ingame/serpen` | `asset/pokemon_moba/ingame/eternatus` | Major objective. Keeps Serpen's permanent stat buff logic, renamed to Eternal Buff. |
-| `asset/base/aseprite_resources/ingame/stump` | `asset/pokemon_moba/ingame/trevenant` | Neutral camp visual. |
+| `asset/base/aseprite_resources/ingame/epic` | `asset/pokemon_moba_stable/ingame/xerneas` | Big epic objective. Replaces the previous Mew visual pass; gameplay logic remains tied to the base epic objective. |
+| `asset/base/aseprite_resources/ingame/bee` | `asset/pokemon_moba_stable/ingame/beedrill` | Neutral camp visual. |
+| `asset/base/aseprite_resources/ingame/mushroom` | `asset/pokemon_moba_stable/ingame/amoonguss` | Neutral camp visual. PMDCollab has no usable Amoonguss source, so this sheet is generated from imagegen using the prior in-mod Amoonguss as reference. |
+| `asset/base/aseprite_resources/ingame/rhino` | `asset/pokemon_moba_stable/ingame/rhyperior` | Neutral camp visual. |
+| `asset/base/aseprite_resources/ingame/serpen` | `asset/pokemon_moba_stable/ingame/eternatus` | Major objective. Keeps Serpen's permanent stat buff logic, renamed to Eternal Buff. |
+| `asset/base/aseprite_resources/ingame/stump` | `asset/pokemon_moba_stable/ingame/trevenant` | Neutral camp visual. |
 
 These are visual overrides through `mod.override_info`. Each replacement targets the concrete `#sheet` and `#anim` assets because those are the assets present in the game bundle. Gameplay values are unchanged for now.
 
@@ -33,7 +33,7 @@ The June 25 sizing pass moved Beedrill, Amoonguss, Trevenant, Rhyperior, Eternat
 
 Ordinary jungle camps use a transparent or short `dead` animation tag. Their base-game healthbars and combat state despawn correctly, but visible idle-style dead frames can leave the Pokemon sprite on the map after death. Xerneas and Eternatus keep visible death frames because their objective lifecycle already clears correctly in game.
 
-Lane minions use `asset/base/aseprite_resources/UI_aseprite/minion`. The mod still overrides its `#sheet` and `#anim` with `asset/pokemon_moba/ingame/falinks_minion`, generated from a single body cropped out of the Falinks train and packed on a 44x44 canvas. The current accepted Falinks minion sheet is staged at `assets\custom_spritework\ingame\falinks_minion#sheet.png` / `#anim.fanim` and synced to `mod\pokemon_moba\ingame`; its normal idle body is about 23 px tall after the June 26 scale pass.
+Lane minions use `asset/base/aseprite_resources/UI_aseprite/minion`. The mod still overrides its `#sheet` and `#anim` with `asset/pokemon_moba_stable/ingame/falinks_minion`, generated from a single body cropped out of the Falinks train and packed on a 44x44 canvas. The current accepted Falinks minion sheet is staged at `assets\custom_spritework\ingame\falinks_minion#sheet.png` / `#anim.fanim` and synced to `mod\pokemon_moba_stable\ingame`; its normal idle body is about 23 px tall after the June 26 scale pass.
 
 ```powershell
 .\tools\convert-minion-sprites.ps1
@@ -65,7 +65,7 @@ Nexus/core assets:
 | `asset/base/aseprite_resources/ingame/blue_nexus_destroy_effect` | 1348x184 | `destroy` |
 | `asset/base/aseprite_resources/ingame/red_nexus_destroy_effect` | 1348x184 | `destroy` |
 
-Tower projectile effect assets also exist at `asset/base/aseprite_resources/skill_effect/blue_tower_projectile` and `asset/base/aseprite_resources/skill_effect/red_tower_projectile`. They are tiny 4x4 PNG effect resources. Transparent replacements are live-remapped to `asset/pokemon_moba/ingame/red_tower_projectile` and `asset/pokemon_moba/ingame/blue_tower_projectile` so the base projectile does not double-render over the baked tower attack animation.
+Tower projectile effect assets also exist at `asset/base/aseprite_resources/skill_effect/blue_tower_projectile` and `asset/base/aseprite_resources/skill_effect/red_tower_projectile`. They are tiny 4x4 PNG effect resources. Transparent replacements are live-remapped to `asset/pokemon_moba_stable/ingame/red_tower_projectile` and `asset/pokemon_moba_stable/ingame/blue_tower_projectile` so the base projectile does not double-render over the baked tower attack animation.
 
 The 5v5 map is not a single editable image. It is a stack of static PNG layers and small shadow sprites. The visible art can be swapped, but gameplay placement/pathing/bush behavior is still controlled by the existing map settings and engine data, so replacement art must keep lanes, walls, bushes, towers, nexus positions, jungle camp reads, and playable boundaries aligned to the original layout.
 
@@ -86,7 +86,7 @@ The 5v5 map is not a single editable image. It is a stack of static PNG layers a
 
 For tower, nexus, and animated objective swaps, override both `#sheet` and `#anim` entries in `mod.override_info`. For static map layer swaps, override the base PNG asset path directly, without `#sheet` or `#anim`.
 
-The local SDK/docs do not expose a supported map geometry API for adding new permanent bushes, walls, collision, pathing, spawn points, or static interactables. Treat the 5v5 map assets above as visual layers unless a later SDK update exposes map-object registration. Custom Pokemon combat fields can still create gameplay at runtime through Rust champion logic, but drawing a new feature onto the static map will not make it functional by itself.
+SDK 0.6.4 correction: `StableMapCustomizer` exposes the freshly built map, including wall/bush grids and tower/camp/nexus/lane placement. Build 0.2.5 reads that grid for Shiftry without editing it. Pathfinding and visibility are still baked from the original terrain, so editing geometry has important limits. The PNG assets above remain visual layers: drawing a new feature does not itself change gameplay. See `docs/sdk-0.6.4-findings.md` for validation and map-capture diagnostics.
 
 Pokemon map background work-in-progress:
 
@@ -96,8 +96,8 @@ Pokemon map background work-in-progress:
 
 Live Pokemon tower replacement pass:
 
-- Red-side tower body: Stakataka, remapped from `asset/base/aseprite_resources/ingame/red_tower` to `asset/pokemon_moba/ingame/red_tower`.
-- Blue-side tower body: Celesteela, remapped from `asset/base/aseprite_resources/ingame/blue_tower` to `asset/pokemon_moba/ingame/blue_tower`.
+- Red-side tower body: Stakataka, remapped from `asset/base/aseprite_resources/ingame/red_tower` to `asset/pokemon_moba_stable/ingame/red_tower`.
+- Blue-side tower body: Celesteela, remapped from `asset/base/aseprite_resources/ingame/blue_tower` to `asset/pokemon_moba_stable/ingame/blue_tower`.
 - The live tower body assets keep the required `idle`, `attack`, `attack_projectile`, and `hit_effect` tags. They use larger custom frame rectangles with gutters rather than the base tower's tight 31x63 body frames, so the Pokemon towers can read as objective-scale structures without neighboring-frame bleed.
 - The body animation carries the visible tower activation and apparent shot origin. The `attack_projectile` tag is still present on the body sheet for compatibility, and the separate tiny tower projectile resources are remapped as transparent placeholders so the renderer cannot show both the base projectile and the baked tower shot.
 - The live `red_tower_orb` and `blue_tower_orb` assets are intentionally transparent. The orb layer appears to be a separate renderer component; blanking it avoids a floating detached overlay while keeping the expected animation tags available. If in-game tower shots need the orb layer as their visible origin, replace the transparent orb with a small aligned eye/core/cannon-mouth sprite instead of a second full tower.
@@ -105,8 +105,8 @@ Live Pokemon tower replacement pass:
 
 Live Pokemon nexus replacement pass:
 
-- Blue-side nexus body: Kyogre, remapped from `asset/base/aseprite_resources/ingame/blue_nexus` to `asset/pokemon_moba/ingame/blue_nexus`.
-- Red-side nexus body: Groudon, remapped from `asset/base/aseprite_resources/ingame/red_nexus` to `asset/pokemon_moba/ingame/red_nexus`.
+- Blue-side nexus body: Kyogre, remapped from `asset/base/aseprite_resources/ingame/blue_nexus` to `asset/pokemon_moba_stable/ingame/blue_nexus`.
+- Red-side nexus body: Groudon, remapped from `asset/base/aseprite_resources/ingame/red_nexus` to `asset/pokemon_moba_stable/ingame/red_nexus`.
 - The June 25 follow-up pass reduced both live nexus body sheets by an additional 6% inside their existing 220x150 frames so Kyogre/Groudon overlap the forward towers less.
 - Destroy effects are remapped separately as `blue_nexus_destroy_effect#sheet.png` / `#anim.fanim` and `red_nexus_destroy_effect#sheet.png` / `#anim.fanim`, each with a `destroy` tag.
 - The live `blue_nexus_orb` and `red_nexus_orb` assets are intentionally transparent, matching the tower strategy. The main nexus body sheet carries the visible idle/attack read, while the `attack_projectile` and `hit_effect` tags remain present as transparent placeholders for compatibility.

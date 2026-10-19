@@ -1,6 +1,6 @@
 {
   "anims": {
-    "area": {
+    "effect": {
       "frames": [
         {
           "duration": 0.08,

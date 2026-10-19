@@ -1,78 +1,103 @@
 # Stable SDK Migration
 
-This project now keeps the released classic package at `mod/pokemon_moba` and the 0.5.3 stable-ABI port at `mod/pokemon_moba_stable`.
+## Current Build: 0.2.10 / SDK 0.6.4
 
-## Rules For SDK Updates
+- Build 0.2.10 adds the complete roster VFX checklist, corrects delayed and
+  conditional visuals, mark/chit states and missing projectile routes. Read
+  `vfx-roster-review.md`: directional anchoring, composite artwork and several
+  animation phases remain unresolved. No live visual sign-off is claimed.
 
-- Keep only the latest SDK version in active use.
-- Do not keep stale downloaded SDK folders around as build inputs.
-- Stable builds should use `mod-sdk-stable` from the current Teamfight Manager 2 install unless we deliberately vendor the latest stable SDK for a release build.
-- `C:\Users\james\Downloads\mod-sdk-stable.rar` was checked on 2026-07-30 and is byte-for-byte identical to the installed `Teamfight Manager2\mod-sdk-stable` folder.
-- When a new SDK lands, update this note, the build scripts, and the active mod package together. Remove or ignore untracked/stale SDK copies before making migration decisions so old APIs and assets do not get mistaken for current support.
+- Build 0.2.6 replaces the move-toward-only web/pulse spotting consumer with
+  shared team detection used by target gates, cast selection, local threat
+  assessment, retreat and unsafe-route avoidance. Ampharos detects continuously.
+  Last-known positions expire after two seconds; stale memory cannot authorize
+  targeted attacks. Host input validation and real untargetability remain intact.
+  See `sdk-0.6.4-findings.md` for behavior, safeguards and live-test limits.
 
-## Migration Targets
+Updated 2026-10-18. The single active package is `mod/pokemon_moba_stable`.
+Cargo uses the official Steam installation's `mod-sdk-stable/mod-api-stable`.
+Its `base_version.txt` reports 0.6.4 and its ABI level is 10. The package now
+requires game >=0.6.4 and ABI 10. Do not downgrade to the 0.5.8 download merely
+because GitHub's releases/latest endpoint still selects that older release.
 
-1. Port native registration from classic `mod_api` to `mod-api-stable`.
-2. Register every Pokemon through `StableChampion`, `StableAction`, `StableEffectType`, and `StablePassive`.
-3. Generate companion `.data_champion` files for view bindings while Rust owns runtime behavior.
-4. Package staged VFX under `asset/pokemon_moba_stable/vfx`.
-5. Bind projectile VFX through `StableSim::spawn_projectile(name, effect_name, spec)` plus matching `view_projectiles`.
-6. Bind caster, target, buff, and field VFX through companion data actions, `view_effects`, and `view_buffs`.
-7. Replace forced-dash teleport approximations with `StableSim::entity_set_pos` where the intended behavior is an instant teleport.
-8. Rework tower-danger and champion-specific input decisions with `StablePlayerAi`, using read-only live sim data for towers, entities, cooldowns, buffs, CC, and projectiles.
-9. Recode Gholdengo gold through stable player gold mutation instead of internal classic state edits.
-10. Use `StableSim::spawn_unit` for summons where built-in chase/attack behavior is sufficient; use match hooks for custom summon orchestration.
-11. Revisit custom kill-credit and kill-log handling last, after the stable damage and gold pathways are proven.
+Official docs were refreshed to commit `064c2fa` in `.mod-docs`.
+See [SDK 0.6.4 findings](sdk-0.6.4-findings.md) for the capabilities audit,
+remaining work, and in-game acceptance checks.
 
-## Position Status In 0.5.3
+## Runtime Ownership
 
-The installed 0.5.3 stable SDK improves positions but does not expose a `StableChampion` preferred-position field.
+- All 103 champions remain native registrations with the existing Pokemon
+  actions, passives, type/STAB resolver, status logic, draft scorer, and AI.
+- `action_name()` returns attack, skill, skill2, or ult. Never display names.
+- Do not ship same-ID companion `.data_champion` files or synthetic damage nodes.
+  The companion exporter remains ignored in ordinary tests.
+- New standalone `.view_effects` assets are supported by the SDK and can supply
+  visuals without replacing native champion ownership. Build 0.2.1 registers all
+  279 staged assets and emits cast/projectile/state events across the roster.
+  See the capability audit for timing and visual-validation limitations.
+- No custom statistics server injector or manual client VFX renderer is registered.
+  Engine damage/heal calls remain the persistence path.
+- The equipment server extension is read-only: it snapshots ItemSetting for
+  equipment-aware skills. It is NOT the retired statistics injector.
 
-- Draft hooks can read candidate champion IDs and current ally/enemy picks through `StableDraftContext`, but no explicit per-pick target lane is visible in the stable score call.
-- The stable port infers the current lane slot from ally pick count using the same lane order the classic scorer used (`Top`, `Jungle`, `Mid`, `Bottom`, `Support`). This lets the hook strongly prefer lane-appropriate Pokemon, but it still cannot directly control any separate post-draft lane swap routine the engine may run.
-- Player AI can read the assigned lane through `StableAiInit::lane`, `StableAiContext::lane`, and live `StablePlayer::lane`.
-- Live sim and kill logs now expose lane data (`player_lane`, `KillLogV1.killer_position`, `killed_position`, and assist positions).
-- The stable port now uses the classic `PokemonDraftScoreHook` through the stable adapter, preserving the old 103-Pokemon position/scoring behavior while running on `StableDraftContext`.
+## Changes In This Upgrade
 
-Practical result: position-aware draft/AI is now viable, but exact slot-forcing is still limited by what the stable draft hook receives. Guide/export metadata should continue to carry the user-facing position labels.
+- Build 0.2.5 reads the actual bush grid through `StableMapCustomizer` and freezes
+  it per matched simulation for Shiftry. True-sight overrides are preserved.
+  Check the capability audit's capture/bind diagnostics on the first live match.
+- Build 0.2.4 addresses the whole-roster AI adapter, dash rejection, engine CC
+  cleanse, anti-heal ownership, intended teleports, terrain passage, native Hunt
+  stealth, copied Gholdengo rewards and simulation-state partitioning. Read the
+  [implementation notes](sdk-0.6.4-findings.md#build-024-audit-fixes) before testing.
+- Build 0.2.3 adds native projectile impact resolution, special Dreepy/cannonball/
+  Bonemerang paths, flat +10 credited-CS rewards, weighted lane priors and explicit
+  engine-versus-resolver crit ownership. See the capability audit for preserved
+  behavior, deliberate timing changes and the custom crit item-proc limitation.
+- `StablePassive::on_kill` now forwards its victim argument to the legacy callback;
+  the owner argument must never be mistaken for the killed entity.
+- `on_unit_kill` is forwarded separately. Snorlax (and Receiver copying it) gains
+  one berry on credited minion/camp kills, respecting passive suppression.
+- Existing WithShield requests now create actual engine shield layers; the old
+  adapter transmitted the duration kind but discarded the shield amount.
+- Action charge counts are clamped to at least one at the SDK boundary.
+- Native lane priors now use the roster's existing primary/secondary positions.
+  Post-draft `decide_positions` now maximizes supported-lane coverage, then primary
+  preference, over all five-player permutations. Draft scoring resolves live names
+  instead of assuming the host has exactly 60 base champions. No UI capture is used.
+- The internal combat ledger measures HP/shield loss rather than crediting the raw
+  damage request. This is an observation of the net delta, not a replacement for
+  engine damage events when concurrent procs heal or shield.
+- Removed the extra fallback kill-gold award because the engine now awards it.
+- Commented out the five old statistics-injector call sites and compile-excluded
+  both private-layout mutation functions. Historical source is retained, not enabled.
+- On-demand adapter methods expose item keys, statistics JSON, and view-effect/SFX
+  calls. Adding these methods does not itself wire every move's visuals.
 
-## Revisit Old Workarounds While Porting
+## Compatibility And Validation
 
-Do not blindly carry old approximations forward. For each champion, check the guide text, `docs/project-reference.md`, and the move/passive implementation before porting.
+Source compilation and adapter tests do not execute the game's damage pipeline.
+Full match, statistics persistence, crit/proc behavior, and replay checks remain
+required. In particular, the Pokemon resolver has bespoke crit/passive logic that
+must be checked against the engine pipeline introduced in 0.5.4.
 
-Stable API features that should replace old compromises where the installed stable crate exposes the needed mutation:
+Use a new test save. Earlier experimental saves may retain deleted data-champion
+definitions and missing native effect references. The August log showed such a
+version mismatch, but it did not prove the exact source of its divide-by-zero panic.
+The current upstream docs separately report a fix for zero charge counts.
 
-- Shields: revisit every shield promise. The local 0.5.3 `BuffV1` exposes shield reads/metadata but not a direct shield amount field, so shield application may need data companion effects or a newer stable API surface.
-- Real gold mutation: use stable player gold APIs for Gholdengo instead of internal player-state edits.
-- Real teleports: use `entity_set_pos` only for moves documented as teleports/blinks, not ordinary dashes.
-- Real summon/deployable units: consider `spawn_unit` for summons and match-hook state for deployables/fields.
-- Better AI: use `StablePlayerAi` plus read-only `StableSim` for tower-aware dashes, copied Smeargle actions, Comfey/Clawitzer attachment behavior, and objective/tower positioning.
-- Better kill inspection: use stable kill-log reads after damage/gold behavior is otherwise stable.
+## SDK Update Procedure
 
-Known champions/mechanics to revisit:
+1. Inspect both the official release and the installed SDK version. Use the newest
+   official SDK compatible with the installed game; retain one active build path.
+2. Refresh `.mod-docs`, record its commit and the SDK/game/ABI versions.
+3. Remove obsolete downloaded SDK trees and archives after confirming the active
+   build uses the current installation. Keep project code history in Git.
+4. Read changed API contracts, including behavior changes to existing calls.
+5. Build and test native roster/action/passive compatibility first.
+6. Implement supported improvements with focused tests. Preserve existing
+   workarounds where the full replacement contract is still absent.
+7. Validate with a new save, watched match, background simulation and replay.
+   Never call compilation alone proof of combat or statistics parity.
 
-- Banette: Phantom Force should be evaluated as a true teleport-to-target style move.
-- Skarmory: Fly/global ally travel should be evaluated separately from normal dashes; do not convert ordinary movement to teleport unless the intended move is instant relocation.
-- Audino: Substitute/ally rescue displacement should be evaluated for true swap/teleport semantics.
-- Kricketune: Sticky Web has staged deployable VFX and should become a proper persistent web/deployable control zone.
-- Octillery: Suction Cups was waiting on terrain/pathing support; stable `ignore_wall`/map/sim data may unlock a better version.
-- Noivern: Infiltrator tower-aggro bypass was waiting on support; stable live tower/entity access and AI hooks may allow a partial or full implementation.
-- Oranguru: Symbiosis should be revisited now that stable player/entity stat reads are cleaner.
-- Ambipom: Technician should react to ally-provided Pokemon buffs through the buff ledger/stable buff reads.
-- Ceruledge: Poltergeist should be revisited for item/stat-surplus behavior and VFX now that stable access is broader.
-- Wishiwashi: Cowardice shield text should become a real shield instead of only metadata/description.
-
-## Current Checkpoint
-
-- `mod/pokemon_moba_stable` exists as a parallel package.
-- Existing package assets, text, guide, icons, UI, sprites, and ingame replacements were copied.
-- Asset paths in the stable package metadata now point at `asset/pokemon_moba_stable/...`.
-- Staged VFX were copied into `mod/pokemon_moba_stable/vfx`.
-- The stable package builds against installed SDK 0.5.3 through `tools/build-stable-native.ps1`.
-- The classic gameplay layer is copied into `src/legacy` and compiled through `stable_legacy_api`, so the full native roster, Pokemon combat resolver, Pokemon status ledger, old draft scorer, and old player input AI are preserved as the migration baseline.
-- All 103 runtime Pokemon are registered through the stable adapter.
-- All 103 companion `.data_champion` files are generated from the Rust roster via `export_stable_data_champions`, with sprites, icons, stats, actions, and staged VFX declarations.
-- Gholdengo's old unsafe live-gold mutation helpers now route through stable `player_add_gold`, preserving the old trigger logic while using the new SDK endpoint.
-- Projectile VFX are declared in companion data. Traveling projectile visuals still need targeted runtime work to replace direct-hit paths with stable `spawn_projectile` calls and matching names.
-
-The stable package is now a systematic full-roster port baseline, not the earlier champion-by-champion spike. Next migration passes should be narrowly scoped upgrades over the preserved legacy behavior: true teleports where documented, stable projectile spawning for projectile VFX, stable summon/deployable primitives, and selected AI fixes.
+The build script checks the SDK version and verifies that Cargo's resolved crate
+matches the requested GameRoot; it fails on mismatched SDK paths.

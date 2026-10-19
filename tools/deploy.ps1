@@ -1,7 +1,7 @@
 param(
   [string]$GameRoot = "C:\Program Files (x86)\Steam\steamapps\common\Teamfight Manager2",
-  [string]$ModId = "pokemon_moba",
-  [string]$WorkshopId = "3744254195"
+  [string]$ModId = "pokemon_moba_stable",
+  [string]$WorkshopId = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -45,7 +45,7 @@ New-Item -ItemType Directory -Force -Path $target | Out-Null
 
 $resolvedTarget = (Resolve-Path -LiteralPath $target).Path
 $resolvedModsRoot = (Resolve-Path -LiteralPath $modsRoot).Path
-if (-not $resolvedTarget.StartsWith($resolvedModsRoot, [StringComparison]::OrdinalIgnoreCase)) {
+if (-not $resolvedTarget.StartsWith($resolvedModsRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) {
   throw "Refusing to clear unexpected deploy target: $resolvedTarget"
 }
 

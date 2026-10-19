@@ -4,10 +4,22 @@ Use this for Pokemon champion sprite work. The workflow is PMDCollab-source-firs
 
 ## Storage Rules
 
+### Build 0.2.11 Precedence
+
+Native detached VFX now replace several historical body-baked overlays below.
+Do not rerun an old overlay/bake command as the final asset step. After changing
+sources, run `tools/repair-stable-vfx-assets.py` with Pillow, then
+`tools/generate-stable-vfx-bindings.py`. The repair script preserves original
+sources under `references/vfx-pre-repair`, replaces only selected body tags and
+packs single-object/phase assets plus directional variants. In particular,
+Charizard's Inferno is a targeted detached area, and Blissey's Heal Pulse is a
+state-driven aura. Dedenne and Swanna replacement art and exact prompts are in
+`assets/custom_spritework/references/imagegen/vfx-repair-prompts.json`.
+
 - Stage converted sheets and animation files under `assets\custom_spritework\champions`.
-- Runtime copies live under `mod\pokemon_moba\champions_custom`; do not put new Pokemon champion sprites back into `mod\pokemon_moba\champions`.
-- `mod.override_info` should map Pokemon champion `#sheet` and `#anim` assets to `asset/pokemon_moba/champions_custom/<short-id>#sheet` and `#anim`.
-- Current new-Pokemon flow: new Pokemon are expected to already have `mod.override_info` mappings or to receive them when `tools\sync-custom-champion-sprites.py` runs. After making a new sprite group, generate previews and sync immediately into `mod\pokemon_moba\champions_custom`; do not wait for a separate staging/remap batch unless James asks for one.
+- Runtime copies live under `mod\pokemon_moba_stable\champions_custom`; do not put new Pokemon champion sprites back into a retired classic package.
+- `mod.override_info` should map Pokemon champion `#sheet` and `#anim` assets to `asset/pokemon_moba_stable/champions_custom/<short-id>#sheet` and `#anim`.
+- Current new-Pokemon flow: new Pokemon are expected to already have `mod.override_info` mappings or to receive them when `tools\sync-custom-champion-sprites.py` runs. After making a new sprite group, generate previews and sync immediately into `mod\pokemon_moba_stable\champions_custom`; do not wait for a separate staging/remap batch unless James asks for one.
 - Stage future-ready custom projectile/spell VFX under `assets\custom_spritework\vfx`.
 - Stage QC GIFs under `assets\custom_spritework\previews`.
 - Store downloaded PMDCollab source material and credits under `assets\custom_spritework\references\pmdcollab\<species-id>`.
@@ -36,8 +48,8 @@ Work alphabetically through the roster, starting with Ambipom.
 
 For each Pokemon:
 
-1. Read an existing comparable live sprite and `.fanim` from `mod\pokemon_moba\champions_custom` to preserve approximate gameplay scale, canvas size, and required animation tags.
-2. Read the Pokemon's kit in `mod\pokemon_moba\src\pokemon_content.rs` and the summary in `docs\project-reference.md`.
+1. Read an existing comparable live sprite and `.fanim` from `mod\pokemon_moba_stable\champions_custom` to preserve approximate gameplay scale, canvas size, and required animation tags.
+2. Read the Pokemon's kit in `mod\pokemon_moba_stable\src\legacy\pokemon_content.rs` and the summary in `docs\project-reference.md`.
 3. Download/cache the PMDCollab source folder for the Pokemon under `assets\custom_spritework\references\pmdcollab\<species-id>`, including `AnimData.xml`, selected `*-Anim.png` files, and `credits.txt`.
 4. Choose source animations for the required TFM2 tags: `idle`, `run`, `attack`, `skill`, `skill2`, `ult`, and `dead`.
 5. Convert the selected PMD animation row into a staged fixed-canvas TFM2 `#sheet.png` and `#anim.fanim` with `tools\convert-pmdcollab-sprite.py`. Use right-facing source rows as the canonical staged direction, but prefer three-quarter right-facing rows for Pokemon idle/portrait readability. PMD's usual second visible row is the preferred right-facing three-quarter view (`--direction-row 1` because the converter is zero-based), the third visible row is pure right side-view (`--direction-row 2`), and the seventh visible row is pure left side-view (`--direction-row 6`).
@@ -47,12 +59,12 @@ For each Pokemon:
 7. Prefer source-frame reuse or small deterministic sprite-attached overlays for missing move readability so the Pokemon does not morph between actions. Use ImageGen only for genuinely missing art that cannot be built from the source frames, and keep the generated result matched to the downloaded source style.
    If a loose generated effect looks pasted on or visibly clashes in the preview GIF, remove it from the champion sheet. For that case, either leave the PMDCollab body clean or rebuild the full affected action as an intentional ImageGen animation strip where the body and effect are generated together in one consistent style.
    When an action needs a longer bridge into another pose, use roughly four prep/transition frames as the default starting point. Four frames has been enough to make abrupt pose changes, such as standing into a low shooting pose, read as intentional without overextending the move.
-8. Detached projectile/spell-area VFX can be designed and staged now, but do not rely on them for current in-game readability until the native Rust champion VFX call path exists. Keep those files under `assets\custom_spritework\vfx` and preview them separately.
+8. Detached projectile and spell VFX are staged under `assets\custom_spritework\vfx` and copied into `mod\pokemon_moba_stable\vfx`. SDK 0.6.4 supports standalone `.view_effects` bindings and native simulation playback; runtime triggers remain unwired in build 0.2.0. See `docs/sdk-0.6.4-findings.md`. After adding or repacking assets, run `.\.venv\Scripts\python.exe .\tools\normalize-stable-vfx.py` to keep their authored scale and anchors consistent.
 9. Generate looping preview GIFs for idle/run/basic/skill1/skill2/ult and any passive or buff state that needs visual QC. Use transparent GIF backgrounds (`--background 0,0,0,0`) rather than chroma-key green so the previews match the alpha behavior expected in-game. Use 288x288 previews for standard 96x96 champion frames so every Pokemon is reviewed at the same 3x scale.
 10. Generate an idle size comparison PNG for every new Pokemon before accepting scale. Use `tools\render-sprite-size-comparison.py <short-id>` so the new Pokemon appears beside the current reference spread: Shedinja, Electrode, Gallade, Venusaur, and Snorlax. The output is `assets\custom_spritework\previews\<short-id>_size_compare.png` and includes visible height, bottom anchor, and a shared ground line.
 11. Verify the staged `.fanim` JSON parses, every referenced rectangle fits inside the staged sheet, preview GIFs play without neighboring-frame bleed, and the size comparison does not show the new Pokemon as an obvious scale outlier.
 12. Treat the preview GIFs and size comparison as the framing check before in-game testing. After the roster-wide healthbar-overlap correction, many accepted champion idle bottoms sit around y=63-67 inside the 96x96 frame, with larger/taller exceptions handled by size bucket. If the Pokemon sits too low in comparison or its healthbar overlaps the body in-game, raise it by increasing `--bottom-padding` or applying a small negative `--shift-y`; if it sits too high, lower it. Do not align to the full transparent PMD source cell.
-13. When a Pokemon's staged files are accepted, run `.\.venv\Scripts\python.exe .\tools\sync-custom-champion-sprites.py` to copy staged assets into `mod\pokemon_moba\champions_custom` and normalize `mod.override_info`.
+13. When a Pokemon's staged files are accepted, run `.\.venv\Scripts\python.exe .\tools\sync-custom-champion-sprites.py` to copy staged assets into `mod\pokemon_moba_stable\champions_custom` and normalize the stable `mod.override_info`.
 
 ## Size QA rules
 
@@ -2913,7 +2925,7 @@ Final VFX counts are 6 Pollen Puff `projectile` frames, 7 Draining Kiss `line` f
 ## Sawk & Throh Source Mapping
 
 - PMDCollab source: none used for this staged pass. The shared pair sheet was generated with ImageGen and preserved under `assets\custom_spritework\references\imagegen`.
-- Current engine limitation: Sawk & Throh is a native Rust `PokemonChampion`, and the native path currently exposes one standard animation tag per action slot. The earlier `SwitchByBuff + view_buffs` stance-routing probe only applies to data champion view-buff routing, not to the current native Rust champion path. For now, use Option 1: one shared tag-team body sheet where both partners are visible in each standard action.
+- Current engine limitation: stable Rust can now add/remove named buffs consumed by companion `view_buffs`, but a buff visual plays explicitly configured animation tags and does not replace the champion sprite or automatically follow its idle/run/action tag. A later canary can test a transparent base sprite plus separate full-body Sawk/Throh buff animations for every visual state. Until that manual renderer proves timing, facing, interruption, death, and cleanup, use Option 1: one shared tag-team body sheet where both partners are visible in each standard action.
 - ImageGen sources: `sawk_throh_source_v2.png` for idle/run/basic/switch base rows, plus corrected replacement rows `sawk_throh_skill2_row_source.png`, `sawk_throh_ult_row_source.png`, and `sawk_throh_dead_row_source.png`.
 - `idle`: shared pair idle, both visible.
 - `run`: shared pair run, both visible.
@@ -2924,7 +2936,7 @@ Final VFX counts are 6 Pollen Puff `projectile` frames, 7 Draining Kiss `line` f
 - `dead`: corrected replacement row ending with both partners down.
 - Passive / Inner Focus: no separate spritework or VFX is staged.
 
-Sawk & Throh has no detached VFX assets in this pass. It is staged only in `assets\custom_spritework` for now; do not add it to `champions_custom` or `mod.override_info` until James asks for the next remap/recompile/redeploy batch. If native view-buff/form routing is added later, revisit this as a proper Sawk-default/Throh-buffed stance swap rather than this shared-pair fallback.
+Sawk & Throh has no detached VFX assets in this pass. The shared-pair sheet remains the live fallback. Revisit a Sawk-default/Throh-buffed visual stance with the deferred transparent-base/full-body-`view_buffs` canary after higher-priority combat, statistics, skill VFX, and AI work.
 
 ## Scizor Source Mapping
 
@@ -3649,7 +3661,7 @@ Final VFX counts are 6 Thunder Cage `field` frames, 6 Zing Zap `counter` frames,
 
 ## Rillaboom Source Mapping
 
-PMDCollab `sprite/0812` supplies the body source. `Strike` is a `CopyOf Attack` alias in `AnimData.xml`, so the staged basic attack maps to the concrete `Attack` source while still representing the requested Strike animation. Rillaboom is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+PMDCollab `sprite/0812` supplies the body source. `Strike` is a `CopyOf Attack` alias in `AnimData.xml`, so the staged basic attack maps to the concrete `Attack` source while still representing the requested Strike animation. Rillaboom is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom`.
 
 - `idle`: `Idle`, 2 frames.
 - `run`: `Walk`, 4 frames.
@@ -3697,7 +3709,7 @@ ImageGen source is preserved as `assets\custom_spritework\references\imagegen\ri
 
 ## Dragapult Source Mapping
 
-PMDCollab `sprite/0887` supplies the full body source. Dragapult is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+PMDCollab `sprite/0887` supplies the full body source. Dragapult is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom`.
 
 - `idle`: `Idle`, 2 frames.
 - `run`: `Walk`, 4 frames.
@@ -3745,7 +3757,7 @@ ImageGen source is preserved as `assets\custom_spritework\references\imagegen\dr
 
 ## Shiftry Source Mapping
 
-PMDCollab `sprite/0275` supplies the full body source. Shiftry is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+PMDCollab `sprite/0275` supplies the full body source. Shiftry is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom`.
 
 - `idle`: `Idle`, 2 frames.
 - `run`: `Walk`, 4 frames.
@@ -3793,7 +3805,7 @@ ImageGen source is preserved as `assets\custom_spritework\references\imagegen\sh
 
 ## Sigilyph Source Mapping
 
-PMDCollab `sprite/0561` supplies the full body source. Sigilyph is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+PMDCollab `sprite/0561` supplies the full body source. Sigilyph is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom`.
 
 - `idle`: `Idle`, 8 frames.
 - `run`: `Walk`, 4 frames.
@@ -3842,7 +3854,7 @@ ImageGen source is preserved as `assets\custom_spritework\references\imagegen\si
 
 ## Weavile Source Mapping
 
-PMDCollab `sprite/0461` supplies the full body source. Weavile is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom`.
+PMDCollab `sprite/0461` supplies the full body source. Weavile is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom`.
 
 - `idle`: `Idle`, 2 frames.
 - `run`: `Walk`, 4 frames.
@@ -3890,7 +3902,7 @@ ImageGen source for the baked cues is preserved as `assets\custom_spritework\ref
 
 ## Swanna Source Mapping
 
-PMDCollab `sprite/0581` supplies the full body source. Swanna is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\swanna#sheet.png` and `swanna#anim.fanim`.
+PMDCollab `sprite/0581` supplies the full body source. Swanna is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom\swanna#sheet.png` and `swanna#anim.fanim`.
 
 - `idle`: `Idle`.
 - `run`: `FlapAround` frames `0,1,0,1`, not `Walk` and not the full FlapAround row. The full row rotates through too many facing angles; this compact loop keeps the three-quarter right-facing flying read.
@@ -3942,7 +3954,7 @@ ImageGen source for the VFX is preserved as `assets\custom_spritework\references
 
 ## Marowak Source Mapping
 
-PMDCollab `sprite/0105` supplies the full body source. Marowak is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\marowak#sheet.png` and `marowak#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0105\credits.txt`.
+PMDCollab `sprite/0105` supplies the full body source. Marowak is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom\marowak#sheet.png` and `marowak#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0105\credits.txt`.
 
 - `idle`: `Idle`.
 - `run`: `Walk`.
@@ -3984,7 +3996,7 @@ This makes Marowak's first idle frame 28 px tall with bottom anchor 72, matching
 
 ## Garganacl Source Mapping
 
-PMDCollab `sprite/0934` supplies the full body source. Garganacl is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\garganacl#sheet.png` and `garganacl#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0934\credits.txt`.
+PMDCollab `sprite/0934` supplies the full body source. Garganacl is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom\garganacl#sheet.png` and `garganacl#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0934\credits.txt`.
 
 - `idle`: `Idle`.
 - `run`: `Walk`.
@@ -4032,7 +4044,7 @@ This makes Garganacl's first idle frame 44 px tall with bottom anchor 72, keepin
 
 ## Ampharos Source Mapping
 
-PMDCollab `sprite/0181` supplies the full body source. Ampharos is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\ampharos#sheet.png` and `ampharos#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0181\credits.txt`.
+PMDCollab `sprite/0181` supplies the full body source. Ampharos is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom\ampharos#sheet.png` and `ampharos#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0181\credits.txt`.
 
 - `idle`: `Idle`.
 - `run`: `Walk`.
@@ -4078,7 +4090,7 @@ This makes Ampharos's first idle frame 34 px tall with bottom anchor 72, aligned
 
 ## Xatu Source Mapping
 
-PMDCollab `sprite/0178` supplies the full body source. Xatu is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\xatu#sheet.png` and `xatu#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0178\credits.txt`.
+PMDCollab `sprite/0178` supplies the full body source. Xatu is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom\xatu#sheet.png` and `xatu#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0178\credits.txt`.
 
 - `idle`: `Idle`.
 - `run`: `Hop` frames `0,2,5,6,7,8,5,2`, using the stable three-quarter start/end plus the raised-wing frames so the loop reads as flying rather than face/body bobbing.
@@ -4097,7 +4109,7 @@ The accepted champion sheet is downscaled to 34 px idle height with bottom ancho
 
 ## Quaquaval Source Mapping
 
-PMDCollab `sprite/0914` supplies the full body source. Use source row 2 for the right-facing three-quarter read; row 1 is too front-facing for Quaquaval. Quaquaval is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\quaquaval#sheet.png` and `quaquaval#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0914\credits.txt`.
+PMDCollab `sprite/0914` supplies the full body source. Use source row 2 for the right-facing three-quarter read; row 1 is too front-facing for Quaquaval. Quaquaval is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom\quaquaval#sheet.png` and `quaquaval#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0914\credits.txt`.
 
 - `idle`: `Idle`.
 - `run`: `Walk`.
@@ -4117,7 +4129,7 @@ The accepted champion sheet uses source row 2 and is downscaled to 39-40 px idle
 
 ## Arcanine Source Mapping
 
-PMDCollab `sprite/0059` supplies the body source for this pass. Arcanine is mapped through `mod.override_info`; sync staged assets directly into `mod\pokemon_moba\champions_custom\arcanine#sheet.png` and `arcanine#anim.fanim`. Preserve credits in `assets\custom_spritework\references\pmdcollab\0059\credits.txt`.
+PMDCollab `sprite/0059` supplies the body source for this pass. Arcanine is mapped through `mod.override_info`; sync staged assets directly into `mod\pokemon_moba_stable\champions_custom\arcanine#sheet.png` and `arcanine#anim.fanim`. Preserve credits in `assets\custom_spritework\references\pmdcollab\0059\credits.txt`.
 
 - `idle`: `Idle`.
 - `run`: `Walk`.
@@ -4137,7 +4149,7 @@ ImageGen source for the VFX is preserved as `assets\custom_spritework\references
 
 ## Wishiwashi Source Mapping
 
-PMDCollab `sprite/0746` supplies regular Solo Form Wishiwashi. PMDCollab `sprite/0746/0001` supplies School Form for the custom Massive Catch `ult` tag. Wishiwashi is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\wishiwashi#sheet.png` and `wishiwashi#anim.fanim`.
+PMDCollab `sprite/0746` supplies regular Solo Form Wishiwashi. PMDCollab `sprite/0746/0001` supplies School Form for the custom Massive Catch `ult` tag. Wishiwashi is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom\wishiwashi#sheet.png` and `wishiwashi#anim.fanim`.
 
 - `idle`: regular `Idle`.
 - `run`: regular `Walk`.
@@ -4163,8 +4175,8 @@ Wishiwashi sprite implementation notes:
 
 MissingNo. is mapped through `mod.override_info` and intentionally does not use PMDCollab MissingNo. source forms. The accepted body source was generated from ImageGen using the original Red/Blue-style backward-L glitch-block sprite reference and a separate fan-sprite mood reference, then packed into:
 
-- `mod\pokemon_moba\champions_custom\missingno#sheet.png`
-- `mod\pokemon_moba\champions_custom\missingno#anim.fanim`
+- `mod\pokemon_moba_stable\champions_custom\missingno#sheet.png`
+- `mod\pokemon_moba_stable\champions_custom\missingno#anim.fanim`
 
 Use the display name `MissingNo.` with the dot. Tags:
 
@@ -4221,7 +4233,7 @@ The VFX were generated on a magenta chroma key to preserve green/yellow Bug and 
 
 ## Kecleon Source Mapping
 
-PMDCollab `sprite/0352` supplies the full body source for this pass. Kecleon is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\kecleon#sheet.png` and `kecleon#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0352\credits.txt`.
+PMDCollab `sprite/0352` supplies the full body source for this pass. Kecleon is pre-mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom\kecleon#sheet.png` and `kecleon#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0352\credits.txt`.
 
 Tags:
 
@@ -4243,7 +4255,7 @@ The VFX were generated on a cyan chroma key and packed with per-frame border-flo
 
 ## Weezing Source Mapping
 
-PMDCollab `sprite/0110` supplies the full body source for this pass. Weezing is mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba\champions_custom\weezing#sheet.png` and `weezing#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0110\credits.txt`.
+PMDCollab `sprite/0110` supplies the full body source for this pass. Weezing is mapped through `mod.override_info`; after staging, sync directly into `mod\pokemon_moba_stable\champions_custom\weezing#sheet.png` and `weezing#anim.fanim`. Credits are preserved in `assets\custom_spritework\references\pmdcollab\0110\credits.txt`.
 
 Tags:
 

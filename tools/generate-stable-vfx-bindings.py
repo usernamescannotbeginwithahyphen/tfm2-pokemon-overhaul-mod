@@ -1,104 +1,68 @@
+"""Generate standalone native visual bindings and the matching Rust asset catalog."""
 import json
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 MOD_ID = "pokemon_moba_stable"
-VFX_DIR = ROOT / "mod" / MOD_ID / "vfx"
-OUT = ROOT / "mod" / MOD_ID / "stable_vfx_bindings.generated.json"
+PACKAGE = ROOT / "mod" / MOD_ID
 
 
-PROJECTILE_HINTS = ("projectile", "cannonball")
-BUFF_HINTS = ("passive", "aura", "field", "terrain", "trail", "mark")
-
-
-def champion_from_stem(stem: str) -> str:
-    return stem.split("_", 1)[0]
-
-
-def classify(stem: str) -> str:
-    lowered = stem.lower()
-    if any(hint in lowered for hint in PROJECTILE_HINTS):
-        return "projectile"
-    if any(hint in lowered for hint in BUFF_HINTS):
-        return "buff_or_effect"
-    return "effect"
-
-
-def first_anim_tag(anim_path: Path) -> str:
-    try:
-        data = json.loads(anim_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return "default"
-    anims = data.get("anims")
-    if isinstance(anims, dict) and anims:
-        return next(iter(anims.keys()))
-    return "default"
-
-
-def binding_for(anim_path: Path) -> dict:
-    stem = anim_path.name.removesuffix("#anim.fanim")
-    champion = champion_from_stem(stem)
-    kind = classify(stem)
-    asset = f"asset/{MOD_ID}/vfx/{stem}"
-    tag = first_anim_tag(anim_path)
-    binding = {
-        "champion_id": f"pokemon_moba_{champion}",
-        "source": str(anim_path.relative_to(ROOT)).replace("\\", "/"),
-        "binding_name": f"{MOD_ID}_{stem}",
-        "asset": asset,
-        "tag": tag,
-        "kind": kind,
-    }
-    if kind == "projectile":
-        binding["view_projectile"] = {
-            "type": "Animated",
-            "name": binding["binding_name"],
-            "anim": asset,
-            "tag": tag,
-            "z": 0,
-            "repeat": True,
-        }
-    else:
-        binding["view_effect"] = {
-            "type": "Animation",
-            "name": binding["binding_name"],
-            "anim": asset,
-            "tag": tag,
-            "z": 0,
-            "is_follow": "aura" in stem or "passive" in stem,
-        }
-    return binding
-
-
-def main() -> None:
-    bindings = [
-        binding_for(path)
-        for path in sorted(VFX_DIR.glob("*#anim.fanim"))
-    ]
-    by_champion: dict[str, list[dict]] = {}
-    for binding in bindings:
-        by_champion.setdefault(binding["champion_id"], []).append(binding)
-
-    OUT.write_text(
-        json.dumps(
-            {
-                "mod_id": MOD_ID,
-                "note": (
-                    "Generated VFX binding candidates. Do not load directly as "
-                    ".data_champion files until the matching stable Rust champion "
-                    "is registered."
-                ),
-                "count": len(bindings),
-                "champions": by_champion,
-            },
-            indent=2,
-            sort_keys=True,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    print(f"Wrote {len(bindings)} VFX binding candidates to {OUT}")
+def main():
+    effects, projectiles, buffs, rows, catalog = [], [], [], [], []
+    for path in sorted((PACKAGE / "vfx").glob("*#anim.fanim")):
+        stem = path.name.removesuffix("#anim.fanim")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        tag, animation = next(iter(data["anims"].items()))
+        assert animation["frames"], path
+        ticks = max(1, round(sum(frame["duration"] for frame in animation["frames"]) * 60))
+        name = f"{MOD_ID}_{stem}"
+        asset = f"asset/{MOD_ID}/vfx/{stem}"
+        champion, tail = stem.split("_", 1)
+        slot = next((i for prefix, i in (("basic", 0), ("skill1", 1), ("skill2", 2), ("ult", 3))
+                     if tail.startswith(prefix)), -1)
+        if stem == "delibird_present_projectile":
+            slot = 0
+        projectile = "projectile" in stem or "cannonball" in stem or stem in (
+            "arboliva_skill1_energy_ball", "arboliva_basic_seed_bomb",
+            "dragapult_passive_dragon_launcher_dreepy", "umbreon_skill2_dark_pulse_line")
+        # Runtime policy, not the filename, decides when and where an event plays.
+        z = 1 if stem == "ludicolo_passive_rain_dish_aura" or "mark" in stem or "chits" in stem else -1
+        effects.append(dict(type="Animation", name=name, anim=asset, tag=tag, z=z, is_follow=False))
+        effects.append(dict(type="LoopAnimation", name=name + "_loop", anim=asset, tag=tag, z=z, is_follow=False))
+        direction_prefix = f"pm_dir_{len(rows)}" if "d0" in data["anims"] else None
+        if direction_prefix:
+            for direction in range(16):
+                directional_name = f"{direction_prefix}_{direction}"
+                effects.append(dict(type="Animation", name=directional_name, anim=asset, tag=f"d{direction}", z=z, is_follow=False))
+                effects.append(dict(type="LoopAnimation", name=directional_name+"_loop", anim=asset, tag=f"d{direction}", z=z, is_follow=False))
+                buffs.append(dict(type="Animated", name=directional_name, anim=asset, tag=f"d{direction}", z=z))
+        if not projectile:
+            assert len(name.encode("utf-8")) <= 64, f"Buff name would truncate: {name}"
+            buffs.append(dict(type="Animated", name=name, anim=asset, tag=tag, z=z))
+        if stem == "shedinja_passive_wonder_guard_chits":
+            for count in range(6):
+                state_tag = f"chits_{count}"
+                assert state_tag in data["anims"], path
+                buffs.append(dict(type="Animated", name=f"pm_wonder_guard_{count}",
+                                  anim=asset, tag=state_tag, z=z))
+        assert path.with_name(stem + "#sheet.png").exists(), path
+        if projectile:
+            projectiles.append(dict(type="Animated", name=name, anim=asset, tag=tag, z=0, repeat=True))
+        # Separate visual transport for swept rectangular wave hitboxes.
+        projectiles.append(dict(type="Animated", name=name + "_travel", anim=asset, tag=tag, z=-1, repeat=True))
+        direction = f'Some("{direction_prefix}")' if direction_prefix else 'None'
+        rows.append(f'    Binding {{ champion: "pokemon_moba_{champion}", slot: {slot}, stem: "{stem}", name: "{name}", ticks: {ticks}, projectile: {str(projectile).lower()}, direction: {direction} }},')
+        catalog.append(dict(champion_id=f"pokemon_moba_{champion}", slot=slot, stem=stem,
+                            binding_name=name, asset=asset, tag=tag, projectile=projectile))
+    out = PACKAGE / "view" / "pokemon.view_effects"
+    out.parent.mkdir(exist_ok=True)
+    out.write_text(json.dumps(dict(view_effects=effects, view_projectiles=projectiles, view_buffs=buffs), indent=2) + "\n", encoding="utf-8")
+    (PACKAGE / "src" / "vfx_catalog.rs").write_text(
+        "// Generated by tools/generate-stable-vfx-bindings.py. Do not edit.\n"
+        "const BINDINGS: &[Binding] = &[\n" + "\n".join(rows) + "\n];\n", encoding="utf-8")
+    (ROOT / "assets/custom_spritework/stable_vfx_bindings.generated.json").write_text(
+        json.dumps(dict(mod_id=MOD_ID, count=len(catalog), bindings=catalog), indent=2) + "\n", encoding="utf-8")
+    print(f"Generated {len(catalog)} assets, {len(projectiles)} projectile bindings: {out}")
 
 
 if __name__ == "__main__":

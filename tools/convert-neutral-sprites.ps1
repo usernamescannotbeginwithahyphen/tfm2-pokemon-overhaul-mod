@@ -1,6 +1,6 @@
 param(
   [string]$SourceDir = "assets\custom_spritework\ingame",
-  [string]$OutputDir = "mod\pokemon_moba\ingame"
+  [string]$OutputDir = "mod\pokemon_moba_stable\ingame"
 )
 
 $ErrorActionPreference = "Stop"

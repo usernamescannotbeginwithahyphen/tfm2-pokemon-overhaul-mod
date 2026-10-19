@@ -1,0 +1,15 @@
+{
+  "mode": "Built-in image_gen tool; deterministic cropping/repacking through tools/repair-stable-vfx-assets.py",
+  "assets": [
+    {
+      "file": "dedenne_single_node_phases.png",
+      "reference": "assets/custom_spritework/vfx/dedenne_ult_spark_grid_nodes#sheet.png",
+      "prompt": "Create a replacement pixel-art game VFX sprite sheet for ONE electric ground node, using this reference only for color and style. Transparent RGBA background, no checkerboard, no text, no grid lines. Exactly 4 columns by 4 rows in equal square cells on a square canvas. Each cell contains exactly ONE isolated small cyan/blue circular electric node with yellow-white rim and tiny magenta sparks, centered in its cell with ample transparent margins. Never a cluster. Consistent footprint and pivot across all cells. Row 1 four frames of idle node gently flickering. Row 2 four frames of that single node activating with a small yellow electric discharge. Row 3 four frames of the node dissolving upward into cyan healing sparkles. Row 4 four frames of the single node bursting into a small electric overload and dissipating. Orthographic game ground plane slightly flattened ellipse, crisp low resolution pixel art, no characters. Individual node should occupy middle half of each cell. This replaces a broken multi-node-per-frame asset.",
+      "correction": "Change ONLY the backdrop in this sprite sheet. Remove the gray checkerboard completely. Deliver actual transparent alpha, not a picture of transparency. If actual alpha is unavailable, use pure flat solid #00FF00 green instead, without shadows, gradients, checkerboard, or texture. Keep all sixteen colored node frames exactly in their current cell layout and keep the crisp pixel art intact. No added text or grid lines."
+    },
+    {
+      "file": "swanna_sky_circus_phases.png",
+      "prompt": "Create a production pixel-art animation sprite sheet. Exactly 4 columns by 3 rows, twelve equally spaced cells, on a PURE SOLID FLAT BRIGHT GREEN #00FF00 chroma-key background. Absolutely no transparency, checkerboard, texture or background glow. Each effect occupies only central 50% of its cell, large green gaps around every sprite. Row 1 four animation frames: small circular pale blue and white feather ring with COMPLETELY EMPTY GREEN CENTER, no zigzag, no beam, no character. Row 2 four frames: small straight horizontal white feather slash pointing right, no ring, no enclosing cloud. Row 3 four frames: small white-blue circular landing puff expanding then fading. Pixel art with hard crisp pixels, tiny simple readable effects, no semitransparent blur. All rows and columns equal-sized. No text, no borders. This is one skill's separated boundary, strike, and landing animation."
+    }
+  ]
+}

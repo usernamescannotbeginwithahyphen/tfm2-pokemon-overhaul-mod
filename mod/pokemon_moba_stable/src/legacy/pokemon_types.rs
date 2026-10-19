@@ -132,15 +132,16 @@ pub fn deal_pokemon_damage(
     attacker_types: TypeSet,
     defender_types: TypeSet,
 ) -> crate::legacy::pokemon_status::PokemonDamageResult {
-    let (target, defender_types) =
-        if let Some(audino_id) = crate::legacy::pokemon_status::audino_protect_redirect(ctx, target) {
-            (
-                audino_id,
-                crate::legacy::neutral_objectives::defender_types_for_target(ctx, audino_id),
-            )
-        } else {
-            (target, defender_types)
-        };
+    let (target, defender_types) = if let Some(audino_id) =
+        crate::legacy::pokemon_status::audino_protect_redirect(ctx, target)
+    {
+        (
+            audino_id,
+            crate::legacy::neutral_objectives::defender_types_for_target(ctx, audino_id),
+        )
+    } else {
+        (target, defender_types)
+    };
 
     if crate::legacy::pokemon_status::telepathy_blocks_ally_harm(ctx, attacker, target) {
         return crate::legacy::pokemon_status::PokemonDamageResult::default();
@@ -149,7 +150,12 @@ pub fn deal_pokemon_damage(
     if crate::legacy::pokemon_status::consume_detect_guard(ctx, target) {
         return crate::legacy::pokemon_status::PokemonDamageResult::default();
     }
-    if crate::legacy::pokemon_status::try_consume_zeraora_zing_zap(ctx, target, attacker, attack_type) {
+    if crate::legacy::pokemon_status::try_consume_zeraora_zing_zap(
+        ctx,
+        target,
+        attacker,
+        attack_type,
+    ) {
         return crate::legacy::pokemon_status::PokemonDamageResult::default();
     }
     if crate::legacy::pokemon_status::is_bouffalant_unstoppable(ctx, target) {
@@ -190,12 +196,19 @@ pub fn deal_pokemon_damage(
         return crate::legacy::pokemon_status::PokemonDamageResult::default();
     }
 
+    // Sketch copies the move's element, not the original species' STAB eligibility.
+    // Centralize this so delayed fields and copied projectiles follow the same rule.
+    let attacker_types = if crate::legacy::pokemon_status::champion_id_for_entity(attacker) == Some("pokemon_moba_smeargle") {
+        crate::legacy::pokemon_status::entity_types(attacker).unwrap_or(TypeSet::single(PokemonType::Normal))
+    } else { attacker_types };
     let modified_ad_damage =
         apply_damage_modifier(ad_damage, move_type, attacker_types, defender_types);
     let modified_ap_damage =
         apply_damage_modifier(ap_damage, move_type, attacker_types, defender_types);
     let (modified_ad_damage, modified_ap_damage) =
-        if crate::legacy::pokemon_status::energy_predator_forces_super_effective(ctx, attacker, target) {
+        if crate::legacy::pokemon_status::energy_predator_forces_super_effective(
+            ctx, attacker, target,
+        ) {
             let (stab_num, stab_den) = stab_modifier_ratio(move_type, attacker_types);
             let forced_num = stab_num.saturating_mul(SUPER_NUM);
             let forced_den = stab_den.saturating_mul(SUPER_DEN).max(1);
@@ -226,7 +239,9 @@ pub fn deal_pokemon_damage(
         };
     let bypass_resistance = crate::legacy::pokemon_status::is_blood_moon_active(ctx, attacker)
         || crate::legacy::pokemon_status::has_scrappy(ctx, attacker)
-        || crate::legacy::pokemon_status::thievul_stakeout_bypasses_resistance(ctx, attacker, target);
+        || crate::legacy::pokemon_status::thievul_stakeout_bypasses_resistance(
+            ctx, attacker, target,
+        );
     let (ad_damage, ap_damage) = if bypass_resistance {
         (
             modified_ad_damage.max(ad_damage),
@@ -268,7 +283,8 @@ pub fn deal_pokemon_damage(
     } else {
         (ad_damage, ap_damage)
     };
-    let reduce_percent = crate::legacy::pokemon_status::wide_guard_reduce_percent(ctx, target, attacker);
+    let reduce_percent =
+        crate::legacy::pokemon_status::wide_guard_reduce_percent(ctx, target, attacker);
     let (ad_damage, ap_damage) = if reduce_percent > 0 {
         (
             ad_damage.saturating_mul(100usize.saturating_sub(reduce_percent)) / 100,
@@ -286,7 +302,8 @@ pub fn deal_pokemon_damage(
     } else {
         (ad_damage, ap_damage)
     };
-    let reduce_percent = crate::legacy::pokemon_status::bouffalant_retaliate_reduce_percent(ctx, target);
+    let reduce_percent =
+        crate::legacy::pokemon_status::bouffalant_retaliate_reduce_percent(ctx, target);
     let (ad_damage, ap_damage) = if reduce_percent > 0 {
         (
             ad_damage.saturating_mul(100usize.saturating_sub(reduce_percent)) / 100,
@@ -305,7 +322,8 @@ pub fn deal_pokemon_damage(
     } else {
         (ad_damage, ap_damage)
     };
-    let reduce_percent = crate::legacy::pokemon_status::sirfetchd_leek_damage_reduce_percent(ctx, target);
+    let reduce_percent =
+        crate::legacy::pokemon_status::sirfetchd_leek_damage_reduce_percent(ctx, target);
     let (ad_damage, ap_damage) = if reduce_percent > 0 {
         (
             ad_damage.saturating_mul(100usize.saturating_sub(reduce_percent)) / 100,
@@ -314,8 +332,12 @@ pub fn deal_pokemon_damage(
     } else {
         (ad_damage, ap_damage)
     };
-    let reduce_percent =
-        crate::legacy::pokemon_status::try_trigger_hawlucha_counter(ctx, target, attacker, attack_type);
+    let reduce_percent = crate::legacy::pokemon_status::try_trigger_hawlucha_counter(
+        ctx,
+        target,
+        attacker,
+        attack_type,
+    );
     let (ad_damage, ap_damage) = if reduce_percent > 0 {
         (
             ad_damage.saturating_mul(100usize.saturating_sub(reduce_percent)) / 100,
@@ -329,19 +351,26 @@ pub fn deal_pokemon_damage(
     } else {
         ap_damage
     };
-    let ad_damage =
-        ad_damage.saturating_add(crate::legacy::pokemon_status::bouffalant_head_charge_bonus_damage(
+    let ad_damage = ad_damage.saturating_add(
+        crate::legacy::pokemon_status::bouffalant_head_charge_bonus_damage(
             ctx,
             attacker,
             target,
             attack_type,
             move_type,
-        ));
+        ),
+    );
     let (ad_damage, ap_damage) =
         crate::legacy::pokemon_status::adjust_endure_damage(ctx, target, ad_damage, ap_damage);
-    let (ad_damage, ap_damage) =
-        crate::legacy::pokemon_status::adjust_sturdy_damage(ctx, target, attack_type, ad_damage, ap_damage);
-    let pain_amp_bonus = crate::legacy::pokemon_status::xatu_pain_amplifier_bonus_percent(ctx, target);
+    let (ad_damage, ap_damage) = crate::legacy::pokemon_status::adjust_sturdy_damage(
+        ctx,
+        target,
+        attack_type,
+        ad_damage,
+        ap_damage,
+    );
+    let pain_amp_bonus =
+        crate::legacy::pokemon_status::xatu_pain_amplifier_bonus_percent(ctx, target);
     let (ad_damage, ap_damage) = if pain_amp_bonus > 0 {
         (
             ad_damage.saturating_mul(100usize.saturating_add(pain_amp_bonus)) / 100,
@@ -470,7 +499,8 @@ fn log_pokemon_damage_probe(
     let (after_hp, after_shield) = after.unwrap_or((0, 0));
     let hp_lost = before_hp.saturating_sub(after_hp);
     let shield_lost = before_shield.saturating_sub(after_shield);
-    let attacker_player = crate::legacy::pokemon_status::player_for_entity(attacker).unwrap_or(attacker);
+    let attacker_player =
+        crate::legacy::pokemon_status::player_for_entity(attacker).unwrap_or(attacker);
     let target_player = crate::legacy::pokemon_status::player_for_entity(target).unwrap_or(target);
     let attacker_champion =
         crate::legacy::pokemon_status::champion_id_for_entity(attacker).unwrap_or("unknown");

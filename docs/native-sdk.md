@@ -1,45 +1,28 @@
 # Native SDK
 
-Installed SDK version: `0.5.0_hotfix` release, reporting base SDK `0.5.0`
+Active official Steam SDK: **0.6.4**, stable ABI level **10** (verified 2026-10-18).
 
-Source release:
-
-```text
-https://github.com/teamsamoyed/TeamfightManager2Mod/releases/tag/0.5.0_hotfix
-```
-
-Verified release asset:
+The only active crate is:
 
 ```text
-0.5.0_hotfix.zip
-sha256:69b2ec48f93cbe4a4dfa2659d36561ab8e4b2a67647cda877e8229ede858f41e
+C:\Program Files (x86)\Steam\steamapps\common\Teamfight Manager2\mod-sdk-stable\mod-api-stable
 ```
 
-Local install path expected by the uploader:
+Its adjacent `base_version.txt` reports 0.6.4. The crate's Cargo package version
+is still 0.1.0; that is not the game/SDK version. Cargo.toml points directly to
+this installed SDK. No downloaded older SDK is retained as another build input.
+GitHub releases/latest still selects 0.5.8; Steam's installed SDK is newer.
 
-```text
-C:\Program Files (x86)\Steam\steamapps\common\Teamfight Manager2\mod-sdk
+Official documentation checkout `.mod-docs` was refreshed to `064c2fa`.
+See [migration policy](stable-sdk-migration.md) and
+[new API findings](sdk-0.6.4-findings.md).
+
+```powershell
+cargo test --release --manifest-path mod/pokemon_moba_stable/Cargo.toml
+.\tools\build-native.ps1
+.\tools\deploy.ps1
 ```
 
-The SDK reports:
-
-```text
-base_version.txt: 0.5.0
-toolchain_version.txt: rustc 1.98.0-nightly (23a3312d9 2026-05-23)
-```
-
-Project toolchain pin:
-
-```text
-mod/pokemon_moba/rust-toolchain.toml: nightly-2026-05-24-x86_64-pc-windows-msvc
-```
-
-Retained SDK cache:
-
-```text
-downloads\tfm2-sdk\0.5.0_hotfix
-```
-
-## Update Policy
-
-When updating SDK versions, keep exactly one retained SDK cache: the currently installed release under `downloads\tfm2-sdk\<version>`. Remove older SDK folders/zips, aborted temp extracts, and stale docs/tool references in the same change. `tools\build-native.ps1`, `mod\pokemon_moba\rust-toolchain.toml`, `mod\pokemon_moba\mod.mod_info`, and this document must all point at the active SDK version.
+When updating, remove obsolete downloaded SDK archives/trees, refresh version
+references, and ensure Cargo and the build script select the same current crate.
+The stable SDK does not need the retired classic nightly toolchain pin.

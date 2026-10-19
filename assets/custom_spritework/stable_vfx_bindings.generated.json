@@ -1,0 +1,2625 @@
+{
+  "mod_id": "pokemon_moba_stable",
+  "count": 291,
+  "bindings": [
+    {
+      "champion_id": "pokemon_moba_ampharos",
+      "slot": 0,
+      "stem": "ampharos_basicattack_cluster_bolt_projectile",
+      "binding_name": "pokemon_moba_stable_ampharos_basicattack_cluster_bolt_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/ampharos_basicattack_cluster_bolt_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_ampharos",
+      "slot": -1,
+      "stem": "ampharos_passive_luminous_pulse_aura",
+      "binding_name": "pokemon_moba_stable_ampharos_passive_luminous_pulse_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/ampharos_passive_luminous_pulse_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ampharos",
+      "slot": 1,
+      "stem": "ampharos_skill1_flash_aoe",
+      "binding_name": "pokemon_moba_stable_ampharos_skill1_flash_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/ampharos_skill1_flash_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ampharos",
+      "slot": 2,
+      "stem": "ampharos_skill2_searchlight_tail_aura",
+      "binding_name": "pokemon_moba_stable_ampharos_skill2_searchlight_tail_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/ampharos_skill2_searchlight_tail_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ampharos",
+      "slot": 3,
+      "stem": "ampharos_ult_gigavolt_strike_zone",
+      "binding_name": "pokemon_moba_stable_ampharos_ult_gigavolt_strike_zone",
+      "asset": "asset/pokemon_moba_stable/vfx/ampharos_ult_gigavolt_strike_zone",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ampharos",
+      "slot": 3,
+      "stem": "ampharos_ult_gigavolt_zone",
+      "binding_name": "pokemon_moba_stable_ampharos_ult_gigavolt_zone",
+      "asset": "asset/pokemon_moba_stable/vfx/ampharos_ult_gigavolt_zone",
+      "tag": "zone",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_appletun",
+      "slot": 1,
+      "stem": "appletun_skill1_projectile",
+      "binding_name": "pokemon_moba_stable_appletun_skill1_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/appletun_skill1_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_appletun",
+      "slot": 3,
+      "stem": "appletun_ult_projectile",
+      "binding_name": "pokemon_moba_stable_appletun_ult_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/appletun_ult_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_arbok",
+      "slot": 2,
+      "stem": "arbok_skill2_projectile",
+      "binding_name": "pokemon_moba_stable_arbok_skill2_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/arbok_skill2_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_arboliva",
+      "slot": 0,
+      "stem": "arboliva_basic_seed_bomb",
+      "binding_name": "pokemon_moba_stable_arboliva_basic_seed_bomb",
+      "asset": "asset/pokemon_moba_stable/vfx/arboliva_basic_seed_bomb",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_arboliva",
+      "slot": -1,
+      "stem": "arboliva_passive_grassy_terrain",
+      "binding_name": "pokemon_moba_stable_arboliva_passive_grassy_terrain",
+      "asset": "asset/pokemon_moba_stable/vfx/arboliva_passive_grassy_terrain",
+      "tag": "terrain",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_arboliva",
+      "slot": 1,
+      "stem": "arboliva_skill1_energy_ball",
+      "binding_name": "pokemon_moba_stable_arboliva_skill1_energy_ball",
+      "asset": "asset/pokemon_moba_stable/vfx/arboliva_skill1_energy_ball",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_arboliva",
+      "slot": 2,
+      "stem": "arboliva_skill2_fiery_terrain",
+      "binding_name": "pokemon_moba_stable_arboliva_skill2_fiery_terrain",
+      "asset": "asset/pokemon_moba_stable/vfx/arboliva_skill2_fiery_terrain",
+      "tag": "terrain",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_arboliva",
+      "slot": 3,
+      "stem": "arboliva_ult_solar_beam",
+      "binding_name": "pokemon_moba_stable_arboliva_ult_solar_beam",
+      "asset": "asset/pokemon_moba_stable/vfx/arboliva_ult_solar_beam",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_arcanine",
+      "slot": 0,
+      "stem": "arcanine_basicattack_flare_projectile",
+      "binding_name": "pokemon_moba_stable_arcanine_basicattack_flare_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/arcanine_basicattack_flare_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_arcanine",
+      "slot": 2,
+      "stem": "arcanine_skill2_white_flames_line_aoe",
+      "binding_name": "pokemon_moba_stable_arcanine_skill2_white_flames_line_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/arcanine_skill2_white_flames_line_aoe",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_arcanine",
+      "slot": 3,
+      "stem": "arcanine_ult_flames_of_rage_inferno_aura",
+      "binding_name": "pokemon_moba_stable_arcanine_ult_flames_of_rage_inferno_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/arcanine_ult_flames_of_rage_inferno_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_archaludon",
+      "slot": 3,
+      "stem": "archaludon_ult_electro_aura",
+      "binding_name": "pokemon_moba_stable_archaludon_ult_electro_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/archaludon_ult_electro_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_armarouge",
+      "slot": 1,
+      "stem": "armarouge_skill1_fire_aura",
+      "binding_name": "pokemon_moba_stable_armarouge_skill1_fire_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/armarouge_skill1_fire_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_armarouge",
+      "slot": 3,
+      "stem": "armarouge_ult_fire_line",
+      "binding_name": "pokemon_moba_stable_armarouge_ult_fire_line",
+      "asset": "asset/pokemon_moba_stable/vfx/armarouge_ult_fire_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_banette",
+      "slot": 1,
+      "stem": "banette_skill1_shadow_smoke",
+      "binding_name": "pokemon_moba_stable_banette_skill1_shadow_smoke",
+      "asset": "asset/pokemon_moba_stable/vfx/banette_skill1_shadow_smoke",
+      "tag": "smoke",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_banette",
+      "slot": 2,
+      "stem": "banette_skill2_night_shade_cone",
+      "binding_name": "pokemon_moba_stable_banette_skill2_night_shade_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/banette_skill2_night_shade_cone",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_banette",
+      "slot": 3,
+      "stem": "banette_ult_phantom_splash",
+      "binding_name": "pokemon_moba_stable_banette_ult_phantom_splash",
+      "asset": "asset/pokemon_moba_stable/vfx/banette_ult_phantom_splash",
+      "tag": "phantom",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_beeheeyem",
+      "slot": 0,
+      "stem": "beeheeyem_basic_projectile",
+      "binding_name": "pokemon_moba_stable_beeheeyem_basic_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/beeheeyem_basic_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_beeheeyem",
+      "slot": 2,
+      "stem": "beeheeyem_skill2_light_screen",
+      "binding_name": "pokemon_moba_stable_beeheeyem_skill2_light_screen",
+      "asset": "asset/pokemon_moba_stable/vfx/beeheeyem_skill2_light_screen",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_beeheeyem",
+      "slot": 3,
+      "stem": "beeheeyem_ult_headbutt_effect",
+      "binding_name": "pokemon_moba_stable_beeheeyem_ult_headbutt_effect",
+      "asset": "asset/pokemon_moba_stable/vfx/beeheeyem_ult_headbutt_effect",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_blastoise",
+      "slot": 0,
+      "stem": "blastoise_basic_projectile_1",
+      "binding_name": "pokemon_moba_stable_blastoise_basic_projectile_1",
+      "asset": "asset/pokemon_moba_stable/vfx/blastoise_basic_projectile_1",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_blastoise",
+      "slot": 0,
+      "stem": "blastoise_basic_projectile_2",
+      "binding_name": "pokemon_moba_stable_blastoise_basic_projectile_2",
+      "asset": "asset/pokemon_moba_stable/vfx/blastoise_basic_projectile_2",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_blastoise",
+      "slot": 3,
+      "stem": "blastoise_ult_cannon",
+      "binding_name": "pokemon_moba_stable_blastoise_ult_cannon",
+      "asset": "asset/pokemon_moba_stable/vfx/blastoise_ult_cannon",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_blastoise",
+      "slot": 3,
+      "stem": "blastoise_ult_hydro_cannon_line",
+      "binding_name": "pokemon_moba_stable_blastoise_ult_hydro_cannon_line",
+      "asset": "asset/pokemon_moba_stable/vfx/blastoise_ult_hydro_cannon_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_blaziken",
+      "slot": 3,
+      "stem": "blaziken_ult_flame_trail",
+      "binding_name": "pokemon_moba_stable_blaziken_ult_flame_trail",
+      "asset": "asset/pokemon_moba_stable/vfx/blaziken_ult_flame_trail",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_blissey",
+      "slot": 1,
+      "stem": "blissey_skill1_heal_pulse_aura",
+      "binding_name": "pokemon_moba_stable_blissey_skill1_heal_pulse_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/blissey_skill1_heal_pulse_aura",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ceruledge",
+      "slot": 1,
+      "stem": "ceruledge_skill1_flame_trail",
+      "binding_name": "pokemon_moba_stable_ceruledge_skill1_flame_trail",
+      "asset": "asset/pokemon_moba_stable/vfx/ceruledge_skill1_flame_trail",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_charizard",
+      "slot": 0,
+      "stem": "charizard_basicattack_flamethrower_cone",
+      "binding_name": "pokemon_moba_stable_charizard_basicattack_flamethrower_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/charizard_basicattack_flamethrower_cone",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_charizard",
+      "slot": 1,
+      "stem": "charizard_skill1_dragon_breath_cone",
+      "binding_name": "pokemon_moba_stable_charizard_skill1_dragon_breath_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/charizard_skill1_dragon_breath_cone",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_charizard",
+      "slot": 2,
+      "stem": "charizard_skill2_fire_blast_projectile",
+      "binding_name": "pokemon_moba_stable_charizard_skill2_fire_blast_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/charizard_skill2_fire_blast_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_charizard",
+      "slot": 3,
+      "stem": "charizard_ult_inferno_area",
+      "binding_name": "pokemon_moba_stable_charizard_ult_inferno_area",
+      "asset": "asset/pokemon_moba_stable/vfx/charizard_ult_inferno_area",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_clawitzer",
+      "slot": 0,
+      "stem": "clawitzer_basicattack_aqua_jet_projectile",
+      "binding_name": "pokemon_moba_stable_clawitzer_basicattack_aqua_jet_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/clawitzer_basicattack_aqua_jet_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_clawitzer",
+      "slot": 1,
+      "stem": "clawitzer_skill1_water_sport_aoe",
+      "binding_name": "pokemon_moba_stable_clawitzer_skill1_water_sport_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/clawitzer_skill1_water_sport_aoe",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_clawitzer",
+      "slot": 2,
+      "stem": "clawitzer_skill2_aqua_cutter_projectile",
+      "binding_name": "pokemon_moba_stable_clawitzer_skill2_aqua_cutter_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/clawitzer_skill2_aqua_cutter_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_clawitzer",
+      "slot": 3,
+      "stem": "clawitzer_ult_bubble_beam_line",
+      "binding_name": "pokemon_moba_stable_clawitzer_ult_bubble_beam_line",
+      "asset": "asset/pokemon_moba_stable/vfx/clawitzer_ult_bubble_beam_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_cloyster",
+      "slot": 0,
+      "stem": "cloyster_basicattack_glaciate_projectile",
+      "binding_name": "pokemon_moba_stable_cloyster_basicattack_glaciate_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/cloyster_basicattack_glaciate_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_cloyster",
+      "slot": 1,
+      "stem": "cloyster_skill1_icicle_crash_projectile",
+      "binding_name": "pokemon_moba_stable_cloyster_skill1_icicle_crash_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/cloyster_skill1_icicle_crash_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_cloyster",
+      "slot": 3,
+      "stem": "cloyster_ult_aurora_beam_line",
+      "binding_name": "pokemon_moba_stable_cloyster_ult_aurora_beam_line",
+      "asset": "asset/pokemon_moba_stable/vfx/cloyster_ult_aurora_beam_line",
+      "tag": "beam",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_coalossal",
+      "slot": 0,
+      "stem": "coalossal_basicattack_rock_blast_projectile",
+      "binding_name": "pokemon_moba_stable_coalossal_basicattack_rock_blast_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/coalossal_basicattack_rock_blast_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_coalossal",
+      "slot": 1,
+      "stem": "coalossal_skill1_tar_shot_wave",
+      "binding_name": "pokemon_moba_stable_coalossal_skill1_tar_shot_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/coalossal_skill1_tar_shot_wave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_coalossal",
+      "slot": 2,
+      "stem": "coalossal_skill2_smokescreen_field",
+      "binding_name": "pokemon_moba_stable_coalossal_skill2_smokescreen_field",
+      "asset": "asset/pokemon_moba_stable/vfx/coalossal_skill2_smokescreen_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_coalossal",
+      "slot": 3,
+      "stem": "coalossal_ult_magma_burst",
+      "binding_name": "pokemon_moba_stable_coalossal_ult_magma_burst",
+      "asset": "asset/pokemon_moba_stable/vfx/coalossal_ult_magma_burst",
+      "tag": "burst",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_coalossal",
+      "slot": 3,
+      "stem": "coalossal_ult_magma_segment",
+      "binding_name": "pokemon_moba_stable_coalossal_ult_magma_segment",
+      "asset": "asset/pokemon_moba_stable/vfx/coalossal_ult_magma_segment",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_coalossal",
+      "slot": 3,
+      "stem": "coalossal_ult_magma_storm_line",
+      "binding_name": "pokemon_moba_stable_coalossal_ult_magma_storm_line",
+      "asset": "asset/pokemon_moba_stable/vfx/coalossal_ult_magma_storm_line",
+      "tag": "line",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_comfey",
+      "slot": 2,
+      "stem": "comfey_skill2_petal_dance_aura",
+      "binding_name": "pokemon_moba_stable_comfey_skill2_petal_dance_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/comfey_skill2_petal_dance_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_cryogonal",
+      "slot": 0,
+      "stem": "cryogonal_basicattack_ice_shard_projectile",
+      "binding_name": "pokemon_moba_stable_cryogonal_basicattack_ice_shard_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/cryogonal_basicattack_ice_shard_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_cryogonal",
+      "slot": 1,
+      "stem": "cryogonal_skill1_icy_wind_wave",
+      "binding_name": "pokemon_moba_stable_cryogonal_skill1_icy_wind_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/cryogonal_skill1_icy_wind_wave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_cryogonal",
+      "slot": 2,
+      "stem": "cryogonal_skill2_freeze_dry_burst",
+      "binding_name": "pokemon_moba_stable_cryogonal_skill2_freeze_dry_burst",
+      "asset": "asset/pokemon_moba_stable/vfx/cryogonal_skill2_freeze_dry_burst",
+      "tag": "burst",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_cryogonal",
+      "slot": 3,
+      "stem": "cryogonal_ult_ice_beam_line",
+      "binding_name": "pokemon_moba_stable_cryogonal_ult_ice_beam_line",
+      "asset": "asset/pokemon_moba_stable/vfx/cryogonal_ult_ice_beam_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_decidueye",
+      "slot": 0,
+      "stem": "decidueye_basicattack_leafage_projectile",
+      "binding_name": "pokemon_moba_stable_decidueye_basicattack_leafage_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/decidueye_basicattack_leafage_projectile",
+      "tag": "flight",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_decidueye",
+      "slot": 0,
+      "stem": "decidueye_basicattack_leafage_triple_arc",
+      "binding_name": "pokemon_moba_stable_decidueye_basicattack_leafage_triple_arc",
+      "asset": "asset/pokemon_moba_stable/vfx/decidueye_basicattack_leafage_triple_arc",
+      "tag": "triple_arc",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_decidueye",
+      "slot": 1,
+      "stem": "decidueye_skill1_phantom_force_impact",
+      "binding_name": "pokemon_moba_stable_decidueye_skill1_phantom_force_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/decidueye_skill1_phantom_force_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_decidueye",
+      "slot": 2,
+      "stem": "decidueye_skill2_leaf_storm_line",
+      "binding_name": "pokemon_moba_stable_decidueye_skill2_leaf_storm_line",
+      "asset": "asset/pokemon_moba_stable/vfx/decidueye_skill2_leaf_storm_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_decidueye",
+      "slot": 3,
+      "stem": "decidueye_ult_spirit_shackle_projectile",
+      "binding_name": "pokemon_moba_stable_decidueye_ult_spirit_shackle_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/decidueye_ult_spirit_shackle_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_dedenne",
+      "slot": 0,
+      "stem": "dedenne_basicattack_nuzzle_spark",
+      "binding_name": "pokemon_moba_stable_dedenne_basicattack_nuzzle_spark",
+      "asset": "asset/pokemon_moba_stable/vfx/dedenne_basicattack_nuzzle_spark",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dedenne",
+      "slot": 1,
+      "stem": "dedenne_skill1_play_rough_dash",
+      "binding_name": "pokemon_moba_stable_dedenne_skill1_play_rough_dash",
+      "asset": "asset/pokemon_moba_stable/vfx/dedenne_skill1_play_rough_dash",
+      "tag": "dash",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dedenne",
+      "slot": 2,
+      "stem": "dedenne_skill2_double_shock_ring",
+      "binding_name": "pokemon_moba_stable_dedenne_skill2_double_shock_ring",
+      "asset": "asset/pokemon_moba_stable/vfx/dedenne_skill2_double_shock_ring",
+      "tag": "ring",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dedenne",
+      "slot": 3,
+      "stem": "dedenne_ult_spark_grid_chain",
+      "binding_name": "pokemon_moba_stable_dedenne_ult_spark_grid_chain",
+      "asset": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_chain",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dedenne",
+      "slot": 3,
+      "stem": "dedenne_ult_spark_grid_consume_heal",
+      "binding_name": "pokemon_moba_stable_dedenne_ult_spark_grid_consume_heal",
+      "asset": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_consume_heal",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dedenne",
+      "slot": 3,
+      "stem": "dedenne_ult_spark_grid_nodes",
+      "binding_name": "pokemon_moba_stable_dedenne_ult_spark_grid_nodes",
+      "asset": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_nodes",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dedenne",
+      "slot": 3,
+      "stem": "dedenne_ult_spark_grid_overload",
+      "binding_name": "pokemon_moba_stable_dedenne_ult_spark_grid_overload",
+      "asset": "asset/pokemon_moba_stable/vfx/dedenne_ult_spark_grid_overload",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_delibird",
+      "slot": 0,
+      "stem": "delibird_present_projectile",
+      "binding_name": "pokemon_moba_stable_delibird_present_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/delibird_present_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_delibird",
+      "slot": 3,
+      "stem": "delibird_ult_drill_peck_flourish",
+      "binding_name": "pokemon_moba_stable_delibird_ult_drill_peck_flourish",
+      "asset": "asset/pokemon_moba_stable/vfx/delibird_ult_drill_peck_flourish",
+      "tag": "flourish",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dragalge",
+      "slot": 0,
+      "stem": "dragalge_basicattack_acid_spit_projectile",
+      "binding_name": "pokemon_moba_stable_dragalge_basicattack_acid_spit_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/dragalge_basicattack_acid_spit_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_dragalge",
+      "slot": 1,
+      "stem": "dragalge_skill1_poison_tail_aura",
+      "binding_name": "pokemon_moba_stable_dragalge_skill1_poison_tail_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/dragalge_skill1_poison_tail_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dragalge",
+      "slot": 2,
+      "stem": "dragalge_skill2_sludge_bomb_splashes",
+      "binding_name": "pokemon_moba_stable_dragalge_skill2_sludge_bomb_splashes",
+      "asset": "asset/pokemon_moba_stable/vfx/dragalge_skill2_sludge_bomb_splashes",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dragalge",
+      "slot": 3,
+      "stem": "dragalge_ult_toxic_chain_impact",
+      "binding_name": "pokemon_moba_stable_dragalge_ult_toxic_chain_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/dragalge_ult_toxic_chain_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dragalge",
+      "slot": 3,
+      "stem": "dragalge_ult_toxic_chain_tether",
+      "binding_name": "pokemon_moba_stable_dragalge_ult_toxic_chain_tether",
+      "asset": "asset/pokemon_moba_stable/vfx/dragalge_ult_toxic_chain_tether",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dragapult",
+      "slot": 0,
+      "stem": "dragapult_basicattack_shred_projectile",
+      "binding_name": "pokemon_moba_stable_dragapult_basicattack_shred_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/dragapult_basicattack_shred_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_dragapult",
+      "slot": -1,
+      "stem": "dragapult_passive_dragon_launcher_dreepy",
+      "binding_name": "pokemon_moba_stable_dragapult_passive_dragon_launcher_dreepy",
+      "asset": "asset/pokemon_moba_stable/vfx/dragapult_passive_dragon_launcher_dreepy",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_dragapult",
+      "slot": 1,
+      "stem": "dragapult_skill1_dragon_darts_projectile",
+      "binding_name": "pokemon_moba_stable_dragapult_skill1_dragon_darts_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/dragapult_skill1_dragon_darts_projectile",
+      "tag": "flight",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_dragapult",
+      "slot": 2,
+      "stem": "dragapult_skill2_diving_swipe_ghost_dash",
+      "binding_name": "pokemon_moba_stable_dragapult_skill2_diving_swipe_ghost_dash",
+      "asset": "asset/pokemon_moba_stable/vfx/dragapult_skill2_diving_swipe_ghost_dash",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_dragapult",
+      "slot": 3,
+      "stem": "dragapult_ult_spooky_shot_projectile",
+      "binding_name": "pokemon_moba_stable_dragapult_ult_spooky_shot_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/dragapult_ult_spooky_shot_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_drampa",
+      "slot": 0,
+      "stem": "drampa_basicattack_twister_line",
+      "binding_name": "pokemon_moba_stable_drampa_basicattack_twister_line",
+      "asset": "asset/pokemon_moba_stable/vfx/drampa_basicattack_twister_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_drampa",
+      "slot": 1,
+      "stem": "drampa_skill1_outrage_aura",
+      "binding_name": "pokemon_moba_stable_drampa_skill1_outrage_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/drampa_skill1_outrage_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_drampa",
+      "slot": 2,
+      "stem": "drampa_skill2_dragon_energy_burst",
+      "binding_name": "pokemon_moba_stable_drampa_skill2_dragon_energy_burst",
+      "asset": "asset/pokemon_moba_stable/vfx/drampa_skill2_dragon_energy_burst",
+      "tag": "burst",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_drampa",
+      "slot": 3,
+      "stem": "drampa_ult_draco_meteor_aoe",
+      "binding_name": "pokemon_moba_stable_drampa_ult_draco_meteor_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/drampa_ult_draco_meteor_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_drednaw",
+      "slot": 1,
+      "stem": "drednaw_skill1_rock_tomb_bind",
+      "binding_name": "pokemon_moba_stable_drednaw_skill1_rock_tomb_bind",
+      "asset": "asset/pokemon_moba_stable/vfx/drednaw_skill1_rock_tomb_bind",
+      "tag": "bind",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_drednaw",
+      "slot": 2,
+      "stem": "drednaw_skill2_rock_polish_aura",
+      "binding_name": "pokemon_moba_stable_drednaw_skill2_rock_polish_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/drednaw_skill2_rock_polish_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_drednaw",
+      "slot": 3,
+      "stem": "drednaw_ult_razor_shell_trail",
+      "binding_name": "pokemon_moba_stable_drednaw_ult_razor_shell_trail",
+      "asset": "asset/pokemon_moba_stable/vfx/drednaw_ult_razor_shell_trail",
+      "tag": "trail",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_eevee",
+      "slot": 1,
+      "stem": "eevee_skill1_babydoll_eyes_charm",
+      "binding_name": "pokemon_moba_stable_eevee_skill1_babydoll_eyes_charm",
+      "asset": "asset/pokemon_moba_stable/vfx/eevee_skill1_babydoll_eyes_charm",
+      "tag": "charm",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_eevee",
+      "slot": 2,
+      "stem": "eevee_skill2_wish_heal_ring",
+      "binding_name": "pokemon_moba_stable_eevee_skill2_wish_heal_ring",
+      "asset": "asset/pokemon_moba_stable/vfx/eevee_skill2_wish_heal_ring",
+      "tag": "heal",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_eevee",
+      "slot": 3,
+      "stem": "eevee_ult_baton_pass_tether",
+      "binding_name": "pokemon_moba_stable_eevee_ult_baton_pass_tether",
+      "asset": "asset/pokemon_moba_stable/vfx/eevee_ult_baton_pass_tether",
+      "tag": "tether",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_electrode",
+      "slot": 3,
+      "stem": "electrode_ult_self_destruct_explosion_aoe",
+      "binding_name": "pokemon_moba_stable_electrode_ult_self_destruct_explosion_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/electrode_ult_self_destruct_explosion_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_espeon",
+      "slot": 2,
+      "stem": "espeon_skill2_confuse_ray_projectile",
+      "binding_name": "pokemon_moba_stable_espeon_skill2_confuse_ray_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/espeon_skill2_confuse_ray_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_espeon",
+      "slot": 3,
+      "stem": "espeon_ult_future_sight_marker",
+      "binding_name": "pokemon_moba_stable_espeon_ult_future_sight_marker",
+      "asset": "asset/pokemon_moba_stable/vfx/espeon_ult_future_sight_marker",
+      "tag": "marker",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_feraligatr",
+      "slot": 3,
+      "stem": "feraligatr_ult_muddy_water_line",
+      "binding_name": "pokemon_moba_stable_feraligatr_ult_muddy_water_line",
+      "asset": "asset/pokemon_moba_stable/vfx/feraligatr_ult_muddy_water_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_flareon",
+      "slot": 0,
+      "stem": "flareon_basic_ember_projectile",
+      "binding_name": "pokemon_moba_stable_flareon_basic_ember_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/flareon_basic_ember_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_flareon",
+      "slot": 1,
+      "stem": "flareon_skill1_fire_spin_aura",
+      "binding_name": "pokemon_moba_stable_flareon_skill1_fire_spin_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/flareon_skill1_fire_spin_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_flareon",
+      "slot": 2,
+      "stem": "flareon_skill2_flame_wheel_line",
+      "binding_name": "pokemon_moba_stable_flareon_skill2_flame_wheel_line",
+      "asset": "asset/pokemon_moba_stable/vfx/flareon_skill2_flame_wheel_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_flareon",
+      "slot": 3,
+      "stem": "flareon_ult_fire_fang_impact",
+      "binding_name": "pokemon_moba_stable_flareon_ult_fire_fang_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/flareon_ult_fire_fang_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_frosmoth",
+      "slot": 0,
+      "stem": "frosmoth_basic_powder_snow_impact",
+      "binding_name": "pokemon_moba_stable_frosmoth_basic_powder_snow_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/frosmoth_basic_powder_snow_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_frosmoth",
+      "slot": 1,
+      "stem": "frosmoth_skill1_avalanche_wave",
+      "binding_name": "pokemon_moba_stable_frosmoth_skill1_avalanche_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/frosmoth_skill1_avalanche_wave",
+      "tag": "line",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_frosmoth",
+      "slot": 2,
+      "stem": "frosmoth_skill2_sleep_powder_field",
+      "binding_name": "pokemon_moba_stable_frosmoth_skill2_sleep_powder_field",
+      "asset": "asset/pokemon_moba_stable/vfx/frosmoth_skill2_sleep_powder_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_frosmoth",
+      "slot": 3,
+      "stem": "frosmoth_ult_silver_wind_wave",
+      "binding_name": "pokemon_moba_stable_frosmoth_ult_silver_wind_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/frosmoth_ult_silver_wind_wave",
+      "tag": "line",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_gallade",
+      "slot": 3,
+      "stem": "gallade_ult_psycho_cut_cone",
+      "binding_name": "pokemon_moba_stable_gallade_ult_psycho_cut_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/gallade_ult_psycho_cut_cone",
+      "tag": "cone",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_garganacl",
+      "slot": -1,
+      "stem": "garganacl_passive_salt_cure_patch",
+      "binding_name": "pokemon_moba_stable_garganacl_passive_salt_cure_patch",
+      "asset": "asset/pokemon_moba_stable/vfx/garganacl_passive_salt_cure_patch",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_garganacl",
+      "slot": 1,
+      "stem": "garganacl_skill1_land_crush_shockwave",
+      "binding_name": "pokemon_moba_stable_garganacl_skill1_land_crush_shockwave",
+      "asset": "asset/pokemon_moba_stable/vfx/garganacl_skill1_land_crush_shockwave",
+      "tag": "projectile",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_garganacl",
+      "slot": 3,
+      "stem": "garganacl_ult_blessed_salt_spire_ring",
+      "binding_name": "pokemon_moba_stable_garganacl_ult_blessed_salt_spire_ring",
+      "asset": "asset/pokemon_moba_stable/vfx/garganacl_ult_blessed_salt_spire_ring",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_gholdengo",
+      "slot": 0,
+      "stem": "gholdengo_basic_flash_cannon_projectile",
+      "binding_name": "pokemon_moba_stable_gholdengo_basic_flash_cannon_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/gholdengo_basic_flash_cannon_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_gholdengo",
+      "slot": 1,
+      "stem": "gholdengo_skill1_ominous_wind_wave",
+      "binding_name": "pokemon_moba_stable_gholdengo_skill1_ominous_wind_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/gholdengo_skill1_ominous_wind_wave",
+      "tag": "line",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_gholdengo",
+      "slot": 2,
+      "stem": "gholdengo_skill2_metal_sound_aura",
+      "binding_name": "pokemon_moba_stable_gholdengo_skill2_metal_sound_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/gholdengo_skill2_metal_sound_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_gholdengo",
+      "slot": 3,
+      "stem": "gholdengo_ult_make_it_rain_aoe",
+      "binding_name": "pokemon_moba_stable_gholdengo_ult_make_it_rain_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/gholdengo_ult_make_it_rain_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_glaceon",
+      "slot": 0,
+      "stem": "glaceon_basic_ice_shard_projectile",
+      "binding_name": "pokemon_moba_stable_glaceon_basic_ice_shard_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/glaceon_basic_ice_shard_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_glaceon",
+      "slot": 1,
+      "stem": "glaceon_skill1_snowscape_field",
+      "binding_name": "pokemon_moba_stable_glaceon_skill1_snowscape_field",
+      "asset": "asset/pokemon_moba_stable/vfx/glaceon_skill1_snowscape_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_glaceon",
+      "slot": 2,
+      "stem": "glaceon_skill2_ice_fang_impact",
+      "binding_name": "pokemon_moba_stable_glaceon_skill2_ice_fang_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/glaceon_skill2_ice_fang_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_glaceon",
+      "slot": 3,
+      "stem": "glaceon_ult_blizzard_field",
+      "binding_name": "pokemon_moba_stable_glaceon_ult_blizzard_field",
+      "asset": "asset/pokemon_moba_stable/vfx/glaceon_ult_blizzard_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_goodra",
+      "slot": 0,
+      "stem": "goodra_basic_dizzy_punch_impact",
+      "binding_name": "pokemon_moba_stable_goodra_basic_dizzy_punch_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/goodra_basic_dizzy_punch_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_goodra",
+      "slot": 1,
+      "stem": "goodra_skill1_rain_dance_field",
+      "binding_name": "pokemon_moba_stable_goodra_skill1_rain_dance_field",
+      "asset": "asset/pokemon_moba_stable/vfx/goodra_skill1_rain_dance_field",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_goodra",
+      "slot": 2,
+      "stem": "goodra_skill2_dragon_cheer_aura",
+      "binding_name": "pokemon_moba_stable_goodra_skill2_dragon_cheer_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/goodra_skill2_dragon_cheer_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_goodra",
+      "slot": 3,
+      "stem": "goodra_ult_life_dew_heal_burst",
+      "binding_name": "pokemon_moba_stable_goodra_ult_life_dew_heal_burst",
+      "asset": "asset/pokemon_moba_stable/vfx/goodra_ult_life_dew_heal_burst",
+      "tag": "burst",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_goodra",
+      "slot": 3,
+      "stem": "goodra_ult_life_dew_pickup",
+      "binding_name": "pokemon_moba_stable_goodra_ult_life_dew_pickup",
+      "asset": "asset/pokemon_moba_stable/vfx/goodra_ult_life_dew_pickup",
+      "tag": "pickup",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_greninja",
+      "slot": 0,
+      "stem": "greninja_basic_night_slash_impact",
+      "binding_name": "pokemon_moba_stable_greninja_basic_night_slash_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/greninja_basic_night_slash_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_greninja",
+      "slot": 1,
+      "stem": "greninja_skill1_quick_attack_streak",
+      "binding_name": "pokemon_moba_stable_greninja_skill1_quick_attack_streak",
+      "asset": "asset/pokemon_moba_stable/vfx/greninja_skill1_quick_attack_streak",
+      "tag": "streak",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_greninja",
+      "slot": 2,
+      "stem": "greninja_skill2_water_pledge_aoe",
+      "binding_name": "pokemon_moba_stable_greninja_skill2_water_pledge_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/greninja_skill2_water_pledge_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_greninja",
+      "slot": 3,
+      "stem": "greninja_ult_water_shuriken_projectile",
+      "binding_name": "pokemon_moba_stable_greninja_ult_water_shuriken_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/greninja_ult_water_shuriken_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_gyarados",
+      "slot": 0,
+      "stem": "gyarados_basic_whirlpool_field",
+      "binding_name": "pokemon_moba_stable_gyarados_basic_whirlpool_field",
+      "asset": "asset/pokemon_moba_stable/vfx/gyarados_basic_whirlpool_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_gyarados",
+      "slot": 1,
+      "stem": "gyarados_skill1_scald_projectile",
+      "binding_name": "pokemon_moba_stable_gyarados_skill1_scald_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/gyarados_skill1_scald_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_gyarados",
+      "slot": 2,
+      "stem": "gyarados_skill2_hurricane_wave",
+      "binding_name": "pokemon_moba_stable_gyarados_skill2_hurricane_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/gyarados_skill2_hurricane_wave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_gyarados",
+      "slot": 3,
+      "stem": "gyarados_ult_hyper_beam_line",
+      "binding_name": "pokemon_moba_stable_gyarados_ult_hyper_beam_line",
+      "asset": "asset/pokemon_moba_stable/vfx/gyarados_ult_hyper_beam_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_hawlucha",
+      "slot": 1,
+      "stem": "hawlucha_skill1_air_slash_wave",
+      "binding_name": "pokemon_moba_stable_hawlucha_skill1_air_slash_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/hawlucha_skill1_air_slash_wave",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_heliolisk",
+      "slot": -1,
+      "stem": "heliolisk_passive_discharge_aura",
+      "binding_name": "pokemon_moba_stable_heliolisk_passive_discharge_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/heliolisk_passive_discharge_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_heliolisk",
+      "slot": 2,
+      "stem": "heliolisk_skill2_shed_tail_decoy",
+      "binding_name": "pokemon_moba_stable_heliolisk_skill2_shed_tail_decoy",
+      "asset": "asset/pokemon_moba_stable/vfx/heliolisk_skill2_shed_tail_decoy",
+      "tag": "decoy",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_houndoom",
+      "slot": 0,
+      "stem": "houndoom_basic_ember_projectile",
+      "binding_name": "pokemon_moba_stable_houndoom_basic_ember_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/houndoom_basic_ember_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_houndoom",
+      "slot": 1,
+      "stem": "houndoom_skill1_foul_play_projectile",
+      "binding_name": "pokemon_moba_stable_houndoom_skill1_foul_play_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/houndoom_skill1_foul_play_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_houndoom",
+      "slot": 2,
+      "stem": "houndoom_skill2_howl_debuff_pulse",
+      "binding_name": "pokemon_moba_stable_houndoom_skill2_howl_debuff_pulse",
+      "asset": "asset/pokemon_moba_stable/vfx/houndoom_skill2_howl_debuff_pulse",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_houndoom",
+      "slot": 3,
+      "stem": "houndoom_ult_inferno_field",
+      "binding_name": "pokemon_moba_stable_houndoom_ult_inferno_field",
+      "asset": "asset/pokemon_moba_stable/vfx/houndoom_ult_inferno_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_inteleon",
+      "slot": 0,
+      "stem": "inteleon_basic_water_gun_projectile",
+      "binding_name": "pokemon_moba_stable_inteleon_basic_water_gun_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/inteleon_basic_water_gun_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_inteleon",
+      "slot": 1,
+      "stem": "inteleon_skill1_rain_dance_aura",
+      "binding_name": "pokemon_moba_stable_inteleon_skill1_rain_dance_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/inteleon_skill1_rain_dance_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_inteleon",
+      "slot": 2,
+      "stem": "inteleon_skill2_soak_field",
+      "binding_name": "pokemon_moba_stable_inteleon_skill2_soak_field",
+      "asset": "asset/pokemon_moba_stable/vfx/inteleon_skill2_soak_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_inteleon",
+      "slot": 3,
+      "stem": "inteleon_ult_snipe_shot_line",
+      "binding_name": "pokemon_moba_stable_inteleon_ult_snipe_shot_line",
+      "asset": "asset/pokemon_moba_stable/vfx/inteleon_ult_snipe_shot_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_jolteon",
+      "slot": 0,
+      "stem": "jolteon_basic_pin_missile_projectile",
+      "binding_name": "pokemon_moba_stable_jolteon_basic_pin_missile_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/jolteon_basic_pin_missile_projectile",
+      "tag": "flight",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_jolteon",
+      "slot": 1,
+      "stem": "jolteon_skill1_sand_attack_cloud",
+      "binding_name": "pokemon_moba_stable_jolteon_skill1_sand_attack_cloud",
+      "asset": "asset/pokemon_moba_stable/vfx/jolteon_skill1_sand_attack_cloud",
+      "tag": "cloud",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_jolteon",
+      "slot": 2,
+      "stem": "jolteon_skill2_thunder_shock_projectile",
+      "binding_name": "pokemon_moba_stable_jolteon_skill2_thunder_shock_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/jolteon_skill2_thunder_shock_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_jolteon",
+      "slot": 3,
+      "stem": "jolteon_ult_thunder_fang_impact",
+      "binding_name": "pokemon_moba_stable_jolteon_ult_thunder_fang_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/jolteon_ult_thunder_fang_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_kecleon",
+      "slot": 2,
+      "stem": "kecleon_skill2_chromashift_pulse",
+      "binding_name": "pokemon_moba_stable_kecleon_skill2_chromashift_pulse",
+      "asset": "asset/pokemon_moba_stable/vfx/kecleon_skill2_chromashift_pulse",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_kecleon",
+      "slot": 3,
+      "stem": "kecleon_ult_colorful_whip_cones",
+      "binding_name": "pokemon_moba_stable_kecleon_ult_colorful_whip_cones",
+      "asset": "asset/pokemon_moba_stable/vfx/kecleon_ult_colorful_whip_cones",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_kilowattrel",
+      "slot": 0,
+      "stem": "kilowattrel_basicattack_spark_projectile",
+      "binding_name": "pokemon_moba_stable_kilowattrel_basicattack_spark_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/kilowattrel_basicattack_spark_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_kilowattrel",
+      "slot": 1,
+      "stem": "kilowattrel_skill1_electro_ball_projectile",
+      "binding_name": "pokemon_moba_stable_kilowattrel_skill1_electro_ball_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/kilowattrel_skill1_electro_ball_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_kilowattrel",
+      "slot": 2,
+      "stem": "kilowattrel_skill2_gust_line",
+      "binding_name": "pokemon_moba_stable_kilowattrel_skill2_gust_line",
+      "asset": "asset/pokemon_moba_stable/vfx/kilowattrel_skill2_gust_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_kilowattrel",
+      "slot": 3,
+      "stem": "kilowattrel_ult_charge_aura",
+      "binding_name": "pokemon_moba_stable_kilowattrel_ult_charge_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/kilowattrel_ult_charge_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_kingdra",
+      "slot": 0,
+      "stem": "kingdra_basicattack_scale_shot_projectile",
+      "binding_name": "pokemon_moba_stable_kingdra_basicattack_scale_shot_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/kingdra_basicattack_scale_shot_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_kingdra",
+      "slot": 1,
+      "stem": "kingdra_skill1_waterfall_aoe",
+      "binding_name": "pokemon_moba_stable_kingdra_skill1_waterfall_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/kingdra_skill1_waterfall_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_kingdra",
+      "slot": 2,
+      "stem": "kingdra_skill2_dragon_dance_aura",
+      "binding_name": "pokemon_moba_stable_kingdra_skill2_dragon_dance_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/kingdra_skill2_dragon_dance_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_kingdra",
+      "slot": 3,
+      "stem": "kingdra_ult_dragon_energy_projectile",
+      "binding_name": "pokemon_moba_stable_kingdra_ult_dragon_energy_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/kingdra_ult_dragon_energy_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_kricketune",
+      "slot": 1,
+      "stem": "kricketune_skill1_sticky_web_deployable",
+      "binding_name": "pokemon_moba_stable_kricketune_skill1_sticky_web_deployable",
+      "asset": "asset/pokemon_moba_stable/vfx/kricketune_skill1_sticky_web_deployable",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_leafeon",
+      "slot": 0,
+      "stem": "leafeon_basicattack_razor_leaf_projectile",
+      "binding_name": "pokemon_moba_stable_leafeon_basicattack_razor_leaf_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/leafeon_basicattack_razor_leaf_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_leafeon",
+      "slot": 1,
+      "stem": "leafeon_skill1_magical_leaf_projectile",
+      "binding_name": "pokemon_moba_stable_leafeon_skill1_magical_leaf_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/leafeon_skill1_magical_leaf_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_leafeon",
+      "slot": 2,
+      "stem": "leafeon_skill2_leaf_blade_slash",
+      "binding_name": "pokemon_moba_stable_leafeon_skill2_leaf_blade_slash",
+      "asset": "asset/pokemon_moba_stable/vfx/leafeon_skill2_leaf_blade_slash",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_leafeon",
+      "slot": 3,
+      "stem": "leafeon_ult_leaf_storm_aoe",
+      "binding_name": "pokemon_moba_stable_leafeon_ult_leaf_storm_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/leafeon_ult_leaf_storm_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ludicolo",
+      "slot": 0,
+      "stem": "ludicolo_basicattack_facade_impact",
+      "binding_name": "pokemon_moba_stable_ludicolo_basicattack_facade_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/ludicolo_basicattack_facade_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ludicolo",
+      "slot": -1,
+      "stem": "ludicolo_passive_rain_dish_aura",
+      "binding_name": "pokemon_moba_stable_ludicolo_passive_rain_dish_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/ludicolo_passive_rain_dish_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ludicolo",
+      "slot": 1,
+      "stem": "ludicolo_skill1_teeter_dance_cone",
+      "binding_name": "pokemon_moba_stable_ludicolo_skill1_teeter_dance_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/ludicolo_skill1_teeter_dance_cone",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ludicolo",
+      "slot": 2,
+      "stem": "ludicolo_skill2_grass_whistle_aura",
+      "binding_name": "pokemon_moba_stable_ludicolo_skill2_grass_whistle_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/ludicolo_skill2_grass_whistle_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ludicolo",
+      "slot": 3,
+      "stem": "ludicolo_ult_ivy_cudgel_impact",
+      "binding_name": "pokemon_moba_stable_ludicolo_ult_ivy_cudgel_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/ludicolo_ult_ivy_cudgel_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_magmortar",
+      "slot": 0,
+      "stem": "magmortar_basicattack_lava_plume_projectile",
+      "binding_name": "pokemon_moba_stable_magmortar_basicattack_lava_plume_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/magmortar_basicattack_lava_plume_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_magmortar",
+      "slot": 1,
+      "stem": "magmortar_skill1_temper_flare_projectile_splash",
+      "binding_name": "pokemon_moba_stable_magmortar_skill1_temper_flare_projectile_splash",
+      "asset": "asset/pokemon_moba_stable/vfx/magmortar_skill1_temper_flare_projectile_splash",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_magmortar",
+      "slot": 2,
+      "stem": "magmortar_skill2_heat_wave_ring",
+      "binding_name": "pokemon_moba_stable_magmortar_skill2_heat_wave_ring",
+      "asset": "asset/pokemon_moba_stable/vfx/magmortar_skill2_heat_wave_ring",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_magmortar",
+      "slot": 3,
+      "stem": "magmortar_ult_eruption_cannonball",
+      "binding_name": "pokemon_moba_stable_magmortar_ult_eruption_cannonball",
+      "asset": "asset/pokemon_moba_stable/vfx/magmortar_ult_eruption_cannonball",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_mantine",
+      "slot": 0,
+      "stem": "mantine_basicattack_bubble_projectile",
+      "binding_name": "pokemon_moba_stable_mantine_basicattack_bubble_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/mantine_basicattack_bubble_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_mantine",
+      "slot": 1,
+      "stem": "mantine_skill1_brine_water_field",
+      "binding_name": "pokemon_moba_stable_mantine_skill1_brine_water_field",
+      "asset": "asset/pokemon_moba_stable/vfx/mantine_skill1_brine_water_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_mantine",
+      "slot": 2,
+      "stem": "mantine_skill2_dive_splash",
+      "binding_name": "pokemon_moba_stable_mantine_skill2_dive_splash",
+      "asset": "asset/pokemon_moba_stable/vfx/mantine_skill2_dive_splash",
+      "tag": "splash",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_mantine",
+      "slot": 3,
+      "stem": "mantine_ult_surf_wave",
+      "binding_name": "pokemon_moba_stable_mantine_ult_surf_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/mantine_ult_surf_wave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_marowak",
+      "slot": 0,
+      "stem": "marowak_basicattack_bonemerang_projectile",
+      "binding_name": "pokemon_moba_stable_marowak_basicattack_bonemerang_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/marowak_basicattack_bonemerang_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_marowak",
+      "slot": 3,
+      "stem": "marowak_ult_bone_windmill_aura",
+      "binding_name": "pokemon_moba_stable_marowak_ult_bone_windmill_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/marowak_ult_bone_windmill_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_missingno",
+      "slot": 0,
+      "stem": "missingno_basicattack_glitch_data_projectile",
+      "binding_name": "pokemon_moba_stable_missingno_basicattack_glitch_data_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/missingno_basicattack_glitch_data_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_missingno",
+      "slot": 0,
+      "stem": "missingno_basicattack_stray_glitch_line",
+      "binding_name": "pokemon_moba_stable_missingno_basicattack_stray_glitch_line",
+      "asset": "asset/pokemon_moba_stable/vfx/missingno_basicattack_stray_glitch_line",
+      "tag": "line",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_missingno",
+      "slot": 1,
+      "stem": "missingno_skill1_random_status_corruption",
+      "binding_name": "pokemon_moba_stable_missingno_skill1_random_status_corruption",
+      "asset": "asset/pokemon_moba_stable/vfx/missingno_skill1_random_status_corruption",
+      "tag": "burst",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_missingno",
+      "slot": 2,
+      "stem": "missingno_skill2_chain_spark_arc",
+      "binding_name": "pokemon_moba_stable_missingno_skill2_chain_spark_arc",
+      "asset": "asset/pokemon_moba_stable/vfx/missingno_skill2_chain_spark_arc",
+      "tag": "chain",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_missingno",
+      "slot": 2,
+      "stem": "missingno_skill2_glitch_storm_aura",
+      "binding_name": "pokemon_moba_stable_missingno_skill2_glitch_storm_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/missingno_skill2_glitch_storm_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_missingno",
+      "slot": 3,
+      "stem": "missingno_ult_trick_room_field",
+      "binding_name": "pokemon_moba_stable_missingno_ult_trick_room_field",
+      "asset": "asset/pokemon_moba_stable/vfx/missingno_ult_trick_room_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_noivern",
+      "slot": 0,
+      "stem": "noivern_basicattack_screech_soundwave",
+      "binding_name": "pokemon_moba_stable_noivern_basicattack_screech_soundwave",
+      "asset": "asset/pokemon_moba_stable/vfx/noivern_basicattack_screech_soundwave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_noivern",
+      "slot": 1,
+      "stem": "noivern_skill1_whirlwind_line",
+      "binding_name": "pokemon_moba_stable_noivern_skill1_whirlwind_line",
+      "asset": "asset/pokemon_moba_stable/vfx/noivern_skill1_whirlwind_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_noivern",
+      "slot": 2,
+      "stem": "noivern_skill2_tailwind_line",
+      "binding_name": "pokemon_moba_stable_noivern_skill2_tailwind_line",
+      "asset": "asset/pokemon_moba_stable/vfx/noivern_skill2_tailwind_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_noivern",
+      "slot": 3,
+      "stem": "noivern_ult_dragon_pulse_projectile",
+      "binding_name": "pokemon_moba_stable_noivern_ult_dragon_pulse_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/noivern_ult_dragon_pulse_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_octillery",
+      "slot": 0,
+      "stem": "octillery_basicattack_bullet_seed_projectile",
+      "binding_name": "pokemon_moba_stable_octillery_basicattack_bullet_seed_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/octillery_basicattack_bullet_seed_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_octillery",
+      "slot": 1,
+      "stem": "octillery_skill1_lock_on_reticle",
+      "binding_name": "pokemon_moba_stable_octillery_skill1_lock_on_reticle",
+      "asset": "asset/pokemon_moba_stable/vfx/octillery_skill1_lock_on_reticle",
+      "tag": "reticle",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_octillery",
+      "slot": 2,
+      "stem": "octillery_skill2_bouncy_bubble_path",
+      "binding_name": "pokemon_moba_stable_octillery_skill2_bouncy_bubble_path",
+      "asset": "asset/pokemon_moba_stable/vfx/octillery_skill2_bouncy_bubble_path",
+      "tag": "burst",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_octillery",
+      "slot": 2,
+      "stem": "octillery_skill2_bubble_flight",
+      "binding_name": "pokemon_moba_stable_octillery_skill2_bubble_flight",
+      "asset": "asset/pokemon_moba_stable/vfx/octillery_skill2_bubble_flight",
+      "tag": "flight",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_octillery",
+      "slot": 2,
+      "stem": "octillery_skill2_bubble_landing",
+      "binding_name": "pokemon_moba_stable_octillery_skill2_bubble_landing",
+      "asset": "asset/pokemon_moba_stable/vfx/octillery_skill2_bubble_landing",
+      "tag": "land",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_octillery",
+      "slot": 3,
+      "stem": "octillery_ult_octazooka_projectile",
+      "binding_name": "pokemon_moba_stable_octillery_ult_octazooka_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/octillery_ult_octazooka_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_oranguru",
+      "slot": 0,
+      "stem": "oranguru_basicattack_simple_beam_projectile",
+      "binding_name": "pokemon_moba_stable_oranguru_basicattack_simple_beam_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/oranguru_basicattack_simple_beam_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_oranguru",
+      "slot": 1,
+      "stem": "oranguru_skill1_nasty_plot_mark",
+      "binding_name": "pokemon_moba_stable_oranguru_skill1_nasty_plot_mark",
+      "asset": "asset/pokemon_moba_stable/vfx/oranguru_skill1_nasty_plot_mark",
+      "tag": "mark",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_oranguru",
+      "slot": 2,
+      "stem": "oranguru_skill2_stored_power_burst",
+      "binding_name": "pokemon_moba_stable_oranguru_skill2_stored_power_burst",
+      "asset": "asset/pokemon_moba_stable/vfx/oranguru_skill2_stored_power_burst",
+      "tag": "burst",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_oranguru",
+      "slot": 3,
+      "stem": "oranguru_ult_instruct_command",
+      "binding_name": "pokemon_moba_stable_oranguru_ult_instruct_command",
+      "asset": "asset/pokemon_moba_stable/vfx/oranguru_ult_instruct_command",
+      "tag": "command",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_orbeetle",
+      "slot": 2,
+      "stem": "orbeetle_skill2_infestation_wave",
+      "binding_name": "pokemon_moba_stable_orbeetle_skill2_infestation_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/orbeetle_skill2_infestation_wave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_orbeetle",
+      "slot": 3,
+      "stem": "orbeetle_ult_psyshock_cone",
+      "binding_name": "pokemon_moba_stable_orbeetle_ult_psyshock_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/orbeetle_ult_psyshock_cone",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_passimian",
+      "slot": 0,
+      "stem": "passimian_basicattack_fling_melon_projectile",
+      "binding_name": "pokemon_moba_stable_passimian_basicattack_fling_melon_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/passimian_basicattack_fling_melon_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_passimian",
+      "slot": 3,
+      "stem": "passimian_ult_focus_blast_projectile",
+      "binding_name": "pokemon_moba_stable_passimian_ult_focus_blast_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/passimian_ult_focus_blast_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_pikachu",
+      "slot": 0,
+      "stem": "pikachu_basicattack_spark_projectile",
+      "binding_name": "pokemon_moba_stable_pikachu_basicattack_spark_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/pikachu_basicattack_spark_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_pikachu",
+      "slot": 1,
+      "stem": "pikachu_skill1_volt_tackle_dash_trail",
+      "binding_name": "pokemon_moba_stable_pikachu_skill1_volt_tackle_dash_trail",
+      "asset": "asset/pokemon_moba_stable/vfx/pikachu_skill1_volt_tackle_dash_trail",
+      "tag": "trail",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_pikachu",
+      "slot": 2,
+      "stem": "pikachu_skill2_thunder_wave_wall",
+      "binding_name": "pokemon_moba_stable_pikachu_skill2_thunder_wave_wall",
+      "asset": "asset/pokemon_moba_stable/vfx/pikachu_skill2_thunder_wave_wall",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_pikachu",
+      "slot": 3,
+      "stem": "pikachu_ult_thunder_strike_aoe",
+      "binding_name": "pokemon_moba_stable_pikachu_ult_thunder_strike_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/pikachu_ult_thunder_strike_aoe",
+      "tag": "strike",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_porygonz",
+      "slot": 0,
+      "stem": "porygonz_basicattack_conversion_projectile",
+      "binding_name": "pokemon_moba_stable_porygonz_basicattack_conversion_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/porygonz_basicattack_conversion_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_porygonz",
+      "slot": 1,
+      "stem": "porygonz_skill1_conversion2_projectile",
+      "binding_name": "pokemon_moba_stable_porygonz_skill1_conversion2_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/porygonz_skill1_conversion2_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_porygonz",
+      "slot": 2,
+      "stem": "porygonz_skill2_recover_aura",
+      "binding_name": "pokemon_moba_stable_porygonz_skill2_recover_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/porygonz_skill2_recover_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_porygonz",
+      "slot": 3,
+      "stem": "porygonz_ult_tri_attack_line",
+      "binding_name": "pokemon_moba_stable_porygonz_ult_tri_attack_line",
+      "asset": "asset/pokemon_moba_stable/vfx/porygonz_ult_tri_attack_line",
+      "tag": "line",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_quaquaval",
+      "slot": 0,
+      "stem": "quaquaval_basicattack_hydro_kick_splash",
+      "binding_name": "pokemon_moba_stable_quaquaval_basicattack_hydro_kick_splash",
+      "asset": "asset/pokemon_moba_stable/vfx/quaquaval_basicattack_hydro_kick_splash",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_quaquaval",
+      "slot": -1,
+      "stem": "quaquaval_passive_aqua_step_empowered_trail",
+      "binding_name": "pokemon_moba_stable_quaquaval_passive_aqua_step_empowered_trail",
+      "asset": "asset/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_empowered_trail",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_quaquaval",
+      "slot": -1,
+      "stem": "quaquaval_passive_aqua_step_trail",
+      "binding_name": "pokemon_moba_stable_quaquaval_passive_aqua_step_trail",
+      "asset": "asset/pokemon_moba_stable/vfx/quaquaval_passive_aqua_step_trail",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_quaquaval",
+      "slot": 1,
+      "stem": "quaquaval_skill1_spiral_shot_projectile",
+      "binding_name": "pokemon_moba_stable_quaquaval_skill1_spiral_shot_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/quaquaval_skill1_spiral_shot_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_quaquaval",
+      "slot": 2,
+      "stem": "quaquaval_skill2_up_tempo_impact",
+      "binding_name": "pokemon_moba_stable_quaquaval_skill2_up_tempo_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/quaquaval_skill2_up_tempo_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ribombee",
+      "slot": 0,
+      "stem": "ribombee_basicattack_pollen_puff_projectile",
+      "binding_name": "pokemon_moba_stable_ribombee_basicattack_pollen_puff_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/ribombee_basicattack_pollen_puff_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_ribombee",
+      "slot": 1,
+      "stem": "ribombee_skill1_draining_kiss_line",
+      "binding_name": "pokemon_moba_stable_ribombee_skill1_draining_kiss_line",
+      "asset": "asset/pokemon_moba_stable/vfx/ribombee_skill1_draining_kiss_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ribombee",
+      "slot": 2,
+      "stem": "ribombee_skill2_u_turn_trail",
+      "binding_name": "pokemon_moba_stable_ribombee_skill2_u_turn_trail",
+      "asset": "asset/pokemon_moba_stable/vfx/ribombee_skill2_u_turn_trail",
+      "tag": "trail",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ribombee",
+      "slot": 3,
+      "stem": "ribombee_ult_alluring_voice_aura",
+      "binding_name": "pokemon_moba_stable_ribombee_ult_alluring_voice_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/ribombee_ult_alluring_voice_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_rillaboom",
+      "slot": 1,
+      "stem": "rillaboom_skill1_drum_beating_aura",
+      "binding_name": "pokemon_moba_stable_rillaboom_skill1_drum_beating_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/rillaboom_skill1_drum_beating_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_rillaboom",
+      "slot": 2,
+      "stem": "rillaboom_skill2_drum_roll_aura",
+      "binding_name": "pokemon_moba_stable_rillaboom_skill2_drum_roll_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/rillaboom_skill2_drum_roll_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_rillaboom",
+      "slot": 3,
+      "stem": "rillaboom_ult_grassy_surge_wave",
+      "binding_name": "pokemon_moba_stable_rillaboom_ult_grassy_surge_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/rillaboom_ult_grassy_surge_wave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_scizor",
+      "slot": 1,
+      "stem": "scizor_skill1_swords_dance_aura",
+      "binding_name": "pokemon_moba_stable_scizor_skill1_swords_dance_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/scizor_skill1_swords_dance_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_shedinja",
+      "slot": 0,
+      "stem": "shedinja_basicattack_shadow_force_projectile",
+      "binding_name": "pokemon_moba_stable_shedinja_basicattack_shadow_force_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/shedinja_basicattack_shadow_force_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_shedinja",
+      "slot": -1,
+      "stem": "shedinja_passive_wonder_guard_chits",
+      "binding_name": "pokemon_moba_stable_shedinja_passive_wonder_guard_chits",
+      "asset": "asset/pokemon_moba_stable/vfx/shedinja_passive_wonder_guard_chits",
+      "tag": "chits_5",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_shedinja",
+      "slot": 1,
+      "stem": "shedinja_skill1_skitter_smack_cone",
+      "binding_name": "pokemon_moba_stable_shedinja_skill1_skitter_smack_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/shedinja_skill1_skitter_smack_cone",
+      "tag": "cone",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_shedinja",
+      "slot": 2,
+      "stem": "shedinja_skill2_grudge_projectile",
+      "binding_name": "pokemon_moba_stable_shedinja_skill2_grudge_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/shedinja_skill2_grudge_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_shedinja",
+      "slot": 3,
+      "stem": "shedinja_ult_astral_barrage_wave",
+      "binding_name": "pokemon_moba_stable_shedinja_ult_astral_barrage_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/shedinja_ult_astral_barrage_wave",
+      "tag": "line",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_shiftry",
+      "slot": 1,
+      "stem": "shiftry_skill1_fan_away_cone",
+      "binding_name": "pokemon_moba_stable_shiftry_skill1_fan_away_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/shiftry_skill1_fan_away_cone",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_shiftry",
+      "slot": 3,
+      "stem": "shiftry_ult_fan_tornado_field",
+      "binding_name": "pokemon_moba_stable_shiftry_ult_fan_tornado_field",
+      "asset": "asset/pokemon_moba_stable/vfx/shiftry_ult_fan_tornado_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_sigilyph",
+      "slot": 0,
+      "stem": "sigilyph_basicattack_psychic_sphere_projectile",
+      "binding_name": "pokemon_moba_stable_sigilyph_basicattack_psychic_sphere_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/sigilyph_basicattack_psychic_sphere_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_sigilyph",
+      "slot": -1,
+      "stem": "sigilyph_passive_glypher_explosion_aoe",
+      "binding_name": "pokemon_moba_stable_sigilyph_passive_glypher_explosion_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/sigilyph_passive_glypher_explosion_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_sigilyph",
+      "slot": -1,
+      "stem": "sigilyph_passive_glypher_mark",
+      "binding_name": "pokemon_moba_stable_sigilyph_passive_glypher_mark",
+      "asset": "asset/pokemon_moba_stable/vfx/sigilyph_passive_glypher_mark",
+      "tag": "mark",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_sigilyph",
+      "slot": 1,
+      "stem": "sigilyph_skill1_sonic_wing_cone",
+      "binding_name": "pokemon_moba_stable_sigilyph_skill1_sonic_wing_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/sigilyph_skill1_sonic_wing_cone",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_sigilyph",
+      "slot": 3,
+      "stem": "sigilyph_ult_psychic_assault_projectile",
+      "binding_name": "pokemon_moba_stable_sigilyph_ult_psychic_assault_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/sigilyph_ult_psychic_assault_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_sirfetchd",
+      "slot": 2,
+      "stem": "sirfetchd_skill2_vacuum_wave_projectile",
+      "binding_name": "pokemon_moba_stable_sirfetchd_skill2_vacuum_wave_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/sirfetchd_skill2_vacuum_wave_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_skeledirge",
+      "slot": 0,
+      "stem": "skeledirge_basicattack_shadow_ball_projectile",
+      "binding_name": "pokemon_moba_stable_skeledirge_basicattack_shadow_ball_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/skeledirge_basicattack_shadow_ball_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_skeledirge",
+      "slot": 1,
+      "stem": "skeledirge_skill1_hex_curse",
+      "binding_name": "pokemon_moba_stable_skeledirge_skill1_hex_curse",
+      "asset": "asset/pokemon_moba_stable/vfx/skeledirge_skill1_hex_curse",
+      "tag": "curse",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_skeledirge",
+      "slot": 2,
+      "stem": "skeledirge_skill2_will_o_wisp_projectile",
+      "binding_name": "pokemon_moba_stable_skeledirge_skill2_will_o_wisp_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/skeledirge_skill2_will_o_wisp_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_skeledirge",
+      "slot": 3,
+      "stem": "skeledirge_ult_torch_song_aoe",
+      "binding_name": "pokemon_moba_stable_skeledirge_ult_torch_song_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/skeledirge_ult_torch_song_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_starmie",
+      "slot": 0,
+      "stem": "starmie_basicattack_water_spout_projectile",
+      "binding_name": "pokemon_moba_stable_starmie_basicattack_water_spout_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/starmie_basicattack_water_spout_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_starmie",
+      "slot": 1,
+      "stem": "starmie_skill1_flip_turn_splash",
+      "binding_name": "pokemon_moba_stable_starmie_skill1_flip_turn_splash",
+      "asset": "asset/pokemon_moba_stable/vfx/starmie_skill1_flip_turn_splash",
+      "tag": "splash",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_starmie",
+      "slot": 2,
+      "stem": "starmie_skill2_heart_swap_shockwave",
+      "binding_name": "pokemon_moba_stable_starmie_skill2_heart_swap_shockwave",
+      "asset": "asset/pokemon_moba_stable/vfx/starmie_skill2_heart_swap_shockwave",
+      "tag": "shockwave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_starmie",
+      "slot": 3,
+      "stem": "starmie_ult_psybeam_line",
+      "binding_name": "pokemon_moba_stable_starmie_ult_psybeam_line",
+      "asset": "asset/pokemon_moba_stable/vfx/starmie_ult_psybeam_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_swanna",
+      "slot": 0,
+      "stem": "swanna_basicattack_flap_gust_projectile",
+      "binding_name": "pokemon_moba_stable_swanna_basicattack_flap_gust_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/swanna_basicattack_flap_gust_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_swanna",
+      "slot": 2,
+      "stem": "swanna_skill2_feathery_cyclone_aura",
+      "binding_name": "pokemon_moba_stable_swanna_skill2_feathery_cyclone_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/swanna_skill2_feathery_cyclone_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_swanna",
+      "slot": 3,
+      "stem": "swanna_ult_sky_circus_aoe",
+      "binding_name": "pokemon_moba_stable_swanna_ult_sky_circus_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/swanna_ult_sky_circus_aoe",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_swanna",
+      "slot": 3,
+      "stem": "swanna_ult_sky_circus_landing",
+      "binding_name": "pokemon_moba_stable_swanna_ult_sky_circus_landing",
+      "asset": "asset/pokemon_moba_stable/vfx/swanna_ult_sky_circus_landing",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_swanna",
+      "slot": 3,
+      "stem": "swanna_ult_sky_circus_slash",
+      "binding_name": "pokemon_moba_stable_swanna_ult_sky_circus_slash",
+      "asset": "asset/pokemon_moba_stable/vfx/swanna_ult_sky_circus_slash",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_sylveon",
+      "slot": 0,
+      "stem": "sylveon_basicattack_disarming_voice_aoe",
+      "binding_name": "pokemon_moba_stable_sylveon_basicattack_disarming_voice_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/sylveon_basicattack_disarming_voice_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_sylveon",
+      "slot": 1,
+      "stem": "sylveon_skill1_misty_terrain_field",
+      "binding_name": "pokemon_moba_stable_sylveon_skill1_misty_terrain_field",
+      "asset": "asset/pokemon_moba_stable/vfx/sylveon_skill1_misty_terrain_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_sylveon",
+      "slot": 2,
+      "stem": "sylveon_skill2_charm_heal",
+      "binding_name": "pokemon_moba_stable_sylveon_skill2_charm_heal",
+      "asset": "asset/pokemon_moba_stable/vfx/sylveon_skill2_charm_heal",
+      "tag": "heal",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_sylveon",
+      "slot": 3,
+      "stem": "sylveon_ult_dazzling_gleam_aoe",
+      "binding_name": "pokemon_moba_stable_sylveon_ult_dazzling_gleam_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/sylveon_ult_dazzling_gleam_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_thievul",
+      "slot": 2,
+      "stem": "thievul_skill2_hone_claws_aura",
+      "binding_name": "pokemon_moba_stable_thievul_skill2_hone_claws_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/thievul_skill2_hone_claws_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_thievul",
+      "slot": 3,
+      "stem": "thievul_ult_stakeout_field",
+      "binding_name": "pokemon_moba_stable_thievul_ult_stakeout_field",
+      "asset": "asset/pokemon_moba_stable/vfx/thievul_ult_stakeout_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_turtonator",
+      "slot": 0,
+      "stem": "turtonator_basicattack_ember_projectile",
+      "binding_name": "pokemon_moba_stable_turtonator_basicattack_ember_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/turtonator_basicattack_ember_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_turtonator",
+      "slot": -1,
+      "stem": "turtonator_passive_burning_jealousy_overlay",
+      "binding_name": "pokemon_moba_stable_turtonator_passive_burning_jealousy_overlay",
+      "asset": "asset/pokemon_moba_stable/vfx/turtonator_passive_burning_jealousy_overlay",
+      "tag": "overlay",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_turtonator",
+      "slot": 1,
+      "stem": "turtonator_skill1_shell_trap_burst",
+      "binding_name": "pokemon_moba_stable_turtonator_skill1_shell_trap_burst",
+      "asset": "asset/pokemon_moba_stable/vfx/turtonator_skill1_shell_trap_burst",
+      "tag": "burst",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_turtonator",
+      "slot": 1,
+      "stem": "turtonator_skill1_shell_trap_field",
+      "binding_name": "pokemon_moba_stable_turtonator_skill1_shell_trap_field",
+      "asset": "asset/pokemon_moba_stable/vfx/turtonator_skill1_shell_trap_field",
+      "tag": "idle",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_turtonator",
+      "slot": 2,
+      "stem": "turtonator_skill2_sunny_day_field",
+      "binding_name": "pokemon_moba_stable_turtonator_skill2_sunny_day_field",
+      "asset": "asset/pokemon_moba_stable/vfx/turtonator_skill2_sunny_day_field",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_turtonator",
+      "slot": 3,
+      "stem": "turtonator_ult_clanging_scales_burst",
+      "binding_name": "pokemon_moba_stable_turtonator_ult_clanging_scales_burst",
+      "asset": "asset/pokemon_moba_stable/vfx/turtonator_ult_clanging_scales_burst",
+      "tag": "burst",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_umbreon",
+      "slot": 1,
+      "stem": "umbreon_skill1_snarl_aoe",
+      "binding_name": "pokemon_moba_stable_umbreon_skill1_snarl_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/umbreon_skill1_snarl_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_umbreon",
+      "slot": 2,
+      "stem": "umbreon_skill2_dark_pulse_line",
+      "binding_name": "pokemon_moba_stable_umbreon_skill2_dark_pulse_line",
+      "asset": "asset/pokemon_moba_stable/vfx/umbreon_skill2_dark_pulse_line",
+      "tag": "line",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_umbreon",
+      "slot": 3,
+      "stem": "umbreon_ult_crunch_impact",
+      "binding_name": "pokemon_moba_stable_umbreon_ult_crunch_impact",
+      "asset": "asset/pokemon_moba_stable/vfx/umbreon_ult_crunch_impact",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ursaluna",
+      "slot": 1,
+      "stem": "ursaluna_skill1_scary_face_terrify",
+      "binding_name": "pokemon_moba_stable_ursaluna_skill1_scary_face_terrify",
+      "asset": "asset/pokemon_moba_stable/vfx/ursaluna_skill1_scary_face_terrify",
+      "tag": "overlay",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ursaluna",
+      "slot": 2,
+      "stem": "ursaluna_skill2_earthquake_aura",
+      "binding_name": "pokemon_moba_stable_ursaluna_skill2_earthquake_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/ursaluna_skill2_earthquake_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_ursaluna",
+      "slot": 3,
+      "stem": "ursaluna_ult_blood_moon_transformation",
+      "binding_name": "pokemon_moba_stable_ursaluna_ult_blood_moon_transformation",
+      "asset": "asset/pokemon_moba_stable/vfx/ursaluna_ult_blood_moon_transformation",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_vanilluxe",
+      "slot": 0,
+      "stem": "vanilluxe_basicattack_icicle_spear_projectile",
+      "binding_name": "pokemon_moba_stable_vanilluxe_basicattack_icicle_spear_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/vanilluxe_basicattack_icicle_spear_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_vanilluxe",
+      "slot": 1,
+      "stem": "vanilluxe_skill1_chilling_water_wave",
+      "binding_name": "pokemon_moba_stable_vanilluxe_skill1_chilling_water_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/vanilluxe_skill1_chilling_water_wave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_vanilluxe",
+      "slot": 2,
+      "stem": "vanilluxe_skill2_frost_breath_cone",
+      "binding_name": "pokemon_moba_stable_vanilluxe_skill2_frost_breath_cone",
+      "asset": "asset/pokemon_moba_stable/vfx/vanilluxe_skill2_frost_breath_cone",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_vanilluxe",
+      "slot": 3,
+      "stem": "vanilluxe_ult_sheer_cold_aoe",
+      "binding_name": "pokemon_moba_stable_vanilluxe_ult_sheer_cold_aoe",
+      "asset": "asset/pokemon_moba_stable/vfx/vanilluxe_ult_sheer_cold_aoe",
+      "tag": "aoe",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_vaporeon",
+      "slot": 0,
+      "stem": "vaporeon_basicattack_water_gun_projectile",
+      "binding_name": "pokemon_moba_stable_vaporeon_basicattack_water_gun_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/vaporeon_basicattack_water_gun_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_vaporeon",
+      "slot": 1,
+      "stem": "vaporeon_skill1_growl_wave",
+      "binding_name": "pokemon_moba_stable_vaporeon_skill1_growl_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/vaporeon_skill1_growl_wave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_vaporeon",
+      "slot": 2,
+      "stem": "vaporeon_skill2_water_pulse_projectile",
+      "binding_name": "pokemon_moba_stable_vaporeon_skill2_water_pulse_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/vaporeon_skill2_water_pulse_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_vaporeon",
+      "slot": 3,
+      "stem": "vaporeon_ult_aqua_ring_aura",
+      "binding_name": "pokemon_moba_stable_vaporeon_ult_aqua_ring_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/vaporeon_ult_aqua_ring_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_venusaur",
+      "slot": 1,
+      "stem": "venusaur_skill1_vine_whip_line",
+      "binding_name": "pokemon_moba_stable_venusaur_skill1_vine_whip_line",
+      "asset": "asset/pokemon_moba_stable/vfx/venusaur_skill1_vine_whip_line",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_venusaur",
+      "slot": 2,
+      "stem": "venusaur_skill2_leech_seed_projectile",
+      "binding_name": "pokemon_moba_stable_venusaur_skill2_leech_seed_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/venusaur_skill2_leech_seed_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_venusaur",
+      "slot": 3,
+      "stem": "venusaur_ult_sludge_wave",
+      "binding_name": "pokemon_moba_stable_venusaur_ult_sludge_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/venusaur_ult_sludge_wave",
+      "tag": "wave",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_weezing",
+      "slot": 0,
+      "stem": "weezing_basicattack_smog_cloud",
+      "binding_name": "pokemon_moba_stable_weezing_basicattack_smog_cloud",
+      "asset": "asset/pokemon_moba_stable/vfx/weezing_basicattack_smog_cloud",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_weezing",
+      "slot": -1,
+      "stem": "weezing_passive_nullifying_gas_aura",
+      "binding_name": "pokemon_moba_stable_weezing_passive_nullifying_gas_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/weezing_passive_nullifying_gas_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_weezing",
+      "slot": 1,
+      "stem": "weezing_skill1_stun_gas_cloud",
+      "binding_name": "pokemon_moba_stable_weezing_skill1_stun_gas_cloud",
+      "asset": "asset/pokemon_moba_stable/vfx/weezing_skill1_stun_gas_cloud",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_weezing",
+      "slot": 2,
+      "stem": "weezing_skill2_body_odor_aura",
+      "binding_name": "pokemon_moba_stable_weezing_skill2_body_odor_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/weezing_skill2_body_odor_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_weezing",
+      "slot": 3,
+      "stem": "weezing_ult_sludge_whirlpool_aura",
+      "binding_name": "pokemon_moba_stable_weezing_ult_sludge_whirlpool_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/weezing_ult_sludge_whirlpool_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_wishiwashi",
+      "slot": 0,
+      "stem": "wishiwashi_basicattack_splash_projectile",
+      "binding_name": "pokemon_moba_stable_wishiwashi_basicattack_splash_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/wishiwashi_basicattack_splash_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_wishiwashi",
+      "slot": 1,
+      "stem": "wishiwashi_skill1_wave_splash_wave",
+      "binding_name": "pokemon_moba_stable_wishiwashi_skill1_wave_splash_wave",
+      "asset": "asset/pokemon_moba_stable/vfx/wishiwashi_skill1_wave_splash_wave",
+      "tag": "projectile",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_wishiwashi",
+      "slot": 3,
+      "stem": "wishiwashi_ult_massive_catch_water_burst",
+      "binding_name": "pokemon_moba_stable_wishiwashi_ult_massive_catch_water_burst",
+      "asset": "asset/pokemon_moba_stable/vfx/wishiwashi_ult_massive_catch_water_burst",
+      "tag": "impact",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_wishiwashi",
+      "slot": 3,
+      "stem": "wishiwashi_ult_schooling_channel_aura",
+      "binding_name": "pokemon_moba_stable_wishiwashi_ult_schooling_channel_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/wishiwashi_ult_schooling_channel_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_xatu",
+      "slot": 0,
+      "stem": "xatu_basicattack_energy_singe_projectile",
+      "binding_name": "pokemon_moba_stable_xatu_basicattack_energy_singe_projectile",
+      "asset": "asset/pokemon_moba_stable/vfx/xatu_basicattack_energy_singe_projectile",
+      "tag": "projectile",
+      "projectile": true
+    },
+    {
+      "champion_id": "pokemon_moba_xatu",
+      "slot": 1,
+      "stem": "xatu_skill1_mind_bend_aura",
+      "binding_name": "pokemon_moba_stable_xatu_skill1_mind_bend_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/xatu_skill1_mind_bend_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_xatu",
+      "slot": 2,
+      "stem": "xatu_skill2_pain_amplifier_aura",
+      "binding_name": "pokemon_moba_stable_xatu_skill2_pain_amplifier_aura",
+      "asset": "asset/pokemon_moba_stable/vfx/xatu_skill2_pain_amplifier_aura",
+      "tag": "aura",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_xatu",
+      "slot": 3,
+      "stem": "xatu_ult_super_psy_beam",
+      "binding_name": "pokemon_moba_stable_xatu_ult_super_psy_beam",
+      "asset": "asset/pokemon_moba_stable/vfx/xatu_ult_super_psy_beam",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_yanmega",
+      "slot": 0,
+      "stem": "yanmega_basicattack_linear_beam",
+      "binding_name": "pokemon_moba_stable_yanmega_basicattack_linear_beam",
+      "asset": "asset/pokemon_moba_stable/vfx/yanmega_basicattack_linear_beam",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_yanmega",
+      "slot": 1,
+      "stem": "yanmega_skill1_buzzing_boost_line",
+      "binding_name": "pokemon_moba_stable_yanmega_skill1_buzzing_boost_line",
+      "asset": "asset/pokemon_moba_stable/vfx/yanmega_skill1_buzzing_boost_line",
+      "tag": "line",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_yanmega",
+      "slot": 3,
+      "stem": "yanmega_ult_giga_drain_tether",
+      "binding_name": "pokemon_moba_stable_yanmega_ult_giga_drain_tether",
+      "asset": "asset/pokemon_moba_stable/vfx/yanmega_ult_giga_drain_tether",
+      "tag": "effect",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_zeraora",
+      "slot": -1,
+      "stem": "zeraora_passive_merciless_overlay",
+      "binding_name": "pokemon_moba_stable_zeraora_passive_merciless_overlay",
+      "asset": "asset/pokemon_moba_stable/vfx/zeraora_passive_merciless_overlay",
+      "tag": "overlay",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_zeraora",
+      "slot": 1,
+      "stem": "zeraora_skill1_thunder_cage_field",
+      "binding_name": "pokemon_moba_stable_zeraora_skill1_thunder_cage_field",
+      "asset": "asset/pokemon_moba_stable/vfx/zeraora_skill1_thunder_cage_field",
+      "tag": "field",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_zeraora",
+      "slot": 2,
+      "stem": "zeraora_skill2_zing_zap_counter",
+      "binding_name": "pokemon_moba_stable_zeraora_skill2_zing_zap_counter",
+      "asset": "asset/pokemon_moba_stable/vfx/zeraora_skill2_zing_zap_counter",
+      "tag": "counter",
+      "projectile": false
+    },
+    {
+      "champion_id": "pokemon_moba_zeraora",
+      "slot": 3,
+      "stem": "zeraora_ult_wild_charge_bolts",
+      "binding_name": "pokemon_moba_stable_zeraora_ult_wild_charge_bolts",
+      "asset": "asset/pokemon_moba_stable/vfx/zeraora_ult_wild_charge_bolts",
+      "tag": "bolts",
+      "projectile": false
+    }
+  ]
+}

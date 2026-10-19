@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
-use std::sync::{Mutex, OnceLock};
+use std::sync::Mutex;
+use crate::runtime_state::SimOnceLock as OnceLock;
 
 use crate::stable_legacy_api::*;
 
@@ -2271,12 +2272,27 @@ impl PokemonAction {
 }
 
 impl ModAction for PokemonAction {
+    fn needs_ai_neighbours(&self) -> bool {
+        ai_heal_only(self.action.effect) || matches!(self.action.effect, PokemonMoveEffect::Sketch)
+    }
+    fn can_activate(&self, world: &crate::ai_world::World) -> bool {
+        ai_can_activate(world, self.champion, self.action)
+    }
+
+    fn target_constraint(&self, world: &crate::ai_world::World, target: usize) -> bool {
+        ai_target_allowed(world, self.champion, self.action, target)
+    }
+
+    fn can_use_with_move_by(&self, caster: &mod_api_stable::StableEntityView<'_>) -> bool {
+        self.action.can_use_with_move && !(0..caster.cc_count()).filter_map(|i| caster.cc_at(i))
+            .any(|cc| cc.kind == mod_api_stable::CcKindV1::Bind.code())
+    }
     fn clone_box(&self) -> Box<dyn ModAction> {
         Box::new(self.clone())
     }
 
     fn action_name(&self) -> &str {
-        move_display_name_static(self.champion.id, self.action.name_key)
+        self.action.slot.action_name()
     }
 
     fn duration(&self) -> usize {
@@ -2297,7 +2313,7 @@ impl ModAction for PokemonAction {
     }
 
     fn casting_target(&self) -> CastingTarget {
-        self.action.target
+        if matches!(self.action.effect, PokemonMoveEffect::Sketch) { CastingTarget::Both } else { self.action.target }
     }
 
     fn effect(&self) -> Option<ModEffect> {
@@ -2306,11 +2322,12 @@ impl ModAction for PokemonAction {
             growth_range: self.engine_growth_range(),
             start_timing: self.engine_start_timing(),
             casting: self.action.casting,
-            target: self.action.target,
+            target: self.casting_target(),
             attack_type: self.action.attack_type,
             effect_type: Box::new(PokemonEffect {
                 champion: self.champion,
                 action: self.action,
+                impact: false,
             }),
         })
     }
@@ -2325,6 +2342,148 @@ impl ModAction for PokemonAction {
 }
 
 const AD_ICON: &str = "<i#asset/base/ui/banpick/champion_stat_icon:ad_0>";
+
+fn ai_resolved_move(world: &crate::ai_world::World, champion: PokemonChampion, action: PokemonMove) -> (PokemonChampion, PokemonMove) {
+    if matches!(action.effect, PokemonMoveEffect::Sketch) {
+        if let Some(copied) = world.player.and_then(|player|
+            crate::legacy::pokemon_status::smeargle_learned_action_for_player(player, action.slot)) {
+            return (copied.source_champion, copied.action);
+        }
+    }
+    (champion, action)
+}
+
+fn ai_heal_only(effect: PokemonMoveEffect) -> bool {
+    matches!(effect, PokemonMoveEffect::SelfHeal { .. }
+        | PokemonMoveEffect::GlobalAllyHealPercent { .. } | PokemonMoveEffect::HealAttachedAllyPercent { .. }
+        | PokemonMoveEffect::PresentHealPercent { .. } | PokemonMoveEffect::CharmHeal { .. })
+}
+
+pub(crate) fn ai_can_activate(world: &crate::ai_world::World, champion: PokemonChampion, action: PokemonMove) -> bool {
+    use crate::legacy::pokemon_status as status;
+    let Some(caster) = world.caster() else { return false; };
+    if caster.cooldowns[action.slot.index()].map_or(false, |cooldown| !cooldown.unlocked || cooldown.charges == 0) { return false; }
+    if matches!(action.effect, PokemonMoveEffect::Sketch) {
+        if let Some(player) = world.player {
+            if status::smeargle_learned_action_for_player(player, action.slot).is_some()
+                && !status::smeargle_copied_slot_ready_for_player(player, world.tick, action.slot) { return false; }
+        }
+    }
+    let (source, actual) = ai_resolved_move(world, champion, action);
+    if matches!(actual.effect, PokemonMoveEffect::DedenneElectricTerrain { .. })
+        && !dedenne_grid_can_cast(caster.id, world.tick) { return false; }
+    if let Some(player) = world.player {
+        if source.id == "pokemon_moba_skeledirge" && matches!(actual.slot, ActionSlot::Skill2)
+            && !status::will_o_wisp_ready_for_player(player, world.tick, 3, 420) { return false; }
+        if source.id == "pokemon_moba_delibird" && matches!(actual.slot, ActionSlot::Skill | ActionSlot::Skill2)
+            && !status::delibird_present_heal_ready_for_player(player, 4) { return false; }
+        let ready = match actual.effect {
+            PokemonMoveEffect::StickyWebField { .. } => status::sticky_web_ready_for_player(player, world.tick, 5, 1800),
+            PokemonMoveEffect::PowerUpPunchChannel { .. } => status::power_up_punch_ready_for_player(player, world.tick),
+            PokemonMoveEffect::SawkThrohSwitch { .. } => status::should_sawk_throh_switch_for_player(player, caster.hp.saturating_mul(100) / caster.max_hp.max(1)),
+            _ => true,
+        };
+        if !ready { return false; }
+    }
+    if matches!(actual.effect, PokemonMoveEffect::HealAttachedAllyPercent { .. } | PokemonMoveEffect::EncoreAttachedAlly { .. })
+        && status::comfey_attached_ally_at(caster.id, world.tick).is_none() { return false; }
+    if matches!(actual.effect, PokemonMoveEffect::HealAttachedAllyPercent { .. }) {
+        return status::comfey_attached_ally_at(caster.id, world.tick).and_then(|id| world.get(id))
+            .map_or(false, |ally| ally.hp < ally.max_hp);
+    }
+    if matches!(actual.effect, PokemonMoveEffect::GlobalAllyHealPercent { .. }) {
+        return world.units.iter().any(|unit| unit.team == caster.team && unit.champion && unit.hp < unit.max_hp);
+    }
+    if ai_heal_only(actual.effect) {
+        if matches!(actual.target, CastingTarget::None | CastingTarget::AllyOnlySelf) { return caster.hp < caster.max_hp; }
+        return world.units.iter().any(|unit| unit.team == caster.team && unit.champion && unit.hp < unit.max_hp
+            && (actual.range == 0 || crate::ai_world::distance_sq(caster.pos, unit.pos) <= u128::from(actual.range).pow(2)));
+    }
+    true
+}
+
+pub(crate) fn ai_target_allowed(world: &crate::ai_world::World, champion: PokemonChampion, action: PokemonMove, target: usize) -> bool {
+    let Some(caster) = world.caster() else { return false; };
+    let Some(target) = world.get(target) else { return false; };
+    let (_, actual) = ai_resolved_move(world, champion, action);
+    let ally = target.team == caster.team;
+    let eligible = match actual.target {
+        CastingTarget::Ally => ally,
+        CastingTarget::AllyChampion => ally && target.champion,
+        CastingTarget::AllyChampionInCC => ally && target.champion && target.cc > 0,
+        CastingTarget::AllyNotSelf => ally && target.id != caster.id,
+        CastingTarget::AllyOnlySelf | CastingTarget::None => target.id == caster.id,
+        CastingTarget::Enemy => !ally,
+        CastingTarget::EnemyWithoutTower => !ally && !target.tower,
+        CastingTarget::EnemyChampion | CastingTarget::EnemyChampionRecentlyAttacked => !ally && target.champion,
+        CastingTarget::EnemyChampionInCC => !ally && target.champion && target.cc > 0,
+        CastingTarget::Both => true,
+        CastingTarget::BothWithoutTower => !target.tower,
+        CastingTarget::BothChampion => target.champion,
+    };
+    if !eligible || (!ally && (!target.targetable || !(target.visible || target.detected))) { return false; }
+    if !ally && crate::legacy::pokemon_status::ai_soft_untargetable(world, target.id) { return false; }
+    if ally && (ai_heal_only(actual.effect) || matches!(actual.effect, PokemonMoveEffect::PollenPuff { .. }))
+        && !matches!(actual.effect, PokemonMoveEffect::GlobalAllyHealPercent { .. } | PokemonMoveEffect::HealAttachedAllyPercent { .. })
+        && target.hp >= target.max_hp { return false; }
+    if matches!(actual.effect, PokemonMoveEffect::HealAttachedAllyPercent { .. } | PokemonMoveEffect::EncoreAttachedAlly { .. })
+        && !matches!(actual.target, CastingTarget::None | CastingTarget::AllyOnlySelf)
+        && crate::legacy::pokemon_status::comfey_attached_ally_at(caster.id, world.tick) != Some(target.id) { return false; }
+    if matches!(action.effect, PokemonMoveEffect::Sketch) && actual.range > 0
+        && crate::ai_world::distance_sq(caster.pos, target.pos) > u128::from(actual.range).pow(2) { return false; }
+    !ai_tower_danger(world, actual, InputTarget::Target { target_id: target.id })
+}
+
+fn ai_tower_danger(world: &crate::ai_world::World, action: PokemonMove, input: InputTarget) -> bool {
+    let Some(caster) = world.caster() else { return true; };
+    let aim = match input {
+        InputTarget::Target { target_id } => world.get(target_id).map(|unit| unit.pos),
+        InputTarget::Pos { x, y } => Some(EntityPos { x, y }),
+        InputTarget::Dir { x, y } => Some(EntityPos { x: (caster.pos.x as i128 + x as i128).max(0) as u64,
+            y: (caster.pos.y as i128 + y as i128).max(0) as u64 }),
+        InputTarget::None => None,
+    };
+    let movement = matches!(action.effect,
+        PokemonMoveEffect::DashDamage { .. } | PokemonMoveEffect::DashDamageReturn { .. }
+        | PokemonMoveEffect::DashDamageChanceParalysis { .. } | PokemonMoveEffect::DashDamageChanceFreeze { .. }
+        | PokemonMoveEffect::DashDamageChanceDisarm { .. } | PokemonMoveEffect::DashDamageChanceBurn { .. }
+        | PokemonMoveEffect::DashEndConeDamage { .. } | PokemonMoveEffect::KingdraDragonDance { .. }
+        | PokemonMoveEffect::DedennePlayRough { .. } | PokemonMoveEffect::LineFirstDashDamageFlameTrail { .. }
+        | PokemonMoveEffect::LineFirstDashDamageMissingHp { .. } | PokemonMoveEffect::LineFirstDashDamageDistanceSelfHp { .. }
+        | PokemonMoveEffect::LineDashPierceDamage { .. } | PokemonMoveEffect::LineDashPierceContactDrain { .. }
+        | PokemonMoveEffect::TargetSwapDamage { .. } | PokemonMoveEffect::QuaquavalUpTempo { .. }
+        | PokemonMoveEffect::ArcanineExtremespeed { .. } | PokemonMoveEffect::ChainDashDamage { .. }
+        | PokemonMoveEffect::WishiwashiMassiveCatch { .. } | PokemonMoveEffect::HawluchaFlyingPress { .. }
+        | PokemonMoveEffect::BouffalantHeadCharge { .. } | PokemonMoveEffect::DirectDamageSpeedCheckCrit { .. }
+        | PokemonMoveEffect::DirectDamageSplashOnKill { .. } | PokemonMoveEffect::FlyAllySplash { .. }
+        | PokemonMoveEffect::AllySwapHeal { .. } | PokemonMoveEffect::KecleonDoubleScratch { .. }
+        | PokemonMoveEffect::StarmieFlipTurn { .. })
+        || (matches!(action.effect, PokemonMoveEffect::SawkThrohUlt { .. })
+            && crate::legacy::pokemon_status::ai_is_sawk_form(caster.id));
+    if !movement { return false; }
+    let Some(aim) = aim else { return true; };
+    let end = match action.effect {
+        PokemonMoveEffect::DashEndConeDamage { dash_range, .. } | PokemonMoveEffect::KingdraDragonDance { dash_range, .. } => crate::ai_world::project(caster.pos, aim, dash_range),
+        PokemonMoveEffect::DedennePlayRough { empowered_range, .. } => crate::ai_world::project(caster.pos, aim, empowered_range),
+        _ => aim,
+    };
+    let blink = matches!(action.effect, PokemonMoveEffect::DirectDamageSplashOnKill { .. }
+        | PokemonMoveEffect::FlyAllySplash { .. } | PokemonMoveEffect::AllySwapHeal { .. });
+    world.units.iter().any(|tower| tower.tower && tower.team != caster.team
+        && crate::ai_world::tower_entry(caster.pos, end, tower.pos, 70_000, blink))
+}
+
+pub(crate) fn ai_input_allowed(world: &crate::ai_world::World, name: &str, input: &Input) -> bool {
+    let Some(champion) = PokemonMobaInputAi::champion_for_ai_name(name) else { return true; };
+    let Some(action) = PokemonMobaInputAi::action_for_input(champion, input) else { return true; };
+    if !ai_can_activate(world, champion, action) { return false; }
+    let (_, actual) = ai_resolved_move(world, champion, action);
+    let Some(target) = PokemonMobaInputAi::target_for_input(input) else { return true; };
+    if let InputTarget::Target { target_id } = target {
+        if !ai_target_allowed(world, champion, action, target_id) { return false; }
+    }
+    !ai_tower_danger(world, actual, target)
+}
 const AP_ICON: &str = "<i#asset/base/ui/banpick/champion_stat_icon:ap_0>";
 const HP_ICON: &str = "<i#asset/base/ui/banpick/champion_stat_icon:hp_0>";
 const SPEED_ICON: &str = "<i#asset/base/ui/banpick/champion_stat_icon:speed_0>";
@@ -4709,7 +4868,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             defence_mult_ad_ratio,
             defence_ticks,
         } => format!(
-            "Deal {} in a targeted {} radius area and reduce enemy {ARMOR_ICON}{CONTROL}armor by {}% + {AD_ICON}{CONTROL}{}% AD<> for {}.",
+            "Deal {} in a {} radius around this Pokemon and reduce enemy {ARMOR_ICON}{CONTROL}armor by {}% + {AD_ICON}{CONTROL}{}% AD<> for {}.",
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
             range_text(radius),
             defence_mult_base.unsigned_abs(),
@@ -4725,7 +4884,7 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             attack_mult,
             attack_ticks,
         } => format!(
-            "Deal {} in a targeted {} radius area and reduce enemy {AD_ICON}{CONTROL}attack by {}%<> for {}.",
+            "Deal {} in a {} radius around this Pokemon and reduce enemy {AD_ICON}{CONTROL}attack by {}%<> for {}.",
             damage_text(base_ad, ad_ratio, base_ap, ap_ratio, type_name),
             range_text(radius),
             attack_mult.unsigned_abs(),
@@ -5201,13 +5360,13 @@ fn effect_description(champion: PokemonChampion, action: PokemonMove, type_name:
             stat_percent,
             ticks,
         } => format!(
-            "Deal {}, then steal one temporary item-like stat category from the target for {}. The stolen stat shifts by {}%.",
+            "Deal {}, then transfer {}% of one supported positive equipment stat from the target to Ambipom for {}. Inventory and item procs are unchanged.",
             damage_text(base_ad, ad_ratio, 0, 0, type_name),
-            seconds_text(ticks),
-            stat_percent.unsigned_abs()
+            stat_percent.unsigned_abs(),
+            seconds_text(ticks)
         ),
         PokemonMoveEffect::TargetItemScaledDamage { damage_percent } => format!(
-            "Turn one positive item-like stat on the target against them, dealing Ghost damage equal to {damage_percent}% of a random positive stat surplus. Targets with no positive item-like stat surplus take no damage."
+            "Turn one supported positive equipment stat on the target against them, dealing Ghost damage equal to {damage_percent}% of its weighted value. Temporary buffs are not equipment; targets with no eligible equipment stats take no damage."
         ),
         PokemonMoveEffect::TargetDamageReduction {
             damaged_reduce,
@@ -6708,7 +6867,7 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Sharpness: Consecutive damaging hits within {CONTROL}5s{END} grant {PHYSICAL}+5% critical chance{END} per hit after the first, up to {PHYSICAL}+50%{END}. Fury Cutter hits count individually."
         ),
         "pokemon_moba_scizor" => format!(
-            "Light Metal: After traveling a long distance without taking or dealing damage, Scizor gains a {SHIELD}shield equal to 20% move speed{END} for {CONTROL}6s{END}."
+            "Light Metal: After traveling a long distance without taking or dealing damage, Scizor gains a {SHIELD}shield equal to 32% move speed{END} for {CONTROL}6s{END}."
         ),
         "pokemon_moba_ursaluna" => format!(
             "Guts: While below {HP_ICON}{CONTROL}50% HP{END}, Ursaluna deals {BUFF}35% increased damage{END}."
@@ -6759,7 +6918,7 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Clingy: After 1.5s, Clawitzer attaches to a nearby allied Pokemon, becoming untargetable and movement-rooted while granting that ally {HP_ICON}{BUFF}99% of Clawitzer's HP{END}, armor, and magic resistance. If the ally dies or takes over one-third max HP in one hit, Clawitzer detaches for {CONTROL}15s{END}, gains move speed, and deals extra damage to towers and jungle camps."
         ),
         "pokemon_moba_octillery" => format!(
-            "Suction Cups: Intended to let Octillery move through terrain with reduced move speed. This passive is waiting for future game developer support before it can fully function."
+            "Suction Cups: Octillery can move through terrain, but has 15% reduced movement speed."
         ),
         "pokemon_moba_pyukumuku" => format!(
             "Innards Out: Burn and Poison {HEAL}heal Pyukumuku instead of damaging it{END}. Melee basic attacks against Pyukumuku reflect increasing damage from repeat attackers and can apply Poison. If direct Pokemon damage kills Pyukumuku, the attacker takes {PHYSICAL}75% of that hit's damage{END} back."
@@ -6768,7 +6927,7 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Cursed Body: Enemy hits against Banette have a {CONTROL}10% chance{END} to disable that enemy's attacks and skills for {CONTROL}5s{END}."
         ),
         "pokemon_moba_kricketune" => format!(
-            "Web Walker: Kricketune's Sticky Webs are permanent and boost only Kricketune's movement while lightly slowing enemies. Enemies entering a web chain connected back to Kricketune are briefly spotted for Kricketune's team AI."
+            "Web Walker: Kricketune's Sticky Webs are permanent and boost only Kricketune's movement while lightly slowing enemies. Enemies in a web chain connected back to Kricketune share their positions with its team, informing attacks, retreats and movement. Their last known positions linger briefly after detection ends."
         ),
         "pokemon_moba_armarouge" => format!(
             "Weak Armor: Armarouge starts with extremely high defenses. Each landed Pokemon attack adds a {ARMOR_ICON}{CONTROL}-5% armor{END} and {MR_ICON}{CONTROL}-5% magic resistance{END} stack, up to {CONTROL}16 stacks{END}. Death or Armor Cannon clears these stacks. While Armor Cannon cools down, Armarouge instead suffers its Armor Cannon defense penalty."
@@ -6789,7 +6948,7 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Receiver: When Passimian kills an enemy Pokemon, it copies that Pokemon's passive. Copies last until Passimian kills a different enemy Pokemon."
         ),
         "pokemon_moba_oranguru" => format!(
-            "Symbiosis: The nearest allied Pokemon in range receives {BUFF}50% of Oranguru's positive item-derived stat bonuses{END}, refreshed repeatedly."
+            "Symbiosis: The nearest allied Pokemon in range receives {BUFF}50% of Oranguru's supported positive equipment stat bonuses{END}, refreshed repeatedly. Item procs are not shared."
         ),
         "pokemon_moba_dragalge" => format!(
             "Poison Sipper: Direct Pokemon attacks and skills {HEAL}heal Dragalge for 20% of their damage{END} when they hit an enemy already affected by Poison."
@@ -6894,7 +7053,7 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Dragon Launcher: Shred, Dragon Darts, and Spooky Shot each launch a following ghastly Dreepy for {MAGIC}14 + 12% AD + 12% AP Ghost magic damage{END}. Dragon Launcher heals Dragapult for {HEAL}35% of damage dealt{END}."
         ),
         "pokemon_moba_shiftry" => format!(
-            "Forest Camouflage: Shiftry gains {SPEED_ICON}{BUFF}+15% move speed{END} while hidden from nearby enemies by bush visibility, lingering for {CONTROL}2s{END} after leaving if it stayed hidden for {CONTROL}1.5s{END}. While Shiftry has any movement-speed buff, Thwack deals {PHYSICAL}10 + 20% AD bonus physical damage{END}."
+            "Forest Camouflage: Shiftry gains {SPEED_ICON}{BUFF}+15% move speed{END} in bushes unless revealed by true sight, lingering for {CONTROL}2s{END} after leaving if camouflage lasted {CONTROL}1.5s{END}. While Shiftry has any movement-speed buff, Thwack deals {PHYSICAL}10 + 20% AD bonus physical damage{END}."
         ),
         "pokemon_moba_sigilyph" => format!(
             "Glypher: Psychic Sphere marks targets with a glyph for {CONTROL}5s{END}. Sigilyph's non-basic abilities deal {MAGIC}+24% damage{END} to glyph-marked targets. If two enemy glyph targets get close, both glyphs explode for {MAGIC}24 + 30% AP Psychic damage{END}, splashing nearby non-tower enemies for {MAGIC}50% damage{END}."
@@ -6912,7 +7071,7 @@ fn passive_description(champion: PokemonChampion) -> String {
             "Salt Cure: When Garganacl is hit by Pokemon physical damage or monster/minion hits, it drops a salt patch for {CONTROL}5s{END}. Enemies entering a patch take {PHYSICAL}22 + 25% AD Rock damage{END} and are slowed; Water and Steel types take {PHYSICAL}+50% damage{END}. Garganacl can have {CONTROL}6{END} temporary patches at once. Blessed Salt terrain is permanent and does not count toward this limit."
         ),
         "pokemon_moba_ampharos" => format!(
-            "Luminous Pulse: Ampharos provides True Sight in an aura around itself, revealing Weavile stealth and nearby bush-hidden enemies. Every {CONTROL}5s{END}, the aura pulses for {MAGIC}50 + 10% AP Electric magic damage{END} and slows enemies for {CONTROL}1s{END}. Searchlight Tail empowers these pulses."
+            "Luminous Pulse: Ampharos continuously senses nearby enemies and shares their positions with its team, informing attacks, retreats and movement and countering Weavile stealth and Shiftry camouflage. Every {CONTROL}5s{END}, the aura pulses for {MAGIC}50 + 10% AP Electric magic damage{END} and slows enemies for {CONTROL}1s{END}. Searchlight Tail empowers these pulses."
         ),
         "pokemon_moba_wishiwashi" => format!(
             "Schooling: Wishiwashi enters School Form while an allied Pokemon is nearby or after casting Massive Catch. While Schooling, Wishiwashi gains {BUFF}+12% defence and magic resistance{END} and {BUFF}+5% skill and ultimate cooldown recovery{END} per nearby ally, counting at least one ally and up to four. While alone, Wishiwashi has {CONTROL}-8% max HP{END} and gains {SPEED_ICON}{BUFF}+15% move speed{END}."
@@ -7039,6 +7198,12 @@ fn pokemon_type_name(pokemon_type: PokemonType) -> &'static str {
 struct PokemonEffect {
     champion: PokemonChampion,
     action: PokemonMove,
+    impact: bool,
+}
+
+pub fn resolve_projectile_impact(ctx: &mut GameCtx, champion: PokemonChampion,
+    action: PokemonMove, seed: u64, caster: usize, input: InputTarget) {
+    PokemonEffect { champion, action, impact: true }.apply(ctx, seed, caster, input);
 }
 
 impl PokemonEffect {
@@ -9252,6 +9417,15 @@ fn stat_percent_i32(value: usize, percent: usize) -> i32 {
 }
 
 impl ModEffectType for PokemonEffect {
+    fn may_adjust_range(&self) -> bool { matches!(self.action.effect, PokemonMoveEffect::Sketch) }
+    fn range_adjust(&self, _caster: &mod_api_stable::StableEntityView<'_>, _target: &mod_api_stable::StableEntityView<'_>) -> u64 {
+        // Sketch has static engine metadata. Give planning enough reach for any
+        // copied move; target_constraint enforces the actual learned move's range.
+        if self.may_adjust_range() {
+            POKEMON_CHAMPIONS.iter().flat_map(|champion| [Some(champion.attack), Some(champion.skill), Some(champion.skill2), champion.ult])
+                .flatten().map(|action| action.range).max().unwrap_or(self.action.range).saturating_sub(self.action.range)
+        } else { 0 }
+    }
     fn apply(&self, ctx: &mut GameCtx, _rng_seed: u64, caster_id: usize, input: InputTarget) {
         crate::legacy::crash_probe::catch_unwind_probe(
             "effect_apply",
@@ -9266,12 +9440,12 @@ impl ModEffectType for PokemonEffect {
                 };
                 let caster_stat = caster.stat();
                 let caster_team = caster.team();
-                let caster_pos = caster.pos();
+                let caster_pos = crate::motion::origin(caster_id).unwrap_or_else(|| caster.pos());
                 let caster_hp = caster.hp();
                 let caster_level = caster.level();
                 drop(caster);
 
-                if self.champion.id == "pokemon_moba_smeargle"
+                if !self.impact && self.champion.id == "pokemon_moba_smeargle"
                     && matches!(self.action.effect, PokemonMoveEffect::Sketch)
                 {
                     if let Some(copied) = crate::legacy::pokemon_status::smeargle_learned_action(
@@ -9302,6 +9476,7 @@ impl ModEffectType for PokemonEffect {
                         PokemonEffect {
                             champion: copied.source_champion,
                             action: copied.action,
+                            impact: false,
                         }
                         .apply(ctx, _rng_seed, caster_id, copied_input);
                         return;
@@ -9321,7 +9496,7 @@ impl ModEffectType for PokemonEffect {
                     return;
                 }
 
-                let input = confused_input(
+                let input = if self.impact { input } else { confused_input(
                     ctx,
                     caster_id,
                     caster_team,
@@ -9329,13 +9504,13 @@ impl ModEffectType for PokemonEffect {
                     self.action.target,
                     self.action.effect,
                     input,
-                );
+                ) };
                 let (base_ad_damage, base_ap_damage) = self.base_damage(&caster_stat);
                 let burn_damage = self.burn_damage(&caster_stat);
                 let bleed_damage = self.bleed_damage(&caster_stat);
                 let (active_move_type, active_attacker_types) =
                     active_action_typing(ctx, caster_id, self.champion, self.action);
-                if self.champion.id == "pokemon_moba_kingdra"
+                if !self.impact && self.champion.id == "pokemon_moba_kingdra"
                     && !matches!(self.action.slot, ActionSlot::Attack)
                 {
                     crate::legacy::pokemon_status::note_kingdra_ability_used(ctx, caster_id);
@@ -9347,19 +9522,40 @@ impl ModEffectType for PokemonEffect {
                         );
                     }
                 }
-                if self.champion.id == "pokemon_moba_delibird"
+                if !self.impact && self.champion.id == "pokemon_moba_delibird"
                     && matches!(self.action.slot, ActionSlot::Attack)
                 {
                     crate::legacy::pokemon_status::note_delibird_present_basic(ctx, caster_id);
                 }
-                if !matches!(self.action.slot, ActionSlot::Attack) {
+                if !self.impact && !matches!(self.action.slot, ActionSlot::Attack) {
                     crate::legacy::pokemon_status::note_rillaboom_skill_cast(ctx, caster_id);
                     crate::legacy::pokemon_status::note_xatu_prophecy_skill_cast(ctx, caster_id);
                 }
-                if self.champion.id == "pokemon_moba_weavile"
+                if !self.impact && self.champion.id == "pokemon_moba_weavile"
                     && matches!(self.action.slot, ActionSlot::Skill | ActionSlot::Skill2)
                 {
-                    crate::legacy::pokemon_status::break_weavile_hunt_stealth(caster_id);
+                    crate::legacy::pokemon_status::break_weavile_hunt_stealth(ctx, caster_id);
+                }
+
+                let input = if !self.impact {
+                    if let PokemonMoveEffect::PollenPuff { ally_search_radius, ally_hp_threshold_percent, .. } = self.action.effect {
+                        let explicit = target_from_input(input).filter(|&id| target_is_living_ally_champion(ctx, caster_team, id));
+                        explicit.or_else(|| low_health_ally_for_pollen_puff(ctx, caster_id, caster_team,
+                            caster_pos, ally_search_radius, ally_hp_threshold_percent))
+                            .map(|target_id| InputTarget::Target { target_id }).unwrap_or(input)
+                    } else { input }
+                } else { input };
+                if !self.impact && crate::projectiles::launch_bounces(ctx, self.champion, self.action, caster_id, input) {
+                    return;
+                }
+                if !self.impact && crate::motion::launch(ctx, self.champion, self.action, caster_id, input) {
+                    return;
+                }
+                if !self.impact && crate::projectiles::launch(ctx, self.champion, self.action, caster_id, input) {
+                    return;
+                }
+                if !crate::motion::resolving(caster_id) {
+                    crate::native_vfx::on_cast(ctx, self.champion.id, self.action, caster_id, input);
                 }
 
                 if let PokemonMoveEffect::KecleonDoubleScratch {
@@ -9397,8 +9593,9 @@ impl ModEffectType for PokemonEffect {
                         force_move_speed,
                         force_move_ticks,
                     );
-                    let adjusted =
-                        crate::legacy::pokemon_status::adjusted_cc_ticks(ctx, target_id, stun_ticks);
+                    let adjusted = crate::legacy::pokemon_status::adjusted_cc_ticks(
+                        ctx, target_id, stun_ticks,
+                    );
                     apply_limber_aware_stun(ctx, caster_id, target_id, adjusted as u64);
                     let damage =
                         base_ad.saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
@@ -9439,8 +9636,9 @@ impl ModEffectType for PokemonEffect {
                 } = self.action.effect
                 {
                     let new_type = random_pokemon_type(ctx.seed(), caster_id, ctx.tick());
-                    let had_type =
-                        crate::legacy::pokemon_status::kecleon_has_seen_type(ctx, caster_id, new_type);
+                    let had_type = crate::legacy::pokemon_status::kecleon_has_seen_type(
+                        ctx, caster_id, new_type,
+                    );
                     crate::legacy::pokemon_status::set_kecleon_type(ctx, caster_id, new_type);
                     crate::legacy::pokemon_status::add_beneficial_buff(
                         ctx,
@@ -9497,20 +9695,27 @@ impl ModEffectType for PokemonEffect {
                     let Some(front_pos) = input_position(ctx, input) else {
                         return;
                     };
-                    crate::legacy::pokemon_status::apply_pokemon_cc(
+                    if !self.impact {
+                        let pulses = (root_ticks / tick_interval.max(1)).max(1);
+                        for index in 1..pulses {
+                            crate::projectiles::queue_release(ctx, self.champion, self.action, caster_id,
+                                InputTarget::Pos { x: front_pos.x, y: front_pos.y }, index * tick_interval.max(1));
+                        }
+                        crate::legacy::pokemon_status::apply_pokemon_cc(
                         ctx,
                         caster_id,
                         caster_id,
                         CCState::Bind {
                             tick: root_ticks as u64,
                         },
-                    );
+                        );
+                    }
                     let front_type = crate::legacy::pokemon_status::kecleon_type(ctx, caster_id);
                     let rear_type =
                         random_type_weak_to(front_type, ctx.seed(), caster_id, ctx.tick());
                     let damage =
                         base_ad.saturating_add(caster_stat.attack.saturating_mul(ad_ratio) / 100);
-                    let ticks = (root_ticks / tick_interval.max(1)).max(1);
+                    let ticks = 1;
                     let rear_pos = reversed_input(ctx, caster_pos, input)
                         .and_then(|reversed| input_position(ctx, reversed))
                         .unwrap_or(caster_pos);
@@ -9632,8 +9837,9 @@ impl ModEffectType for PokemonEffect {
                     ticks,
                 } = self.action.effect
                 {
-                    let tracked_bonus =
-                        crate::legacy::pokemon_status::tracked_bonus_move_speed_mult(ctx, caster_id) as i32;
+                    let tracked_bonus = crate::legacy::pokemon_status::tracked_bonus_move_speed_mult(
+                        ctx, caster_id,
+                    ) as i32;
                     let attack_mult = (move_speed_mult.max(0) + tracked_bonus)
                         .saturating_mul(bonus_move_speed_to_attack_percent as i32)
                         / 100;
@@ -9713,8 +9919,10 @@ impl ModEffectType for PokemonEffect {
                     max_berries,
                 } = self.action.effect
                 {
-                    let consumed =
-                        crate::legacy::pokemon_status::consume_snorlax_berries(caster_id, max_berries);
+                    let consumed = crate::legacy::pokemon_status::consume_snorlax_berries(
+                        caster_id,
+                        max_berries,
+                    );
                     if consumed == 0 {
                         return;
                     }
@@ -9745,8 +9953,10 @@ impl ModEffectType for PokemonEffect {
                     ticks,
                 } = self.action.effect
                 {
-                    let consumed =
-                        crate::legacy::pokemon_status::consume_snorlax_berries(caster_id, max_berries);
+                    let consumed = crate::legacy::pokemon_status::consume_snorlax_berries(
+                        caster_id,
+                        max_berries,
+                    );
                     if consumed == 0 {
                         return;
                     }
@@ -9829,8 +10039,11 @@ impl ModEffectType for PokemonEffect {
                             active_attacker_types,
                             defender_types,
                         );
-                        let ticks =
-                            crate::legacy::pokemon_status::adjusted_cc_ticks(ctx, target_id, terrify_ticks);
+                        let ticks = crate::legacy::pokemon_status::adjusted_cc_ticks(
+                            ctx,
+                            target_id,
+                            terrify_ticks,
+                        );
                         apply_limber_aware_fear_away(
                             ctx,
                             caster_id,
@@ -9946,6 +10159,8 @@ impl ModEffectType for PokemonEffect {
                         .take(bolts.max(1))
                         .map(|(target_id, _)| target_id)
                     {
+                        crate::native_vfx::burst(ctx, "zeraora_ult_wild_charge_bolts", caster_id,
+                            InputTarget::Target { target_id }, 10000);
                         crate::legacy::pokemon_status::note_smeargle_affected(
                             ctx,
                             target_id,
@@ -10112,9 +10327,10 @@ impl ModEffectType for PokemonEffect {
                         return;
                     };
                     if let PokemonMoveEffect::AreaDamage { radius, .. } = self.action.effect {
-                        let spend = crate::legacy::pokemon_status::spend_gholdengo_make_it_rain_gold(
-                            ctx, caster_id,
-                        );
+                        let spend =
+                            crate::legacy::pokemon_status::spend_gholdengo_make_it_rain_gold(
+                                ctx, caster_id,
+                            );
                         let radius = radius.saturating_add(
                             radius.saturating_mul(spend.radius_bonus_percent as u64) / 100,
                         );
@@ -10198,6 +10414,7 @@ impl ModEffectType for PokemonEffect {
                         _ => None,
                     };
                     let heal_target = explicit_ally.or_else(|| {
+                        if self.impact { return None; }
                         low_health_ally_for_pollen_puff(
                             ctx,
                             caster_id,
@@ -10207,7 +10424,8 @@ impl ModEffectType for PokemonEffect {
                             ally_hp_threshold_percent,
                         )
                     });
-                    let honey_stacks = crate::legacy::pokemon_status::consume_honey_stacks(caster_id);
+                    let honey_stacks =
+                        crate::legacy::pokemon_status::consume_honey_stacks(caster_id);
 
                     if let Some(target_id) = heal_target {
                         crate::legacy::pokemon_status::note_smeargle_affected(
@@ -10249,7 +10467,9 @@ impl ModEffectType for PokemonEffect {
 
                     let Some(target_id) = (match input {
                         InputTarget::Target { target_id }
-                            if !crate::legacy::pokemon_status::is_soft_untargetable(ctx, target_id) =>
+                            if !crate::legacy::pokemon_status::is_soft_untargetable(
+                                ctx, target_id,
+                            ) =>
                         {
                             Some(target_id)
                         }
@@ -10327,8 +10547,12 @@ impl ModEffectType for PokemonEffect {
                         .map(|target| target.hp().max.saturating_mul(hp_percent) / 100)
                         .unwrap_or(0);
                     if heal > 0 {
-                        crate::legacy::pokemon_status::heal_with_antiheal(ctx, caster_id, target_id, heal);
-                        crate::legacy::pokemon_status::after_blissey_heal(ctx, caster_id, target_id);
+                        crate::legacy::pokemon_status::heal_with_antiheal(
+                            ctx, caster_id, target_id, heal,
+                        );
+                        crate::legacy::pokemon_status::after_blissey_heal(
+                            ctx, caster_id, target_id,
+                        );
                         if let Some(target_pos) =
                             ctx.get_entity(target_id).map(|target| target.pos())
                         {
@@ -10468,40 +10692,13 @@ impl ModEffectType for PokemonEffect {
                     }
 
                     if let Some(end_pos) = retreat_end {
-                        for target_id in collect_enemy_targets(ctx, caster_team, |pos| {
-                            distance_to_segment_sq(pos, caster_pos, end_pos)
-                                <= width.saturating_mul(width)
-                        }) {
-                            crate::legacy::pokemon_status::note_smeargle_affected(
-                                ctx,
-                                target_id,
-                                self.champion,
-                                self.action,
-                            );
-                            let defender_types =
-                                effective_defender_types(ctx, target_id, active_move_type);
-                            deal_move_or_volt_absorb_pokemon_damage(
-                                ctx,
-                                self.champion,
-                                self.action,
-                                caster_id,
-                                target_id,
-                                dash_damage.max(1),
-                                0,
-                                self.action.attack_type,
-                                active_move_type,
-                                active_attacker_types,
-                                defender_types,
-                            );
-                        }
-                        apply_force_move_toward_pos(
-                            ctx,
-                            caster_id,
-                            caster_pos,
-                            end_pos,
-                            force_move_speed,
-                            force_move_ticks,
-                        );
+                        let mut dash = self.action;
+                        dash.range = dash_range;
+                        dash.effect = PokemonMoveEffect::LineDashPierceDamage {
+                            base_ad: dash_damage, ad_ratio: 0, width, force_move_speed, force_move_ticks,
+                        };
+                        crate::motion::launch_secondary(ctx,self.champion,self.action,dash,caster_id,
+                            InputTarget::Pos{x:end_pos.x,y:end_pos.y});
                     }
 
                     draw_skill_visual(ctx, self.action.effect, active_move_type, caster_pos, input);
@@ -10509,17 +10706,12 @@ impl ModEffectType for PokemonEffect {
                 }
 
                 if let PokemonMoveEffect::DedennePlayRough {
-                    base_ad,
-                    ad_ratio,
                     width,
                     normal_range,
                     empowered_range,
-                    empowered_damage_bonus_percent,
                     empowered_charge_threshold,
                     charge_spend,
-                    silence_ticks,
-                    force_move_speed,
-                    force_move_ticks,
+                    ..
                 } = self.action.effect
                 {
                     let charges = dedenne_static_charges(caster_id);
@@ -10546,71 +10738,20 @@ impl ModEffectType for PokemonEffect {
                             })
                         })
                         .unwrap_or(caster_pos);
-                    let mut damage = base_ad + caster_stat.attack.saturating_mul(ad_ratio) / 100;
-                    if empowered {
-                        damage = damage.saturating_mul(
-                            100usize.saturating_add(empowered_damage_bonus_percent),
-                        ) / 100;
-                    }
-                    let mut target_ids = collect_enemy_targets(ctx, caster_team, |pos| {
+                    let target_ids = collect_enemy_targets(ctx, caster_team, |pos| {
                         distance_to_segment_sq(pos, caster_pos, end_pos)
                             <= width.saturating_mul(width)
                     });
                     end_pos =
                         dedenne_play_rough_jungle_safe_end(ctx, caster_pos, end_pos, &target_ids);
-                    target_ids = collect_enemy_targets(ctx, caster_team, |pos| {
-                        distance_to_segment_sq(pos, caster_pos, end_pos)
-                            <= width.saturating_mul(width)
-                    });
-                    for target_id in target_ids {
-                        crate::legacy::pokemon_status::note_smeargle_affected(
-                            ctx,
-                            target_id,
-                            self.champion,
-                            self.action,
-                        );
-                        let defender_types =
-                            effective_defender_types(ctx, target_id, active_move_type);
-                        deal_move_or_volt_absorb_pokemon_damage(
-                            ctx,
-                            self.champion,
-                            self.action,
-                            caster_id,
-                            target_id,
-                            damage.max(1),
-                            0,
-                            self.action.attack_type,
-                            active_move_type,
-                            active_attacker_types,
-                            defender_types,
-                        );
-                        if empowered {
-                            crate::legacy::pokemon_status::apply_pokemon_cc(
-                                ctx,
-                                caster_id,
-                                target_id,
-                                CCState::BlockSkill {
-                                    tick: silence_ticks,
-                                },
-                            );
-                        }
-                    }
                     if spent > 0 {
                         dedenne_chain_from_nodes(
                             ctx,
                             caster_id,
                             caster_team,
-                            damage.saturating_mul(45) / 100,
                         );
                     }
-                    apply_force_move_toward_pos_bounded(
-                        ctx,
-                        caster_id,
-                        caster_pos,
-                        end_pos,
-                        force_move_speed,
-                        force_move_ticks,
-                    );
+                    crate::motion::launch_dedenne(ctx,self.champion,self.action,caster_id,end_pos,empowered);
                     draw_line_band(
                         ctx,
                         caster_pos,
@@ -11125,18 +11266,14 @@ impl ModEffectType for PokemonEffect {
                     if illuminated {
                         apply_limber_aware_stun(ctx, caster_id, target_id, stun_ticks as u64);
                     }
-                    apply_force_move_toward(
-                        ctx,
-                        caster_id,
-                        target_id,
-                        force_move_speed,
-                        force_move_ticks,
-                    );
+                    if !crate::motion::resolving(caster_id) {
+                        apply_force_move_toward(ctx, caster_id, target_id, force_move_speed, force_move_ticks);
+                    }
                     crate::legacy::pokemon_status::schedule_force_away_from_pos(
                         ctx,
                         caster_id,
                         target_pos,
-                        force_move_ticks as usize,
+                        if crate::motion::resolving(caster_id) { 0 } else { force_move_ticks as usize },
                         retreat_speed,
                         retreat_ticks,
                     );
@@ -11180,10 +11317,12 @@ impl ModEffectType for PokemonEffect {
                     let target_pos = target.pos();
                     drop(target);
 
-                    let _ =
-                        crate::legacy::pokemon_status::heart_swap_tracked_buffs(ctx, caster_id, target_id);
-                    let _ =
-                        crate::legacy::pokemon_status::heart_swap_custom_states(ctx, caster_id, target_id);
+                    let _ = crate::legacy::pokemon_status::heart_swap_tracked_buffs(
+                        ctx, caster_id, target_id,
+                    );
+                    let _ = crate::legacy::pokemon_status::heart_swap_custom_states(
+                        ctx, caster_id, target_id,
+                    );
                     crate::legacy::pokemon_status::cleanse_harmful_statuses(ctx, caster_id);
                     crate::legacy::pokemon_status::add_beneficial_buff(
                         ctx,
@@ -11212,6 +11351,8 @@ impl ModEffectType for PokemonEffect {
                     );
 
                     if crate::legacy::pokemon_status::is_illuminated_by(ctx, caster_id, target_id) {
+                        crate::native_vfx::burst(ctx, "starmie_skill2_heart_swap_shockwave", caster_id,
+                            InputTarget::Pos { x: target_pos.x, y: target_pos.y }, shockwave_radius);
                         let bleed_damage = bleed_base_ap
                             + caster_stat.magic_power.saturating_mul(bleed_ap_ratio) / 100;
                         crate::legacy::pokemon_status::apply_bleed_for(
@@ -11279,22 +11420,30 @@ impl ModEffectType for PokemonEffect {
                     else {
                         return;
                     };
-                    crate::legacy::pokemon_status::apply_pokemon_cc(
-                        ctx,
-                        caster_id,
-                        caster_id,
-                        CCState::Bind {
-                            tick: charge_ticks as u64,
-                        },
-                    );
-                    ctx.add_buff(
-                        caster_id,
-                        BuffState {
-                            duration: BuffType::Time { tick: charge_ticks },
-                            damaged_reduce: self_damage_reduce_percent,
-                            ..Default::default()
-                        },
-                    );
+                    if !self.impact {
+                        crate::legacy::pokemon_status::apply_pokemon_cc(
+                            ctx,
+                            caster_id,
+                            caster_id,
+                            CCState::Bind {
+                                tick: charge_ticks as u64,
+                            },
+                        );
+                        ctx.add_buff(
+                            caster_id,
+                            BuffState {
+                                duration: BuffType::Time { tick: charge_ticks },
+                                damaged_reduce: self_damage_reduce_percent,
+                                ..Default::default()
+                            },
+                        );
+                        crate::projectiles::queue_release(ctx, self.champion, self.action, caster_id,
+                            InputTarget::Pos { x: end_pos.x, y: end_pos.y }, charge_ticks);
+                        return;
+                    }
+
+                    crate::native_vfx::line_pulse(ctx, "starmie_ult_psybeam_line", caster_id,
+                        caster_pos, end_pos, width);
 
                     let damage = base_ap + caster_stat.magic_power.saturating_mul(ap_ratio) / 100;
                     let primary_targets = collect_enemy_targets(ctx, caster_team, |pos| {
@@ -11303,17 +11452,21 @@ impl ModEffectType for PokemonEffect {
                     });
                     let mut spoke_centers = Vec::new();
                     for target_id in primary_targets {
-                        if crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id).is_some()
+                        if crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id)
+                            .is_some()
                             || crate::legacy::pokemon_status::telepathy_blocks_ally_harm(
                                 ctx, caster_id, target_id,
                             )
                             || crate::legacy::pokemon_status::consume_detect_guard(ctx, target_id)
-                            || crate::legacy::pokemon_status::is_bouffalant_unstoppable(ctx, target_id)
+                            || crate::legacy::pokemon_status::is_bouffalant_unstoppable(
+                                ctx, target_id,
+                            )
                         {
                             continue;
                         }
-                        let illuminated =
-                            crate::legacy::pokemon_status::is_illuminated_by(ctx, caster_id, target_id);
+                        let illuminated = crate::legacy::pokemon_status::is_illuminated_by(
+                            ctx, caster_id, target_id,
+                        );
                         deal_move_tracked_damage(
                             ctx,
                             self.champion,
@@ -11324,7 +11477,9 @@ impl ModEffectType for PokemonEffect {
                             damage.max(1),
                             self.action.attack_type,
                         );
-                        crate::legacy::pokemon_status::note_starmie_damage_hit(ctx, caster_id, target_id);
+                        crate::legacy::pokemon_status::note_starmie_damage_hit(
+                            ctx, caster_id, target_id,
+                        );
                         if illuminated {
                             if let Some(pos) = ctx.get_entity(target_id).map(|target| target.pos())
                             {
@@ -11344,9 +11499,13 @@ impl ModEffectType for PokemonEffect {
                                 <= illuminated_spoke_radius.saturating_mul(illuminated_spoke_radius)
                         });
                         for target_id in spoke_targets {
-                            if crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id)
-                                .is_some()
-                                || crate::legacy::pokemon_status::consume_detect_guard(ctx, target_id)
+                            if crate::legacy::pokemon_status::audino_protect_redirect(
+                                ctx, target_id,
+                            )
+                            .is_some()
+                                || crate::legacy::pokemon_status::consume_detect_guard(
+                                    ctx, target_id,
+                                )
                             {
                                 continue;
                             }
@@ -11398,6 +11557,9 @@ impl ModEffectType for PokemonEffect {
                     return;
                 }
 
+                let shed_tail = if let PokemonMoveEffect::ShedTailTauntDash { taunt_ticks, .. } = self.action.effect {
+                    ctx.spawn_shed_tail(caster_id, taunt_ticks)
+                } else { None };
                 let mut raw_targets = targets_for_effect(
                     ctx,
                     self.action.effect,
@@ -11406,6 +11568,10 @@ impl ModEffectType for PokemonEffect {
                     caster_pos,
                     input,
                 );
+                if self.impact && matches!(input, InputTarget::Target { .. })
+                    && !matches!(self.action.effect, PokemonMoveEffect::AreaMiasmaSlow { .. }) {
+                    raw_targets = target_from_input(input).into_iter().collect();
+                }
                 if let Some((center, radius, _spend)) = make_it_rain_context {
                     for target_id in collect_enemy_targets(ctx, caster_team, |pos| {
                         distance_sq(pos, center) <= radius.saturating_mul(radius)
@@ -11807,6 +11973,8 @@ impl ModEffectType for PokemonEffect {
 
                 draw_skill_visual(ctx, self.action.effect, active_move_type, caster_pos, input);
                 if let Some((center, radius, spend)) = make_it_rain_context {
+                    crate::native_vfx::burst(ctx, "gholdengo_ult_make_it_rain_aoe", caster_id,
+                        InputTarget::Pos { x: center.x, y: center.y }, radius);
                     if spend.spent_gold > 0 {
                         draw_impact_circle(ctx, center, radius, type_debug_color(active_move_type));
                     }
@@ -11982,6 +12150,7 @@ impl ModEffectType for PokemonEffect {
                     if let Some(target_pos) = input_position(ctx, input) {
                         crate::legacy::pokemon_status::begin_light_screen(
                             ctx,
+                            caster_id,
                             caster_pos,
                             target_pos,
                             duration_ticks,
@@ -11999,6 +12168,7 @@ impl ModEffectType for PokemonEffect {
                     if let Some(target_pos) = input_position(ctx, input) {
                         crate::legacy::pokemon_status::begin_smoke_screen(
                             ctx,
+                            caster_id,
                             caster_pos,
                             target_pos,
                             duration_ticks,
@@ -12009,7 +12179,11 @@ impl ModEffectType for PokemonEffect {
                 }
 
                 if let PokemonMoveEffect::SelfDetectGuard { duration_ticks } = self.action.effect {
-                    crate::legacy::pokemon_status::begin_detect_guard(ctx, caster_id, duration_ticks);
+                    crate::legacy::pokemon_status::begin_detect_guard(
+                        ctx,
+                        caster_id,
+                        duration_ticks,
+                    );
                     return;
                 }
 
@@ -12118,6 +12292,21 @@ impl ModEffectType for PokemonEffect {
                     let damage = base_ad + caster_stat.attack.saturating_mul(ad_ratio) / 100;
                     let burn_damage =
                         burn_base_ad + caster_stat.attack.saturating_mul(burn_ad_ratio) / 100;
+                    if self.impact {
+                        let Some(target_id) = target_from_input(input) else { return; };
+                        let defender_types = effective_defender_types(ctx, target_id, PokemonType::Fire);
+                        apply_magmortar_overheat_penetration(ctx, caster_id, target_id);
+                        deal_or_volt_absorb_pokemon_damage(ctx, caster_id, target_id, damage.max(1), 0,
+                            AttackType::Skill, PokemonType::Fire, active_attacker_types, defender_types);
+                        if chance_percent(_rng_seed, caster_id, target_id, ctx.tick(), burn_chance_percent) {
+                            crate::legacy::pokemon_status::apply_burn_for(ctx, caster_id, target_id,
+                                burn_damage.max(1), burn_ticks);
+                        }
+                        crate::legacy::pokemon_status::add_harmful_buff(ctx, caster_id, target_id,
+                            BuffState { duration: BuffType::Time { tick: slow_ticks },
+                                move_speed_mult: -slow_per_stack_percent.abs(), ..Default::default() });
+                        return;
+                    }
                     begin_magmortar_eruption(
                         ctx,
                         caster_id,
@@ -12352,8 +12541,7 @@ impl ModEffectType for PokemonEffect {
                     base_ad,
                     ad_ratio,
                     radius,
-                    force_move_speed,
-                    force_move_ticks,
+                    ..
                 } = self.action.effect
                 {
                     if let InputTarget::Target { target_id } = input {
@@ -12363,14 +12551,9 @@ impl ModEffectType for PokemonEffect {
                                 ally.team() == caster_team && ally.is_alive() && ally.is_champion();
                             drop(ally);
                             if valid_ally {
-                                apply_force_move_toward_pos(
-                                    ctx,
-                                    caster_id,
-                                    caster_pos,
-                                    landing_pos,
-                                    force_move_speed,
-                                    force_move_ticks,
-                                );
+                                if !ctx.entity_set_pos(caster_id, landing_pos.x, landing_pos.y) {
+                                    return;
+                                }
                                 let damage =
                                     base_ad + caster_stat.attack.saturating_mul(ad_ratio) / 100;
                                 let enemy_ids = collect_enemy_targets(ctx, caster_team, |pos| {
@@ -12447,6 +12630,8 @@ impl ModEffectType for PokemonEffect {
                         crate::legacy::pokemon_status::begin_ice_field(
                             ctx,
                             caster_id,
+                            if matches!(self.action.slot, ActionSlot::Ult) { "glaceon_ult_blizzard_field" }
+                            else { "glaceon_skill1_snowscape_field" },
                             center,
                             radius,
                             duration_ticks,
@@ -12526,6 +12711,7 @@ impl ModEffectType for PokemonEffect {
                     if let Some(center) = input_position(ctx, input).or(Some(caster_pos)) {
                         crate::legacy::pokemon_status::begin_brine_field(
                             ctx,
+                            caster_id,
                             center,
                             duration_ticks,
                             radius,
@@ -12708,7 +12894,9 @@ impl ModEffectType for PokemonEffect {
                                 ally_id,
                                 heal.max(1),
                             );
-                            crate::legacy::pokemon_status::after_blissey_heal(ctx, caster_id, ally_id);
+                            crate::legacy::pokemon_status::after_blissey_heal(
+                                ctx, caster_id, ally_id,
+                            );
                         }
                     }
                     return;
@@ -12743,7 +12931,9 @@ impl ModEffectType for PokemonEffect {
                             target_id,
                             heal_amount,
                         );
-                        crate::legacy::pokemon_status::after_blissey_heal(ctx, caster_id, target_id);
+                        crate::legacy::pokemon_status::after_blissey_heal(
+                            ctx, caster_id, target_id,
+                        );
                     }
                     return;
                 }
@@ -12898,16 +13088,18 @@ impl ModEffectType for PokemonEffect {
                     if target.team() == caster_team
                         || !target.is_alive()
                         || !target.is_targetable()
-                        || crate::legacy::pokemon_status::is_weavile_hidden_from_pokemon_ai(ctx, target_id)
+                        || crate::legacy::pokemon_status::is_weavile_hidden_from_pokemon_ai(
+                            ctx, target_id,
+                        )
                     {
                         return;
                     }
                     let target_pos = target.pos();
                     drop(target);
 
-                    let speed_bonus =
-                        crate::legacy::pokemon_status::tracked_bonus_attack_speed_mult(ctx, caster_id)
-                            as u64;
+                    let speed_bonus = crate::legacy::pokemon_status::tracked_bonus_attack_speed_mult(
+                        ctx, caster_id,
+                    ) as u64;
                     let shuffle_speed = force_move_speed.saturating_add(speed_bonus * 140);
                     apply_force_move_toward(
                         ctx,
@@ -13337,7 +13529,9 @@ impl ModEffectType for PokemonEffect {
                     if self.champion.id == "pokemon_moba_archaludon"
                         && matches!(self.action.slot, ActionSlot::Skill)
                     {
-                        crate::legacy::pokemon_status::begin_archaludon_iron_defense(ctx, caster_id, ticks);
+                        crate::legacy::pokemon_status::begin_archaludon_iron_defense(
+                            ctx, caster_id, ticks,
+                        );
                     }
                     ctx.add_buff(
                         caster_id,
@@ -13506,7 +13700,7 @@ impl ModEffectType for PokemonEffect {
                     ..
                 } = self.action.effect
                 {
-                    if let Some(target_pos) = input_position(ctx, input) {
+                    if let Some(target_pos) = input_position(ctx, input).filter(|_| !crate::motion::resolving(caster_id)) {
                         apply_force_move_away_from_pos(
                             ctx,
                             caster_id,
@@ -13960,7 +14154,8 @@ impl ModEffectType for PokemonEffect {
                 } = self.action.effect
                 {
                     crate::legacy::pokemon_status::cleanse_harmful_statuses(ctx, caster_id);
-                    let in_salt = crate::legacy::pokemon_status::garganacl_entity_in_salt(ctx, caster_id);
+                    let in_salt =
+                        crate::legacy::pokemon_status::garganacl_entity_in_salt(ctx, caster_id);
                     let heal_percent = if in_salt {
                         salt_heal_hp_percent
                     } else {
@@ -14218,7 +14413,9 @@ impl ModEffectType for PokemonEffect {
                                 / 100;
                         }
                         let defender_types =
-                            crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+                            crate::legacy::neutral_objectives::defender_types_for_target(
+                                ctx, target_id,
+                            );
                         crate::legacy::pokemon_types::deal_pokemon_damage(
                             ctx,
                             caster_id,
@@ -14244,8 +14441,8 @@ impl ModEffectType for PokemonEffect {
                     let Some(target_pos) = input_position(ctx, input) else {
                         return;
                     };
-                    let Some(target_id) =
-                        first_enemy_on_line(ctx, caster_team, caster_pos, target_pos, width)
+                    let Some(target_id) = (if self.impact { target_from_input(input) } else {
+                        first_enemy_on_line(ctx, caster_team, caster_pos, target_pos, width) })
                     else {
                         draw_line_band(
                             ctx,
@@ -14726,7 +14923,8 @@ impl ModEffectType for PokemonEffect {
                     let heal = heal_base.saturating_add(
                         caster_stat.magic_power.saturating_mul(heal_ap_ratio) / 100,
                     );
-                    let schooling = crate::legacy::pokemon_status::wishiwashi_is_schooling(ctx, caster_id);
+                    let schooling =
+                        crate::legacy::pokemon_status::wishiwashi_is_schooling(ctx, caster_id);
                     let range = travel_range.saturating_add(if schooling {
                         schooling_travel_bonus
                     } else {
@@ -14878,7 +15076,9 @@ impl ModEffectType for PokemonEffect {
                             "pokemon_moba_shiftry",
                         ))
                         && matches!(self.action.slot, ActionSlot::Attack)
-                        && crate::legacy::pokemon_status::tracked_bonus_move_speed_mult(ctx, caster_id) > 0
+                        && crate::legacy::pokemon_status::tracked_bonus_move_speed_mult(
+                            ctx, caster_id,
+                        ) > 0
                     {
                         ad_damage = ad_damage.saturating_add(
                             10usize.saturating_add(caster_stat.attack.saturating_mul(20) / 100),
@@ -14886,7 +15086,9 @@ impl ModEffectType for PokemonEffect {
                     }
                     if self.champion.id == "pokemon_moba_shiftry"
                         && matches!(self.action.slot, ActionSlot::Skill2)
-                        && crate::legacy::pokemon_status::tracked_bonus_move_speed_mult(ctx, caster_id) > 0
+                        && crate::legacy::pokemon_status::tracked_bonus_move_speed_mult(
+                            ctx, caster_id,
+                        ) > 0
                     {
                         ad_damage = ad_damage.saturating_add(ad_damage.saturating_mul(35) / 100);
                     }
@@ -14905,7 +15107,7 @@ impl ModEffectType for PokemonEffect {
                             .get_entity(target_id)
                             .map(|target| target.pos())
                             .unwrap_or(caster_pos);
-                        let end_pos = input_position(ctx, input).unwrap_or(target_pos);
+                        let end_pos = crate::motion::endpoint(caster_id).or_else(|| input_position(ctx, input)).unwrap_or(target_pos);
                         let is_contact_target =
                             distance_sq(target_pos, end_pos) <= contact_radius * contact_radius;
                         ad_damage = 0;
@@ -14923,8 +15125,9 @@ impl ModEffectType for PokemonEffect {
                         ..
                     } = self.action.effect
                     {
-                        let kills =
-                            crate::legacy::pokemon_status::grudge_kill_count(ctx, caster_id, target_id);
+                        let kills = crate::legacy::pokemon_status::grudge_kill_count(
+                            ctx, caster_id, target_id,
+                        );
                         if kills > 0 {
                             ap_damage = ap_damage.saturating_add(
                                 ap_damage
@@ -15106,7 +15309,8 @@ impl ModEffectType for PokemonEffect {
                     if self.champion.id == "pokemon_moba_houndoom"
                         && matches!(self.action.slot, ActionSlot::Skill)
                     {
-                        let bonus = crate::legacy::pokemon_status::houndoom_foul_play_bonus(ctx, caster_id);
+                        let bonus =
+                            crate::legacy::pokemon_status::houndoom_foul_play_bonus(ctx, caster_id);
                         ap_damage += ap_damage.saturating_mul(bonus) / 100;
                     }
 
@@ -15184,7 +15388,8 @@ impl ModEffectType for PokemonEffect {
                         "pokemon_moba_ribombee",
                     ) && is_basic_action(self.action)
                     {
-                        let honey_stacks = crate::legacy::pokemon_status::consume_honey_stacks(caster_id);
+                        let honey_stacks =
+                            crate::legacy::pokemon_status::consume_honey_stacks(caster_id);
                         if honey_stacks > 0 {
                             ad_damage += ad_damage.saturating_mul(10 * honey_stacks) / 100;
                             ap_damage += ap_damage.saturating_mul(10 * honey_stacks) / 100;
@@ -15209,7 +15414,8 @@ impl ModEffectType for PokemonEffect {
                         ))
                         && matches!(self.action.slot, ActionSlot::Ult)
                     {
-                        let stacks = crate::legacy::pokemon_status::battle_bond_stacks(ctx, caster_id);
+                        let stacks =
+                            crate::legacy::pokemon_status::battle_bond_stacks(ctx, caster_id);
                         ad_damage += ad_damage.saturating_mul(12 * stacks) / 100;
                         ap_damage += ap_damage.saturating_mul(12 * stacks) / 100;
                     }
@@ -15217,12 +15423,13 @@ impl ModEffectType for PokemonEffect {
                     if self.champion.id == "pokemon_moba_clawitzer"
                         && is_structure_or_jungle(ctx, target_id)
                     {
-                        let bonus = if crate::legacy::pokemon_status::is_clawitzer_clinging(ctx, caster_id)
-                        {
-                            20
-                        } else {
-                            45
-                        };
+                        let bonus =
+                            if crate::legacy::pokemon_status::is_clawitzer_clinging(ctx, caster_id)
+                            {
+                                20
+                            } else {
+                                45
+                            };
                         ad_damage += ad_damage.saturating_mul(bonus) / 100;
                         ap_damage += ap_damage.saturating_mul(bonus) / 100;
                     }
@@ -15230,7 +15437,8 @@ impl ModEffectType for PokemonEffect {
                     if let PokemonMoveEffect::SelfAreaMiasmaDetonate { ad_per_stack, .. } =
                         self.action.effect
                     {
-                        let stacks = crate::legacy::pokemon_status::miasma_stacks(caster_id, target_id);
+                        let stacks =
+                            crate::legacy::pokemon_status::miasma_stacks(caster_id, target_id);
                         ad_damage += caster_stat
                             .attack
                             .saturating_mul(ad_per_stack)
@@ -15267,7 +15475,9 @@ impl ModEffectType for PokemonEffect {
                     }
 
                     if let Some(stakeout_bonus) =
-                        crate::legacy::pokemon_status::thievul_stakeout_bonus(ctx, caster_id, target_id)
+                        crate::legacy::pokemon_status::thievul_stakeout_bonus(
+                            ctx, caster_id, target_id,
+                        )
                     {
                         ad_damage += ad_damage.saturating_mul(stakeout_bonus) / 100;
                         ap_damage += ap_damage.saturating_mul(stakeout_bonus) / 100;
@@ -15278,7 +15488,7 @@ impl ModEffectType for PokemonEffect {
                         ap_damage += ap_damage.saturating_mul(20) / 100;
                     }
 
-                    let hit_count = match self.action.effect {
+                    let hit_count = if crate::projectiles::hit_index().is_some() { 1 } else { match self.action.effect {
                         PokemonMoveEffect::MultiHitDamage { hits, .. } => hits,
                         PokemonMoveEffect::CloysterIcicleCrash {
                             hits_1,
@@ -15288,10 +15498,11 @@ impl ModEffectType for PokemonEffect {
                             ..
                         } => cloyster_level_value(caster_level, hits_1, hits_2, hits_3, hits_4),
                         _ => 1,
-                    };
+                    }};
 
                     if deals_direct_damage(self.action.effect) {
                         for hit_index in 0..hit_count {
+                            let hit_index = crate::projectiles::hit_index().unwrap_or(hit_index);
                             let kleavor_hit_count = if self.champion.id == "pokemon_moba_kleavor"
                                 || crate::legacy::pokemon_status::receiver_has_copied(
                                     caster_id,
@@ -15456,9 +15667,11 @@ impl ModEffectType for PokemonEffect {
                             }
                             let crit_chance = caster_stat
                                 .crit_chance
-                                .saturating_add(crate::legacy::pokemon_status::delibird_hustle_crit_bonus(
-                                    ctx, caster_id,
-                                ))
+                                .saturating_add(
+                                    crate::legacy::pokemon_status::delibird_hustle_crit_bonus(
+                                        ctx, caster_id,
+                                    ),
+                                )
                                 .saturating_add(leek_crit_bonus(
                                     ctx,
                                     caster_id,
@@ -15466,12 +15679,16 @@ impl ModEffectType for PokemonEffect {
                                     self.action,
                                 ))
                                 .saturating_add(kleavor_sharpness_crit_bonus(kleavor_hit_count))
-                                .saturating_add(crate::legacy::pokemon_status::octillery_lock_on_bonus(
-                                    ctx, caster_id, target_id,
-                                ))
-                                .saturating_add(crate::legacy::pokemon_status::kingdra_focus_crit_bonus(
-                                    ctx, caster_id, target_id,
-                                ));
+                                .saturating_add(
+                                    crate::legacy::pokemon_status::octillery_lock_on_bonus(
+                                        ctx, caster_id, target_id,
+                                    ),
+                                )
+                                .saturating_add(
+                                    crate::legacy::pokemon_status::kingdra_focus_crit_bonus(
+                                        ctx, caster_id, target_id,
+                                    ),
+                                );
                             if let PokemonMoveEffect::PresentDamage {
                                 double_chance_percent,
                                 triple_chance_percent,
@@ -15552,7 +15769,9 @@ impl ModEffectType for PokemonEffect {
                                 crate::legacy::pokemon_status::has_kings_rock(caster_id)
                                     && is_basic_action(self.action)
                                     && crit_chance > 0
-                                    && !crate::legacy::pokemon_status::has_shell_armor(ctx, target_id)
+                                    && !crate::legacy::pokemon_status::has_shell_armor(
+                                        ctx, target_id,
+                                    )
                                     && basic_attack_crits(
                                         ctx.seed(),
                                         caster_id,
@@ -15628,11 +15847,12 @@ impl ModEffectType for PokemonEffect {
                             }
                             if kingdra_dragon_pulse_true {
                                 let true_damage = hit_ap_damage.max(1);
-                                if crate::legacy::pokemon_status::consume_detect_guard(ctx, target_id)
-                                    || crate::legacy::pokemon_status::audino_protect_redirect(
-                                        ctx, target_id,
-                                    )
-                                    .is_some()
+                                if crate::legacy::pokemon_status::consume_detect_guard(
+                                    ctx, target_id,
+                                ) || crate::legacy::pokemon_status::audino_protect_redirect(
+                                    ctx, target_id,
+                                )
+                                .is_some()
                                 {
                                     continue;
                                 }
@@ -15689,7 +15909,9 @@ impl ModEffectType for PokemonEffect {
                                     })
                                     .unwrap_or(false);
                                 if should_crit
-                                    && !crate::legacy::pokemon_status::has_shell_armor(ctx, target_id)
+                                    && !crate::legacy::pokemon_status::has_shell_armor(
+                                        ctx, target_id,
+                                    )
                                 {
                                     let crit_damage_percent =
                                 crate::legacy::pokemon_status::adjust_incoming_critical_damage_percent(
@@ -15780,18 +16002,11 @@ impl ModEffectType for PokemonEffect {
                                 ))
                                 && crate::legacy::pokemon_status::is_poisoned(ctx, target_id);
                             if let PokemonMoveEffect::DirectDamageSplashOnKill {
-                                force_move_speed,
-                                force_move_ticks,
                                 ..
                             } = self.action.effect
                             {
-                                apply_force_move_toward_bounded(
-                                    ctx,
-                                    caster_id,
-                                    target_id,
-                                    force_move_speed,
-                                    force_move_ticks,
-                                );
+                                let Some(landing) = ctx.get_entity(target_id).map(|target| target.pos()) else { return; };
+                                if !ctx.entity_set_pos(caster_id, landing.x, landing.y) { return; }
                             }
                             let primary_applied_damage;
 
@@ -15799,12 +16014,13 @@ impl ModEffectType for PokemonEffect {
                                 self.action.effect,
                                 PokemonMoveEffect::GuardSplitDamage { .. }
                             ) {
-                                let adjusted_ap = crate::legacy::pokemon_types::apply_damage_modifier(
-                                    hit_ap_damage,
-                                    active_move_type,
-                                    active_attacker_types,
-                                    defender_types,
-                                );
+                                let adjusted_ap =
+                                    crate::legacy::pokemon_types::apply_damage_modifier(
+                                        hit_ap_damage,
+                                        active_move_type,
+                                        active_attacker_types,
+                                        defender_types,
+                                    );
                                 let (adjusted_ad, adjusted_ap) =
                                     crate::legacy::pokemon_status::adjust_endure_damage(
                                         ctx,
@@ -15988,7 +16204,9 @@ impl ModEffectType for PokemonEffect {
                                             / 100,
                                     );
                                     let extra_crits = crit_chance > 0
-                                        && !crate::legacy::pokemon_status::has_shell_armor(ctx, target_id)
+                                        && !crate::legacy::pokemon_status::has_shell_armor(
+                                            ctx, target_id,
+                                        )
                                         && basic_attack_crits(
                                             ctx.seed() ^ 0xd6a6_ce_u64,
                                             caster_id,
@@ -16111,7 +16329,6 @@ impl ModEffectType for PokemonEffect {
                                     ctx,
                                     caster_id,
                                     caster_team,
-                                    hit_ad_damage.saturating_mul(35) / 100,
                                 );
                             }
                             if (self.champion.id == "pokemon_moba_magmortar"
@@ -16202,7 +16419,11 @@ impl ModEffectType for PokemonEffect {
                             }
                         }
                         for ally_id in ally_freezes {
-                            crate::legacy::pokemon_status::apply_frozen_for(ctx, ally_id, freeze_ticks);
+                            crate::legacy::pokemon_status::apply_frozen_for(
+                                ctx,
+                                ally_id,
+                                freeze_ticks,
+                            );
                         }
                     }
 
@@ -16813,6 +17034,11 @@ impl ModEffectType for PokemonEffect {
                                 crate::legacy::pokemon_status::begin_flame_trail(
                                     ctx,
                                     caster_id,
+                                    match self.champion.id {
+                                        "pokemon_moba_blaziken" => Some("blaziken_ult_flame_trail"),
+                                        "pokemon_moba_ceruledge" => Some("ceruledge_skill1_flame_trail"),
+                                        _ => None,
+                                    },
                                     caster_pos,
                                     target_pos,
                                     trail_width,
@@ -17087,7 +17313,9 @@ impl ModEffectType for PokemonEffect {
                                 target_id,
                                 ctx.tick(),
                             );
-                            crate::legacy::pokemon_status::set_porygon_type(ctx, caster_id, new_type);
+                            crate::legacy::pokemon_status::set_porygon_type(
+                                ctx, caster_id, new_type,
+                            );
                         }
                         PokemonMoveEffect::DirectBindBoth { bind_ticks } => {
                             apply_limber_aware_bind(ctx, caster_id, target_id, bind_ticks);
@@ -17289,7 +17517,9 @@ impl ModEffectType for PokemonEffect {
                             poison_damage,
                             ..
                         } => {
-                            crate::legacy::pokemon_status::consume_miasma_stacks(caster_id, target_id);
+                            crate::legacy::pokemon_status::consume_miasma_stacks(
+                                caster_id, target_id,
+                            );
                             crate::legacy::pokemon_status::apply_poison_stacks(
                                 ctx,
                                 caster_id,
@@ -17299,12 +17529,14 @@ impl ModEffectType for PokemonEffect {
                             );
                         }
                         PokemonMoveEffect::ShedTailTauntDash { taunt_ticks, .. } => {
+                            let Some(decoy) = shed_tail else { continue; };
                             if !crate::legacy::pokemon_status::is_limber(ctx, target_id) {
-                                let adjusted_ticks = crate::legacy::pokemon_status::adjusted_cc_ticks(
-                                    ctx,
-                                    target_id,
-                                    taunt_ticks,
-                                );
+                                let adjusted_ticks =
+                                    crate::legacy::pokemon_status::adjusted_cc_ticks(
+                                        ctx,
+                                        target_id,
+                                        taunt_ticks,
+                                    );
                                 crate::legacy::pokemon_status::break_kommoo_duel_on_hard_cc(
                                     ctx, caster_id, target_id,
                                 );
@@ -17314,7 +17546,7 @@ impl ModEffectType for PokemonEffect {
                                     target_id,
                                     CCState::Taunt {
                                         tick: adjusted_ticks as u64,
-                                        target: caster_id,
+                                        target: decoy,
                                     },
                                 );
                                 crate::legacy::pokemon_status::apply_pokemon_cc(
@@ -17344,8 +17576,9 @@ impl ModEffectType for PokemonEffect {
                             throw_ticks,
                             ..
                         } => {
-                            let adjusted_ticks =
-                                crate::legacy::pokemon_status::adjusted_cc_ticks(ctx, target_id, cc_ticks);
+                            let adjusted_ticks = crate::legacy::pokemon_status::adjusted_cc_ticks(
+                                ctx, target_id, cc_ticks,
+                            );
                             apply_limber_aware_airborne(
                                 ctx,
                                 caster_id,
@@ -17397,11 +17630,12 @@ impl ModEffectType for PokemonEffect {
                             defence_mult,
                         } => {
                             if !crate::legacy::pokemon_status::is_limber(ctx, target_id) {
-                                let adjusted_ticks = crate::legacy::pokemon_status::adjusted_cc_ticks(
-                                    ctx,
-                                    target_id,
-                                    taunt_ticks,
-                                );
+                                let adjusted_ticks =
+                                    crate::legacy::pokemon_status::adjusted_cc_ticks(
+                                        ctx,
+                                        target_id,
+                                        taunt_ticks,
+                                    );
                                 crate::legacy::pokemon_status::break_kommoo_duel_on_hard_cc(
                                     ctx, caster_id, target_id,
                                 );
@@ -17490,8 +17724,9 @@ impl ModEffectType for PokemonEffect {
                             ticks,
                             force_move_speed: _,
                         } => {
-                            let ticks =
-                                crate::legacy::pokemon_status::adjusted_cc_ticks(ctx, target_id, ticks);
+                            let ticks = crate::legacy::pokemon_status::adjusted_cc_ticks(
+                                ctx, target_id, ticks,
+                            );
                             apply_limber_aware_fear_away(
                                 ctx,
                                 caster_id,
@@ -17825,6 +18060,7 @@ impl ModEffectType for PokemonEffect {
                             poison_damage,
                             execute_at_stacks,
                         } => {
+                            crate::native_vfx::toxic_chain(ctx, caster_id, target_id);
                             if crate::legacy::pokemon_status::poison_stack_count(ctx, target_id)
                                 >= execute_at_stacks
                             {
@@ -17874,11 +18110,12 @@ impl ModEffectType for PokemonEffect {
                             ..
                         } => {
                             if !crate::legacy::pokemon_status::is_limber(ctx, target_id) {
-                                let adjusted_ticks = crate::legacy::pokemon_status::adjusted_cc_ticks(
-                                    ctx,
-                                    target_id,
-                                    taunt_ticks,
-                                );
+                                let adjusted_ticks =
+                                    crate::legacy::pokemon_status::adjusted_cc_ticks(
+                                        ctx,
+                                        target_id,
+                                        taunt_ticks,
+                                    );
                                 crate::legacy::pokemon_status::break_kommoo_duel_on_hard_cc(
                                     ctx, caster_id, target_id,
                                 );
@@ -18097,8 +18334,10 @@ impl ModEffectType for PokemonEffect {
                     crate::legacy::pokemon_status::add_long_reach_stack(ctx, caster_id, 2500, 150);
                 }
 
-                if crate::legacy::pokemon_status::receiver_has_copied(caster_id, "pokemon_moba_hawlucha")
-                    && landed_any_target
+                if crate::legacy::pokemon_status::receiver_has_copied(
+                    caster_id,
+                    "pokemon_moba_hawlucha",
+                ) && landed_any_target
                     && self
                         .expected_cc_ticks_for_ai()
                         .map(|ticks| ticks > 0)
@@ -18123,9 +18362,12 @@ impl ModEffectType for PokemonEffect {
 
     fn expected_damage(&self, caster_stat: &EntityStat) -> (usize, usize) {
         let detail = self.metadata_detail("expected_damage", Some(caster_stat));
-        crate::legacy::crash_probe::catch_unwind_probe("metadata_expected_damage", detail, (0, 0), || {
-            self.expected_damage_for_ai(caster_stat)
-        })
+        crate::legacy::crash_probe::catch_unwind_probe(
+            "metadata_expected_damage",
+            detail,
+            (0, 0),
+            || self.expected_damage_for_ai(caster_stat),
+        )
     }
 
     fn expected_heal(&self, caster_stat: &EntityStat) -> usize {
@@ -18137,28 +18379,38 @@ impl ModEffectType for PokemonEffect {
 
     fn expected_shield(&self, caster_stat: &EntityStat) -> usize {
         let detail = self.metadata_detail("expected_shield", Some(caster_stat));
-        crate::legacy::crash_probe::catch_unwind_probe("metadata_expected_shield", detail, 0, || match self
-            .action
-            .effect
-        {
-            PokemonMoveEffect::FutureSight { .. } => caster_stat.hp,
-            _ => 0,
-        })
+        crate::legacy::crash_probe::catch_unwind_probe(
+            "metadata_expected_shield",
+            detail,
+            0,
+            || match self.action.effect {
+                PokemonMoveEffect::FutureSight { .. } => caster_stat.hp,
+                _ => 0,
+            },
+        )
     }
 
     fn expected_cc_time(&self) -> Option<usize> {
         let detail = self.metadata_detail("expected_cc_time", None);
-        crate::legacy::crash_probe::catch_unwind_probe("metadata_expected_cc_time", detail, None, || {
-            self.expected_cc_ticks_for_ai().filter(|ticks| *ticks > 0)
-        })
+        crate::legacy::crash_probe::catch_unwind_probe(
+            "metadata_expected_cc_time",
+            detail,
+            None,
+            || self.expected_cc_ticks_for_ai().filter(|ticks| *ticks > 0),
+        )
     }
 
     fn expected_buff(&self, caster_stat: &EntityStat) -> Option<BuffState> {
         let detail = self.metadata_detail("expected_buff", Some(caster_stat));
-        crate::legacy::crash_probe::catch_unwind_probe("metadata_expected_buff", detail, None, || {
-            self.expected_buff_state(caster_stat)
-                .filter(Self::expected_buff_is_nonzero)
-        })
+        crate::legacy::crash_probe::catch_unwind_probe(
+            "metadata_expected_buff",
+            detail,
+            None,
+            || {
+                self.expected_buff_state(caster_stat)
+                    .filter(Self::expected_buff_is_nonzero)
+            },
+        )
     }
 
     fn expected_move_distance(&self) -> Option<(usize, u64)> {
@@ -18532,7 +18784,11 @@ fn targets_for_effect(
         }
         PokemonMoveEffect::EarthquakeAura { .. } => Vec::new(),
         PokemonMoveEffect::TrailblazeGrassyTerrain { search_radius, .. } => {
-            crate::legacy::pokemon_status::grassy_terrain_trailblaze_targets(ctx, caster_id, search_radius)
+            crate::legacy::pokemon_status::grassy_terrain_trailblaze_targets(
+                ctx,
+                caster_id,
+                search_radius,
+            )
         }
         PokemonMoveEffect::ConeDamage {
             length,
@@ -18596,11 +18852,12 @@ fn targets_for_effect(
             cone_width,
             ..
         } => {
-            let Some(end_pos) = traveling_wave_end(ctx, input, caster_pos, dash_range) else {
+            let Some(end_pos) = crate::motion::endpoint(caster_id).or_else(|| traveling_wave_end(ctx, input, caster_pos, dash_range)) else {
                 return Vec::new();
             };
-            let Some(target_pos) = input_position(ctx, input) else {
-                return Vec::new();
+            let target_pos = EntityPos {
+                x: (2 * end_pos.x as i128 - caster_pos.x as i128).max(0) as u64,
+                y: (2 * end_pos.y as i128 - caster_pos.y as i128).max(0) as u64,
             };
             collect_enemy_targets(ctx, caster_team, |pos| {
                 is_inside_cone(pos, end_pos, target_pos, cone_length, cone_width)
@@ -18777,7 +19034,7 @@ fn move_allows_tower_damage(champion: PokemonChampion, action: PokemonMove) -> b
     )
 }
 
-fn move_damage_target_allowed(
+pub(crate) fn move_damage_target_allowed(
     ctx: &GameCtx,
     champion: PokemonChampion,
     action: PokemonMove,
@@ -18801,7 +19058,9 @@ fn filter_move_damage_targets(
 fn deals_direct_damage(effect: PokemonMoveEffect) -> bool {
     matches!(
         effect,
-        PokemonMoveEffect::DirectDamage { .. }
+        PokemonMoveEffect::DashEndConeDamage { .. }
+            | PokemonMoveEffect::TravelingWaveDamageTerrify { .. }
+            | PokemonMoveEffect::DirectDamage { .. }
             | PokemonMoveEffect::DirectDamageTargetMaxHp { .. }
             | PokemonMoveEffect::DirectDamageDrain { .. }
             | PokemonMoveEffect::DirectDamageTerrify { .. }
@@ -19771,12 +20030,26 @@ fn draw_skill_visual(
             ..
         } => {
             if let Some(front_pos) = target_pos {
-                draw_cone(ctx, caster_pos, front_pos, front_length, front_width_at_end, color);
+                draw_cone(
+                    ctx,
+                    caster_pos,
+                    front_pos,
+                    front_length,
+                    front_width_at_end,
+                    color,
+                );
             }
-            if let Some(rear_pos) =
-                reversed_input(ctx, caster_pos, input).and_then(|reversed| input_position(ctx, reversed))
+            if let Some(rear_pos) = reversed_input(ctx, caster_pos, input)
+                .and_then(|reversed| input_position(ctx, reversed))
             {
-                draw_cone(ctx, caster_pos, rear_pos, rear_length, rear_width_at_end, color);
+                draw_cone(
+                    ctx,
+                    caster_pos,
+                    rear_pos,
+                    rear_length,
+                    rear_width_at_end,
+                    color,
+                );
             }
         }
         PokemonMoveEffect::AquaRing { radius, .. } => {
@@ -20218,7 +20491,10 @@ fn chain_dash_targets(
             if entity.team() == caster_team
                 || !entity.is_alive()
                 || !entity.is_targetable()
-                || crate::legacy::pokemon_status::is_weavile_hidden_from_pokemon_ai(ctx, entity.id())
+                || crate::legacy::pokemon_status::is_weavile_hidden_from_pokemon_ai(
+                    ctx,
+                    entity.id(),
+                )
                 || targets.contains(&entity.id())
             {
                 continue;
@@ -20366,7 +20642,7 @@ fn triple_arc_targets(
     })
 }
 
-fn triple_arc_endpoints(start: EntityPos, end: EntityPos, spread: u64) -> [EntityPos; 3] {
+pub(crate) fn triple_arc_endpoints(start: EntityPos, end: EntityPos, spread: u64) -> [EntityPos; 3] {
     let dx = end.x as f64 - start.x as f64;
     let dy = end.y as f64 - start.y as f64;
     let len = (dx * dx + dy * dy).sqrt();
@@ -20390,7 +20666,7 @@ fn triple_arc_endpoints(start: EntityPos, end: EntityPos, spread: u64) -> [Entit
     ]
 }
 
-fn triangle_area_centers(start: EntityPos, end: EntityPos, spread: u64) -> [EntityPos; 3] {
+pub(crate) fn triangle_area_centers(start: EntityPos, end: EntityPos, spread: u64) -> [EntityPos; 3] {
     let dx = end.x as f64 - start.x as f64;
     let dy = end.y as f64 - start.y as f64;
     let len = (dx * dx + dy * dy).sqrt();
@@ -20419,7 +20695,7 @@ fn triangle_area_centers(start: EntityPos, end: EntityPos, spread: u64) -> [Enti
     ]
 }
 
-fn bouncing_area_centers(
+pub(crate) fn bouncing_area_centers(
     start: EntityPos,
     first: EntityPos,
     bounce_distance: u64,
@@ -20697,7 +20973,8 @@ fn apply_marowak_bonemerang(
     rhythm_ticks: usize,
     attacker_types: TypeSet,
 ) {
-    let empowered = crate::legacy::pokemon_status::consume_marowak_windmill_bonemerang(ctx, caster_id);
+    let empowered =
+        crate::legacy::pokemon_status::consume_marowak_windmill_bonemerang(ctx, caster_id);
     let travel_range = if empowered {
         travel_range.saturating_mul(100usize.saturating_add(empowered_range_percent) as u64) / 100
     } else {
@@ -20706,6 +20983,9 @@ fn apply_marowak_bonemerang(
     let Some(end_pos) = traveling_wave_end(ctx, input, caster_pos, travel_range) else {
         return;
     };
+    if crate::projectiles::launch_bonemerang(ctx, caster_id, caster_pos, end_pos, empowered) {
+        return;
+    }
     let targets = collect_enemy_targets(ctx, caster_team, |pos| {
         distance_to_segment_sq(pos, caster_pos, end_pos) <= width.saturating_mul(width)
     });
@@ -20729,7 +21009,8 @@ fn apply_marowak_bonemerang(
     let mut hit_index = 0usize;
     for target_id in targets.iter().copied().chain(targets.iter().rev().copied()) {
         let actual_target_id =
-            crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id).unwrap_or(target_id);
+            crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id)
+                .unwrap_or(target_id);
         if crate::legacy::pokemon_status::consume_detect_guard(ctx, actual_target_id) {
             hit_index = hit_index.saturating_add(1);
             continue;
@@ -20802,6 +21083,37 @@ fn apply_marowak_bonemerang(
                 ..Default::default()
             },
         );
+    }
+}
+
+pub fn resolve_bonemerang_hit(ctx: &mut GameCtx, caster_id: usize, target_id: usize,
+    empowered: bool, seed: u64) {
+    let Some(champion) = POKEMON_CHAMPIONS.iter().find(|champion| champion.id == "pokemon_moba_marowak").copied() else { return; };
+    let action = champion.attack;
+    let PokemonMoveEffect::MarowakBonemerang { base_ad, ad_ratio, empowered_missing_hp_percent,
+        empowered_speed_percent, rhythm_attack_speed_mult, rhythm_ticks, .. } = action.effect else { return; };
+    let Some(caster) = ctx.get_entity(caster_id) else { return; };
+    let stat = caster.stat();
+    let target_id = crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id).unwrap_or(target_id);
+    if crate::legacy::pokemon_status::consume_detect_guard(ctx, target_id) { return; }
+    let mut damage = base_ad.saturating_add(stat.attack.saturating_mul(ad_ratio) / 100);
+    if empowered {
+        let missing = ctx.get_entity(target_id).map_or(0, |target| target.hp().max.saturating_sub(target.hp().current));
+        damage = damage.saturating_add(missing.saturating_mul(empowered_missing_hp_percent) / 100);
+    }
+    let (damage, _) = apply_basic_attack_crit(ctx, champion.id, action, action.effect,
+        stat.crit_chance, caster_id, target_id, seed as usize, damage, 0);
+    let (_, types) = active_action_typing(ctx, caster_id, champion, action);
+    let defender_types = effective_defender_types(ctx, target_id, PokemonType::Ground);
+    crate::legacy::pokemon_status::note_physical_basic_hit(ctx, caster_id, target_id);
+    let result = deal_or_volt_absorb_pokemon_damage(ctx, caster_id, target_id, damage.max(1), 0,
+        AttackType::BaseAttack, PokemonType::Ground, types, defender_types);
+    if result.applied_damage > 0 {
+        let speed = rhythm_attack_speed_mult.saturating_add(if empowered { empowered_speed_percent as i32 } else { 0 });
+        // Each pass can hit several enemies; refresh rhythm, don't multiply it per collision.
+        ctx.refresh_stat_buff(caster_id, "pokemon_bonemerang_rhythm", BuffState {
+            duration: BuffType::Time { tick: rhythm_ticks }, attack_speed_mult: speed, ..Default::default()
+        });
     }
 }
 
@@ -20908,17 +21220,19 @@ fn apply_marowak_bone_rush(
             second_landed = true;
         }
         let actual_target_id =
-            crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id).unwrap_or(target_id);
+            crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id)
+                .unwrap_or(target_id);
         if crate::legacy::pokemon_status::consume_detect_guard(ctx, actual_target_id) {
             continue;
         }
         let mut damage = base.saturating_add(caster_stat.attack.saturating_mul(ratio) / 100);
         if index == 2 && !crate::legacy::pokemon_status::has_shell_armor(ctx, actual_target_id) {
-            let crit_percent = crate::legacy::pokemon_status::adjust_incoming_critical_damage_percent(
-                ctx,
-                actual_target_id,
-                crit_damage_percent(caster_id, champion_id, caster_stat.crit_chance.max(100)),
-            );
+            let crit_percent =
+                crate::legacy::pokemon_status::adjust_incoming_critical_damage_percent(
+                    ctx,
+                    actual_target_id,
+                    crit_damage_percent(caster_id, champion_id, caster_stat.crit_chance.max(100)),
+                );
             damage = damage.saturating_mul(crit_percent) / 100;
         }
         let defender_types = effective_defender_types(ctx, actual_target_id, PokemonType::Ground);
@@ -20968,7 +21282,8 @@ fn apply_garganacl_land_crush(
     });
     for target_id in targets {
         let actual_target_id =
-            crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id).unwrap_or(target_id);
+            crate::legacy::pokemon_status::audino_protect_redirect(ctx, target_id)
+                .unwrap_or(target_id);
         if crate::legacy::pokemon_status::consume_detect_guard(ctx, actual_target_id) {
             continue;
         }
@@ -21385,7 +21700,7 @@ fn reset_usize_store(store: &OnceLock<Mutex<usize>>, value: usize) {
     }
 }
 
-fn reset_pokemon_content_runtime_state_for_new_match() {
+pub(crate) fn reset_pokemon_content_runtime_state_for_new_match() {
     clear_vec_store(&INSTRUCTS);
     clear_vec_store(&DELAYED_POISON_AREAS);
     clear_vec_store(&DISCHARGES);
@@ -21640,6 +21955,9 @@ fn resolve_electrode_self_destruct(ctx: &mut GameCtx, state: ElectrodeSelfDestru
     }
     drop(caster);
 
+    crate::native_vfx::burst(ctx, "electrode_ult_self_destruct_explosion_aoe", state.caster_id,
+        InputTarget::Pos { x: state.center.x, y: state.center.y }, state.radius);
+
     let mut targets = Vec::new();
     for index in 0..ctx.entity_count() {
         let Some(entity) = ctx.entity_at(index) else {
@@ -21701,12 +22019,10 @@ fn resolve_electrode_self_destruct(ctx: &mut GameCtx, state: ElectrodeSelfDestru
         }
     }
 
-    let killed_enemy = enemy_champions.into_iter().any(|target_id| {
-        ctx.get_entity(target_id)
-            .map(|target| !target.is_alive())
-            .unwrap_or(false)
-    });
-    if let Some(player_id) = state.caster_player {
+    let caught_enemy = !enemy_champions.is_empty();
+    // The bonus belongs to the next life, not to an unrelated later death if
+    // protection let Electrode survive this explosion.
+    if let Some(player_id) = state.caster_player.filter(|_| ctx.get_entity(state.caster_id).map_or(true, |e| !e.is_alive())) {
         let outcomes = ELECTRODE_SPAWN_OUTCOMES.get_or_init(|| Mutex::new(Vec::new()));
         let mut outcomes = outcomes
             .lock()
@@ -21714,12 +22030,12 @@ fn resolve_electrode_self_destruct(ctx: &mut GameCtx, state: ElectrodeSelfDestru
         outcomes.retain(|outcome| outcome.player_id != player_id);
         outcomes.push(ElectrodeSpawnOutcomeState {
             player_id,
-            move_speed_mult: if killed_enemy {
+            move_speed_mult: if caught_enemy {
                 state.success_move_speed_mult
             } else {
                 state.failure_move_speed_mult
             },
-            ticks: if killed_enemy {
+            ticks: if caught_enemy {
                 state.success_ticks
             } else {
                 state.failure_ticks
@@ -21736,6 +22052,7 @@ fn resolve_electrode_self_destruct(ctx: &mut GameCtx, state: ElectrodeSelfDestru
 }
 
 fn apply_electrode_spawn_outcome(ctx: &mut GameCtx, player_id: usize, entity_id: usize) {
+    if !ctx.get_entity(entity_id).map_or(false, |e| e.is_alive()) { return; }
     let outcome = {
         let outcomes = ELECTRODE_SPAWN_OUTCOMES.get_or_init(|| Mutex::new(Vec::new()));
         let mut outcomes = outcomes
@@ -21752,7 +22069,7 @@ fn apply_electrode_spawn_outcome(ctx: &mut GameCtx, player_id: usize, entity_id:
     if outcome.ticks == 0 || outcome.move_speed_mult == 0 {
         return;
     }
-    ctx.add_buff(
+    ctx.refresh_periodic_buff("pm_self_destruct_respawn",
         entity_id,
         BuffState {
             duration: BuffType::Time {
@@ -21765,7 +22082,7 @@ fn apply_electrode_spawn_outcome(ctx: &mut GameCtx, player_id: usize, entity_id:
 }
 
 fn update_discharge_passive(ctx: &mut GameCtx, entity_id: usize) {
-    const DISTANCE_THRESHOLD: u64 = 90_000;
+    const DISTANCE_THRESHOLD: u64 = 66_000;
     const RADIUS: u64 = 24_000;
     const BASE_AD: usize = 28;
     const AD_RATIO: usize = 35;
@@ -21811,6 +22128,8 @@ fn update_discharge_passive(ctx: &mut GameCtx, entity_id: usize) {
     state.distance_traveled = 0;
     drop(states);
 
+    crate::native_vfx::burst(ctx, "heliolisk_passive_discharge_aura", entity_id,
+        InputTarget::Pos { x: pos.x, y: pos.y }, RADIUS);
     draw_impact_circle(ctx, pos, RADIUS, type_debug_color(PokemonType::Electric));
     let damage = BASE_AD + caster_stat.attack.saturating_mul(AD_RATIO) / 100;
     let targets = collect_enemy_targets(ctx, caster_team, |target_pos| {
@@ -22048,7 +22367,7 @@ fn update_magmortar_heat_waves(ctx: &mut GameCtx, tick: usize) {
             attacker_types,
             defender_types,
         );
-        crate::legacy::pokemon_status::add_harmful_buff(
+        crate::legacy::pokemon_status::refresh_harmful_buff("pm_magmortar_heat_waves_0",
             ctx,
             caster_id,
             target_id,
@@ -22152,6 +22471,7 @@ fn update_magmortar_eruptions(ctx: &mut GameCtx, rng_seed: u64, tick: usize) {
         else {
             continue;
         };
+        if crate::projectiles::launch_eruption(ctx, shot.caster_id, target_id) { continue; }
         let defender_types = effective_defender_types(ctx, target_id, PokemonType::Fire);
         apply_magmortar_overheat_penetration(ctx, shot.caster_id, target_id);
         deal_or_volt_absorb_pokemon_damage(
@@ -22180,7 +22500,7 @@ fn update_magmortar_eruptions(ctx: &mut GameCtx, rng_seed: u64, tick: usize) {
                 shot.burn_ticks,
             );
         }
-        crate::legacy::pokemon_status::add_harmful_buff(
+        crate::legacy::pokemon_status::refresh_harmful_buff("pm_magmortar_eruptions_0",
             ctx,
             shot.caster_id,
             target_id,
@@ -22287,6 +22607,21 @@ fn apply_dragapult_dragon_launcher(
     caster_stat: EntityStat,
     active_attacker_types: TypeSet,
 ) {
+    if crate::projectiles::launch_named(ctx, "pokemon_moba_stable_dragapult_passive_dragon_launcher_dreepy",
+        "pokemon_moba_stable:dreepy_hit", caster_id, target_id) { return; }
+    apply_dreepy_contact(ctx, caster_id, target_id, caster_stat, active_attacker_types);
+}
+
+pub fn resolve_dreepy_hit(ctx: &mut GameCtx, caster_id: usize, target_id: usize) {
+    let Some(caster) = ctx.get_entity(caster_id) else { return; };
+    let stat = caster.stat();
+    let types = crate::legacy::pokemon_status::entity_types(caster_id)
+        .unwrap_or(TypeSet::dual(PokemonType::Dragon, PokemonType::Ghost));
+    apply_dreepy_contact(ctx, caster_id, target_id, stat, types);
+}
+
+fn apply_dreepy_contact(ctx: &mut GameCtx, caster_id: usize, target_id: usize,
+    caster_stat: EntityStat, active_attacker_types: TypeSet) {
     let Some(target_pos) = ctx.get_entity(target_id).map(|target| target.pos()) else {
         return;
     };
@@ -22311,7 +22646,9 @@ fn apply_dragapult_dragon_launcher(
     );
     let heal = result.applied_damage.saturating_mul(35) / 100;
     if heal > 0 {
-        crate::legacy::pokemon_status::heal_from_damage_or_poison_yanmega(ctx, caster_id, target_id, heal);
+        crate::legacy::pokemon_status::heal_from_damage_or_poison_yanmega(
+            ctx, caster_id, target_id, heal,
+        );
     }
     draw_line_band(
         ctx,
@@ -22497,6 +22834,8 @@ fn update_shell_traps(ctx: &mut GameCtx) {
     }
 
     for (trap, target_id) in triggered {
+        crate::native_vfx::burst(ctx,"turtonator_skill1_shell_trap_burst",trap.caster_id,
+            InputTarget::Pos{x:trap.center.x,y:trap.center.y},trap.radius);
         let defender_types = effective_defender_types(ctx, target_id, PokemonType::Fire);
         deal_or_volt_absorb_pokemon_damage(
             ctx,
@@ -22601,7 +22940,7 @@ fn update_sunny_days(ctx: &mut GameCtx) {
     }
 
     for (target_id, slow_percent, slow_ticks) in slows {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_sunny_days_0",
             target_id,
             BuffState {
                 duration: BuffType::Time { tick: slow_ticks },
@@ -22742,7 +23081,7 @@ fn update_rain_dances(ctx: &mut GameCtx) {
     }
 
     for (entity_id, cooldown_mult) in cooldown_buffs {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_rain_dances_0",
             entity_id,
             BuffState {
                 duration: BuffType::Time { tick: 35 },
@@ -22939,7 +23278,7 @@ fn update_dragon_cheer_auras(ctx: &mut GameCtx) {
     }
 
     for (entity_id, crit_chance) in buffs {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_dragon_cheer_auras",
             entity_id,
             BuffState {
                 duration: BuffType::Time { tick: 35 },
@@ -22984,6 +23323,55 @@ fn begin_life_dew_pickups(
             heal_amount,
             expires_at: tick.saturating_add(duration_ticks),
         });
+    }
+}
+
+pub fn update_native_field_visuals(ctx: &GameCtx) {
+    let tick = ctx.tick();
+    macro_rules! snapshot {
+        ($states:ident) => { $states.get().and_then(|s| s.lock().ok()).map(|s| s.clone()).unwrap_or_default() };
+    }
+    for s in snapshot!(LIFE_DEW_PICKUPS) {
+        if s.expires_at > tick {
+            crate::native_vfx::field(ctx, "goodra_ult_life_dew_pickup", s.caster_id, s.center, s.radius);
+        }
+    }
+    for s in snapshot!(SHELL_TRAPS) {
+        if s.expires_at > tick {
+            crate::native_vfx::field(ctx, "turtonator_skill1_shell_trap_field", s.caster_id, s.center, s.radius);
+        }
+    }
+    for s in snapshot!(SUNNY_DAYS) {
+        if s.expires_at > tick {
+            crate::native_vfx::rectangle(ctx, "turtonator_skill2_sunny_day_field", s.caster_id, s.start, s.target, s.length, s.width);
+        }
+    }
+    for s in snapshot!(RAIN_DANCES) {
+        if s.expires_at > tick {
+            crate::native_vfx::rectangle(ctx, "goodra_skill1_rain_dance_field", s.caster_id, s.start, s.target, s.length, s.width);
+        }
+    }
+    for s in snapshot!(DRAGON_CHEERS) {
+        if s.expires_at > tick {
+            crate::native_vfx::attached(ctx, "goodra_skill2_dragon_cheer_aura", s.caster_id);
+        }
+    }
+    for s in snapshot!(GRASS_POWER_AURAS) {
+        if s.expires_at > tick {
+            crate::native_vfx::attached(ctx, "comfey_skill2_petal_dance_aura", s.center_id);
+        }
+    }
+    for s in snapshot!(MAGMORTAR_HEAT_WAVES) {
+        if s.expires_at > tick && ctx.get_entity(s.caster_id).map_or(false, |e| e.is_alive()) {
+            crate::native_vfx::attached(ctx, "magmortar_skill2_heat_wave_ring", s.caster_id);
+        }
+    }
+    for s in snapshot!(DEDENNE_GRIDS) {
+        if s.expires_at > tick {
+            for node in s.nodes {
+                crate::native_vfx::field(ctx, "dedenne_ult_spark_grid_nodes", s.caster_id, node, s.node_radius);
+            }
+        }
     }
 }
 
@@ -23035,6 +23423,8 @@ fn update_life_dew_pickups(ctx: &mut GameCtx) {
     }
 
     for (pickup, ally_id) in triggered {
+        crate::native_vfx::burst(ctx, "goodra_ult_life_dew_heal_burst", pickup.caster_id,
+            InputTarget::Target { target_id: ally_id }, pickup.radius);
         crate::legacy::pokemon_status::heal_with_antiheal(
             ctx,
             pickup.caster_id,
@@ -23273,47 +23663,6 @@ fn life_dew_move_input_for_player(
     })
 }
 
-fn web_walker_move_input_for_player(
-    player_id: usize,
-    tick: usize,
-    base_input: Option<&Input>,
-) -> Option<Input> {
-    const WEB_WALKER_AI_SEARCH_RADIUS: u64 = 230_000;
-    const WEB_WALKER_AI_MIN_HP_PERCENT: usize = 40;
-
-    if !matches!(base_input, None | Some(Input::Move { .. })) {
-        return None;
-    }
-
-    let snapshot = {
-        let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
-        snapshots
-            .lock()
-            .expect("ai entity snapshot state poisoned")
-            .iter()
-            .copied()
-            .find(|state| state.player_id == player_id)
-    }?;
-    if snapshot.hp_max == 0 || tick.saturating_sub(snapshot.tick) > 30 {
-        return None;
-    }
-    let hp_percent = snapshot.hp_current.saturating_mul(100) / snapshot.hp_max;
-    if hp_percent < WEB_WALKER_AI_MIN_HP_PERCENT {
-        return None;
-    }
-
-    crate::legacy::pokemon_status::best_web_walker_spotted_target(
-        snapshot.team,
-        snapshot.pos,
-        WEB_WALKER_AI_SEARCH_RADIUS,
-        tick,
-    )
-    .map(|spot| Input::Move {
-        x: spot.target_pos.x,
-        y: spot.target_pos.y,
-    })
-}
-
 fn attach_partner_move_input_for_player(
     player_id: usize,
     tick: usize,
@@ -23345,7 +23694,9 @@ fn attach_partner_move_input_for_player(
     {
         return None;
     }
-    if is_comfey && !crate::legacy::pokemon_status::is_comfey_attach_ready_at(snapshot.entity_id, tick) {
+    if is_comfey
+        && !crate::legacy::pokemon_status::is_comfey_attach_ready_at(snapshot.entity_id, tick)
+    {
         return None;
     }
 
@@ -23487,7 +23838,10 @@ fn nearest_enemy_champion_target_for_player(
         if enemy.team == snapshot.team
             || enemy.hp_current == 0
             || tick.saturating_sub(enemy.tick) > 30
-            || crate::legacy::pokemon_status::is_weavile_hidden_from_pokemon_ai_at(enemy.entity_id, tick)
+            || crate::legacy::pokemon_status::is_weavile_hidden_from_pokemon_ai_at(
+                enemy.entity_id,
+                tick,
+            )
         {
             continue;
         }
@@ -23649,6 +24003,7 @@ fn first_ally_champion_in_radius(
             && entity.team() == caster_team
             && entity.is_alive()
             && entity.is_champion()
+            && entity.hp().current < entity.hp().max
             && distance_sq(entity.pos(), center) <= radius.saturating_mul(radius)
         {
             return Some(entity.id());
@@ -23668,7 +24023,7 @@ fn has_any_type(ctx: &GameCtx, entity_id: usize, candidates: &[PokemonType]) -> 
 }
 
 fn update_dedenne_static(ctx: &mut GameCtx, entity_id: usize) {
-    const DISTANCE_PER_CHARGE: u64 = 15_000;
+    const DISTANCE_PER_CHARGE: u64 = 11_000;
     const MAX_CHARGES: usize = 20;
 
     let Some(entity) = ctx.get_entity(entity_id) else {
@@ -23714,7 +24069,7 @@ fn update_dedenne_static(ctx: &mut GameCtx, entity_id: usize) {
     drop(states);
 
     if charges > 10 && !enemy_champion_or_jungle_near(ctx, entity_id, 45_000) {
-        ctx.add_buff(
+        ctx.refresh_periodic_buff("pm_dedenne_static",
             entity_id,
             BuffState {
                 duration: BuffType::Time { tick: 35 },
@@ -23821,6 +24176,12 @@ fn enemy_champion_or_jungle_near(ctx: &GameCtx, entity_id: usize, radius: u64) -
         }
     }
     false
+}
+
+fn dedenne_grid_can_cast(caster: usize, tick: usize) -> bool {
+    DEDENNE_GRIDS.get_or_init(|| Mutex::new(Vec::new())).lock().expect("dedenne grid state poisoned")
+        .iter().any(|grid| grid.caster_id == caster && grid.expires_at > tick && !grid.overloaded)
+        || dedenne_terrain_ready(caster, tick)
 }
 
 fn begin_or_overload_dedenne_grid(
@@ -23973,7 +24334,7 @@ fn update_dedenne_grids(ctx: &mut GameCtx) {
             if grid.nodes.iter().any(|node| {
                 distance_sq(caster_pos, *node) <= grid.node_radius.saturating_mul(grid.node_radius)
             }) {
-                ctx.add_buff(
+                ctx.refresh_periodic_buff("pm_dedenne_grid_speed",
                     grid.caster_id,
                     BuffState {
                         duration: BuffType::Time { tick: 35 },
@@ -24005,6 +24366,8 @@ fn update_dedenne_grids(ctx: &mut GameCtx) {
     }
 
     for (caster_id, node, radius, charge_gain, heal_percent) in consumed_nodes {
+        crate::native_vfx::burst(ctx, "dedenne_ult_spark_grid_consume_heal", caster_id,
+            InputTarget::Pos { x: node.x, y: node.y }, radius);
         add_dedenne_static_charges(caster_id, charge_gain);
         if let Some(caster) = ctx.get_entity(caster_id) {
             let hp = caster.hp();
@@ -24025,6 +24388,8 @@ fn update_dedenne_grids(ctx: &mut GameCtx) {
 fn overload_dedenne_grid(ctx: &mut GameCtx, grid: DedenneGridState) {
     let mut hit_counts: Vec<(usize, usize)> = Vec::new();
     for node in grid.nodes.iter().copied() {
+        crate::native_vfx::burst(ctx, "dedenne_ult_spark_grid_overload", grid.caster_id,
+            InputTarget::Pos { x: node.x, y: node.y }, grid.node_radius);
         draw_impact_circle(
             ctx,
             node,
@@ -24096,7 +24461,6 @@ fn dedenne_chain_from_nodes(
     ctx: &mut GameCtx,
     caster_id: usize,
     caster_team: usize,
-    damage: usize,
 ) {
     let grid = DEDENNE_GRIDS
         .get_or_init(|| Mutex::new(Vec::new()))
@@ -24113,12 +24477,14 @@ fn dedenne_chain_from_nodes(
             distance_sq(pos, node) <= grid.node_radius.saturating_mul(grid.node_radius)
         });
         for target_id in targets {
+            crate::native_vfx::burst(ctx, "dedenne_ult_spark_grid_chain", caster_id,
+                InputTarget::Target { target_id }, grid.node_radius);
             let defender_types = effective_defender_types(ctx, target_id, PokemonType::Electric);
             deal_or_volt_absorb_pokemon_damage(
                 ctx,
                 caster_id,
                 target_id,
-                damage.max(1),
+                grid.node_damage.max(1),
                 0,
                 AttackType::Skill,
                 PokemonType::Electric,
@@ -24273,6 +24639,8 @@ fn update_burning_jealousy(ctx: &mut GameCtx, turtonator_id: usize) {
 
     let damage = BASE_AD + caster_stat.attack.saturating_mul(AD_RATIO) / 100;
     for target_id in hits {
+        crate::native_vfx::burst(ctx, "turtonator_passive_burning_jealousy_overlay", turtonator_id,
+            InputTarget::Target { target_id }, 10000);
         let defender_types = effective_defender_types(ctx, target_id, PokemonType::Fire);
         deal_or_volt_absorb_pokemon_damage(
             ctx,
@@ -24310,7 +24678,8 @@ fn resolve_instruct(ctx: &mut GameCtx, rng_seed: u64, state: InstructState) {
     let ally_pos = ally.pos();
     drop(ally);
 
-    let Some(champion_id) = crate::legacy::pokemon_status::champion_id_for_entity(state.ally_id) else {
+    let Some(champion_id) = crate::legacy::pokemon_status::champion_id_for_entity(state.ally_id)
+    else {
         return;
     };
     let Some(champion) = champion_by_id(champion_id) else {
@@ -24321,7 +24690,7 @@ fn resolve_instruct(ctx: &mut GameCtx, rng_seed: u64, state: InstructState) {
         return;
     };
     let input = instruct_input_for_action(ctx, state.ally_id, ally_team, ally_pos, action);
-    PokemonEffect { champion, action }.apply(ctx, rng_seed, state.ally_id, input);
+    PokemonEffect { champion, action, impact: false }.apply(ctx, rng_seed, state.ally_id, input);
 }
 
 fn choose_instruct_action(
@@ -24384,11 +24753,12 @@ fn instruct_input_for_action(
 #[derive(Clone, Debug)]
 struct PokemonPassive {
     champion: PokemonChampion,
+    gold_kills: std::collections::BTreeSet<(u64, usize, usize)>,
 }
 
 impl PokemonPassive {
     const fn new(champion: PokemonChampion) -> Self {
-        Self { champion }
+        Self { champion, gold_kills: std::collections::BTreeSet::new() }
     }
 }
 
@@ -24407,7 +24777,8 @@ impl ModPassive for PokemonPassive {
             (),
             || {
                 if crate::legacy::pokemon_status::has_status_tick_rolled_back(ctx.tick()) {
-                    crate::legacy::pokemon_status::reset_pokemon_status_runtime_state_for_new_match();
+                    crate::legacy::pokemon_status::reset_pokemon_status_runtime_state_for_new_match(
+                    );
                     reset_pokemon_content_runtime_state_for_new_match();
                     if crate::legacy::crash_probe::damage_probe_enabled() {
                         crate::legacy::crash_probe::log_damage_probe(&format!(
@@ -24428,7 +24799,17 @@ impl ModPassive for PokemonPassive {
                     life_id,
                 );
                 crate::legacy::pokemon_status::register_entity_types(_entity, self.champion.types);
-                crate::legacy::pokemon_status::register_entity_champion(ctx, _entity, self.champion.id);
+                crate::legacy::pokemon_status::register_entity_champion(
+                    ctx,
+                    _entity,
+                    self.champion.id,
+                );
+                if self.champion.id == "pokemon_moba_smeargle"
+                    && ctx.tick() >= SMEARGLE_FIRST_MOVE_FALLBACK_TICKS
+                    && crate::legacy::pokemon_status::smeargle_learned_count_for_player(_player) == 0
+                {
+                    crate::legacy::pokemon_status::smeargle_force_learn_for_player(_player, SMEARGLE, SMEARGLE_MINION_ATTACK);
+                }
                 update_ai_entity_snapshot(ctx, _player, _entity);
                 update_ai_attack_target_snapshots(ctx);
                 update_ai_tower_snapshots(ctx);
@@ -24444,6 +24825,8 @@ impl ModPassive for PokemonPassive {
                 update_grass_power_auras(ctx);
                 update_magmortar_states(ctx, rng_seed);
                 update_electrode_self_destructs(ctx);
+                apply_electrode_spawn_outcome(ctx, _player, _entity);
+                update_native_field_visuals(ctx);
                 if crate::legacy::pokemon_status::passive_suppressed_by_nullifying_gas(
                     ctx,
                     _entity,
@@ -24453,6 +24836,11 @@ impl ModPassive for PokemonPassive {
                 }
                 if self.champion.id == "pokemon_moba_venusaur" {
                     crate::legacy::pokemon_status::update_tangling_vines_aura(ctx, _entity);
+                }
+                if self.champion.id == "pokemon_moba_weezing" {
+                    if ctx.get_entity(_entity).map_or(false, |e| e.is_alive()) {
+                        crate::native_vfx::attached(ctx, "weezing_passive_nullifying_gas_aura", _entity);
+                    }
                 }
                 if self.champion.id == "pokemon_moba_eevee" {
                     crate::legacy::pokemon_status::update_helping_hand_aura(ctx, _entity);
@@ -24464,7 +24852,9 @@ impl ModPassive for PokemonPassive {
                     crate::legacy::pokemon_status::update_ludicolo_rain_dish(ctx, _entity);
                 }
                 if self.champion.id == "pokemon_moba_kingdra" {
-                    crate::legacy::pokemon_status::update_kingdra_dragon_dance_passive(ctx, _entity);
+                    crate::legacy::pokemon_status::update_kingdra_dragon_dance_passive(
+                        ctx, _entity,
+                    );
                 }
                 if self.champion.id == "pokemon_moba_delibird" {
                     crate::legacy::pokemon_status::update_delibird_hustle(ctx, _entity);
@@ -24505,9 +24895,6 @@ impl ModPassive for PokemonPassive {
                 if self.champion.id == "pokemon_moba_thievul" {
                     crate::legacy::pokemon_status::update_heal_block_aura(ctx, _entity);
                 }
-                if self.champion.id == "pokemon_moba_gholdengo" {
-                    crate::legacy::pokemon_status::update_gholdengo_gold_passive(ctx, _entity);
-                }
                 if self.champion.id == "pokemon_moba_dedenne" {
                     update_dedenne_static(ctx, _entity);
                 }
@@ -24543,8 +24930,10 @@ impl ModPassive for PokemonPassive {
                 }
                 if self.champion.id == "pokemon_moba_passimian" {
                     crate::legacy::pokemon_status::update_receiver_copied_passive(ctx, _entity);
-                    if crate::legacy::pokemon_status::receiver_has_copied(_entity, "pokemon_moba_heliolisk")
-                    {
+                    if crate::legacy::pokemon_status::receiver_has_copied(
+                        _entity,
+                        "pokemon_moba_heliolisk",
+                    ) {
                         update_discharge_passive(ctx, _entity);
                     }
                     if crate::legacy::pokemon_status::receiver_has_copied(
@@ -24553,10 +24942,16 @@ impl ModPassive for PokemonPassive {
                     ) {
                         update_burning_jealousy(ctx, _entity);
                     }
-                    if crate::legacy::pokemon_status::receiver_has_copied(_entity, "pokemon_moba_thievul") {
+                    if crate::legacy::pokemon_status::receiver_has_copied(
+                        _entity,
+                        "pokemon_moba_thievul",
+                    ) {
                         crate::legacy::pokemon_status::update_heal_block_aura(ctx, _entity);
                     }
-                    if crate::legacy::pokemon_status::receiver_has_copied(_entity, "pokemon_moba_drednaw") {
+                    if crate::legacy::pokemon_status::receiver_has_copied(
+                        _entity,
+                        "pokemon_moba_drednaw",
+                    ) {
                         crate::legacy::pokemon_status::update_wide_guard_passive(ctx, _entity);
                     }
                     if crate::legacy::pokemon_status::receiver_has_copied(
@@ -24565,11 +24960,16 @@ impl ModPassive for PokemonPassive {
                     ) {
                         crate::legacy::pokemon_status::update_afro_passive(ctx, _entity);
                     }
-                    if crate::legacy::pokemon_status::receiver_has_copied(_entity, "pokemon_moba_dedenne") {
+                    if crate::legacy::pokemon_status::receiver_has_copied(
+                        _entity,
+                        "pokemon_moba_dedenne",
+                    ) {
                         update_dedenne_static(ctx, _entity);
                     }
-                    if crate::legacy::pokemon_status::receiver_has_copied(_entity, "pokemon_moba_quaquaval")
-                    {
+                    if crate::legacy::pokemon_status::receiver_has_copied(
+                        _entity,
+                        "pokemon_moba_quaquaval",
+                    ) {
                         crate::legacy::pokemon_status::update_quaquaval_aqua_step(ctx, _entity);
                     }
                 }
@@ -24612,7 +25012,7 @@ impl ModPassive for PokemonPassive {
             || {
                 if damage > 0 {
                     if self.champion.id == "pokemon_moba_weavile" {
-                        crate::legacy::pokemon_status::break_weavile_hunt_stealth(entity);
+                        crate::legacy::pokemon_status::break_weavile_hunt_stealth(ctx, entity);
                     }
                     if crate::legacy::crash_probe::damage_probe_enabled() {
                         crate::legacy::crash_probe::log_damage_probe(&format!(
@@ -24626,7 +25026,9 @@ impl ModPassive for PokemonPassive {
                         ));
                     }
                     crate::legacy::pokemon_status::try_post_damage_endure_heal(ctx, entity);
-                    crate::legacy::pokemon_status::handle_audino_protect_damage(ctx, entity, damage);
+                    crate::legacy::pokemon_status::handle_audino_protect_damage(
+                        ctx, entity, damage,
+                    );
                     crate::legacy::pokemon_status::note_stored_power_damage(ctx, entity, damage);
                 }
 
@@ -24655,18 +25057,28 @@ impl ModPassive for PokemonPassive {
                 }
 
                 if self.champion.id == "pokemon_moba_passimian" && damage > 0 {
-                    crate::legacy::pokemon_status::note_receiver_copied_damage_taken(ctx, entity, damage);
+                    crate::legacy::pokemon_status::note_receiver_copied_damage_taken(
+                        ctx, entity, damage,
+                    );
                 }
 
                 if (self.champion.id == "pokemon_moba_arcanine"
-                    || crate::legacy::pokemon_status::receiver_has_copied(entity, "pokemon_moba_arcanine"))
+                    || crate::legacy::pokemon_status::receiver_has_copied(
+                        entity,
+                        "pokemon_moba_arcanine",
+                    ))
                     && damage > 0
                 {
-                    crate::legacy::pokemon_status::handle_arcanine_damaged(ctx, entity, attacker, damage);
+                    crate::legacy::pokemon_status::handle_arcanine_damaged(
+                        ctx, entity, attacker, damage,
+                    );
                 }
 
                 if (self.champion.id == "pokemon_moba_garganacl"
-                    || crate::legacy::pokemon_status::receiver_has_copied(entity, "pokemon_moba_garganacl"))
+                    || crate::legacy::pokemon_status::receiver_has_copied(
+                        entity,
+                        "pokemon_moba_garganacl",
+                    ))
                     && damage > 0
                 {
                     let attacker_is_non_champion = ctx
@@ -24683,7 +25095,10 @@ impl ModPassive for PokemonPassive {
                 }
 
                 if (self.champion.id == "pokemon_moba_arboliva"
-                    || crate::legacy::pokemon_status::receiver_has_copied(entity, "pokemon_moba_arboliva"))
+                    || crate::legacy::pokemon_status::receiver_has_copied(
+                        entity,
+                        "pokemon_moba_arboliva",
+                    ))
                     && damage > 0
                 {
                     crate::legacy::pokemon_status::maybe_spawn_grassy_terrain(
@@ -24723,14 +25138,20 @@ impl ModPassive for PokemonPassive {
                 }
 
                 if (self.champion.id == "pokemon_moba_pyukumuku"
-                    || crate::legacy::pokemon_status::receiver_has_copied(entity, "pokemon_moba_pyukumuku"))
+                    || crate::legacy::pokemon_status::receiver_has_copied(
+                        entity,
+                        "pokemon_moba_pyukumuku",
+                    ))
                     && damage > 0
                 {
                     handle_pyukumuku_damaged(ctx, entity, attacker, damage);
                 }
 
                 if (self.champion.id == "pokemon_moba_banette"
-                    || crate::legacy::pokemon_status::receiver_has_copied(entity, "pokemon_moba_banette"))
+                    || crate::legacy::pokemon_status::receiver_has_copied(
+                        entity,
+                        "pokemon_moba_banette",
+                    ))
                     && damage > 0
                     && chance_percent(ctx.seed(), entity, attacker, ctx.tick(), 10)
                 {
@@ -24738,7 +25159,10 @@ impl ModPassive for PokemonPassive {
                 }
 
                 if (self.champion.id == "pokemon_moba_electrode"
-                    || crate::legacy::pokemon_status::receiver_has_copied(entity, "pokemon_moba_electrode"))
+                    || crate::legacy::pokemon_status::receiver_has_copied(
+                        entity,
+                        "pokemon_moba_electrode",
+                    ))
                     && damage > 0
                 {
                     handle_electrode_aftermath(ctx, entity, attacker);
@@ -24786,7 +25210,9 @@ impl ModPassive for PokemonPassive {
                     return;
                 }
 
-                if !crate::legacy::pokemon_status::try_begin_spiked_hide_reflect(ctx, entity, attacker) {
+                if !crate::legacy::pokemon_status::try_begin_spiked_hide_reflect(
+                    ctx, entity, attacker,
+                ) {
                     return;
                 }
 
@@ -24803,6 +25229,30 @@ impl ModPassive for PokemonPassive {
                 }
             },
         );
+    }
+
+    fn on_unit_kill(&mut self, ctx: &mut GameCtx, player: usize, entity: usize, victim: usize) {
+        if crate::legacy::pokemon_status::passive_suppressed_by_nullifying_gas(
+            ctx,
+            entity,
+            self.champion.id,
+        ) {
+            return;
+        }
+        if (self.champion.id == "pokemon_moba_gholdengo"
+            || crate::legacy::pokemon_status::receiver_has_copied(entity, "pokemon_moba_gholdengo"))
+            && ctx.get_player(player).and_then(|player| player.champion())
+                .map(|champion| champion.id()) == Some(entity)
+            && self.gold_kills.insert((ctx.seed(), ctx.tick(), victim))
+        {
+            // The engine credits this player's CS. Record before mutation to reject reentry.
+            ctx.player_add_gold(player, 10);
+        }
+        if self.champion.id == "pokemon_moba_snorlax"
+            || crate::legacy::pokemon_status::receiver_has_copied(entity, "pokemon_moba_snorlax")
+        {
+            crate::legacy::pokemon_status::add_snorlax_berries(entity, 1);
+        }
     }
 
     fn on_kill(&mut self, ctx: &mut GameCtx, player: usize, killed_entity: usize) {
@@ -24827,8 +25277,9 @@ impl ModPassive for PokemonPassive {
                 let killed_is_champion = killed.is_champion();
                 drop(killed);
 
-                let Some(killer_id) = crate::legacy::pokemon_status::entity_for_player_in_ctx(ctx, player)
-                    .or_else(|| crate::legacy::pokemon_status::entity_for_player(player))
+                let Some(killer_id) =
+                    crate::legacy::pokemon_status::entity_for_player_in_ctx(ctx, player)
+                        .or_else(|| crate::legacy::pokemon_status::entity_for_player(player))
                 else {
                     return;
                 };
@@ -24842,7 +25293,10 @@ impl ModPassive for PokemonPassive {
                 }
 
                 if self.champion.id == "pokemon_moba_snorlax"
-                    || crate::legacy::pokemon_status::receiver_has_copied(killer_id, "pokemon_moba_snorlax")
+                    || crate::legacy::pokemon_status::receiver_has_copied(
+                        killer_id,
+                        "pokemon_moba_snorlax",
+                    )
                 {
                     crate::legacy::pokemon_status::add_snorlax_berries(
                         killer_id,
@@ -24859,7 +25313,11 @@ impl ModPassive for PokemonPassive {
                 }
 
                 if self.champion.id == "pokemon_moba_passimian" {
-                    crate::legacy::pokemon_status::copy_receiver_passive(ctx, killer_id, killed_entity);
+                    crate::legacy::pokemon_status::copy_receiver_passive(
+                        ctx,
+                        killer_id,
+                        killed_entity,
+                    );
                     if crate::legacy::pokemon_status::receiver_has_copied(
                         killer_id,
                         "pokemon_moba_greninja",
@@ -24868,8 +25326,10 @@ impl ModPassive for PokemonPassive {
                     }
                 }
                 if self.champion.id == "pokemon_moba_kecleon" {
-                    let killed_types =
-                        crate::legacy::neutral_objectives::defender_types_for_target(ctx, killed_entity);
+                    let killed_types = crate::legacy::neutral_objectives::defender_types_for_target(
+                        ctx,
+                        killed_entity,
+                    );
                     let new_type = random_type_from_type_set(
                         killed_types,
                         ctx.seed(),
@@ -24901,7 +25361,11 @@ impl ModPassive for PokemonPassive {
                     life_id,
                 );
                 crate::legacy::pokemon_status::register_entity_types(entity, self.champion.types);
-                crate::legacy::pokemon_status::register_entity_champion(_ctx, entity, self.champion.id);
+                crate::legacy::pokemon_status::register_entity_champion(
+                    _ctx,
+                    entity,
+                    self.champion.id,
+                );
                 if self.champion.id == "pokemon_moba_torterra" {
                     crate::legacy::pokemon_status::register_shell_armor(entity);
                 }
@@ -24946,7 +25410,9 @@ impl ModPassive for PokemonPassive {
                     crate::legacy::pokemon_status::register_hitmontop(_ctx, _player, entity);
                 }
                 if self.champion.id == "pokemon_moba_hawlucha" {
-                    crate::legacy::pokemon_status::register_hawlucha_momentum(_ctx, _player, entity);
+                    crate::legacy::pokemon_status::register_hawlucha_momentum(
+                        _ctx, _player, entity,
+                    );
                 }
                 if self.champion.id == "pokemon_moba_kilowattrel" {
                     crate::legacy::pokemon_status::register_kilowattrel(entity);
@@ -24995,9 +25461,7 @@ impl ModPassive for PokemonPassive {
                 if self.champion.id == "pokemon_moba_delibird" {
                     crate::legacy::pokemon_status::register_delibird_present(_ctx, entity);
                 }
-                if self.champion.id == "pokemon_moba_electrode" {
-                    apply_electrode_spawn_outcome(_ctx, _player, entity);
-                }
+                apply_electrode_spawn_outcome(_ctx, _player, entity);
                 if self.champion.id == "pokemon_moba_snorlax" {
                     crate::legacy::pokemon_status::register_snorlax(entity);
                 }
@@ -25080,10 +25544,10 @@ impl PokemonMobaInputAi {
     const DASH_TOWER_DANGER_RADIUS: u64 = 70_000;
 
     fn champion_name_matches(champion_name: &str, display_name: &str) -> bool {
-        champion_name == display_name
-            || champion_name
-                .to_ascii_lowercase()
-                .contains(&display_name.to_ascii_lowercase())
+        let normalize = |name: &str| name.chars().filter(char::is_ascii_alphanumeric).collect::<String>().to_ascii_lowercase();
+        let actual = normalize(champion_name);
+        let expected = normalize(display_name);
+        actual == expected || actual == format!("pokemonmoba{expected}")
     }
 
     fn is_handled_champion(champion_name: &str) -> bool {
@@ -25094,6 +25558,59 @@ impl PokemonMobaInputAi {
 
     fn champion_is(ctx: &PlayerAiContext<'_, '_, '_>, display_name: &str) -> bool {
         Self::champion_name_matches(ctx.champion_name(), display_name)
+    }
+
+    fn detection_input(ctx: &PlayerAiContext<'_, '_, '_>, base: Option<&Input>, defensive: bool) -> Option<Input> {
+        let world = ctx.world()?;
+        let caster = world.caster()?;
+        if crate::legacy::pokemon_status::is_comfey_attached_at(caster.id, world.tick)
+            || crate::legacy::pokemon_status::is_clawitzer_attached_at(caster.id, world.tick) {
+            return None;
+        }
+        if defensive {
+            return crate::shared_detection::defensive_moves(world, base).into_iter()
+                .find(|input| ctx.is_valid_input(input));
+        }
+        // Preserve recalls, attacks and specialist cast/channel decisions already selected.
+        if !matches!(base, None | Some(Input::Move { .. })) { return None; }
+        let champion = Self::champion_for_ai_name(ctx.champion_name())?;
+        for id in crate::shared_detection::targets(world) {
+            let target = world.get(id)?;
+            if target.detected && target.targetable {
+                for action in [Some(champion.skill), Some(champion.skill2), champion.ult, Some(champion.attack)].into_iter().flatten() {
+                    let (_, actual) = ai_resolved_move(world, champion, action);
+                    if !matches!(actual.target, CastingTarget::Enemy | CastingTarget::EnemyWithoutTower
+                        | CastingTarget::EnemyChampion | CastingTarget::EnemyChampionInCC
+                        | CastingTarget::EnemyChampionRecentlyAttacked | CastingTarget::Both
+                        | CastingTarget::BothWithoutTower | CastingTarget::BothChampion) { continue; }
+                    if !ai_can_activate(world, champion, action) || !ai_target_allowed(world, champion, action, id)
+                        || crate::ai_world::distance_sq(caster.pos, target.pos) > u128::from(actual.range).pow(2) { continue; }
+                    let aim = match actual.casting {
+                        CastingType::Targeting => InputTarget::Target { target_id: id },
+                        CastingType::Position => InputTarget::Pos { x: target.pos.x, y: target.pos.y },
+                        CastingType::Direction => InputTarget::Dir {
+                            x: target.pos.x as i64 - caster.pos.x as i64,
+                            y: target.pos.y as i64 - caster.pos.y as i64,
+                        },
+                        CastingType::None => continue,
+                    };
+                    let input = Self::input_for_slot(action.slot, aim);
+                    // Host validation remains authoritative; never bypass fog/CC restrictions.
+                    if ai_input_allowed(world, ctx.champion_name(), &input) && ctx.is_valid_input(&input) { return Some(input); }
+                }
+            }
+            if let Some(Input::Move { x, y }) = base {
+                // Do not reverse an existing retreat just to investigate a detection.
+                if crate::ai_world::distance_sq(EntityPos { x: *x, y: *y }, target.pos)
+                    > crate::ai_world::distance_sq(caster.pos, target.pos) { continue; }
+            }
+            let end = if crate::ai_world::distance_sq(caster.pos, target.pos) > 60_000u128.pow(2) {
+                crate::ai_world::project(caster.pos, target.pos, 60_000)
+            } else { target.pos };
+            let input = Input::Move { x: end.x, y: end.y };
+            if crate::shared_detection::safe_step(world, end) && ctx.is_valid_input(&input) { return Some(input); }
+        }
+        None
     }
 
     fn kricketune_support_should_hold_lunge(
@@ -25124,7 +25641,7 @@ impl PokemonMobaInputAi {
             {
                 PlayerInputDecision::Replace(input)
             }
-            _ => PlayerInputDecision::Pass,
+            _ => PlayerInputDecision::Block,
         }
     }
 
@@ -25341,6 +25858,9 @@ impl PokemonMobaInputAi {
         action: PokemonMove,
         input: &Input,
     ) -> bool {
+        if let Some(world) = ctx.world() {
+            return Self::target_for_input(input).map_or(false, |target| ai_tower_danger(world, action, target));
+        }
         let Some(target) = Self::target_for_input(input) else {
             return false;
         };
@@ -25443,8 +25963,26 @@ impl PokemonMobaInputAi {
             else {
                 continue;
             };
-            let Some(target) =
-                Self::smeargle_target_for_copied_action(player_id, tick, copied, preferred_target)
+            let live_choice = ctx.world().and_then(|world| {
+                let caster = world.caster()?;
+                let wrapper = Self::action_for_input(SMEARGLE, &Self::input_for_slot(slot, InputTarget::None))?;
+                if !ai_can_activate(world, SMEARGLE, wrapper) { return None; }
+                let effect = PokemonEffect { champion: copied.source_champion, action: copied.action, impact: false };
+                world.units.iter().filter(|target| ai_target_allowed(world, SMEARGLE, wrapper, target.id))
+                    .map(|target| {
+                        let score = if target.team == caster.team {
+                            let healing = effect.expected_heal_amount(&caster.stat).min(target.max_hp.saturating_sub(target.hp));
+                            healing.saturating_mul(1000) / target.max_hp.max(1) + if target.cc > 0 { 150 } else { 0 } + 1
+                        } else {
+                            let (ad, ap) = effect.expected_damage_for_ai(&caster.stat);
+                            ad.saturating_add(ap).min(target.hp).saturating_mul(500) / target.max_hp.max(1)
+                                + if ad.saturating_add(ap) >= target.hp { 300 } else { 0 } + 50
+                        };
+                        (score, target.id)
+                    }).max_by_key(|(score, id)| (*score, std::cmp::Reverse(*id)))
+            });
+            let Some(target) = live_choice.map(|(_, target_id)| InputTarget::Target { target_id })
+                .or_else(|| if ctx.world().is_none() { Self::smeargle_target_for_copied_action(player_id, tick, copied, preferred_target) } else { None })
             else {
                 continue;
             };
@@ -25454,7 +25992,7 @@ impl PokemonMobaInputAi {
             {
                 continue;
             }
-            let score = Self::smeargle_copied_action_score(slot, copied);
+            let score = live_choice.map(|(score, _)| score).unwrap_or_else(|| Self::smeargle_copied_action_score(slot, copied));
             if best
                 .as_ref()
                 .map(|(best_score, _)| score > *best_score)
@@ -25481,13 +26019,6 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
     }
 
     fn matches(&self, ctx: &PlayerAiInitContext) -> bool {
-        crate::legacy::pokemon_status::register_player_identity_from_ai(
-            ctx.player_id,
-            ctx.athlete_id,
-            ctx.team,
-            ctx.position,
-            &ctx.champion_name,
-        );
         Self::is_handled_champion(&ctx.champion_name)
     }
 
@@ -25518,6 +26049,14 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                     ctx.champion_name(),
                 );
 
+                if let Some(input) = Self::detection_input(ctx, base_input.as_ref(), true) {
+                    return PlayerInputDecision::Replace(input);
+                }
+                // Run detection-selected casts through the same champion-specific gates
+                // as built-in choices (charges, channels, support lunges and Sketch).
+                let detected_input = Self::detection_input(ctx, base_input.as_ref(), false);
+                let base_input = detected_input.or(base_input);
+
                 if matches!(base_input, Some(Input::Return))
                     && crate::legacy::pokemon_status::is_player_spirit_shackled(player_id, tick)
                 {
@@ -25525,9 +26064,13 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                 }
 
                 if matches!(base_input, Some(Input::Return)) {
-                    if let Some(entity_id) = crate::legacy::pokemon_status::entity_for_player(player_id) {
+                    if let Some(entity_id) =
+                        crate::legacy::pokemon_status::entity_for_player(player_id)
+                    {
                         let is_attached_partner = (Self::champion_is(ctx, "Comfey")
-                            && crate::legacy::pokemon_status::is_comfey_attached_at(entity_id, tick))
+                            && crate::legacy::pokemon_status::is_comfey_attached_at(
+                                entity_id, tick,
+                            ))
                             || (Self::champion_is(ctx, "Clawitzer")
                                 && crate::legacy::pokemon_status::is_clawitzer_attached_at(
                                     entity_id, tick,
@@ -25574,7 +26117,9 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                     }
 
                     if matches!(base_input, Some(Input::Ult { .. }))
-                        && !crate::legacy::pokemon_status::power_up_punch_ready_for_player(player_id, tick)
+                        && !crate::legacy::pokemon_status::power_up_punch_ready_for_player(
+                            player_id, tick,
+                        )
                     {
                         return Self::release_channel_input(ctx);
                     }
@@ -25582,14 +26127,18 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
 
                 if Self::champion_is(ctx, "Skeledirge")
                     && matches!(base_input, Some(Input::Skill2 { .. }))
-                    && !crate::legacy::pokemon_status::will_o_wisp_ready_for_player(player_id, tick, 3, 420)
+                    && !crate::legacy::pokemon_status::will_o_wisp_ready_for_player(
+                        player_id, tick, 3, 420,
+                    )
                 {
                     return Self::release_channel_input(ctx);
                 }
 
                 if Self::champion_is(ctx, "Kricketune")
                     && matches!(base_input, Some(Input::Skill { .. }))
-                    && !crate::legacy::pokemon_status::sticky_web_ready_for_player(player_id, tick, 5, 1800)
+                    && !crate::legacy::pokemon_status::sticky_web_ready_for_player(
+                        player_id, tick, 5, 1800,
+                    )
                 {
                     return Self::release_channel_input(ctx);
                 }
@@ -25602,7 +26151,9 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
 
                 if Self::champion_is(ctx, "Delibird")
                     && matches!(base_input, Some(Input::Skill { .. } | Input::Skill2 { .. }))
-                    && !crate::legacy::pokemon_status::delibird_present_heal_ready_for_player(player_id, 4)
+                    && !crate::legacy::pokemon_status::delibird_present_heal_ready_for_player(
+                        player_id, 4,
+                    )
                 {
                     if let Some(input) = delibird_basic_input_for_player(player_id, tick) {
                         return Self::replace_if_valid(ctx, Some(input));
@@ -25611,9 +26162,10 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                 }
 
                 if Self::champion_is(ctx, "Sawk & Throh") {
-                    let should_switch = crate::legacy::pokemon_status::should_sawk_throh_switch_for_player(
-                        player_id, hp_ratio,
-                    );
+                    let should_switch =
+                        crate::legacy::pokemon_status::should_sawk_throh_switch_for_player(
+                            player_id, hp_ratio,
+                        );
                     if matches!(base_input, Some(Input::Skill { .. })) && !should_switch {
                         return Self::release_channel_input(ctx);
                     }
@@ -25629,18 +26181,8 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                     let base_target = base_input.as_ref().and_then(Self::target_for_input);
                     let preferred_target = base_target
                         .or_else(|| nearest_enemy_target_for_player(player_id, tick, 220_000));
-                    let mut learned_count =
+                    let learned_count =
                         crate::legacy::pokemon_status::smeargle_learned_count_for_player(player_id);
-                    if learned_count == 0
-                        && tick >= SMEARGLE_FIRST_MOVE_FALLBACK_TICKS
-                        && crate::legacy::pokemon_status::smeargle_force_learn_for_player(
-                            player_id,
-                            SMEARGLE,
-                            SMEARGLE_MINION_ATTACK,
-                        )
-                    {
-                        learned_count = 1;
-                    }
 
                     if let Some(slot) =
                         crate::legacy::pokemon_status::smeargle_active_sketch_slot_with_valid_candidate_for_player(
@@ -25728,9 +26270,7 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                     return Self::replace_if_valid(ctx, Some(input));
                 }
 
-                if let Some(input) =
-                    web_walker_move_input_for_player(player_id, tick, base_input.as_ref())
-                {
+                if let Some(input) = detected_input {
                     return Self::replace_if_valid(ctx, Some(input));
                 }
 
@@ -25783,7 +26323,9 @@ fn handle_electrode_aftermath(ctx: &mut GameCtx, entity: usize, attacker: usize)
         return;
     }
     let close_contact = distance_sq(defender_pos, attacker_pos) <= 30000_u64.saturating_mul(30000);
-    if !close_contact && !crate::legacy::pokemon_status::recent_physical_basic_hit(ctx, attacker, entity) {
+    if !close_contact
+        && !crate::legacy::pokemon_status::recent_physical_basic_hit(ctx, attacker, entity)
+    {
         return;
     }
 
@@ -25828,7 +26370,8 @@ fn handle_pyukumuku_damaged(ctx: &mut GameCtx, entity: usize, attacker: usize, d
 
     let in_melee_range = distance_sq(defender_pos, attacker_pos) <= 28000_u64.saturating_mul(28000);
     let should_reflect_barbs = if attacker_is_champion {
-        in_melee_range && crate::legacy::pokemon_status::consume_physical_basic_hit(ctx, attacker, entity)
+        in_melee_range
+            && crate::legacy::pokemon_status::consume_physical_basic_hit(ctx, attacker, entity)
     } else {
         in_melee_range && (attacker_is_minion || attacker_is_jungle)
     };
@@ -25837,7 +26380,8 @@ fn handle_pyukumuku_damaged(ctx: &mut GameCtx, entity: usize, attacker: usize, d
         && should_reflect_barbs
         && crate::legacy::pokemon_status::try_begin_spiked_hide_reflect(ctx, entity, attacker)
     {
-        let barb_stacks = crate::legacy::pokemon_status::note_pyukumuku_barb_hit(ctx, entity, attacker);
+        let barb_stacks =
+            crate::legacy::pokemon_status::note_pyukumuku_barb_hit(ctx, entity, attacker);
         let reflected = pyukumuku_barb_reflect_damage(&defender_stat, damage, barb_stacks);
         if reflected > 0 {
             crate::legacy::pokemon_status::deal_tracked_damage(
@@ -25904,6 +26448,7 @@ fn apply_force_move_toward(
     speed: u64,
     tick: u64,
 ) {
+    if crate::motion::resolving(caster_id) { return; }
     let Some(caster) = ctx.get_entity(caster_id) else {
         return;
     };
@@ -25918,6 +26463,8 @@ fn apply_force_move_toward(
     if stalwart_blocks_force_move(ctx, caster_id, caster_id) {
         return;
     }
+    let speed = bounded_force_move_speed(speed, tick, integer_sqrt(distance_sq(caster_pos, target_pos)));
+    if speed == 0 { return; }
     let dx = target_pos.x as i64 - caster_pos.x as i64;
     let dy = target_pos.y as i64 - caster_pos.y as i64;
     crate::legacy::pokemon_status::apply_pokemon_cc(
@@ -25940,6 +26487,7 @@ fn apply_force_move_toward_bounded(
     speed: u64,
     tick: u64,
 ) {
+    if crate::motion::resolving(caster_id) { return; }
     let Some(caster) = ctx.get_entity(caster_id) else {
         return;
     };
@@ -25979,7 +26527,12 @@ fn apply_limber_aware_stun(ctx: &mut GameCtx, caster_id: usize, target_id: usize
         return;
     }
     crate::legacy::pokemon_status::break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
-    crate::legacy::pokemon_status::apply_pokemon_cc(ctx, caster_id, target_id, CCState::Stun { tick });
+    crate::legacy::pokemon_status::apply_pokemon_cc(
+        ctx,
+        caster_id,
+        target_id,
+        CCState::Stun { tick },
+    );
     crate::legacy::pokemon_status::note_steadfast_cc(ctx, target_id);
 }
 
@@ -25988,7 +26541,12 @@ fn apply_limber_aware_airborne(ctx: &mut GameCtx, caster_id: usize, target_id: u
         return;
     }
     crate::legacy::pokemon_status::break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
-    crate::legacy::pokemon_status::apply_pokemon_cc(ctx, caster_id, target_id, CCState::Airborne { tick });
+    crate::legacy::pokemon_status::apply_pokemon_cc(
+        ctx,
+        caster_id,
+        target_id,
+        CCState::Airborne { tick },
+    );
     crate::legacy::pokemon_status::note_steadfast_cc(ctx, target_id);
 }
 
@@ -26030,7 +26588,12 @@ fn apply_limber_aware_bind(ctx: &mut GameCtx, caster_id: usize, target_id: usize
         return;
     }
     crate::legacy::pokemon_status::break_kommoo_duel_on_hard_cc(ctx, caster_id, target_id);
-    crate::legacy::pokemon_status::apply_pokemon_cc(ctx, caster_id, target_id, CCState::Bind { tick });
+    crate::legacy::pokemon_status::apply_pokemon_cc(
+        ctx,
+        caster_id,
+        target_id,
+        CCState::Bind { tick },
+    );
     crate::legacy::pokemon_status::note_steadfast_cc(ctx, target_id);
 }
 
@@ -26101,9 +26664,12 @@ fn apply_force_move_toward_pos(
     speed: u64,
     tick: u64,
 ) {
+    if crate::motion::resolving(entity_id) { return; }
     if crate::legacy::pokemon_status::smoke_screen_blocks_line(ctx, entity_pos, target_pos) {
         return;
     }
+    let speed = bounded_force_move_speed(speed, tick, integer_sqrt(distance_sq(entity_pos, target_pos)));
+    if speed == 0 { return; }
     let dx = target_pos.x as i64 - entity_pos.x as i64;
     let dy = target_pos.y as i64 - entity_pos.y as i64;
     crate::legacy::pokemon_status::apply_pokemon_cc(
@@ -26127,6 +26693,7 @@ fn apply_force_move_toward_pos_bounded(
     speed: u64,
     tick: u64,
 ) {
+    if crate::motion::resolving(entity_id) { return; }
     if crate::legacy::pokemon_status::smoke_screen_blocks_line(ctx, entity_pos, target_pos) {
         return;
     }
@@ -26165,7 +26732,12 @@ fn apply_airborne_force_move_toward_pos(
     }
     let dx = target_pos.x as i64 - entity_pos.x as i64;
     let dy = target_pos.y as i64 - entity_pos.y as i64;
-    crate::legacy::pokemon_status::apply_pokemon_cc(ctx, entity_id, entity_id, CCState::Airborne { tick });
+    crate::legacy::pokemon_status::apply_pokemon_cc(
+        ctx,
+        entity_id,
+        entity_id,
+        CCState::Airborne { tick },
+    );
     crate::legacy::pokemon_status::apply_pokemon_cc(
         ctx,
         entity_id,
@@ -26177,6 +26749,20 @@ fn apply_airborne_force_move_toward_pos(
             speed,
         },
     );
+}
+
+pub(crate) fn resolve_dedenne_contact(ctx: &mut GameCtx, champion: PokemonChampion,
+    action: PokemonMove, caster: usize, target: usize, empowered: bool) {
+    let PokemonMoveEffect::DedennePlayRough {base_ad,ad_ratio,empowered_damage_bonus_percent,silence_ticks,..}=action.effect else{return;};
+    let Some(entity)=ctx.get_entity(caster) else{return;};
+    let mut damage=base_ad+entity.stat().attack.saturating_mul(ad_ratio)/100;
+    if empowered {damage=damage.saturating_mul(100+empowered_damage_bonus_percent)/100;}
+    let (element,types)=active_action_typing(ctx,caster,champion,action);
+    let defender=effective_defender_types(ctx,target,element);
+    crate::legacy::pokemon_status::note_smeargle_affected(ctx,target,champion,action);
+    deal_move_or_volt_absorb_pokemon_damage(ctx,champion,action,caster,target,damage.max(1),0,
+        action.attack_type,element,types,defender);
+    if empowered {crate::legacy::pokemon_status::apply_pokemon_cc(ctx,caster,target,CCState::BlockSkill{tick:silence_ticks});}
 }
 
 fn apply_ribombee_rescue(
@@ -26203,7 +26789,9 @@ fn apply_ribombee_rescue(
     let target_pos = target.pos();
     drop(target);
 
-    apply_force_move_toward_pos(ctx, caster_id, caster_pos, target_pos, speed, ticks / 2);
+    if !crate::motion::resolving(caster_id) {
+        apply_force_move_toward_pos(ctx, caster_id, caster_pos, target_pos, speed, ticks / 2);
+    }
 
     let away_from = closest_enemy_target(ctx, caster_team, target_pos)
         .and_then(|enemy_id| ctx.get_entity(enemy_id).map(|enemy| enemy.pos()))
@@ -26279,8 +26867,8 @@ fn apply_audino_substitute_displacement(
     ctx: &mut GameCtx,
     caster_id: usize,
     target_id: usize,
-    speed: u64,
-    tick: u64,
+    _speed: u64,
+    _tick: u64,
 ) {
     let Some(caster) = ctx.get_entity(caster_id) else {
         return;
@@ -26296,8 +26884,11 @@ fn apply_audino_substitute_displacement(
     drop(caster);
     drop(target);
 
-    apply_airborne_force_move_toward_pos(ctx, caster_id, caster_pos, target_pos, speed, tick);
-    apply_airborne_force_move_toward_pos(ctx, target_id, target_pos, caster_pos, speed, tick);
+    if ctx.entity_set_pos(caster_id, target_pos.x, target_pos.y)
+        && !ctx.entity_set_pos(target_id, caster_pos.x, caster_pos.y)
+    {
+        ctx.entity_set_pos(caster_id, caster_pos.x, caster_pos.y);
+    }
 }
 
 fn apply_phantom_force_splash_on_kill(
@@ -26324,6 +26915,9 @@ fn apply_phantom_force_splash_on_kill(
     if splash_damage == 0 {
         return;
     }
+
+    crate::native_vfx::burst(ctx, "banette_ult_phantom_splash", caster_id,
+        InputTarget::Pos { x: center.x, y: center.y }, radius);
 
     let splash_targets = collect_enemy_targets(ctx, caster_team, |pos| {
         distance_sq(pos, center) <= radius.saturating_mul(radius)
@@ -26354,46 +26948,18 @@ fn apply_stat_steal(
     stat_percent: i32,
     ticks: usize,
 ) {
-    if caster_id == target_id || stat_percent == 0 || ticks == 0 {
+    if caster_id == target_id || stat_percent <= 0 || ticks == 0 {
         return;
     }
+    let Some(equipment) = crate::equipment::for_entity(ctx, target_id) else {
+        return;
+    };
     let roll = splitmix64(
         ctx.seed() ^ ((caster_id as u64) << 32) ^ ((target_id as u64) << 12) ^ ctx.tick() as u64,
-    ) % 6;
-    let mut stolen = BuffState {
-        duration: BuffType::Time { tick: ticks },
-        ..Default::default()
-    };
-    let mut loss = BuffState {
-        duration: BuffType::Time { tick: ticks },
-        ..Default::default()
-    };
-    match roll {
-        0 => {
-            stolen.attack_mult = stat_percent;
-            loss.attack_mult = -stat_percent;
-        }
-        1 => {
-            stolen.attack_speed_mult = stat_percent;
-            loss.attack_speed_mult = -stat_percent;
-        }
-        2 => {
-            stolen.crit_chance = stat_percent;
-            loss.crit_chance = -stat_percent;
-        }
-        3 => {
-            stolen.defence_mult = stat_percent;
-            loss.defence_mult = -stat_percent;
-        }
-        4 => {
-            stolen.magic_resistance_mult = stat_percent;
-            loss.magic_resistance_mult = -stat_percent;
-        }
-        _ => {
-            stolen.move_speed_mult = stat_percent;
-            loss.move_speed_mult = -stat_percent;
-        }
-    }
+    );
+    let Some(contribution) = equipment.steal(roll, stat_percent) else { return; };
+    let stolen = contribution.buff(100, ticks);
+    let loss = contribution.buff(-100, ticks);
     crate::legacy::pokemon_status::add_beneficial_buff(ctx, caster_id, caster_id, stolen);
     crate::legacy::pokemon_status::add_harmful_buff(ctx, caster_id, target_id, loss);
 }
@@ -26411,69 +26977,63 @@ fn apply_poltergeist_damage(
     if !target.is_alive() {
         return;
     }
-    let target_stat = target.stat();
     let level = target.level();
     drop(target);
 
-    let Some(champion_id) = crate::legacy::pokemon_status::champion_id_for_entity(target_id) else {
+    let Some(equipment) = crate::equipment::for_entity(ctx, target_id) else {
         return;
     };
-    let Some(base_stat) = champion_base_stat_for_level(champion_id, level) else {
-        return;
-    };
+    let base_stat = crate::legacy::pokemon_status::champion_id_for_entity(target_id)
+        .and_then(|id| champion_base_stat_for_level(id, level))
+        .unwrap_or_default();
+    let item_stat = equipment.poltergeist_stats(base_stat);
 
     let mut candidates: Vec<(usize, usize)> = Vec::new();
     push_poltergeist_candidate(
         &mut candidates,
-        target_stat.attack.saturating_sub(base_stat.attack),
+        item_stat.attack,
         damage_percent,
         true,
         1,
     );
     push_poltergeist_candidate(
         &mut candidates,
-        target_stat
-            .magic_power
-            .saturating_sub(base_stat.magic_power),
+        item_stat.magic_power,
         damage_percent,
         false,
         1,
     );
     push_poltergeist_candidate(
         &mut candidates,
-        target_stat.hp.saturating_sub(base_stat.hp),
+        item_stat.hp,
         damage_percent,
         true,
         4,
     );
     push_poltergeist_candidate(
         &mut candidates,
-        target_stat.defence.saturating_sub(base_stat.defence),
+        item_stat.defence,
         damage_percent,
         true,
         1,
     );
     push_poltergeist_candidate(
         &mut candidates,
-        target_stat
-            .magic_resistance
-            .saturating_sub(base_stat.magic_resistance),
+        item_stat.magic_resistance,
         damage_percent,
         false,
         1,
     );
     push_poltergeist_candidate(
         &mut candidates,
-        target_stat.move_speed.saturating_sub(base_stat.move_speed),
+        item_stat.move_speed,
         damage_percent,
         true,
         8,
     );
     push_poltergeist_candidate(
         &mut candidates,
-        target_stat
-            .crit_chance
-            .saturating_sub(base_stat.crit_chance),
+        item_stat.crit_chance,
         damage_percent,
         true,
         1,
@@ -26548,7 +27108,8 @@ fn apply_mega_launcher_damage(
         return (ad_damage, ap_damage);
     }
 
-    let crit_percent = crate::legacy::pokemon_status::note_mega_launcher_hit(ctx, caster_id, target_id);
+    let crit_percent =
+        crate::legacy::pokemon_status::note_mega_launcher_hit(ctx, caster_id, target_id);
     let crit_percent = crit_percent.saturating_add(generic_crit_chance);
     if !mega_launcher_crits(
         ctx.seed(),
@@ -26561,15 +27122,35 @@ fn apply_mega_launcher_damage(
         return (ad_damage, ap_damage);
     }
 
-    let crit_damage_percent = crate::legacy::pokemon_status::adjust_incoming_critical_damage_percent(
-        ctx,
-        target_id,
-        200 + crit_percent.saturating_sub(100),
-    );
+    let crit_damage_percent =
+        crate::legacy::pokemon_status::adjust_incoming_critical_damage_percent(
+            ctx,
+            target_id,
+            200 + crit_percent.saturating_sub(100),
+        );
     (
         ad_damage.saturating_mul(crit_damage_percent) / 100,
         ap_damage.saturating_mul(crit_damage_percent) / 100,
     )
+}
+
+fn engine_crit_for_move(ctx: &GameCtx, champion_id: &str, action: PokemonMove,
+    caster: usize, target: usize) -> bool {
+    use crate::legacy::pokemon_status as status;
+    if !is_basic_action(action) || !matches!(action.effect,
+        PokemonMoveEffect::DirectDamage { .. } | PokemonMoveEffect::MultiHitDamage { mega_launcher: false, .. }) {
+        return false;
+    }
+    let special = ["pokemon_moba_blastoise", "pokemon_moba_inteleon", "pokemon_moba_delibird",
+        "pokemon_moba_kleavor", "pokemon_moba_octillery", "pokemon_moba_kingdra",
+        "pokemon_moba_sirfetchd", "pokemon_moba_vanilluxe", "pokemon_moba_thievul",
+        "pokemon_moba_weavile", "pokemon_moba_marowak", "pokemon_moba_sawk_throh"];
+    !special.iter().any(|id| *id == champion_id || status::receiver_has_copied(caster, id))
+        && !status::has_shell_armor(ctx, target)
+        && !status::requires_resolved_crit(ctx, target)
+        && status::adjust_incoming_critical_damage_percent(ctx, target, 200) == 200
+        && ctx.get_entity(caster).map_or(false, |entity| entity.stat().crit_chance <= 100)
+        && status::thievul_stakeout_bonus(ctx, caster, target).is_none()
 }
 
 fn apply_basic_attack_crit(
@@ -26584,6 +27165,9 @@ fn apply_basic_attack_crit(
     ad_damage: usize,
     ap_damage: usize,
 ) -> (usize, usize) {
+    if engine_crit_for_move(ctx, champion_id, action, caster_id, target_id) {
+        return (ad_damage, ap_damage);
+    }
     let can_crit = is_basic_action(action)
         || (champion_id == "pokemon_moba_kleavor"
             && matches!(effect, PokemonMoveEffect::MultiHitDamage { .. }))
@@ -26605,11 +27189,12 @@ fn apply_basic_attack_crit(
         return (ad_damage, ap_damage);
     }
 
-    let crit_damage_percent = crate::legacy::pokemon_status::adjust_incoming_critical_damage_percent(
-        ctx,
-        target_id,
-        crit_damage_percent(caster_id, champion_id, crit_chance),
-    );
+    let crit_damage_percent =
+        crate::legacy::pokemon_status::adjust_incoming_critical_damage_percent(
+            ctx,
+            target_id,
+            crit_damage_percent(caster_id, champion_id, crit_chance),
+        );
     (
         ad_damage.saturating_mul(crit_damage_percent) / 100,
         ap_damage.saturating_mul(crit_damage_percent) / 100,
@@ -26738,7 +27323,10 @@ fn leek_crit_eligible(
             action.slot,
             ActionSlot::Attack | ActionSlot::Skill | ActionSlot::Ult
         )
-    } else if crate::legacy::pokemon_status::receiver_has_copied(caster_id, "pokemon_moba_sirfetchd") {
+    } else if crate::legacy::pokemon_status::receiver_has_copied(
+        caster_id,
+        "pokemon_moba_sirfetchd",
+    ) {
         is_basic_action(action)
     } else {
         let _ = ctx;
@@ -27148,7 +27736,9 @@ fn is_structure_or_jungle(ctx: &GameCtx, entity_id: usize) -> bool {
 }
 
 fn effective_defender_types(ctx: &GameCtx, target_id: usize, move_type: PokemonType) -> TypeSet {
-    if matches!(move_type, PokemonType::Water) && crate::legacy::pokemon_status::is_soaked(ctx, target_id) {
+    if matches!(move_type, PokemonType::Water)
+        && crate::legacy::pokemon_status::is_soaked(ctx, target_id)
+    {
         TypeSet::single(PokemonType::Fire)
     } else {
         crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id)
@@ -27193,7 +27783,8 @@ fn apply_yanmega_tinted_lens_modifier(
     if !crate::legacy::pokemon_status::yanmega_tinted_lens_active(ctx, caster_id) {
         return (ad_damage, ap_damage);
     }
-    let (type_num, type_den) = crate::legacy::pokemon_types::type_modifier_ratio(move_type, defender_types);
+    let (type_num, type_den) =
+        crate::legacy::pokemon_types::type_modifier_ratio(move_type, defender_types);
     if type_num >= type_den || type_num == 0 {
         return (ad_damage, ap_damage);
     }
@@ -27255,7 +27846,8 @@ fn deal_move_or_volt_absorb_pokemon_damage(
     if !move_damage_target_allowed(ctx, champion, action, target_id) {
         return crate::legacy::pokemon_status::PokemonDamageResult::default();
     }
-    deal_or_volt_absorb_pokemon_damage_with_tower_policy(
+    let engine_crit = engine_crit_for_move(ctx, champion.id, action, caster_id, target_id);
+    crate::combat_crit::with_engine_hit(engine_crit, caster_id, target_id, || deal_or_volt_absorb_pokemon_damage_with_tower_policy(
         ctx,
         caster_id,
         target_id,
@@ -27266,7 +27858,7 @@ fn deal_move_or_volt_absorb_pokemon_damage(
         attacker_types,
         defender_types,
         target_is_tower(ctx, target_id),
-    )
+    ))
 }
 
 fn deal_move_tracked_damage(
@@ -27282,14 +27874,15 @@ fn deal_move_tracked_damage(
     if !move_damage_target_allowed(ctx, champion, action, target_id) {
         return crate::legacy::pokemon_status::PokemonDamageResult::default();
     }
-    crate::legacy::pokemon_status::deal_tracked_damage(
+    let engine_crit = engine_crit_for_move(ctx, champion.id, action, caster_id, target_id);
+    crate::combat_crit::with_engine_hit(engine_crit, caster_id, target_id, || crate::legacy::pokemon_status::deal_tracked_damage(
         ctx,
         caster_id,
         target_id,
         ad_damage,
         ap_damage,
         attack_type,
-    )
+    ))
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -27398,7 +27991,9 @@ fn deal_or_volt_absorb_pokemon_damage_with_tower_policy(
         (ad_damage, ap_damage)
     };
     let glyph_bonus = if matches!(attack_type, AttackType::Skill) {
-        crate::legacy::pokemon_status::sigilyph_glyph_damage_bonus_percent(ctx, caster_id, target_id)
+        crate::legacy::pokemon_status::sigilyph_glyph_damage_bonus_percent(
+            ctx, caster_id, target_id,
+        )
     } else {
         0
     };
@@ -27426,19 +28021,18 @@ fn deal_or_volt_absorb_pokemon_damage_with_tower_policy(
             target_id,
             crate::legacy::pokemon_status::WEAVILE_LONE_PREDATOR_RADIUS,
         );
-    let (ad_damage, ap_damage) =
-        if lone_predator_bonus {
-            (
-                ad_damage.saturating_mul(100usize.saturating_add(
-                    crate::legacy::pokemon_status::WEAVILE_LONE_PREDATOR_DAMAGE_BONUS_PERCENT,
-                )) / 100,
-                ap_damage.saturating_mul(100usize.saturating_add(
-                    crate::legacy::pokemon_status::WEAVILE_LONE_PREDATOR_DAMAGE_BONUS_PERCENT,
-                )) / 100,
-            )
-        } else {
-            (ad_damage, ap_damage)
-        };
+    let (ad_damage, ap_damage) = if lone_predator_bonus {
+        (
+            ad_damage.saturating_mul(100usize.saturating_add(
+                crate::legacy::pokemon_status::WEAVILE_LONE_PREDATOR_DAMAGE_BONUS_PERCENT,
+            )) / 100,
+            ap_damage.saturating_mul(100usize.saturating_add(
+                crate::legacy::pokemon_status::WEAVILE_LONE_PREDATOR_DAMAGE_BONUS_PERCENT,
+            )) / 100,
+        )
+    } else {
+        (ad_damage, ap_damage)
+    };
     if lone_predator_bonus && matches!(attack_type, AttackType::BaseAttack) {
         crate::legacy::pokemon_status::add_beneficial_buff(
             ctx,
@@ -27565,8 +28159,10 @@ fn random_type_weak_to(
         .iter()
         .copied()
         .filter(|candidate| {
-            let (num, den) =
-                crate::legacy::pokemon_types::type_modifier_ratio(front_type, TypeSet::single(*candidate));
+            let (num, den) = crate::legacy::pokemon_types::type_modifier_ratio(
+                front_type,
+                TypeSet::single(*candidate),
+            );
             num > den
         })
         .collect();
@@ -27689,7 +28285,8 @@ fn log_native_damage_probe(
     }
     let (before_hp, before_shield) = before.unwrap_or((0, 0));
     let (after_hp, after_shield) = after.unwrap_or((0, 0));
-    let attacker_player = crate::legacy::pokemon_status::player_for_entity(attacker).unwrap_or(attacker);
+    let attacker_player =
+        crate::legacy::pokemon_status::player_for_entity(attacker).unwrap_or(attacker);
     let target_player = crate::legacy::pokemon_status::player_for_entity(target).unwrap_or(target);
     let attacker_champion =
         crate::legacy::pokemon_status::champion_id_for_entity(attacker).unwrap_or("unknown");
@@ -27775,7 +28372,8 @@ fn apply_forced_self_crit(ctx: &mut GameCtx, target_id: usize, crit_damage_perce
 
     let attacker_types = crate::legacy::pokemon_status::entity_types(target_id)
         .unwrap_or(TypeSet::single(PokemonType::Normal));
-    let defender_types = crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
+    let defender_types =
+        crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
     let damage = if crate::legacy::pokemon_status::has_shell_armor(ctx, target_id) {
         target_stat.attack.max(1)
     } else {
@@ -27860,7 +28458,7 @@ const JOLTEON: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Electric),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range, ChampionTag::CC],
-    stat: stat(68, 38, 500, 18, 24, 1310, 2),
+    stat: stat(68, 38, 500, 18, 24, 898, 2),
     growth: stat(7, 4, 54, 2, 3, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -27961,7 +28559,7 @@ const FLAREON: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::Dot,
     ],
-    stat: stat(28, 78, 500, 16, 26, 900, 1),
+    stat: stat(28, 78, 500, 16, 26, 807, 1),
     growth: stat(2, 9, 52, 2, 3, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28086,7 +28684,7 @@ const VAPOREON: PokemonChampion = PokemonChampion {
         ChampionTag::Magic,
         ChampionTag::Heal,
     ],
-    stat: stat(32, 54, 980, 48, 44, 870, 8),
+    stat: stat(32, 54, 980, 48, 44, 800, 8),
     growth: stat(2, 5, 118, 6, 5, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28185,7 +28783,7 @@ const LEAFEON: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Grass),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Range, ChampionTag::Dot],
-    stat: stat(78, 28, 480, 16, 20, 1280, 1),
+    stat: stat(78, 28, 480, 16, 20, 891, 1),
     growth: stat(8, 2, 50, 2, 2, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28290,7 +28888,7 @@ const GLACEON: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Ice),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range, ChampionTag::CC],
-    stat: stat(74, 32, 520, 18, 24, 1220, 2),
+    stat: stat(74, 32, 520, 18, 24, 878, 2),
     growth: stat(8, 2, 55, 2, 3, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28398,7 +28996,7 @@ const UMBREON: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Dark),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(74, 26, 540, 22, 26, 1260, 2),
+    stat: stat(74, 26, 540, 22, 26, 887, 2),
     growth: stat(8, 2, 56, 3, 3, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28508,7 +29106,7 @@ const ESPEON: PokemonChampion = PokemonChampion {
         ChampionTag::CC,
         ChampionTag::Range,
     ],
-    stat: stat(36, 72, 720, 32, 42, 1150, 4),
+    stat: stat(36, 72, 720, 32, 42, 862, 4),
     growth: stat(3, 6, 76, 3, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28600,7 +29198,7 @@ const SYLVEON: PokemonChampion = PokemonChampion {
         ChampionTag::Heal,
         ChampionTag::Range,
     ],
-    stat: stat(24, 62, 690, 34, 44, 1180, 3),
+    stat: stat(24, 62, 690, 34, 44, 869, 3),
     growth: stat(2, 6, 74, 3, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28697,7 +29295,7 @@ const EEVEE: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Normal),
     category: ChampionCategory::Util,
     tags: &[ChampionTag::Heal, ChampionTag::Shield, ChampionTag::Range],
-    stat: stat(22, 48, 500, 18, 24, 1210, 3),
+    stat: stat(22, 48, 500, 18, 24, 876, 3),
     growth: stat(1, 5, 48, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28793,7 +29391,7 @@ const VENUSAUR: PokemonChampion = PokemonChampion {
         ChampionTag::Dot,
         ChampionTag::Melee,
     ],
-    stat: stat(42, 44, 920, 42, 42, 930, 6),
+    stat: stat(42, 44, 920, 42, 42, 813, 6),
     growth: stat(3, 4, 105, 5, 5, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28889,7 +29487,7 @@ const BLASTOISE: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Water),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range, ChampionTag::Tank],
-    stat: stat(64, 38, 760, 34, 28, 990, 4),
+    stat: stat(64, 38, 760, 34, 28, 827, 4),
     growth: stat(6, 3, 86, 4, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -28993,7 +29591,7 @@ const FERALIGATR: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Water),
     category: ChampionCategory::Melee,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::Tank],
-    stat: stat(72, 30, 840, 42, 34, 1040, 5),
+    stat: stat(72, 30, 840, 42, 34, 838, 5),
     growth: stat(7, 3, 92, 5, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29094,7 +29692,7 @@ const EMBOAR: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(78, 20, 820, 38, 30, 980, 5),
+    stat: stat(78, 20, 820, 38, 30, 825, 5),
     growth: stat(7, 2, 88, 4, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29194,7 +29792,7 @@ const BLAZIKEN: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Fire, PokemonType::Fighting),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee],
-    stat: stat(86, 20, 650, 24, 22, 1120, 3),
+    stat: stat(86, 20, 650, 24, 22, 856, 3),
     growth: stat(8, 2, 64, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29309,7 +29907,7 @@ const GRENINJA: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Water, PokemonType::Dark),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee],
-    stat: stat(84, 16, 640, 23, 22, 1280, 3),
+    stat: stat(84, 16, 640, 23, 22, 891, 3),
     growth: stat(9, 1, 62, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29408,7 +30006,7 @@ const DECIDUEYE: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Grass, PokemonType::Ghost),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(78, 13, 620, 22, 20, 980, 3),
+    stat: stat(78, 13, 620, 22, 20, 825, 3),
     growth: stat(9, 1, 58, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29504,7 +30102,7 @@ const INTELEON: PokemonChampion = PokemonChampion {
     tags: &[ChampionTag::AD, ChampionTag::Range],
     stat: EntityStat {
         crit_chance: 12,
-        ..stat(68, 10, 500, 14, 16, 850, 1)
+        ..stat(68, 10, 500, 14, 16, 796, 1)
     },
     growth: stat(7, 1, 42, 1, 1, 0, 1),
     attack: PokemonMove {
@@ -29598,7 +30196,7 @@ const SKELEDIRGE: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::Dot,
     ],
-    stat: stat(44, 72, 820, 36, 34, 760, 6),
+    stat: stat(44, 72, 820, 36, 34, 772, 6),
     growth: stat(3, 8, 88, 4, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29694,7 +30292,7 @@ const PORYGONZ: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Normal),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Magic, ChampionTag::Range],
-    stat: stat(36, 86, 560, 17, 22, 1120, 2),
+    stat: stat(36, 86, 560, 17, 22, 856, 2),
     growth: stat(2, 10, 50, 1, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29781,7 +30379,7 @@ const BLISSEY: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Normal),
     category: ChampionCategory::Util,
     tags: &[ChampionTag::Heal, ChampionTag::Tank, ChampionTag::Melee],
-    stat: stat(24, 18, 3100, 12, 14, 650, 20),
+    stat: stat(24, 18, 3100, 12, 14, 728, 20),
     growth: stat(1, 2, 260, 1, 1, 0, 4),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29872,7 +30470,7 @@ const KLEAVOR: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::Dot,
     ],
-    stat: stat(76, 16, 790, 38, 25, 850, 5),
+    stat: stat(76, 16, 790, 38, 25, 796, 5),
     growth: stat(8, 1, 78, 4, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29970,7 +30568,7 @@ const SCIZOR: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Bug, PokemonType::Steel),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::Shield],
-    stat: stat(88, 12, 560, 18, 20, 1480, 2),
+    stat: stat(88, 12, 560, 18, 20, 936, 2),
     growth: stat(9, 1, 46, 2, 2, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -29989,7 +30587,7 @@ const SCIZOR: PokemonChampion = PokemonChampion {
         effect: PokemonMoveEffect::DirectDamageSpeedScale {
             base_ad: 12,
             ad_ratio: 54,
-            move_speed_ratio: 4,
+            move_speed_ratio: 6,
         },
     },
     skill: PokemonMove {
@@ -30007,7 +30605,7 @@ const SCIZOR: PokemonChampion = PokemonChampion {
         attack_type: AttackType::Skill,
         can_use_with_move: true,
         effect: PokemonMoveEffect::SelfSpeedCritBuff {
-            speed_to_crit_percent: 50,
+            speed_to_crit_percent: 79,
             ticks: 5 * 60,
         },
     },
@@ -30028,7 +30626,7 @@ const SCIZOR: PokemonChampion = PokemonChampion {
         effect: PokemonMoveEffect::DirectDamageSpeedCheckCrit {
             base_ad: 42,
             ad_ratio: 88,
-            target_speed_under_caster_percent: 50,
+            target_speed_under_caster_percent: 81,
             force_move_speed: 14500,
             force_move_ticks: 8,
         },
@@ -30067,7 +30665,7 @@ const URSALUNA: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(70, 12, 1120, 48, 34, 720, 7),
+    stat: stat(70, 12, 1120, 48, 34, 756, 7),
     growth: stat(7, 1, 118, 6, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -30171,7 +30769,7 @@ const SAWK_THROH: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(74, 10, 760, 34, 28, 1060, 4),
+    stat: stat(74, 10, 760, 34, 28, 842, 4),
     growth: stat(7, 1, 82, 4, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -30277,7 +30875,7 @@ const HITMONCHAN: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(84, 12, 780, 38, 30, 1040, 5),
+    stat: stat(84, 12, 780, 38, 30, 838, 5),
     growth: stat(9, 1, 82, 4, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -30374,7 +30972,7 @@ const HITMONLEE: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Fighting),
     category: ChampionCategory::Melee,
     tags: &[ChampionTag::AD, ChampionTag::Melee],
-    stat: stat(96, 8, 620, 24, 22, 860, 3),
+    stat: stat(96, 8, 620, 24, 22, 798, 3),
     growth: stat(11, 1, 64, 3, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -30475,7 +31073,7 @@ const HITMONTOP: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Fighting),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee],
-    stat: stat(86, 8, 650, 27, 24, 1120, 3),
+    stat: stat(86, 8, 650, 27, 24, 856, 3),
     growth: stat(10, 1, 66, 3, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -30569,7 +31167,7 @@ const KILOWATTREL: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Electric, PokemonType::Flying),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Range],
-    stat: stat(34, 94, 610, 23, 31, 1060, 3),
+    stat: stat(34, 94, 610, 23, 31, 842, 3),
     growth: stat(3, 11, 62, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -30670,7 +31268,7 @@ const BEEHEEYEM: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Psychic),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Magic, ChampionTag::Range],
-    stat: stat(36, 92, 660, 25, 36, 620, 4),
+    stat: stat(36, 92, 660, 25, 36, 716, 4),
     growth: stat(2, 9, 66, 2, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -30865,7 +31463,7 @@ const NOIVERN: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Flying, PokemonType::Dragon),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Magic, ChampionTag::Range],
-    stat: stat(34, 108, 620, 22, 29, 1040, 3),
+    stat: stat(34, 108, 620, 22, 29, 838, 3),
     growth: stat(3, 13, 62, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -30964,7 +31562,7 @@ const MANTINE: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Water, PokemonType::Flying),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Magic, ChampionTag::Range],
-    stat: stat(33, 104, 630, 24, 32, 1000, 3),
+    stat: stat(33, 104, 630, 24, 32, 829, 3),
     growth: stat(3, 12, 66, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31068,7 +31666,7 @@ const CRYOGONAL: PokemonChampion = PokemonChampion {
         ChampionTag::CC,
         ChampionTag::Range,
     ],
-    stat: stat(30, 110, 600, 20, 35, 980, 2),
+    stat: stat(30, 110, 600, 20, 35, 825, 2),
     growth: stat(2, 13, 60, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31175,7 +31773,7 @@ const VANILLUXE: PokemonChampion = PokemonChampion {
         ChampionTag::CC,
         ChampionTag::Range,
     ],
-    stat: stat(24, 135, 430, 12, 22, 840, 2),
+    stat: stat(24, 135, 430, 12, 22, 793, 2),
     growth: stat(1, 16, 42, 1, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31279,7 +31877,7 @@ const SKARMORY: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Steel, PokemonType::Flying),
     category: ChampionCategory::Melee,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::Tank],
-    stat: stat(58, 18, 980, 58, 43, 930, 8),
+    stat: stat(58, 18, 980, 58, 43, 813, 8),
     growth: stat(4, 1, 112, 6, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31379,7 +31977,7 @@ const HOUNDOOM: PokemonChampion = PokemonChampion {
         ChampionTag::Dot,
         ChampionTag::Range,
     ],
-    stat: stat(34, 78, 735, 31, 32, 1110, 4),
+    stat: stat(34, 78, 735, 31, 32, 854, 4),
     growth: stat(2, 8, 78, 3, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31481,7 +32079,7 @@ const ARBOK: PokemonChampion = PokemonChampion {
         ChampionTag::Dot,
         ChampionTag::CC,
     ],
-    stat: stat(66, 16, 610, 24, 25, 1160, 5),
+    stat: stat(66, 16, 610, 24, 25, 865, 5),
     growth: stat(7, 1, 62, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31590,7 +32188,7 @@ const CLAWITZER: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Water),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(70, 10, 480, 16, 16, 860, 5),
+    stat: stat(70, 10, 480, 16, 16, 798, 5),
     growth: stat(8, 1, 45, 1, 1, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31687,7 +32285,7 @@ const OCTILLERY: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Water),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(68, 12, 560, 22, 22, 900, 5),
+    stat: stat(68, 12, 560, 22, 22, 807, 5),
     growth: stat(7, 1, 58, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31751,7 +32349,7 @@ const OCTILLERY: PokemonChampion = PokemonChampion {
             base_ap: 0,
             ap_ratio: 0,
             radius: 18000,
-            bounce_distance: 21000,
+            bounce_distance: 36000,
         },
     },
     ult: Some(PokemonMove {
@@ -31784,7 +32382,7 @@ const PYUKUMUKU: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Water),
     category: ChampionCategory::Util,
     tags: &[ChampionTag::Melee, ChampionTag::Tank],
-    stat: stat(18, 8, 1180, 56, 42, 720, 3),
+    stat: stat(18, 8, 1180, 56, 42, 756, 3),
     growth: stat(1, 0, 125, 6, 4, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31869,7 +32467,7 @@ const BANETTE: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Ghost),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee],
-    stat: stat(74, 12, 610, 24, 22, 1180, 8),
+    stat: stat(74, 12, 610, 24, 22, 869, 8),
     growth: stat(8, 1, 55, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -31966,7 +32564,7 @@ const KRICKETUNE: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Bug),
     category: ChampionCategory::Util,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(42, 8, 600, 24, 26, 1010, 7),
+    stat: stat(42, 8, 600, 24, 26, 831, 7),
     growth: stat(4, 0, 58, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -32063,7 +32661,7 @@ const AMBIPOM: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Normal),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(78, 12, 650, 24, 22, 1060, 5),
+    stat: stat(78, 12, 650, 24, 22, 842, 5),
     growth: stat(8, 1, 64, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -32157,7 +32755,7 @@ const GALLADE: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Psychic, PokemonType::Fighting),
     category: ChampionCategory::Melee,
     tags: &[ChampionTag::AD, ChampionTag::Melee],
-    stat: stat(102, 16, 680, 30, 24, 900, 3),
+    stat: stat(102, 16, 680, 30, 24, 807, 3),
     growth: stat(12, 1, 70, 3, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -32249,7 +32847,7 @@ const AUDINO: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Normal),
     category: ChampionCategory::Util,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::Heal],
-    stat: stat(38, 24, 980, 38, 36, 760, 6),
+    stat: stat(38, 24, 980, 38, 36, 772, 6),
     growth: stat(3, 2, 98, 4, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -32337,7 +32935,7 @@ const PANGORO: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(56, 16, 1120, 55, 42, 660, 5),
+    stat: stat(56, 16, 1120, 55, 42, 732, 5),
     growth: stat(5, 1, 96, 5, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -32431,7 +33029,7 @@ const PASSIMIAN: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Fighting),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(72, 12, 740, 31, 27, 720, 4),
+    stat: stat(72, 12, 740, 31, 27, 756, 4),
     growth: stat(7, 1, 58, 3, 2, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -32615,7 +33213,7 @@ const DRAGALGE: PokemonChampion = PokemonChampion {
         ChampionTag::Dot,
         ChampionTag::Range,
     ],
-    stat: stat(34, 80, 700, 28, 40, 740, 0),
+    stat: stat(34, 80, 700, 28, 40, 764, 0),
     growth: stat(2, 8, 60, 3, 4, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -32721,7 +33319,7 @@ const HELIOLISK: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Electric, PokemonType::Normal),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(58, 16, 610, 24, 27, 980, 8),
+    stat: stat(58, 16, 610, 24, 27, 825, 8),
     growth: stat(6, 1, 48, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -32821,7 +33419,7 @@ const TURTONATOR: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(54, 9, 890, 40, 34, 520, 7),
+    stat: stat(54, 9, 890, 40, 34, 676, 7),
     growth: stat(4, 1, 76, 4, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -32928,7 +33526,7 @@ const RIBOMBEE: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::CC,
     ],
-    stat: stat(18, 54, 520, 22, 34, 720, 5),
+    stat: stat(18, 54, 520, 22, 34, 756, 5),
     growth: stat(1, 5, 42, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33036,7 +33634,7 @@ const DRAMPA: PokemonChampion = PokemonChampion {
         ChampionTag::CC,
         ChampionTag::Range,
     ],
-    stat: stat(28, 58, 820, 36, 40, 520, 7),
+    stat: stat(28, 58, 820, 36, 40, 676, 7),
     growth: stat(2, 6, 74, 4, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33138,7 +33736,7 @@ const KOMMOO: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(72, 10, 780, 36, 30, 760, 5),
+    stat: stat(72, 10, 780, 36, 30, 772, 5),
     growth: stat(8, 1, 72, 4, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33234,7 +33832,7 @@ const THIEVUL: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Dark),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(62, 12, 610, 22, 27, 940, 7),
+    stat: stat(62, 12, 610, 22, 27, 816, 7),
     growth: stat(6, 1, 48, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33333,7 +33931,7 @@ const DREDNAW: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(44, 10, 1180, 60, 44, 560, 6),
+    stat: stat(44, 10, 1180, 60, 44, 692, 6),
     growth: stat(4, 1, 108, 6, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33438,7 +34036,7 @@ const ARCHALUDON: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(42, 8, 1240, 78, 68, 470, 8),
+    stat: stat(42, 8, 1240, 78, 68, 656, 8),
     growth: stat(3, 1, 112, 8, 7, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33537,7 +34135,7 @@ const APPLETUN: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(44, 34, 1160, 54, 48, 510, 9),
+    stat: stat(44, 34, 1160, 54, 48, 672, 9),
     growth: stat(4, 3, 98, 5, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33635,7 +34233,7 @@ const GOODRA: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(52, 14, 1040, 48, 50, 560, 7),
+    stat: stat(52, 14, 1040, 48, 50, 692, 7),
     growth: stat(5, 1, 88, 4, 5, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33735,7 +34333,7 @@ const DEDENNE: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Electric, PokemonType::Fairy),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(48, 18, 570, 24, 25, 1190, 7),
+    stat: stat(48, 18, 570, 24, 25, 871, 7),
     growth: stat(4, 1, 42, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33850,7 +34448,7 @@ const HAWLUCHA: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Fighting, PokemonType::Flying),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(58, 10, 610, 27, 24, 980, 7),
+    stat: stat(58, 10, 610, 27, 24, 825, 7),
     growth: stat(6, 1, 44, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -33960,7 +34558,7 @@ const BOUFFALANT: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Normal),
     category: ChampionCategory::Melee,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::Tank],
-    stat: stat(54, 8, 1120, 58, 44, 520, 6),
+    stat: stat(54, 8, 1120, 58, 44, 676, 6),
     growth: stat(5, 1, 104, 6, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -34176,7 +34774,7 @@ const ORBEETLE: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Bug, PokemonType::Psychic),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(58, 12, 610, 28, 28, 930, 7),
+    stat: stat(58, 12, 610, 28, 28, 813, 7),
     growth: stat(6, 1, 46, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -34278,7 +34876,7 @@ const COALOSSAL: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Rock, PokemonType::Fire),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range, ChampionTag::Tank],
-    stat: stat(72, 8, 900, 46, 34, 430, 5),
+    stat: stat(72, 8, 900, 46, 34, 640, 5),
     growth: stat(8, 0, 72, 4, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -34386,7 +34984,7 @@ const MAGMORTAR: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Fire),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(84, 8, 640, 30, 27, 520, 8),
+    stat: stat(84, 8, 640, 30, 27, 676, 8),
     growth: stat(9, 0, 48, 3, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -34507,7 +35105,7 @@ const GRAPPLOCT: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(70, 8, 820, 42, 34, 610, 5),
+    stat: stat(70, 8, 820, 42, 34, 712, 5),
     growth: stat(7, 0, 68, 4, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -34607,7 +35205,7 @@ const SIRFETCHD: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(54, 8, 830, 40, 34, 650, 5),
+    stat: stat(54, 8, 830, 40, 34, 728, 5),
     growth: stat(6, 0, 72, 4, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -34703,7 +35301,7 @@ const ARBOLIVA: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Grass, PokemonType::Normal),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range, ChampionTag::Dot],
-    stat: stat(50, 10, 540, 18, 22, 620, 3),
+    stat: stat(50, 10, 540, 18, 22, 716, 3),
     growth: stat(6, 1, 38, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -34812,7 +35410,7 @@ const ARMAROUGE: PokemonChampion = PokemonChampion {
         ChampionTag::CC,
         ChampionTag::Dot,
     ],
-    stat: stat(70, 8, 780, 88, 84, 600, 5),
+    stat: stat(70, 8, 780, 88, 84, 708, 5),
     growth: stat(7, 0, 64, 5, 5, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -34926,7 +35524,7 @@ const CERULEDGE: PokemonChampion = PokemonChampion {
         ChampionTag::CC,
         ChampionTag::Dot,
     ],
-    stat: stat(82, 14, 620, 24, 28, 1120, 3),
+    stat: stat(82, 14, 620, 24, 28, 856, 3),
     growth: stat(9, 1, 56, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35029,7 +35627,7 @@ const GHOLDENGO: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Steel, PokemonType::Ghost),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(76, 18, 620, 28, 30, 720, 4),
+    stat: stat(76, 18, 620, 28, 30, 756, 4),
     growth: stat(7, 1, 50, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35136,7 +35734,7 @@ const FROSMOTH: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::CC,
     ],
-    stat: stat(18, 46, 600, 22, 34, 690, 4),
+    stat: stat(18, 46, 600, 22, 34, 744, 4),
     growth: stat(1, 5, 48, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35245,7 +35843,7 @@ const SHEDINJA: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::CC,
     ],
-    stat: stat(8, 86, 1, 5, 5, 720, 4),
+    stat: stat(8, 86, 1, 5, 5, 756, 4),
     growth: stat(0, 8, 0, 0, 0, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35351,7 +35949,7 @@ const LUDICOLO: PokemonChampion = PokemonChampion {
         ChampionTag::Melee,
         ChampionTag::CC,
     ],
-    stat: stat(18, 38, 800, 34, 42, 700, 3),
+    stat: stat(18, 38, 800, 34, 42, 748, 3),
     growth: stat(1, 3, 78, 3, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35446,7 +36044,7 @@ const KINGDRA: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Water, PokemonType::Dragon),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::AP, ChampionTag::Range],
-    stat: stat(52, 18, 620, 26, 28, 620, 12),
+    stat: stat(52, 18, 620, 26, 28, 716, 12),
     growth: stat(5, 1, 52, 2, 2, 0, 3),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35546,7 +36144,7 @@ const DELIBIRD: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Ice, PokemonType::Flying),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(58, 12, 560, 22, 22, 620, 14),
+    stat: stat(58, 12, 560, 22, 22, 716, 14),
     growth: stat(6, 1, 46, 2, 2, 0, 3),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35637,7 +36235,7 @@ const CLOYSTER: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Water, PokemonType::Ice),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(64, 10, 700, 34, 26, 560, 18),
+    stat: stat(64, 10, 700, 34, 26, 692, 18),
     growth: stat(7, 1, 58, 4, 2, 0, 3),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35741,7 +36339,7 @@ const ELECTRODE: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Electric),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(54, 8, 560, 22, 22, 1180, 5),
+    stat: stat(54, 8, 560, 22, 22, 869, 5),
     growth: stat(5, 1, 40, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35839,7 +36437,7 @@ const SNORLAX: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Normal),
     category: ChampionCategory::Util,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::Tank],
-    stat: stat(82, 10, 980, 42, 38, 420, 8),
+    stat: stat(82, 10, 980, 42, 38, 636, 8),
     growth: stat(7, 1, 96, 5, 4, 0, 2),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -35935,7 +36533,7 @@ const ZERAORA: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Electric),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(36, 78, 650, 36, 42, 820, 13),
+    stat: stat(36, 78, 650, 36, 42, 789, 13),
     growth: stat(3, 7, 56, 3, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -36047,7 +36645,7 @@ const RILLABOOM: PokemonChampion = PokemonChampion {
         ChampionTag::CC,
         ChampionTag::Range,
     ],
-    stat: stat(42, 58, 890, 42, 38, 570, 6),
+    stat: stat(42, 58, 890, 42, 38, 696, 6),
     growth: stat(3, 4, 82, 4, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -36158,7 +36756,7 @@ const DRAGAPULT: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::Heal,
     ],
-    stat: stat(78, 54, 610, 22, 24, 760, 6),
+    stat: stat(78, 54, 610, 22, 24, 772, 6),
     growth: stat(7, 5, 52, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -36261,7 +36859,7 @@ const SHIFTRY: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Grass, PokemonType::Dark),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(84, 10, 620, 24, 22, 690, 6),
+    stat: stat(84, 10, 620, 24, 22, 744, 6),
     growth: stat(8, 1, 48, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -36365,7 +36963,7 @@ const SIGILYPH: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::CC,
     ],
-    stat: stat(18, 82, 620, 22, 30, 630, 6),
+    stat: stat(18, 82, 620, 22, 30, 720, 6),
     growth: stat(1, 8, 50, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -36466,7 +37064,7 @@ const WEAVILE: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Dark, PokemonType::Ice),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(74, 12, 610, 24, 22, 1160, 4),
+    stat: stat(74, 12, 610, 24, 22, 865, 4),
     growth: stat(7, 1, 58, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -36571,7 +37169,7 @@ const SWANNA: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::CC,
     ],
-    stat: stat(26, 77, 590, 21, 25, 1060, 6),
+    stat: stat(26, 77, 590, 21, 25, 842, 6),
     growth: stat(2, 8, 46, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -36679,7 +37277,7 @@ const MAROWAK: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Ground),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range, ChampionTag::CC],
-    stat: stat(69, 16, 720, 33, 27, 760, 5),
+    stat: stat(69, 16, 720, 33, 27, 772, 5),
     growth: stat(7, 1, 66, 3, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -36791,7 +37389,7 @@ const GARGANACL: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Rock),
     category: ChampionCategory::Melee,
     tags: &[ChampionTag::Tank, ChampionTag::AD, ChampionTag::CC],
-    stat: stat(58, 8, 1180, 64, 55, 420, 3),
+    stat: stat(58, 8, 1180, 64, 55, 636, 3),
     growth: stat(5, 1, 112, 6, 5, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -36901,7 +37499,7 @@ const AMPHAROS: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::CC,
     ],
-    stat: stat(20, 84, 560, 20, 28, 520, 5),
+    stat: stat(20, 84, 560, 20, 28, 676, 5),
     growth: stat(2, 8, 42, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -37010,7 +37608,7 @@ const XATU: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::CC,
     ],
-    stat: stat(18, 88, 540, 18, 30, 500, 5),
+    stat: stat(18, 88, 540, 18, 30, 668, 5),
     growth: stat(2, 9, 40, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -37107,7 +37705,7 @@ const QUAQUAVAL: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Water, PokemonType::Fighting),
     category: ChampionCategory::Range,
     tags: &[ChampionTag::AD, ChampionTag::Range],
-    stat: stat(82, 24, 650, 24, 22, 555, 6),
+    stat: stat(82, 24, 650, 24, 22, 690, 6),
     growth: stat(9, 2, 48, 2, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -37206,7 +37804,7 @@ const ARCANINE: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Fire),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Range],
-    stat: stat(44, 84, 820, 34, 36, 600, 5),
+    stat: stat(44, 84, 820, 34, 36, 708, 5),
     growth: stat(4, 8, 66, 3, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -37311,7 +37909,7 @@ const MISSINGNO: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Bird),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Range],
-    stat: stat(28, 94, 690, 24, 31, 560, 4),
+    stat: stat(28, 94, 690, 24, 31, 692, 4),
     growth: stat(2, 9, 46, 2, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -37424,7 +38022,7 @@ const KECLEON: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Normal),
     category: ChampionCategory::Assassin,
     tags: &[ChampionTag::AD, ChampionTag::Melee, ChampionTag::CC],
-    stat: stat(78, 18, 780, 34, 34, 575, 5),
+    stat: stat(78, 18, 780, 34, 34, 698, 5),
     growth: stat(7, 2, 58, 3, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -37527,7 +38125,7 @@ const YANMEGA: PokemonChampion = PokemonChampion {
     types: TypeSet::dual(PokemonType::Bug, PokemonType::Flying),
     category: ChampionCategory::Magician,
     tags: &[ChampionTag::AP, ChampionTag::Range, ChampionTag::CC],
-    stat: stat(34, 82, 780, 32, 34, 545, 5),
+    stat: stat(34, 82, 780, 32, 34, 686, 5),
     growth: stat(3, 7, 62, 3, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -37634,7 +38232,7 @@ const WEEZING: PokemonChampion = PokemonChampion {
         ChampionTag::Tank,
         ChampionTag::CC,
     ],
-    stat: stat(26, 58, 980, 42, 45, 500, 4),
+    stat: stat(26, 58, 980, 42, 45, 668, 4),
     growth: stat(2, 5, 78, 4, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -37752,7 +38350,7 @@ const WISHIWASHI: PokemonChampion = PokemonChampion {
         ChampionTag::CC,
         ChampionTag::Range,
     ],
-    stat: stat(34, 58, 900, 38, 38, 515, 4),
+    stat: stat(34, 58, 900, 38, 38, 674, 4),
     growth: stat(3, 5, 78, 4, 4, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -37862,7 +38460,7 @@ const COMFEY: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Fairy),
     category: ChampionCategory::Util,
     tags: &[ChampionTag::Heal, ChampionTag::Shield, ChampionTag::Range],
-    stat: stat(6, 48, 340, 14, 24, 390, 4),
+    stat: stat(6, 48, 340, 14, 24, 624, 4),
     growth: stat(0, 4, 30, 1, 2, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -38082,7 +38680,7 @@ const SMEARGLE: PokemonChampion = PokemonChampion {
     types: TypeSet::single(PokemonType::Normal),
     category: ChampionCategory::Util,
     tags: &[ChampionTag::Melee, ChampionTag::Range, ChampionTag::Magic],
-    stat: stat(52, 52, 760, 34, 34, 660, 5),
+    stat: stat(52, 52, 760, 34, 34, 732, 5),
     growth: stat(5, 5, 72, 3, 3, 0, 1),
     attack: SMEARGLE_SKETCH_ATTACK,
     skill: SMEARGLE_SKETCH_SKILL,
@@ -38193,7 +38791,7 @@ const CHARIZARD: PokemonChampion = PokemonChampion {
         ChampionTag::Range,
         ChampionTag::Dot,
     ],
-    stat: stat(38, 70, 700, 28, 30, 1050, 3),
+    stat: stat(38, 70, 700, 28, 30, 840, 3),
     growth: stat(3, 7, 78, 3, 3, 0, 1),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -38304,7 +38902,7 @@ const PIKACHU: PokemonChampion = PokemonChampion {
         ChampionTag::CC,
         ChampionTag::Range,
     ],
-    stat: stat(32, 72, 520, 18, 24, 1180, 2),
+    stat: stat(32, 72, 520, 18, 24, 869, 2),
     growth: stat(2, 8, 55, 2, 3, 0, 0),
     attack: PokemonMove {
         slot: ActionSlot::Attack,
@@ -38452,6 +39050,150 @@ mod guide_export_tests {
     use crate::legacy::pokemon_types::{type_modifier_ratio, PokemonType};
     use std::fs;
 
+    #[test]
+    fn roster_movement_band_preserves_median_and_speed_order() {
+        // Frozen pre-0.2.8 speeds make this a one-time authored rebalance, not a
+        // runtime clamp that would erase haste, slows, or future explicit tuning.
+        let baseline = [
+            ("pokemon_moba_pikachu", 1180, 869),
+            ("pokemon_moba_charizard", 1050, 840),
+            ("pokemon_moba_blastoise", 990, 827),
+            ("pokemon_moba_feraligatr", 1040, 838),
+            ("pokemon_moba_emboar", 980, 825),
+            ("pokemon_moba_blaziken", 1120, 856),
+            ("pokemon_moba_greninja", 1280, 891),
+            ("pokemon_moba_decidueye", 980, 825),
+            ("pokemon_moba_inteleon", 850, 796),
+            ("pokemon_moba_skeledirge", 760, 772),
+            ("pokemon_moba_porygonz", 1120, 856),
+            ("pokemon_moba_blissey", 650, 728),
+            ("pokemon_moba_kleavor", 850, 796),
+            ("pokemon_moba_scizor", 1480, 936),
+            ("pokemon_moba_ursaluna", 720, 756),
+            ("pokemon_moba_sawk_throh", 1060, 842),
+            ("pokemon_moba_hitmonchan", 1040, 838),
+            ("pokemon_moba_hitmonlee", 860, 798),
+            ("pokemon_moba_hitmontop", 1120, 856),
+            ("pokemon_moba_kilowattrel", 1060, 842),
+            ("pokemon_moba_beeheeyem", 620, 716),
+            ("pokemon_moba_gyarados", 780, 780),
+            ("pokemon_moba_noivern", 1040, 838),
+            ("pokemon_moba_mantine", 1000, 829),
+            ("pokemon_moba_cryogonal", 980, 825),
+            ("pokemon_moba_vanilluxe", 840, 793),
+            ("pokemon_moba_skarmory", 930, 813),
+            ("pokemon_moba_houndoom", 1110, 854),
+            ("pokemon_moba_arbok", 1160, 865),
+            ("pokemon_moba_clawitzer", 860, 798),
+            ("pokemon_moba_octillery", 900, 807),
+            ("pokemon_moba_pyukumuku", 720, 756),
+            ("pokemon_moba_banette", 1180, 869),
+            ("pokemon_moba_kricketune", 1010, 831),
+            ("pokemon_moba_ambipom", 1060, 842),
+            ("pokemon_moba_gallade", 900, 807),
+            ("pokemon_moba_audino", 760, 772),
+            ("pokemon_moba_pangoro", 660, 732),
+            ("pokemon_moba_passimian", 720, 756),
+            ("pokemon_moba_oranguru", 780, 780),
+            ("pokemon_moba_dragalge", 740, 764),
+            ("pokemon_moba_heliolisk", 980, 825),
+            ("pokemon_moba_turtonator", 520, 676),
+            ("pokemon_moba_ribombee", 720, 756),
+            ("pokemon_moba_drampa", 520, 676),
+            ("pokemon_moba_kommoo", 760, 772),
+            ("pokemon_moba_thievul", 940, 816),
+            ("pokemon_moba_archaludon", 470, 656),
+            ("pokemon_moba_appletun", 510, 672),
+            ("pokemon_moba_goodra", 560, 692),
+            ("pokemon_moba_dedenne", 1190, 871),
+            ("pokemon_moba_hawlucha", 980, 825),
+            ("pokemon_moba_bouffalant", 520, 676),
+            ("pokemon_moba_starmie", 780, 780),
+            ("pokemon_moba_drednaw", 560, 692),
+            ("pokemon_moba_orbeetle", 930, 813),
+            ("pokemon_moba_coalossal", 430, 640),
+            ("pokemon_moba_magmortar", 520, 676),
+            ("pokemon_moba_grapploct", 610, 712),
+            ("pokemon_moba_sirfetchd", 650, 728),
+            ("pokemon_moba_arboliva", 620, 716),
+            ("pokemon_moba_armarouge", 600, 708),
+            ("pokemon_moba_ceruledge", 1120, 856),
+            ("pokemon_moba_gholdengo", 720, 756),
+            ("pokemon_moba_frosmoth", 690, 744),
+            ("pokemon_moba_shedinja", 720, 756),
+            ("pokemon_moba_ludicolo", 700, 748),
+            ("pokemon_moba_kingdra", 620, 716),
+            ("pokemon_moba_delibird", 620, 716),
+            ("pokemon_moba_cloyster", 560, 692),
+            ("pokemon_moba_electrode", 1180, 869),
+            ("pokemon_moba_snorlax", 420, 636),
+            ("pokemon_moba_zeraora", 820, 789),
+            ("pokemon_moba_rillaboom", 570, 696),
+            ("pokemon_moba_dragapult", 760, 772),
+            ("pokemon_moba_shiftry", 690, 744),
+            ("pokemon_moba_sigilyph", 630, 720),
+            ("pokemon_moba_weavile", 1160, 865),
+            ("pokemon_moba_swanna", 1060, 842),
+            ("pokemon_moba_marowak", 760, 772),
+            ("pokemon_moba_garganacl", 420, 636),
+            ("pokemon_moba_ampharos", 520, 676),
+            ("pokemon_moba_xatu", 500, 668),
+            ("pokemon_moba_quaquaval", 555, 690),
+            ("pokemon_moba_arcanine", 600, 708),
+            ("pokemon_moba_missingno", 560, 692),
+            ("pokemon_moba_kecleon", 575, 698),
+            ("pokemon_moba_yanmega", 545, 686),
+            ("pokemon_moba_weezing", 500, 668),
+            ("pokemon_moba_wishiwashi", 515, 674),
+            ("pokemon_moba_comfey", 390, 624),
+            ("pokemon_moba_smeargle", 660, 732),
+            ("pokemon_moba_torterra", 780, 780),
+            ("pokemon_moba_venusaur", 930, 813),
+            ("pokemon_moba_eevee", 1210, 876),
+            ("pokemon_moba_jolteon", 1310, 898),
+            ("pokemon_moba_flareon", 900, 807),
+            ("pokemon_moba_vaporeon", 870, 800),
+            ("pokemon_moba_leafeon", 1280, 891),
+            ("pokemon_moba_glaceon", 1220, 878),
+            ("pokemon_moba_umbreon", 1260, 887),
+            ("pokemon_moba_espeon", 1150, 862),
+            ("pokemon_moba_sylveon", 1180, 869),
+        ];
+        assert_eq!(baseline.len(), POKEMON_CHAMPIONS.len());
+        let mut actual = Vec::new();
+        for (id, old, expected) in baseline {
+            let champion = champion_by_id(id).unwrap();
+            assert_eq!(champion.stat.move_speed, expected, "{id}");
+            assert_eq!(champion.growth.move_speed, 0, "{id}");
+            assert_eq!(champion_base_stat_for_level(id, 12).unwrap().move_speed, expected);
+            assert!((624..=936).contains(&expected));
+            actual.push((old, expected));
+        }
+        actual.sort_unstable();
+        assert_eq!(actual[actual.len() / 2].1, 780);
+        assert_eq!(actual.first().unwrap().1, 624);
+        assert_eq!(actual.last().unwrap().1, 936);
+        for pair in actual.windows(2) {
+            if pair[0].0 < pair[1].0 { assert!(pair[0].1 < pair[1].1); }
+            else { assert_eq!(pair[0].1, pair[1].1); }
+        }
+        let PokemonMoveEffect::DirectDamageSpeedCheckCrit { target_speed_under_caster_percent, .. } = SCIZOR.skill2.effect else { panic!("Scizor speed check missing"); };
+        for (old, new) in actual {
+            assert_eq!(old * 100 < 1480 * 50, new * 100 < SCIZOR.stat.move_speed * target_speed_under_caster_percent,
+                "Scizor's unbuffed speed-crit eligibility changed for {old} -> {new}");
+        }
+    }
+
+    #[test]
+    fn scizor_speed_scaling_keeps_combat_strength_after_compression() {
+        let PokemonMoveEffect::DirectDamageSpeedScale { move_speed_ratio, .. } = SCIZOR.attack.effect else { panic!("Scizor speed scaling missing"); };
+        assert!((SCIZOR.stat.move_speed * move_speed_ratio / 100).abs_diff(1480 * 4 / 100) <= 4);
+        let PokemonMoveEffect::SelfSpeedCritBuff { speed_to_crit_percent, .. } = SCIZOR.skill.effect else { panic!("Scizor speed crit buff missing"); };
+        assert!((SCIZOR.stat.move_speed * speed_to_crit_percent / 100).abs_diff(1480 * 50 / 100) <= 2);
+        assert!(DEDENNE.stat.move_speed > PIKACHU.stat.move_speed);
+        assert!(SCIZOR.stat.move_speed > DEDENNE.stat.move_speed);
+    }
+
     const GUIDE_EXPORT_PATH: &str =
         r"C:\Users\james\Documents\TFT Pokemon Mod\scratch\pokemon_guide_data.json";
     const STABLE_CHAMPION_EXPORT_DIR: &str =
@@ -38489,6 +39231,7 @@ mod guide_export_tests {
     }
 
     #[test]
+    #[ignore = "native-only package: companion data champions are intentionally not shipped"]
     fn export_stable_data_champions() {
         fs::create_dir_all(STABLE_CHAMPION_EXPORT_DIR).expect("create stable champion dir");
         for champion in POKEMON_CHAMPIONS {

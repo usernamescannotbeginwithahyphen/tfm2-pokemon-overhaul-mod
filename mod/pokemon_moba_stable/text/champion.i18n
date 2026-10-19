@@ -206,7 +206,7 @@
         "skill": "Lock-On: Marks an enemy for 15 seconds, giving Octillery increased critical chance against that target.",
         "skill2": "Bouncy Bubble: Fires a Water bubble that lands three times along an aimed path, dealing physical damage at each impact.",
         "ult": "Octazooka: Fires a massive Water projectile in a line, dealing heavy physical damage to the first enemy hit.",
-        "passive": "Suction Cups: Intended terrain-walking passive. This is pending a lower-level pathing hook."
+        "passive": "Suction Cups: Octillery can move through terrain, but has 15% reduced movement speed."
       },
       "pokemon_moba_pyukumuku": {
         "name": "Pyukumuku",
@@ -230,13 +230,13 @@
         "skill": "Sticky Web: Places a permanent web field. Kricketune moves faster in webs and enemies are lightly slowed.",
         "skill2": "Sing: Sings a lingering song that puts nearby enemies to Sleep while they remain in the aura.",
         "ult": "Bug Buzz: Emits a damaging buzzing aura that Confuses nearby enemies.",
-        "passive": "Web Walker: Sticky Webs create permanent control zones that speed Kricketune and lightly slow enemies."
+        "passive": "Web Walker: Sticky Webs speed Kricketune and lightly slow enemies. Web chains connected to Kricketune share enemy positions with its team for attacks, retreats and movement."
       },
       "pokemon_moba_ambipom": {
         "name": "Ambipom",
         "attack": "Double Hit: Strikes twice with its tail hands, dealing physical Normal damage.",
         "skill": "Tickle: Confuses a nearby enemy for a short duration.",
-        "skill2": "Thief: Deals physical Dark damage and temporarily steals an item-like stat from the target.",
+        "skill2": "Thief: Deals physical Dark damage and temporarily transfers part of one supported equipment stat from the target to Ambipom. Inventory and item procs are unchanged.",
         "ult": "Fury Swipes: Greatly increases Ambipom's attack speed and critical chance for a short duration.",
         "passive": "Technician: Ally-provided Pokemon buffs also grant Ambipom movement speed."
       },
@@ -278,7 +278,7 @@
         "skill": "Nasty Plot: Marks an enemy, then damages wounded targets or stuns full-health targets after a delay.",
         "skill2": "Stored Power: Stores incoming damage for a short duration, then releases it around Oranguru.",
         "ult": "Instruct: Causes a targeted ally to fire one random skill after a short delay.",
-        "passive": "Symbiosis: Shares part of Oranguru's positive item-derived stat bonuses with a nearby ally."
+        "passive": "Symbiosis: Shares 50% of Oranguru's supported positive equipment stats with the nearest allied Pokemon in range. Item procs are not shared."
       },
       "pokemon_moba_dragalge": {
         "name": "Dragalge",
@@ -460,7 +460,7 @@
         "name": "Ceruledge",
         "attack": "Astonish: Strikes with Ghost force, dealing physical damage with a chance to stun.",
         "skill": "Flame Charge: Dashes into the first enemy hit, dealing Fire physical damage and leaving a damaging flame trail that can Burn.",
-        "skill2": "Poltergeist: Turns one positive item-like stat on the target against them, dealing Ghost damage based on that stat.",
+        "skill2": "Poltergeist: Turns one supported positive equipment stat on the target against them, dealing Ghost damage based on its weighted value. Temporary buffs are not counted as equipment.",
         "ult": "Bitter Blade: Slashes an enemy for heavy Fire physical damage and executes low-health targets.",
         "passive": "Flash Fire: Taking Fire damage increases Ceruledge's damage stats for a short time."
       },
@@ -566,7 +566,7 @@
         "skill": "Fan Away: Blows enemies in a cone away from Shiftry and briefly slows them.",
         "skill2": "Shiftadieu: Slashes an enemy for Dark physical damage, dealing more while Shiftry has a movement speed buff.",
         "ult": "Fan Tornado: Places a tornado that repeatedly damages and knocks airborne enemies caught inside.",
-        "passive": "Forest Camouflage: Gains movement speed while hidden from nearby enemies by bush visibility. Movement speed buffs empower Shiftry's basic attacks."
+        "passive": "Forest Camouflage: Gains movement speed in bushes unless revealed by true sight. After 1.5 seconds of camouflage, the bonus lingers for 2 seconds after leaving. Movement speed buffs empower Shiftry's basic attacks."
       },
       "pokemon_moba_sigilyph": {
         "name": "Sigilyph",
@@ -614,7 +614,7 @@
         "skill": "Flash: Emits a brilliant pulse around Ampharos, damaging, silencing, and slowing nearby enemies.",
         "skill2": "Searchlight Tail: Lights Ampharos's tail, increasing movement speed and empowering Luminous Pulse. Empowered pulses can extend the buff and paralyze enemies.",
         "ult": "Gigavolt: Channels before calling down a large lightning strike. The impact leaves an Amped Zone that slows enemies and speeds up Ampharos's attacks while he stands inside it.",
-        "passive": "Luminous Pulse: Ampharos reveals nearby stealth and bush-hidden enemies to Pokemon AI. The aura periodically pulses, dealing Electric magic damage and slowing enemies."
+        "passive": "Luminous Pulse: Ampharos continuously shares nearby enemy positions with its team for attacks, retreats and movement, countering Weavile stealth and Shiftry camouflage. The aura periodically pulses for Electric magic damage and a slow."
       },
       "pokemon_moba_xatu": {
         "name": "Xatu",

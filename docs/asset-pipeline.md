@@ -25,9 +25,9 @@ mod/pokemon_moba/champions_custom/<short-id>#anim.fanim
 
 ```text
 asset/base/aseprite_resources/champions/pokemon_moba_<short-id>#sheet
-  -> asset/pokemon_moba/champions_custom/<short-id>#sheet
+  -> asset/pokemon_moba_stable/champions_custom/<short-id>#sheet
 asset/base/aseprite_resources/champions/pokemon_moba_<short-id>#anim
-  -> asset/pokemon_moba/champions_custom/<short-id>#anim
+  -> asset/pokemon_moba_stable/champions_custom/<short-id>#anim
 ```
 
 After new champion sprite assets are supplied, run:

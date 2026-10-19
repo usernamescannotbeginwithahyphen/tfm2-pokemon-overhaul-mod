@@ -1,109 +1,397 @@
 # Stable Champion Migration Audit
 
-Generated from the classic roster, project reference notes, and staged stable VFX bindings.
+SDK 0.6.4 / build 0.2.8 source inventory. 103 champions, 412 actions, 103 passive descriptions.
+Run `cargo test --offline` in the stable package before regenerating to refresh the guide export.
+Content SHA-256 (normalized text): `6255edaac759cfe0ebc5bfd73247ceb38023b68efd481cd56862cb6a6e239073`.
 
-| Champion | VFX | Stable Revisit | Reference |
-| --- | ---: | --- | --- |
-| Jolteon (`pokemon_moba_jolteon`) | 4 |  | - Jolteon: Electric, Range, fast ADC. Eeveelution passive. |
-| Flareon (`pokemon_moba_flareon`) | 4 |  | - Flareon: Fire, Magician, high-damage burn caster. Eeveelution passive. |
-| Vaporeon (`pokemon_moba_vaporeon`) | 4 |  | - Vaporeon: Water, Tank, bulky caster/top-laner with Aqua Ring. Eeveelution passive. |
-| Leafeon (`pokemon_moba_leafeon`) | 4 |  | - Leafeon: Grass, Assassin, physical jungler with Bleed. Eeveelution passive. |
-| Glaceon (`pokemon_moba_glaceon`) | 4 |  | - Glaceon: Ice, Range, physical ADC with Freeze fields. Eeveelution passive. |
-| Umbreon (`pokemon_moba_umbreon`) | 3 |  | - Umbreon: Dark, Assassin, mobile single-target lockdown with soft untargetable. Eeveelution passive. |
-| Espeon (`pokemon_moba_espeon`) | 2 |  | - Espeon: Psychic, Util, single-target debuffer with Confusion and Future Sight. Eeveelution passive. |
-| Sylveon (`pokemon_moba_sylveon`) | 4 |  | - Sylveon: Fairy, Util, healer with Misty Terrain, Charm HoT, Dazzling Gleam cleanse. Eeveelution passive. |
-| Eevee (`pokemon_moba_eevee`) | 3 |  | - Eevee: Normal, Util, support with Baby-Doll Eyes, Wish, Baton Pass, Helping Hand. |
-| Venusaur (`pokemon_moba_venusaur`) | 3 |  | - Venusaur: Grass/Poison, Util, tanky control/support with Bind, Leech Seed, traveling Sludge Wave poison/slow, and Tangling Vines. |
-| Blastoise (`pokemon_moba_blastoise`) | 4 |  | - Blastoise: Water, Range, bulky ADC with multi-shot basic attack and cannon ult. |
-| Feraligatr (`pokemon_moba_feraligatr`) | 1 |  | - Feraligatr: Water, Melee, bulky bruiser with Aqua Tail, Thrash, Muddy Water, and Spiked Hide reflect. |
-| Emboar (`pokemon_moba_emboar`) | 0 |  | - Emboar: Fire/Fighting, Melee, bulky bruiser with Arm Thrust, Hammer Arm stun, Heat Crash recoil dash, Power-up Punch wind-up, and Reckless. |
-| Blaziken (`pokemon_moba_blaziken`) | 1 |  | - Blaziken: Fire/Fighting, Assassin, single-target physical jungler with Speed Boost, Blaze Kick, Bulk Up, and Flare Blitz flame trail. |
-| Greninja (`pokemon_moba_greninja`) | 4 |  | - Greninja: Water/Dark, Assassin, fast physical jungler with Night Slash, Quick Attack return dash, Water Pledge, Water Shuriken, and Battle Bond. |
-| Decidueye (`pokemon_moba_decidueye`) | 4 |  | - Decidueye: Grass/Ghost, Range, physical ADC/objective burner with triple-arc Leafage, Phantom Force, retreating Leaf Storm, Spirit Shackle, and Long Reach. |
-| Inteleon (`pokemon_moba_inteleon`) | 4 |  | - Inteleon: Water, Range, long-range physical single-target carry/assassin with Rain Dance crit buff, Soak Water weakness, Snipe Shot execute, and stronger Sniper crits. |
-| Skeledirge (`pokemon_moba_skeledirge`) | 4 |  | - Skeledirge: Fire/Ghost, Magician, bulky AP mage tank with Shadow Ball burn amp, Hex skill block, 3-charge Will-O-Wisp, Torch Song AoE Burn. |
-| Porygon-Z (`pokemon_moba_porygonz`) | 4 |  | - Porygon-Z: Normal, Magician, fast squishy AP caster with dynamic Conversion typing, Recover type reset, Tri Attack forced STAB/super-effective line nuke, and Adaptability scaling by unique types seen. |
-| Blissey (`pokemon_moba_blissey`) | 0 |  | - Blissey: Normal, Util, extreme-HP healer with Pound, moving Heal Pulse aura, Softboiled self HoT, global Healing Wish, and Healer cleanse/speed proc. |
-| Kleavor (`pokemon_moba_kleavor`) | 0 |  | - Kleavor: Bug/Rock, Melee, bruiser/top-jungle with Sharpness consecutive-hit crit scaling, Stone Axe every-third-hit Bleed, Fury Cutter multi-hit crits, Stealth Rock defense plus alternating soft untargetable, and Smack Down recoil crit/root. |
-| Scizor (`pokemon_moba_scizor`) | 1 |  | - Scizor: Bug/Steel, Assassin, very fast physical melee assassin with speed-scaling Metal Claw, Swords Dance speed-to-crit conversion, Bullet Punch speed-check crit dash, X-Scissor, and Light Metal movement shield. |
-| Ursaluna (`pokemon_moba_ursaluna`) | 3 |  | - Ursaluna: Ground/Normal, Melee/Tank, high-HP top-lane anchor with Scratch, Scary Face terrify, Earthquake aura, Blood Moon self-berserk, and Guts low-HP damage. |
-| Sawk & Throh (`pokemon_moba_sawk_throh`) | 0 |  | - Sawk & Throh: Fighting, Melee, stance-switching jungle/top fighter. Sawk stance is faster and more offensive with Brick Break, Dynamic Punch, and Mach Punch stun dash; Throh stance is tankier with Rock Smash, Circle Throw, and Storm Throw. Inner Focus shortens Pokemon-layer CC. |
-| Hitmonchan (`pokemon_moba_hitmonchan`) | 0 |  | - Hitmonchan: Fighting, Melee/Bruiser, top/jungle physical bruiser with Drain Punch sustain, Ice Punch freeze chance, Fire Punch burn chance, Thunder Punch paralysis, and Iron Fist status-target damage amplification. |
-| Hitmonlee (`pokemon_moba_hitmonlee`) | 0 |  | - Hitmonlee: Fighting, Melee/ADC, bottom-lane physical carry with Double Kick multi-hit basics, Low Sweep stun, High Jump Kick cleave, Axe Kick self-slow nuke, and Limber CC immunity. |
-| Hitmontop (`pokemon_moba_hitmontop`) | 0 |  | - Hitmontop: Fighting, Assassin, fast physical jungle assassin with Body Press, Low Kick, Feint armor debuff, Triple Kick multi-hit ultimate, and Steadfast permanent move-speed stacking when hard CC'd. |
-| Kilowattrel (`pokemon_moba_kilowattrel`) | 4 |  | - Kilowattrel: Electric/Flying, Magician, mid-lane AP caster with Spark, Electro Ball, Gust piercing line, Charge untargetable electric AoE, and Volt Absorb anti-Electric healing. |
-| Beeheeyem (`pokemon_moba_beeheeyem`) | 3 |  | - Beeheeyem: Psychic, Magician, bottom/mid AP basic attacker/objective carry with Guard Split Protect-bypassing non-crit basic attacks, Imprison root, Light Screen Fire/Electric blocking line, Zen Headbutt nuke plus Confusion, and Synchronize reflected statuses. |
-| Gyarados (`pokemon_moba_gyarados`) | 4 |  | - Gyarados: Water/Flying, Magician, slow high-damage mid-lane AP caster with Whirlpool field, Scald burn that bypasses normal burn immunity, Hurricane traveling horizontal wave, Hyper Beam line nuke, and Lake of Rage self-sustain inside Whirlpool. |
-| Noivern (`pokemon_moba_noivern`) | 4 | Revisit Infiltrator tower targeting/aggro with live sim and AI hooks. | - Noivern: Flying/Dragon, Magician, squishy AP mid-lane caster with Screech armor debuff, Whirlwind piercing airborne line, Fighting Wings retreating damage line, Dragon Pulse, and a pending Infiltrator tower-aggro bypass hook. |
-| Mantine (`pokemon_moba_mantine`) | 4 |  | - Mantine: Water/Flying, Magician, squishy AP mid-lane caster with Bubble first-hit projectile, Brine Water slow field, Dive fast engage/stun, Surf traveling horizontal wave dash, and Swift Swim move speed inside Water fields. |
-| Cryogonal (`pokemon_moba_cryogonal`) | 4 |  | - Cryogonal: Ice, Magician, squishy AP mid-lane caster with Ice Shard, Icy Wind traveling horizontal wave freeze chance, Freeze-Dry bonus damage against Water-type Pokemon, Ice Beam line freeze chance, and Immunity against Burn/Poison DOT statuses. |
-| Vanilluxe (`pokemon_moba_vanilluxe`) | 4 |  | - Vanilluxe: Ice, Magician, very fragile high-damage AP mid-lane caster with long-range Icicle Spear, Chilling Water traveling horizontal wave freeze chance, Frost Breath cone freeze, Sheer Cold self-centered enemy damage plus enemy/ally freeze, and Snow Patrol critical hits against Frozen targets. |
-| Skarmory (`pokemon_moba_skarmory`) | 0 | Review Fly/global travel separately from normal dashes. | - Skarmory: Steel/Flying, Tank, mobile top-lane physical tank with Peck, Roost temporary pure-Steel self-heal, Dual Wingbeat double hit, Fly global ally travel with landing splash, and Sturdy lethal-direct-damage prevention. |
-| Houndoom (`pokemon_moba_houndoom`) | 4 |  | - Houndoom: Dark/Fire, Magician, mid-lane AP mage with Ember, Foul Play bonus damage after avoiding damage, Howl defense debuff plus brief stun, Inferno area Fire damage plus Burn, and Intimidate nearby enemy attack reduction. |
-| Arbok (`pokemon_moba_arbok`) | 1 |  | - Arbok: Poison, Assassin, jungle physical DOT assassin with Poison Sting Miasma stacking, Coil line dash/primary stun/untargetable self-root, Spit Up area Miasma slow, Venoshock Miasma detonation plus Poison, and Dripping Fangs Miasma poison thresholds/death spread. |
-| Clawitzer (`pokemon_moba_clawitzer`) | 4 |  | - Clawitzer: Water, Range, bottom-lane physical ADC/objective burner with Aqua Jet, Water Sport three-circle triangle AoE, Aqua Cutter tower-hitting single target shot, Bubble Beam wide piercing line, and Clingy ally attachment/objective damage passive. |
-| Octillery (`pokemon_moba_octillery`) | 4 | Revisit Suction Cups with stable ignore-wall/pathing options. | - Octillery: Water, Range, bottom-lane physical ADC with Bullet Seed triple-hit Bug basic, Lock-On target crit window, Bouncy Bubble three-impact Water AoE path, Octazooka first-hit line nuke, and pending Suction Cups terrain-walking passive. |
-| Pyukumuku (`pokemon_moba_pyukumuku`) | 0 |  | - Pyukumuku: Water, Tank, top/support zero-direct-damage tank with Harden brief full damage ignore, Toxic Poison stacks, Rest self-sleep healing, Pain Split HP averaging, and Innards Out DOT absorption/barb reflect/lethal-hit retaliation. |
-| Banette (`pokemon_moba_banette`) | 3 | Review Phantom Force as true teleport-to-target behavior. | - Banette: Ghost, Assassin, jungle physical assassin with Shadow Claw, Shadow Sneak rapid dash-plus-displacement, Night Shade short cone blind, Phantom Force rapid teleport-to-target kill-splash nuke, and Cursed Body offensive disable chance when hit. |
-| Kricketune (`pokemon_moba_kricketune`) | 1 | Implement Sticky Web as persistent deployable/control zone with staged VFX. | - Kricketune: Bug, Util, support/jungle physical disabler with short-forward Lunge basics, permanent charge-based Sticky Web fields, Sing sleep aura, Bug Buzz damage/confusion aura, and Web Walker persistent-web control zones. |
-| Ambipom (`pokemon_moba_ambipom`) | 0 | Revisit Technician with stable buff reads and Pokemon buff ledger. | - Ambipom: Normal, Range, short-range physical bottom-lane ADC with Double Hit twin basic attack, Tickle short Confusion, Thief temporary randomized stat steal, Fury Swipes attack-speed/crit steroid, and Technician speed from ally-provided Pokemon buffs. |
-| Gallade (`pokemon_moba_gallade`) | 1 |  | - Gallade: Psychic/Fighting, Melee, bottom-lane physical carry with Sacred Sword basics, Future Sight source-specific damage reduction, Calm Mind cleanse plus attack buff, Psycho Cut tower-capable cleave, and Justified attack buffs from Dark-type Pokemon damage. |
-| Audino (`pokemon_moba_audino`) | 0 | Review Substitute/ally rescue as true displacement or swap. | - Audino: Normal, Util, support with weak Pound basic, Protect pre-damage ally damage redirection, Substitute ally rescue displacement plus heal, Endure one-shot lethal prevention, and Regenerator out-of-combat self/nearby-ally healing. |
-| Pangoro (`pokemon_moba_pangoro`) | 0 |  | - Pangoro: Fighting/Dark, Melee/Tank, top-lane frontline with Night Slash, Taunt target focus plus self-armor, Parting Shot retreat strike, Brutal Swing AoE throw/control, and Scrappy resistance-floor damage. |
-| Passimian (`pokemon_moba_passimian`) | 2 |  | - Passimian: Fighting, Range, bottom-lane short-ranged physical ADC with Fling, Coaching attack/armor buff, Reversal one-hit damage counter, Focus Blast single-target burst, and Receiver copied-passive identity. |
-| Oranguru (`pokemon_moba_oranguru`) | 4 | Revisit Symbiosis using stable stat/item-derived read paths. | - Oranguru: Normal/Psychic, Util, support/mid special utility Pokemon with Simple Beam, delayed Nasty Plot punish/stun, Stored Power damage return, Instruct delayed random ally skill trigger, and Symbiosis 50% item-derived stat-share support passive. |
-| Dragalge (`pokemon_moba_dragalge`) | 4 |  | - Dragalge: Poison/Dragon, Magician, mid-lane special poison mage with Acid Spit chance Poison, Poison Tail self-AoE knockback/chance Poison, Sludge Bomb sequential three-circle poison AoE, Toxic Chain 50-stack poison or execute at 5+ existing stacks, and Poison Sipper lifesteal against poisoned targets. |
-| Heliolisk (`pokemon_moba_heliolisk`) | 2 |  | - Heliolisk: Electric/Normal, Assassin, fast physical jungle assassin with Scratch, Swift piercing line dash, Shed Tail taunt-and-retreat decoy pulse, Parabolic Charge self-AoE paralysis nuke, and Discharge movement-distance Electric pulses. |
-| Turtonator (`pokemon_moba_turtonator`) | 5 |  | - Turtonator: Fire/Dragon, Util/Tank, slow short-ranged top-lane physical tank with Ember, Shell Trap three-trap triangle, Sunny Day rectangle field, Clanging Scales self-AoE Dragon damage, and Burning Jealousy anti-buff punishment. |
-| Ribombee (`pokemon_moba_ribombee`) | 4 |  | - Ribombee: Bug/Fairy, Util, mobile ranged support with Pollen Puff ally heal/enemy damage using Honey stacks, Draining Kiss line drain, U-Turn ally rescue, Alluring Voice taunt/confusion aura, and Honey Gatherer. |
-| Drampa (`pokemon_moba_drampa`) | 4 |  | - Drampa: Normal/Dragon, Magician, tanky mid/top mage with Twister line knock-up basic, Outrage attack/defense/MR buff, Dragon Energy current-HP sacrifice nuke, Draco Meteor large AoE, and Berserk low-HP offense/crit buff with reduced defenses. |
-| Kommo-o (`pokemon_moba_kommoo`) | 0 |  | - Kommo-o: Dragon/Fighting, Assassin, tanky physical jungle tankbuster with Dragon Claw percent-health basic, Noble Roar area attack/defense debuff, Clangorous Soul half-max-HP steroid, Close Combat forced duel, and Overcoat Burn/Poison immunity. |
-| Thievul (`pokemon_moba_thievul`) | 2 |  | - Thievul: Dark, Assassin, physical anti-heal jungler with Feint Attack, Baddy Bad full healing/lifesteal block, Hone Claws basic-crit plus heal block window, Stakeout long-duration trap field, and Heal Block aura. |
-| Drednaw (`pokemon_moba_drednaw`) | 3 |  | - Drednaw: Water/Rock, Melee/Tank, high-health defensive top-lane anchor with Head Smash, Rock Tomb root, Rock Polish defenses, Razor Shell spin-then-retreat dash damage, and Wide Guard shell-back damage reduction. |
-| Archaludon (`pokemon_moba_archaludon`) | 1 |  | - Archaludon: Steel/Dragon, Melee/Tank, extremely high-resistance slow top-lane anchor with Breaking Swipe, Iron Defense damage reduction plus crit immunity, Autotomize defense-for-speed tradeoff, Electro Shot self-centered channeled Electric AoE, and Stalwart forced-movement immunity. |
-| Appletun (`pokemon_moba_appletun`) | 2 |  | - Appletun: Grass/Dragon, Util/Tank, top/support mixed-damage frontline with Headbutt AD basic, Apple Acid defense/MR debuff, Sweet Scent ally HP aura plus enemy attack/defense/MR debuff, Fickle Beam AP line with independent crit/resistance-bypass rolls, and Ripen doubled healing received. |
-| Goodra (`pokemon_moba_goodra`) | 5 |  | - Goodra: Dragon, Util/Support, tanky physical support with Dizzy Punch chance Confusion basic, Rain Dance Water/Electric boost plus Fire weaken rectangle, Dragon Cheer crit aura doubled for Dragon allies, Life Dew healing pickups, and Sap Sipper Grass damage reduction. |
-| Dedenne (`pokemon_moba_dedenne`) | 7 |  | - Dedenne: Electric/Fairy, Assassin, fast utility jungler with Nuzzle chance Paralysis basic, Static movement charges, Play Rough charge-spending dash/silence, Double Shock charge/heal ring, and Electric Terrain Spark Grid nodes that can be consumed or overloaded. |
-| Hawlucha (`pokemon_moba_hawlucha`) | 1 |  | - Hawlucha: Fighting/Flying, Assassin, physical jungle assassin with Wing Attack, Air Slash short cone, Counter parry/retaliation, Flying Press dual-type stun dash plus donut knockback, and Momentum CC-triggered haste plus unique-target AD stacking. |
-| Bouffalant (`pokemon_moba_bouffalant`) | 0 |  | - Bouffalant: Normal, Melee/Tank, slow top-lane tank with Stomp, Retaliate damage-storage stance, Stomping Tantrum recent-CC bonus AoE slow, Head Charge unstoppable dash/mark, and Afro frontal damage/CC reduction. |
-| Starmie (`pokemon_moba_starmie`) | 4 |  | - Starmie: Water/Psychic, Magician, midlane AP caster with Water Spout basic, Illuminate mark passive, Flip Turn two-stage dash, Heart Swap cleanse/debuff plus illuminated shockwave, and Psybeam global true-damage line with illuminated spoke burst. |
-| Orbeetle (`pokemon_moba_orbeetle`) | 2 |  | - Orbeetle: Bug/Psychic, Assassin, fast physical jungle assassin with Struggle Bug, Agility multi-target chain dash, Infestation traveling wave plus fast Bug DOT, Psyshock cone Confusion, and Telepathy allied-harm immunity. |
-| Coalossal (`pokemon_moba_coalossal`) | 4 |  | - Coalossal: Rock/Fire, Ranged bottom-lane ADC, very slow tanky objective taker with Rock Blast, Tar Shot traveling slow/Burn wave, Smokescreen wall that blocks Pokemon-layer attacks/dashes crossing it, Magma Storm staged volcanic parallel-line plus center eruption ultimate, and Steam Engine speed burst when hit by Fire or Water Pokemon damage. |
-| Magmortar (`pokemon_moba_magmortar`) | 4 |  | - Magmortar: Fire, Ranged bottom-lane physical ADC with fixed-cadence Lava Plume basics, Temper Flare burn-amplified splash, Heat Wave moving ring/exit punish, Eruption rooted cannonball salvo, and Overheat bonus-attack-speed-to-armor-penetration conversion plus every-fourth-basic burning ground. |
-| Grapploct (`pokemon_moba_grapploct`) | 0 |  | - Grapploct: Fighting, Melee bruiser/tank leaning top with Comet Punch four-hit basic, Detect one-hit guard, Submission bind-and-damage hold, Octolock longer hold with 10% HP execute, and Boxer anti-Fighting/punch defense plus kick vulnerability. |
-| Sirfetch'd (`pokemon_moba_sirfetchd`) | 1 |  | - Sirfetch'd: Fighting, Melee bruiser/tank leaning top with Skull Bash lower-damage crit-enabled basic, Solar Blade short-cast Grass crit strike, Vacuum Wave medium-range non-crit Fighting projectile, Brave Bird dash/root crit strike, and Leek crit chance plus crit-surplus defensive conversion. |
-| Arboliva (`pokemon_moba_arboliva`) | 5 |  | - Arboliva: Grass/Normal, Range, bottom-lane physical ADC with Seed Bomb explosive splash basic, Energy Ball single-target Grass shot, Trailblaze Grassy Terrain ignition, Solar Beam charged long line, and Seed Sower persistent Grassy Terrain passive. |
-| Armarouge (`pokemon_moba_armarouge`) | 2 |  | - Armarouge: Fire/Psychic, Melee bruiser flexing top/jungle with Fire Lash, Mystical Fire self-aura burn/Confusion chance, Heart Stamp short stun, Armor Cannon long Fire line with cooldown defense penalty, and Weak Armor high-defense erosion passive. |
-| Ceruledge (`pokemon_moba_ceruledge`) | 1 | Revisit Poltergeist item/stat-surplus behavior and staged VFX. | - Ceruledge: Fire/Ghost, Assassin, jungle AD assassin with Astonish chance-stun basic, Flame Charge dash plus burn-capable flame trail, Poltergeist item-like stat surplus damage, Bitter Blade low-health execute, and Receiver-compatible Flash Fire. |
-| Gholdengo (`pokemon_moba_gholdengo`) | 4 | Use stable player gold mutation for Good as Gold/Make It Rain. | - Gholdengo: Steel/Ghost, Range, bottom-lane physical ADC with Flash Cannon basics, Ominous Wind traveling wave plus self-speed buff, Metal Sound defense-lowering aura, Make It Rain octagonal AoE ult that spends live gold for damage/radius tiers, and Good as Gold CS bonus gold. |
-| Frosmoth (`pokemon_moba_frosmoth`) | 4 |  | - Frosmoth: Ice/Bug, Magician, mid-lane AP mage with Powder Snow small AoE plus brief freeze chance, Avalanche moving Ice wave with root/freeze chance, Sleep Powder fixed circular sleep field with Frosmoth flight movement, Silver Wind Bug wave with per-hit stat boost rolls, and Ice Scales halving Pokemon-layer AP damage. |
-| Shedinja (`pokemon_moba_shedinja`) | 5 |  | - Shedinja: Bug/Ghost, Magician, mid-lane AP mage with Shadow Force, Skitter Smack dash-end cone plus speed buff, Grudge kill-ledger scaling against enemies that killed Shedinja, Astral Barrage traveling Terrify wave, and Wonder Guard 1-HP shell/chit survivability. |
-| Ludicolo (`pokemon_moba_ludicolo`) | 5 |  | - Ludicolo: Water/Grass, Util, support disabler with Facade, Teeter Dance cone Taunt into delayed Confusion, Grass Whistle sleep aura, Ivy Cudgel random Water/Grass stun strike, and Rain Dish rain aura that heals Ludicolo, boosts Water damage, weakens Fire damage, and reduces Ludicolo's Fire damage taken. |
-| Kingdra (`pokemon_moba_kingdra`) | 4 |  | - Kingdra: Water/Dragon, Ranged ADC, mixed crit carry with Scale Shot, Waterfall crit-scaling AoE, Dragon Dance dash/attack-speed passive with a primed extra Water bullet, Dragon Energy targeted crit-to-true-damage attack, and King's Rock/Focus critical strike scaling. King's Rock is Passimian Receiver-compatible. |
-| Delibird (`pokemon_moba_delibird`) | 2 |  | - Delibird: Ice/Flying, Ranged ADC with variable-damage Present basics, a four-Present charge gate for Present (Healing), a temporary long-cooldown Present (Reserve) second slot used to avoid registered no-op action metadata during day-advance stability testing, Drill Peck heavy melee strike with a chance execute, and Hustle movement-based crit chance. Hustle is Passimian Receiver-compatible. |
-| Cloyster (`pokemon_moba_cloyster`) | 3 |  | - Cloyster: Water/Ice, short-range Ranged ADC with Glaciate freeze-chance basics, Icicle Crash crit-capable multi-hit volley, Clamp low-health basic damage plus active grapple, Aurora Beam freeze-chance ult, and Overcoat crit-chance-to-armor plus incoming critical damage reduction. Overcoat is Passimian Receiver-compatible. |
-| Electrode (`pokemon_moba_electrode`) | 1 |  | - Electrode: Electric, Assassin/Jungler, fastest-roster melee physical attacker with rapid low-damage Rollout basics, Magnet Rise cleanse/speed/attack buff plus enemy pull, Magnetic Flux speed buff that converts bonus move speed to attack, Self-Destruct delayed lethal non-structure AoE, and Aftermath contact-death retaliation plus Paralysis. |
-| Snorlax (`pokemon_moba_snorlax`) | 0 |  | - Snorlax: Normal, Utility Tank, slow heavy-hitting melee physical tank with Strength basics, Berry-consuming Swallow heal, Berry/HP-consuming Belly Drum attack and speed steroid, sleep-gated Snore AoE terrify, and Gluttony Berry stacks that heal over time, resist Pokemon-layer slows/knockbacks, and empower Strength at full stacks. |
-| Zeraora (`pokemon_moba_zeraora`) | 4 |  | - Zeraora: Electric, Magician, mid/jungle melee AP caster with two-hit Plasma Fists basics, Thunder Cage persistent Electric slow/damage field with exit damage, Zing Zap one-hit ability parry plus blink retaliation, Wild Charge low-health-seeking lightning bolts with speed/basic-damage follow-up, and Merciless two-ability combo burst plus cooldown recovery. Merciless is Passimian Receiver-compatible through Passimian's own non-basic ability hits. |
-| Rillaboom (`pokemon_moba_rillaboom`) | 3 |  | - Rillaboom: Grass, Util, tanky support with Drum Stick melee AD basic, Drum Beating moving ally heal/speed aura, Drum Roll moving heal/slow aura with final stun, Grassy Surge forward temporary Grassy Terrain strip with AP tick damage/slow, and Drum Solo two-skill heal/speed passive. Drum Solo is Passimian Receiver-compatible through Passimian's own non-basic ability casts. |
-| Dragapult (`pokemon_moba_dragapult`) | 5 |  | - Dragapult: Dragon/Ghost, Range, bottom-lane mixed ADC with Shred AD basic, Dragon Darts two-hit AD targeted skill, Diving Swipe Ghost AP dash-through with reduced pass-through damage/heal and full endpoint damage, Spooky Shot Ghost AP damage plus Terrify, and Dragon Launcher follow-up Ghost damage/heal on basic, skill, and ultimate hits. Dragon Launcher is Passimian Receiver-compatible. |
-| Shiftry (`pokemon_moba_shiftry`) | 2 |  | - Shiftry: Grass/Dark, Assassin, jungle physical assassin with Thwack basics, Fan Away no-damage cone displacement/slow that ignores jungle camps, Shiftadieu Dark strike with bonus damage while speed-buffed, Fan Tornado persistent Grass damage/airborne control field, and Forest Camouflage bush-visibility speed plus movement-buff basic damage. Forest Camouflage is Passimian Receiver-compatible for the movement-buff basic damage portion. |
-| Sigilyph (`pokemon_moba_sigilyph`) | 5 |  | - Sigilyph: Psychic/Flying, Magic, mid-lane AP zoner with Psychic Sphere basics that apply Glypher marks, Sonic Wing cone AP damage, Gravity self-buff that temporarily changes Sigilyph to pure Psychic while trading move speed for AP/attack speed/cooldown recovery, Psychic Assault AP damage plus Confusion, and Glypher mark explosions when two marked enemies get close. Glypher is Passimian Receiver-compatible. |
-| Weavile (`pokemon_moba_weavile`) | 0 |  | - Weavile: Dark/Ice, Assassin, fast melee jungle assassin with Hail Claw freeze-chance basics, Scratch and Shuffle two-hit basic-attack dash pattern using best-of Ice/Dark typing, Pursuit Claw melee arc cleave with isolated-hit steroid, Assaulting Hunt attack/attack-speed steroid plus Pokemon-layer stealth, and Lone Predator isolated-target damage/speed. Lone Predator is Passimian Receiver-compatible. |
-| Swanna (`pokemon_moba_swanna`) | 3 |  | - Swanna: Water/Flying, Magician, mobile AP mid-lane zoner with Flap ranged magic basics, Feather Slice melee bleed, Feathery Cyclone moving Water aura slow/damage, Sky Circus placed AoE airborne into untargetable/damage-immune zig-zag pass-through hits with return-to-start movement, and Tailwind straight-line movement buff/next-damage amplifier. Tailwind is Passimian Receiver-compatible. |
-| Marowak (`pokemon_moba_marowak`) | 2 |  | - Marowak: Ground, Range, bottom-lane physical ADC with Bonemerang custom outbound/return piercing basic, Bone Rush first-enemy dash/stun with chance-based second and third hits, Bone Club melee stun, Bone Windmill short defensive knockback aura that primes the next Bonemerang, and Rhythm successful-Bonemerang speed/cooldown recovery. |
-| Garganacl (`pokemon_moba_garganacl`) | 3 |  | - Garganacl: Rock, Melee, slow top-lane tank with heavy Block Hammer basics, Land Crush wide Rock shockwave, Purifying Salt cleanse/heal that improves inside Salt Cure, Blessed Salt spire into permanent Salt Cure terrain, and Salt Cure passive patches on Pokemon-layer physical damage or native minion/neutral hits. Salt Cure is Passimian Receiver-compatible. |
-| Ampharos (`pokemon_moba_ampharos`) | 5 |  | - Ampharos: Electric, Magician, slow AP mid-lane mage with Cluster Bolt basics, Flash self-centered Electric damage/silence/slow, Searchlight Tail move-speed buff that empowers and extends Luminous Pulse, Gigavolt delayed Electric strike into Amped Zone, and Luminous Pulse true-sight aura/pulse. Luminous Pulse is Passimian Receiver-compatible. |
-| Xatu (`pokemon_moba_xatu`) | 4 |  | - Xatu: Psychic/Flying, Magician, stationary AP mid-lane mage with Energy Singe basics, Mind Bend Confusion plus stationary bonus damage, Pain Amplifier damage-taken amplification plus stationary stun, Super Psy global retargeting channel beam, and Prophecy skill-cast reveal/magic-resistance debuff. Prophecy is Passimian Receiver-compatible. |
-| Quaquaval (`pokemon_moba_quaquaval`) | 5 |  | - Quaquaval: Water/Fighting, Range, bottom-lane physical ADC with Hydro Kick Water basics that punish Spiral Shot-slowed targets, Spiral Shot aimed first-hit slow projectile, Up-Tempo targeted dash/knockback that upgrades when crossing Aqua Step, Exciting Dance speed/attack-speed steroid that empowers newly dropped Aqua Step trails, and Aqua Step movement trail. Aqua Step is Passimian Receiver-compatible. |
-| Arcanine (`pokemon_moba_arcanine`) | 3 |  | - Arcanine: Fire, Magician, tankier mid-lane AP mage/top flex with Flare Fire basics, Extremespeed aimed physical dash plus shield-break speed buff, White Flames two parallel Fire AP lines with Burn chance and healing, Flames of Rage missing-health self-centered inferno, and Blazing Mane anti-melee debuff/burn/sustain passive. Blazing Mane is Passimian Receiver-compatible. |
-| MissingNo. (`pokemon_moba_missingno`) | 6 |  | - MissingNo.: Bird, Magician, mid-lane AP glitch mage with ??? Bird basic plus random stray untyped projectile, -- random status corruption, 'M (00) moving self-aura glitch storm with ally-conduit chain damage, Trick Room large warped arena that distorts stats and inverts Pokemon-layer allied buffs/heals received by enemies, and Old man glitch cooldown/speed buff/debuff passive. MissingNo. uses the custom neutral Bird type. |
-| Kecleon (`pokemon_moba_kecleon`) | 2 |  | - Kecleon: Normal, Assassin, jungle physical Eeveelution-counter with slightly extended Stretch Tongue basics, Double Scratch short leap/stun/two-hit slash, Chromashift random current-type swap plus self-centered damage pulse and move speed, Colorful Whip rotating hourglass front/rear cone ultimate, and Energy Predator anti-Eeveelution damage/effectiveness plus kill-based type stealing. |
-| Yanmega (`pokemon_moba_yanmega`) | 3 |  |  |
-| Weezing (`pokemon_moba_weezing`) | 5 |  |  |
-| Wishiwashi (`pokemon_moba_wishiwashi`) | 4 | Implement Cowardice allied shield as a real shield buff. | - Wishiwashi: Water, Util, high-health support with Splash AP basics, Wave Splash healing/damage wave that upgrades to cleanse/airborne while Schooling, Cowardice ally heal/shield or solo speed buff, Massive Catch School Form dash-grab-return-spit displacement, and Schooling proximity defense/range/cooldown bonuses with a solo health tradeoff for speed. |
-| Comfey (`pokemon_moba_comfey`) | 1 |  | - Comfey: Fairy, Util, attached healer support with Growth self-stat buff, Floral Healing max-HP heal on attached ally, Petal Dance Grass move aura, Encore attached-ally cooldown recovery, and Flower Veil stat sharing plus nearby allied Grass status immunity. |
-| Smeargle (`pokemon_moba_smeargle`) | 0 |  | - Smeargle: Normal, Util, mid/support flexible Pokemon with average stats and four dynamic Sketch slots. Starts with only Sketch as its basic; each successful Sketch learns the most recent valid move that affected Smeargle into the next empty slot and moves Sketch onward. |
-| Torterra (`pokemon_moba_torterra`) | 0 |  | - Torterra: Grass/Ground, Util/Tank, hulking defensive anchor with Absorb, Withdraw, Synthesis, Headlong Rush, and Shell Armor. |
-| Charizard (`pokemon_moba_charizard`) | 3 |  | - Charizard: Fire/Flying, Magician, bulky continuous cone caster with Burn. |
-| Pikachu (`pokemon_moba_pikachu`) | 4 |  | - Pikachu: Electric, Magician, mobile burst caster/assassin. Thunder Wave is a traveling horizontal wave that applies Paralysis, and Static Shock amplifies damage against Paralyzed enemies. |
+This is an exhaustive inventory and review checklist, NOT 103 live-tested champions.
+All rows inherit the shared runtime, damage/statistics, AI, draft and deployment checks.
+Family tags are mechanically assigned review prompts, not confirmed per-champion defects.
+Finding codes and evidence: [full SDK audit](sdk-0.6.4-findings.md#whole-mod-audit-follow-up).
+Shared fixes and remaining limits: [0.2.4 implementation](sdk-0.6.4-findings.md#build-024-audit-fixes).
+Current fixes and coverage limits: [0.2.7 combat semantics](sdk-0.6.4-findings.md#build-027-combat-semantics-fixes).
+VFX counts are staged asset bindings, not proof of correct runtime playback. P = projectile assets.
+Actions are listed in attack / skill / skill2 / ultimate order; repeated variants are intentional.
+
+| Champion | Four action implementations | Passive | VFX / P | Review families | Specific follow-up |
+| --- | --- | --- | ---: | --- | --- |
+| Pikachu (`pokemon_moba_pikachu`) | `DirectDamage` / `DashDamage` / `TravelingWaveDamageParalysis` / `AreaDamage` | Static Shock | 4 / 1 | M1/A2, F1 | Shared checks + family-specific regression tests. |
+| Charizard (`pokemon_moba_charizard`) | `ConeDamage` / `ConeDamage` / `LineFirstDamage` / `AreaDamage` | Blaze | 3 / 1 | M1/A2, F1 | Shared checks + family-specific regression tests. |
+| Blastoise (`pokemon_moba_blastoise`) | `MultiHitDamage` / `SelfBuffAreaDamage` / `DirectDamageKnockback` / `LinePierceDamage` | Mega Launcher | 4 / 2 | C3, M1/A2, F1 | Shared checks + family-specific regression tests. |
+| Feraligatr (`pokemon_moba_feraligatr`) | `DirectDamage` / `DirectDamageKnockback` / `SelfOffenseBuff` / `LinePierceDamageSlowApToAd` | Spiked Hide | 1 / 0 | C3, M1/A2 | Shared checks + family-specific regression tests. |
+| Emboar (`pokemon_moba_emboar`) | `DirectDamage` / `DirectDamageStun` / `LineFirstDashDamageDistanceSelfHp` / `PowerUpPunchChannel` | Reckless | 0 / 0 | M1/A2, A1 | Shared checks + family-specific regression tests. |
+| Blaziken (`pokemon_moba_blaziken`) | `MultiHitDamage` / `SelfBuffAreaDamageKnockbackChanceBurn` / `SelfOffenseBuff` / `LineFirstDashDamageFlameTrail` | Speed Boost | 1 / 0 | M1/A2, F1 | Shared checks + family-specific regression tests. |
+| Greninja (`pokemon_moba_greninja`) | `DirectDamage` / `DashDamageReturn` / `AreaDamage` / `LinePierceDamage` | Battle Bond | 4 / 1 | M1/A2, A1, F1 | Shared checks + family-specific regression tests. |
+| Decidueye (`pokemon_moba_decidueye`) | `TripleArcDamage` / `DirectDamage` / `LinePierceDamageSelfRetreat` / `DirectDamageSpiritShackle` | Long Reach | 4 / 1 | M1/A2, A1 | Shared checks + family-specific regression tests. |
+| Inteleon (`pokemon_moba_inteleon`) | `DirectDamage` / `SelfOffenseCritBuff` / `AreaSoak` / `LineExecute` | Sniper | 4 / 1 | C3, F1 | Shared checks + family-specific regression tests. |
+| Skeledirge (`pokemon_moba_skeledirge`) | `DirectDamage` / `TargetSkillBlock` / `DirectBurn` / `SelfAreaDamageBurn` | Where There's Smoke There's Fire | 4 / 2 | F1 | Shared checks + family-specific regression tests. |
+| Porygon-Z (`pokemon_moba_porygonz`) | `ConversionDamage` / `Conversion2Damage` / `SelfHealResetPorygonType` / `TriAttack` | Adaptability | 4 / 2 | C1/C2 | Shared checks + family-specific regression tests. |
+| Blissey (`pokemon_moba_blissey`) | `DirectDamage` / `BlisseyHealAura` / `CharmHeal` / `GlobalAllyHealPercent` | Healer | 0 / 0 | C1/C2, F1 | C1/C2 fixed 0.2.4: one anti-heal owner and native/custom cleanse; live engine verification. |
+| Kleavor (`pokemon_moba_kleavor`) | `DirectDamageEveryThirdBleed` / `MultiHitDamage` / `StealthRockBuff` / `DirectDamageBindRecoilCrit` | Sharpness | 0 / 0 | C3, S1 | S1: Stealth Rock uses custom alternating untargetability; do not blindly replace with banish. |
+| Scizor (`pokemon_moba_scizor`) | `DirectDamageSpeedScale` / `SelfSpeedCritBuff` / `DirectDamageSpeedCheckCrit` / `DirectDamage` | Light Metal | 1 / 0 | C3, A1 | 0.2.7 Light Metal uses native shield without custom double absorption; live engine-origin hits need validation. |
+| Ursaluna (`pokemon_moba_ursaluna`) | `DirectDamage` / `TargetTerrify` / `EarthquakeAura` / `BloodMoon` | Guts | 3 / 0 | F1 | C3/F1: Blood Moon combat rules preserved; no public full-model swapping API found. |
+| Sawk & Throh (`pokemon_moba_sawk_throh`) | `SawkThrohBasic` / `SawkThrohSwitch` / `SawkThrohSkill2` / `SawkThrohUlt` | Inner Focus | 0 / 0 | M1/A2 | A1/F1: state-dependent cast gates available; full-model swapping not exposed. |
+| Hitmonchan (`pokemon_moba_hitmonchan`) | `DirectDamageDrain` / `DirectDamageChanceFreeze` / `DirectDamageChanceBurn` / `DirectDamageParalysisFor` | Iron Fist | 0 / 0 | Shared baseline | Shared checks + family-specific regression tests. |
+| Hitmonlee (`pokemon_moba_hitmonlee`) | `MultiHitDamage` / `DirectDamageStun` / `MeleeArcDamage` / `DirectDamageSelfSlow` | Limber | 0 / 0 | C3 | Shared checks + family-specific regression tests. |
+| Hitmontop (`pokemon_moba_hitmontop`) | `DirectDamage` / `DirectDamage` / `TargetDefenseDebuff` / `MultiHitDamage` | Steadfast | 0 / 0 | Shared baseline | Shared checks + family-specific regression tests. |
+| Kilowattrel (`pokemon_moba_kilowattrel`) | `DirectDamage` / `LineFirstDamage` / `LinePierceDamage` / `SelfBuffAreaDamage` | Volt Absorb | 4 / 2 | C1/C2, F1 | Shared checks + family-specific regression tests. |
+| Beeheeyem (`pokemon_moba_beeheeyem`) | `GuardSplitDamage` / `DirectBindBoth` / `LightScreen` / `DirectDamageConfusion` | Synchronize | 3 / 1 | C3 | Shared checks + family-specific regression tests. |
+| Gyarados (`pokemon_moba_gyarados`) | `WhirlpoolField` / `DirectDamageChanceBurnBypassImmune` / `TravelingWaveDamage` / `LinePierceDamage` | Lake of Rage | 4 / 1 | C1/C2, C3, F1 | Shared checks + family-specific regression tests. |
+| Noivern (`pokemon_moba_noivern`) | `DirectDamageDefenseDebuff` / `LinePierceDamageStun` / `LinePierceDamage` / `DirectDamage` | Infiltrator | 4 / 1 | Shared baseline | Explicitly deferred: Infiltrator unchanged; no tower-aggro interception API found. |
+| Mantine (`pokemon_moba_mantine`) | `LineFirstDamage` / `BrineField` / `DirectDamageStun` / `TravelingWaveDamage` | Swift Swim | 4 / 1 | F1 | 0.2.7 Swift Swim refreshes one named speed buff; live water entry/exit validation remains. |
+| Cryogonal (`pokemon_moba_cryogonal`) | `DirectDamage` / `TravelingWaveDamageChanceFreeze` / `DirectDamage` / `LinePierceDamageChanceFreeze` | Immunity | 4 / 1 | C3 | Shared checks + family-specific regression tests. |
+| Vanilluxe (`pokemon_moba_vanilluxe`) | `DirectDamage` / `TravelingWaveDamageChanceFreeze` / `ConeDamageFreeze` / `SelfAreaDamageFreezeAll` | Snow Patrol | 4 / 1 | C3, F1 | Shared checks + family-specific regression tests. |
+| Skarmory (`pokemon_moba_skarmory`) | `DirectDamage` / `Roost` / `MultiHitDamage` / `FlyAllySplash` | Sturdy | 0 / 0 | M1/A2 | M1 fixed 0.2.4: native Fly teleport; Sturdy covers Pokemon resolver hits only (C3). |
+| Houndoom (`pokemon_moba_houndoom`) | `DirectDamage` / `DirectDamage` / `TargetDefenseDebuffStun` / `AreaDamageBurn` | Intimidate | 4 / 2 | F1 | Shared checks + family-specific regression tests. |
+| Arbok (`pokemon_moba_arbok`) | `DirectDamageEverySecondMiasma` / `LinePierceDamageMiasmaCoil` / `AreaMiasmaSlow` / `SelfAreaMiasmaDetonate` | Dripping Fangs | 1 / 1 | C1/C2, A1, F1 | Shared checks + family-specific regression tests. |
+| Clawitzer (`pokemon_moba_clawitzer`) | `DirectDamage` / `TripleAreaDamage` / `DirectDamage` / `LinePierceDamage` | Clingy | 4 / 2 | A1, F1, S1 | A1/S1: attachment target/recall gates; soft untargetability not engine-wide immunity. |
+| Octillery (`pokemon_moba_octillery`) | `MultiHitDamage` / `TargetLockOn` / `BouncingAreaDamage` / `LineFirstDamage` | Suction Cups | 4 / 2 | F1 | M2 fixed 0.2.4: ignore_wall and -15% speed; route selection needs testing. |
+| Pyukumuku (`pokemon_moba_pyukumuku`) | `SelfProtectDefenseBuff` / `TargetPoison` / `SelfSleepHeal` / `PainSplit` | Innards Out | 0 / 0 | C1/C2, C3, A1 | Shared checks + family-specific regression tests. |
+| Banette (`pokemon_moba_banette`) | `DirectDamage` / `TargetSwapDamage` / `ConeDamageBlind` / `DirectDamageSplashOnKill` | Cursed Body | 3 / 0 | M1/A2 | M1 fixed 0.2.4: native Phantom Force teleport; live landing test. |
+| Kricketune (`pokemon_moba_kricketune`) | `DirectDamage` / `StickyWebField` / `SingAura` / `BugBuzzAuraConfusion` | Web Walker | 1 / 0 | M1/A2, F1 | Shared detection wired; 0.2.7 named web refresh and immediate field leases. Live overlap/lifecycle validation remains. |
+| Ambipom (`pokemon_moba_ambipom`) | `MultiHitDamage` / `ApplyConfusion` / `TargetStatSteal` / `SelfOffenseCritBuff` | Technician | 0 / 0 | C3 | I1: equipment Thief implemented; Technician still Pokemon buff ledger. |
+| Gallade (`pokemon_moba_gallade`) | `DirectDamage` / `TargetDamageReduction` / `SelfCleanseOffenseBuff` / `MeleeArcDamage` | Justified | 1 / 0 | C1/C2 | Shared checks + family-specific regression tests. |
+| Audino (`pokemon_moba_audino`) | `DirectDamage` / `AllyDamageRedirect` / `AllySwapHeal` / `EndureBuff` | Regenerator | 0 / 0 | C1/C2, C3, M1/A2 | M1 fixed 0.2.4: native Substitute position swap; Protect redirection preserved (C3). |
+| Pangoro (`pokemon_moba_pangoro`) | `DirectDamage` / `TargetTauntSelfDefenseBuff` / `DirectDamageSelfRetreat` / `SelfAreaDamageThrow` | Scrappy | 0 / 0 | M1/A2, A1, F1 | Shared checks + family-specific regression tests. |
+| Passimian (`pokemon_moba_passimian`) | `DirectDamage` / `SelfAttackDefenseBuff` / `ReversalGuard` / `DirectDamage` | Receiver | 2 / 2 | C3 | Copied CS payout, Inteleon/Emboar named refresh and Shiftry updater wired; full copied-passive live acceptance remains. |
+| Oranguru (`pokemon_moba_oranguru`) | `DirectDamage` / `NastyPlot` / `StoredPower` / `Instruct` | Symbiosis | 4 / 1 | A1 | I1: equipment-derived Symbiosis implemented; no item-proc sharing; copied Instruct targeting needs A1. |
+| Dragalge (`pokemon_moba_dragalge`) | `DirectDamageChancePoison` / `SelfAreaDamageKnockbackChancePoison` / `TripleAreaDamagePoison` / `TargetPoisonExecute` | Poison Sipper | 4 / 1 | C1/C2, M1/A2, F1 | Shared checks + family-specific regression tests. |
+| Heliolisk (`pokemon_moba_heliolisk`) | `DirectDamage` / `LineDashPierceDamage` / `ShedTailTauntDash` / `SelfAreaDamageParalysis` | Discharge | 2 / 0 | M1/A2, A1, F1 | 0.2.7 separate Shed Tail unit/taunt and swept piercing dash; live summon/body/lifetime validation remains. |
+| Turtonator (`pokemon_moba_turtonator`) | `DirectDamage` / `ShellTrap` / `SunnyDay` / `SelfAreaDamage` | Burning Jealousy | 5 / 1 | F1 | Shared checks + family-specific regression tests. |
+| Ribombee (`pokemon_moba_ribombee`) | `PollenPuff` / `LinePierceDamageDrain` / `RescueAllyDash` / `AlluringVoiceAura` | Honey Gatherer | 4 / 1 | C1/C2, M1/A2, A1, F1 | Shared checks + family-specific regression tests. |
+| Drampa (`pokemon_moba_drampa`) | `LinePierceDamageStun` / `SelfAttackDualDefenseBuff` / `HpCostDirectDamage` / `AreaDamage` | Berserk | 4 / 0 | C3, A1, F1 | Shared checks + family-specific regression tests. |
+| Kommo-o (`pokemon_moba_kommoo`) | `DirectDamageTargetMaxHp` / `AreaAttackDefenseDebuff` / `SelfHpCostOffenseSpeedBuff` / `KommooCloseCombatDuel` | Overcoat | 0 / 0 | C3, F1 | Shared checks + family-specific regression tests. |
+| Thievul (`pokemon_moba_thievul`) | `DirectDamage` / `DirectDamageAntiHeal` / `SelfCritAntiHealBuff` / `StakeoutField` | Heal Block | 2 / 0 | C1/C2, C3, F1 | C1 fixed 0.2.4: strongest-source named anti-heal with expiry tests; live engine verification. |
+| Archaludon (`pokemon_moba_archaludon`) | `DirectDamage` / `SelfDefenseBuff` / `SelfAttackDualDefenseBuff` / `SelfAreaDamage` | Stalwart | 1 / 0 | C3, M1/A2, F1 | Shared checks + family-specific regression tests. |
+| Appletun (`pokemon_moba_appletun`) | `DirectDamage` / `TargetDefenseDebuff` / `AreaAttackDefenseDebuff` / `LinePierceDamage` | Ripen | 2 / 2 | C1/C2, F1 | C1: Ripen amplification, HP cap and anti-heal order need engine tests. |
+| Goodra (`pokemon_moba_goodra`) | `DirectDamageChanceConfusion` / `RainDance` / `DragonCheerAura` / `LifeDewPickups` | Sap Sipper | 5 / 0 | F1 | Shared checks + family-specific regression tests. |
+| Dedenne (`pokemon_moba_dedenne`) | `DirectDamageChanceParalysis` / `DedennePlayRough` / `DedenneParabolicDischarge` / `DedenneElectricTerrain` | Static | 7 / 0 | A1, F1 | 0.2.7 grid refresh, configured node damage and cooldown gate fixed. Bespoke Play Rough timing remains separate; live grid acceptance pending. |
+| Hawlucha (`pokemon_moba_hawlucha`) | `DirectDamage` / `ConeDamage` / `HawluchaCounter` / `HawluchaFlyingPress` | Momentum | 1 / 0 | M1/A2 | Shared checks + family-specific regression tests. |
+| Bouffalant (`pokemon_moba_bouffalant`) | `DirectDamage` / `BouffalantRetaliate` / `BouffalantStompingTantrum` / `BouffalantHeadCharge` | Afro | 0 / 0 | A1 | Shared checks + family-specific regression tests. |
+| Starmie (`pokemon_moba_starmie`) | `DirectDamage` / `StarmieFlipTurn` / `StarmieHeartSwap` / `StarmiePsybeam` | Illuminate | 4 / 1 | M1/A2, A1, S1 | S1/F1: Illuminate reveal, mark size/anchor/lifetime verification. |
+| Drednaw (`pokemon_moba_drednaw`) | `DirectDamage` / `DirectDamageBind` / `SelfAttackDualDefenseBuff` / `SelfAreaDamageRetreatLine` | Wide Guard | 3 / 0 | C3, M1/A2, F1 | Shared checks + family-specific regression tests. |
+| Orbeetle (`pokemon_moba_orbeetle`) | `DirectDamage` / `ChainDashDamage` / `TravelingWaveDamageInfestation` / `ConeDamageConfusion` | Telepathy | 2 / 0 | M1/A2 | Shared checks + family-specific regression tests. |
+| Coalossal (`pokemon_moba_coalossal`) | `DirectDamage` / `TravelingWaveDamageSlowBurn` / `SmokeScreen` / `CoalossalMagmaStorm` | Steam Engine | 4 / 1 | Shared baseline | Shared checks + family-specific regression tests. |
+| Magmortar (`pokemon_moba_magmortar`) | `DirectDamage` / `DirectDamageSplash` / `MagmortarHeatWave` / `MagmortarEruption` | Overheat | 4 / 3 | Shared baseline | P1: per-shot impacts implemented; launch-vs-impact stat sampling changed. |
+| Grapploct (`pokemon_moba_grapploct`) | `MultiHitDamage` / `SelfDetectGuard` / `SubmissionBindDot` / `SubmissionBindDot` | Boxer | 0 / 0 | C3 | Shared checks + family-specific regression tests. |
+| Sirfetch'd (`pokemon_moba_sirfetchd`) | `DirectDamage` / `DirectDamage` / `LineFirstDamage` / `DirectDamageSpeedCheckCrit` | Leek | 1 / 1 | C3 | Shared checks + family-specific regression tests. |
+| Arboliva (`pokemon_moba_arboliva`) | `DirectDamageSplash` / `DirectDamage` / `TrailblazeGrassyTerrain` / `LinePierceDamageChanceBurn` | Seed Sower | 5 / 1 | A1, F1 | Shared checks + family-specific regression tests. |
+| Armarouge (`pokemon_moba_armarouge`) | `DirectDamage` / `SelfAreaDamageBurnConfusion` / `DirectDamageStun` / `LinePierceDamageSelfDefenseDebuff` | Weak Armor | 2 / 0 | A1, F1 | Shared checks + family-specific regression tests. |
+| Ceruledge (`pokemon_moba_ceruledge`) | `DirectDamageChanceStun` / `LineFirstDashDamageFlameTrail` / `TargetItemScaledDamage` / `DirectDamageExecuteThreshold` | Flash Fire | 1 / 0 | M1/A2, F1 | I1: equipment-derived Poltergeist implemented; validate equipment changes/expiry. |
+| Gholdengo (`pokemon_moba_gholdengo`) | `DirectDamage` / `TravelingWaveDamage` / `AreaDamageDefenseDebuff` / `AreaDamage` | Good as Gold | 4 / 1 | F1 | G1: +10 credited-CS callback implemented; duplicate/death/replay tests remain. |
+| Frosmoth (`pokemon_moba_frosmoth`) | `AreaDamage` / `TravelingWaveDamageChanceFreeze` / `SleepPowderCircle` / `TravelingWaveDamage` | Ice Scales | 4 / 0 | A1, F1 | Shared checks + family-specific regression tests. |
+| Shedinja (`pokemon_moba_shedinja`) | `DirectDamage` / `DashEndConeDamage` / `GrudgeDamage` / `TravelingWaveDamageTerrify` | Wonder Guard | 5 / 2 | C3, M1/A2 | 0.2.7 dash-cone resolves on arrival; missing damage classification fixed. Wonder Guard remains custom pre-damage logic. |
+| Ludicolo (`pokemon_moba_ludicolo`) | `DirectDamage` / `ConeTauntThenConfuse` / `SingAura` / `DirectDamageStun` | Rain Dish | 5 / 0 | C1/C2, F1 | Shared checks + family-specific regression tests. |
+| Kingdra (`pokemon_moba_kingdra`) | `DirectDamage` / `AreaDamage` / `KingdraDragonDance` / `DirectDamage` | King's Rock | 4 / 2 | C3, A1, F1 | Shared checks + family-specific regression tests. |
+| Delibird (`pokemon_moba_delibird`) | `PresentDamage` / `PresentHealPercent` / `PresentHealPercent` / `DirectDamageChanceExecute` | Hustle | 2 / 1 | C1/C2, C3 | Shared checks + family-specific regression tests. |
+| Cloyster (`pokemon_moba_cloyster`) | `DirectDamageChanceFreeze` / `CloysterIcicleCrash` / `CloysterClamp` / `DirectDamageChanceFreeze` | Overcoat | 3 / 2 | C3 | Shared checks + family-specific regression tests. |
+| Electrode (`pokemon_moba_electrode`) | `DirectDamage` / `ElectrodeMagnetRise` / `ElectrodeMagneticFlux` / `ElectrodeSelfDestruct` | Aftermath | 1 / 0 | Shared baseline | 0.2.7 post-respawn speed outcome fixed and one-shot tested; no public respawn-countdown setter. |
+| Snorlax (`pokemon_moba_snorlax`) | `DirectDamage` / `SnorlaxSwallow` / `SnorlaxBellyDrum` / `SnorlaxSnore` | Gluttony | 0 / 0 | C1/C2, M1/A2, A1 | Shared checks + family-specific regression tests. |
+| Zeraora (`pokemon_moba_zeraora`) | `MultiHitDamage` / `ZeraoraThunderCage` / `ZeraoraZingZap` / `ZeraoraWildCharge` | Merciless | 4 / 0 | A1 | Shared checks + family-specific regression tests. |
+| Rillaboom (`pokemon_moba_rillaboom`) | `DirectDamage` / `RillaboomDrumBeating` / `RillaboomDrumRoll` / `RillaboomGrassySurge` | Drum Solo | 3 / 0 | C1/C2 | Shared checks + family-specific regression tests. |
+| Dragapult (`pokemon_moba_dragapult`) | `DirectDamage` / `MultiHitDamage` / `LineDashPierceContactDrain` / `DirectDamageTerrify` | Dragon Launcher | 5 / 4 | C1/C2, M1/A2 | P1: Dreepy callback flight, spawn origin and source/copy ownership tests. |
+| Shiftry (`pokemon_moba_shiftry`) | `DirectDamage` / `ConeForceAwaySlow` / `DirectDamage` / `ShiftryTornado` | Forest Camouflage | 2 / 0 | M1/A2, F1, S1 | Map-grid occupancy, named speed refresh and Receiver camouflage updater wired. Live map validation pending. |
+| Sigilyph (`pokemon_moba_sigilyph`) | `DirectDamage` / `ConeDamage` / `SigilyphGravity` / `DirectDamageConfusion` | Glypher | 5 / 2 | Shared baseline | Shared checks + family-specific regression tests. |
+| Weavile (`pokemon_moba_weavile`) | `DirectDamageChanceFreeze` / `WeavileScratchAndShuffle` / `WeavilePursuitClaw` / `WeavileAssaultingHunt` | Lone Predator | 0 / 0 | Shared baseline | S1 improved 0.2.4: native Hunt invisibility plus custom protection; reveal/break live tests. |
+| Swanna (`pokemon_moba_swanna`) | `DirectDamage` / `DirectDamageBleed` / `SwannaFeatheryCyclone` / `SwannaSkyCircus` | Tailwind | 3 / 1 | A1 | Shared checks + family-specific regression tests. |
+| Marowak (`pokemon_moba_marowak`) | `MarowakBonemerang` / `MarowakBoneRush` / `DirectDamageStun` / `MarowakBoneWindmill` | Rhythm | 2 / 1 | A1 | P1: outbound/return collisions, catch timing and Rhythm refresh require live tests. |
+| Garganacl (`pokemon_moba_garganacl`) | `DirectDamage` / `GarganaclLandCrush` / `GarganaclPurifyingSalt` / `GarganaclBlessedSalt` | Salt Cure | 3 / 0 | F1 | Shared checks + family-specific regression tests. |
+| Ampharos (`pokemon_moba_ampharos`) | `DirectDamage` / `AmpharosFlash` / `AmpharosSearchlightTail` / `AmpharosGigavolt` | Luminous Pulse | 5 / 1 | M1/A2, F1, S1 | 0.2.6 continuous shared team detection and Weavile reveal wired; live host attack acceptance pending. |
+| Xatu (`pokemon_moba_xatu`) | `DirectDamage` / `XatuMindBend` / `XatuPainAmplifier` / `XatuSuperPsy` | Prophecy | 4 / 1 | M1/A2, A1, S1 | S1: custom reveal must coordinate with any native invisibility migration. |
+| Quaquaval (`pokemon_moba_quaquaval`) | `QuaquavalHydroKick` / `QuaquavalSpiralShot` / `QuaquavalUpTempo` / `QuaquavalExcitingDance` | Aqua Step | 5 / 1 | F1 | Shared checks + family-specific regression tests. |
+| Arcanine (`pokemon_moba_arcanine`) | `DirectDamage` / `ArcanineExtremespeed` / `ArcanineWhiteFlames` / `ArcanineFlamesOfRage` | Blazing Mane | 3 / 1 | C1/C2, A1 | Shared checks + family-specific regression tests. |
+| MissingNo. (`pokemon_moba_missingno`) | `MissingNoGlitchBasic` / `MissingNoRandomStatus` / `MissingNoGlitchStorm` / `MissingNoTrickRoom` | Old man glitch | 6 / 1 | A1 | Shared checks + family-specific regression tests. |
+| Kecleon (`pokemon_moba_kecleon`) | `DirectDamage` / `KecleonDoubleScratch` / `KecleonChromashift` / `KecleonColorfulWhip` | Energy Predator | 2 / 0 | Shared baseline | Shared checks + family-specific regression tests. |
+| Yanmega (`pokemon_moba_yanmega`) | `LinePierceDamage` / `YanmegaBuzzingBoost` / `YanmegaTintedLens` / `YanmegaGigaDrain` | Ogre Darner's Bug Blood | 3 / 0 | C1/C2, C3 | C3: drain immunity is Pokemon-layer-only; engine item lifesteal requires verification. |
+| Weezing (`pokemon_moba_weezing`) | `LinePierceDamageChancePoison` / `LinePierceDamageStun` / `WeezingBodyOdor` / `WeezingSludgeWhirlpool` | Nullifying Gas | 5 / 0 | F1 | C3: Nullifying Gas suppression must cover copied passives and all new callbacks. |
+| Wishiwashi (`pokemon_moba_wishiwashi`) | `DirectDamage` / `WishiwashiWaveSplash` / `WishiwashiCowardice` / `WishiwashiMassiveCatch` | Schooling | 4 / 1 | A1 | C3/F1: native shields supported; Schooling state and overlays are not body swaps. |
+| Comfey (`pokemon_moba_comfey`) | `SelfAllStatsBuff` / `HealAttachedAllyPercent` / `GrassPowerAura` / `EncoreAttachedAlly` | Flower Veil | 1 / 0 | C1/C2, C3, A1, F1, S1 | A1/S1: attachment target/recall gates; retain casting while attached; Encore is currently haste. |
+| Smeargle (`pokemon_moba_smeargle`) | `Sketch` / `Sketch` / `Sketch` / `Sketch` | Sketch | 0 / 0 | A1 | 0.2.7 preserves copied move element/art with actual caster STAB; persistent copies still need live tests. |
+| Torterra (`pokemon_moba_torterra`) | `DirectDamageDrain` / `SelfDefenseBuff` / `SelfHeal` / `LineFirstDashDamageMissingHp` | Shell Armor | 0 / 0 | C1/C2, C3, M1/A2 | Shared checks + family-specific regression tests. |
+| Venusaur (`pokemon_moba_venusaur`) | `DirectDamage` / `LineFirstBindBoth` / `LineFirstLeechSeed` / `TravelingWavePoisonSlow` | Tangling Vines | 3 / 1 | Shared baseline | Shared checks + family-specific regression tests. |
+| Eevee (`pokemon_moba_eevee`) | `DirectDamage` / `TargetAttackDebuffProtect` / `WishChannel` / `BatonPass` | Helping Hand | 3 / 0 | A1 | Shared checks + family-specific regression tests. |
+| Jolteon (`pokemon_moba_jolteon`) | `MultiHitDamage` / `TargetOffenseDebuff` / `DirectDamage` / `DashDamageChanceParalysis` | Eeveelution | 4 / 2 | M1/A2, A1 | Shared checks + family-specific regression tests. |
+| Flareon (`pokemon_moba_flareon`) | `DirectDamageChanceBurn` / `SelfBuffAreaDamageKnockbackChanceBurn` / `LinePierceDamageChanceBurn` / `DashDamageChanceBurn` | Eeveelution | 4 / 1 | M1/A2, A1, F1 | Shared checks + family-specific regression tests. |
+| Vaporeon (`pokemon_moba_vaporeon`) | `LinePierceDamage` / `TargetAttackDebuffByDefense` / `LineFirstDamage` / `AquaRing` | Eeveelution | 4 / 2 | A1 | Shared checks + family-specific regression tests. |
+| Leafeon (`pokemon_moba_leafeon`) | `DirectDamageChanceBleed` / `DirectDamageIgnoreType` / `DirectDamageBleed` / `AreaDamageSelfSlow` | Eeveelution | 4 / 2 | A1, F1 | Shared checks + family-specific regression tests. |
+| Glaceon (`pokemon_moba_glaceon`) | `DirectDamage` / `IceField` / `DashDamageChanceFreeze` / `IceField` | Eeveelution | 4 / 1 | M1/A2, A1, F1 | Shared checks + family-specific regression tests. |
+| Umbreon (`pokemon_moba_umbreon`) | `DirectDamage` / `AreaDamageDefenseDebuff` / `LineFirstDamageSelfBuff` / `DashDamageChanceDisarm` | Eeveelution | 3 / 0 | M1/A2, A1, F1 | Shared checks + family-specific regression tests. |
+| Espeon (`pokemon_moba_espeon`) | `DirectDamage` / `ApplyConfusion` / `ForceSelfCrit` / `FutureSight` | Eeveelution | 2 / 1 | C3, M1/A2, A1 | Shared checks + family-specific regression tests. |
+| Sylveon (`pokemon_moba_sylveon`) | `AreaDamageAttackDebuff` / `MistyTerrain` / `CharmHeal` / `DazzlingGleam` | Eeveelution | 4 / 0 | C1/C2, A1, F1 | Shared checks + family-specific regression tests. |
+
+## Shared Effect Coverage
+
+Every action variant below inherits the shared resolver/adapter audit; occurrence counts are not test counts.
+
+| Effect | Roster actions |
+| --- | ---: |
+| `AlluringVoiceAura` | 1 |
+| `AllyDamageRedirect` | 1 |
+| `AllySwapHeal` | 1 |
+| `AmpharosFlash` | 1 |
+| `AmpharosGigavolt` | 1 |
+| `AmpharosSearchlightTail` | 1 |
+| `ApplyConfusion` | 2 |
+| `AquaRing` | 1 |
+| `ArcanineExtremespeed` | 1 |
+| `ArcanineFlamesOfRage` | 1 |
+| `ArcanineWhiteFlames` | 1 |
+| `AreaAttackDefenseDebuff` | 2 |
+| `AreaDamage` | 7 |
+| `AreaDamageAttackDebuff` | 1 |
+| `AreaDamageBurn` | 1 |
+| `AreaDamageDefenseDebuff` | 2 |
+| `AreaDamageSelfSlow` | 1 |
+| `AreaMiasmaSlow` | 1 |
+| `AreaSoak` | 1 |
+| `BatonPass` | 1 |
+| `BlisseyHealAura` | 1 |
+| `BloodMoon` | 1 |
+| `BouffalantHeadCharge` | 1 |
+| `BouffalantRetaliate` | 1 |
+| `BouffalantStompingTantrum` | 1 |
+| `BouncingAreaDamage` | 1 |
+| `BrineField` | 1 |
+| `BugBuzzAuraConfusion` | 1 |
+| `ChainDashDamage` | 1 |
+| `CharmHeal` | 2 |
+| `CloysterClamp` | 1 |
+| `CloysterIcicleCrash` | 1 |
+| `CoalossalMagmaStorm` | 1 |
+| `ConeDamage` | 4 |
+| `ConeDamageBlind` | 1 |
+| `ConeDamageConfusion` | 1 |
+| `ConeDamageFreeze` | 1 |
+| `ConeForceAwaySlow` | 1 |
+| `ConeTauntThenConfuse` | 1 |
+| `Conversion2Damage` | 1 |
+| `ConversionDamage` | 1 |
+| `DashDamage` | 1 |
+| `DashDamageChanceBurn` | 1 |
+| `DashDamageChanceDisarm` | 1 |
+| `DashDamageChanceFreeze` | 1 |
+| `DashDamageChanceParalysis` | 1 |
+| `DashDamageReturn` | 1 |
+| `DashEndConeDamage` | 1 |
+| `DazzlingGleam` | 1 |
+| `DedenneElectricTerrain` | 1 |
+| `DedenneParabolicDischarge` | 1 |
+| `DedennePlayRough` | 1 |
+| `DirectBindBoth` | 1 |
+| `DirectBurn` | 1 |
+| `DirectDamage` | 71 |
+| `DirectDamageAntiHeal` | 1 |
+| `DirectDamageBind` | 1 |
+| `DirectDamageBindRecoilCrit` | 1 |
+| `DirectDamageBleed` | 2 |
+| `DirectDamageChanceBleed` | 1 |
+| `DirectDamageChanceBurn` | 2 |
+| `DirectDamageChanceBurnBypassImmune` | 1 |
+| `DirectDamageChanceConfusion` | 1 |
+| `DirectDamageChanceExecute` | 1 |
+| `DirectDamageChanceFreeze` | 4 |
+| `DirectDamageChanceParalysis` | 1 |
+| `DirectDamageChancePoison` | 1 |
+| `DirectDamageChanceStun` | 1 |
+| `DirectDamageConfusion` | 2 |
+| `DirectDamageDefenseDebuff` | 1 |
+| `DirectDamageDrain` | 2 |
+| `DirectDamageEverySecondMiasma` | 1 |
+| `DirectDamageEveryThirdBleed` | 1 |
+| `DirectDamageExecuteThreshold` | 1 |
+| `DirectDamageIgnoreType` | 1 |
+| `DirectDamageKnockback` | 2 |
+| `DirectDamageParalysisFor` | 1 |
+| `DirectDamageSelfRetreat` | 1 |
+| `DirectDamageSelfSlow` | 1 |
+| `DirectDamageSpeedCheckCrit` | 2 |
+| `DirectDamageSpeedScale` | 1 |
+| `DirectDamageSpiritShackle` | 1 |
+| `DirectDamageSplash` | 2 |
+| `DirectDamageSplashOnKill` | 1 |
+| `DirectDamageStun` | 6 |
+| `DirectDamageTargetMaxHp` | 1 |
+| `DirectDamageTerrify` | 1 |
+| `DragonCheerAura` | 1 |
+| `EarthquakeAura` | 1 |
+| `ElectrodeMagnetRise` | 1 |
+| `ElectrodeMagneticFlux` | 1 |
+| `ElectrodeSelfDestruct` | 1 |
+| `EncoreAttachedAlly` | 1 |
+| `EndureBuff` | 1 |
+| `FlyAllySplash` | 1 |
+| `ForceSelfCrit` | 1 |
+| `FutureSight` | 1 |
+| `GarganaclBlessedSalt` | 1 |
+| `GarganaclLandCrush` | 1 |
+| `GarganaclPurifyingSalt` | 1 |
+| `GlobalAllyHealPercent` | 1 |
+| `GrassPowerAura` | 1 |
+| `GrudgeDamage` | 1 |
+| `GuardSplitDamage` | 1 |
+| `HawluchaCounter` | 1 |
+| `HawluchaFlyingPress` | 1 |
+| `HealAttachedAllyPercent` | 1 |
+| `HpCostDirectDamage` | 1 |
+| `IceField` | 2 |
+| `Instruct` | 1 |
+| `KecleonChromashift` | 1 |
+| `KecleonColorfulWhip` | 1 |
+| `KecleonDoubleScratch` | 1 |
+| `KingdraDragonDance` | 1 |
+| `KommooCloseCombatDuel` | 1 |
+| `LifeDewPickups` | 1 |
+| `LightScreen` | 1 |
+| `LineDashPierceContactDrain` | 1 |
+| `LineDashPierceDamage` | 1 |
+| `LineExecute` | 1 |
+| `LineFirstBindBoth` | 1 |
+| `LineFirstDamage` | 6 |
+| `LineFirstDamageSelfBuff` | 1 |
+| `LineFirstDashDamageDistanceSelfHp` | 1 |
+| `LineFirstDashDamageFlameTrail` | 2 |
+| `LineFirstDashDamageMissingHp` | 1 |
+| `LineFirstLeechSeed` | 1 |
+| `LinePierceDamage` | 9 |
+| `LinePierceDamageChanceBurn` | 2 |
+| `LinePierceDamageChanceFreeze` | 1 |
+| `LinePierceDamageChancePoison` | 1 |
+| `LinePierceDamageDrain` | 1 |
+| `LinePierceDamageMiasmaCoil` | 1 |
+| `LinePierceDamageSelfDefenseDebuff` | 1 |
+| `LinePierceDamageSelfRetreat` | 1 |
+| `LinePierceDamageSlowApToAd` | 1 |
+| `LinePierceDamageStun` | 3 |
+| `MagmortarEruption` | 1 |
+| `MagmortarHeatWave` | 1 |
+| `MarowakBoneRush` | 1 |
+| `MarowakBoneWindmill` | 1 |
+| `MarowakBonemerang` | 1 |
+| `MeleeArcDamage` | 2 |
+| `MissingNoGlitchBasic` | 1 |
+| `MissingNoGlitchStorm` | 1 |
+| `MissingNoRandomStatus` | 1 |
+| `MissingNoTrickRoom` | 1 |
+| `MistyTerrain` | 1 |
+| `MultiHitDamage` | 12 |
+| `NastyPlot` | 1 |
+| `PainSplit` | 1 |
+| `PollenPuff` | 1 |
+| `PowerUpPunchChannel` | 1 |
+| `PresentDamage` | 1 |
+| `PresentHealPercent` | 2 |
+| `QuaquavalExcitingDance` | 1 |
+| `QuaquavalHydroKick` | 1 |
+| `QuaquavalSpiralShot` | 1 |
+| `QuaquavalUpTempo` | 1 |
+| `RainDance` | 1 |
+| `RescueAllyDash` | 1 |
+| `ReversalGuard` | 1 |
+| `RillaboomDrumBeating` | 1 |
+| `RillaboomDrumRoll` | 1 |
+| `RillaboomGrassySurge` | 1 |
+| `Roost` | 1 |
+| `SawkThrohBasic` | 1 |
+| `SawkThrohSkill2` | 1 |
+| `SawkThrohSwitch` | 1 |
+| `SawkThrohUlt` | 1 |
+| `SelfAllStatsBuff` | 1 |
+| `SelfAreaDamage` | 2 |
+| `SelfAreaDamageBurn` | 1 |
+| `SelfAreaDamageBurnConfusion` | 1 |
+| `SelfAreaDamageFreezeAll` | 1 |
+| `SelfAreaDamageKnockbackChancePoison` | 1 |
+| `SelfAreaDamageParalysis` | 1 |
+| `SelfAreaDamageRetreatLine` | 1 |
+| `SelfAreaDamageThrow` | 1 |
+| `SelfAreaMiasmaDetonate` | 1 |
+| `SelfAttackDefenseBuff` | 1 |
+| `SelfAttackDualDefenseBuff` | 3 |
+| `SelfBuffAreaDamage` | 2 |
+| `SelfBuffAreaDamageKnockbackChanceBurn` | 2 |
+| `SelfCleanseOffenseBuff` | 1 |
+| `SelfCritAntiHealBuff` | 1 |
+| `SelfDefenseBuff` | 2 |
+| `SelfDetectGuard` | 1 |
+| `SelfHeal` | 1 |
+| `SelfHealResetPorygonType` | 1 |
+| `SelfHpCostOffenseSpeedBuff` | 1 |
+| `SelfOffenseBuff` | 2 |
+| `SelfOffenseCritBuff` | 2 |
+| `SelfProtectDefenseBuff` | 1 |
+| `SelfSleepHeal` | 1 |
+| `SelfSpeedCritBuff` | 1 |
+| `ShedTailTauntDash` | 1 |
+| `ShellTrap` | 1 |
+| `ShiftryTornado` | 1 |
+| `SigilyphGravity` | 1 |
+| `SingAura` | 2 |
+| `Sketch` | 4 |
+| `SleepPowderCircle` | 1 |
+| `SmokeScreen` | 1 |
+| `SnorlaxBellyDrum` | 1 |
+| `SnorlaxSnore` | 1 |
+| `SnorlaxSwallow` | 1 |
+| `StakeoutField` | 1 |
+| `StarmieFlipTurn` | 1 |
+| `StarmieHeartSwap` | 1 |
+| `StarmiePsybeam` | 1 |
+| `StealthRockBuff` | 1 |
+| `StickyWebField` | 1 |
+| `StoredPower` | 1 |
+| `SubmissionBindDot` | 2 |
+| `SunnyDay` | 1 |
+| `SwannaFeatheryCyclone` | 1 |
+| `SwannaSkyCircus` | 1 |
+| `TargetAttackDebuffByDefense` | 1 |
+| `TargetAttackDebuffProtect` | 1 |
+| `TargetDamageReduction` | 1 |
+| `TargetDefenseDebuff` | 2 |
+| `TargetDefenseDebuffStun` | 1 |
+| `TargetItemScaledDamage` | 1 |
+| `TargetLockOn` | 1 |
+| `TargetOffenseDebuff` | 1 |
+| `TargetPoison` | 1 |
+| `TargetPoisonExecute` | 1 |
+| `TargetSkillBlock` | 1 |
+| `TargetStatSteal` | 1 |
+| `TargetSwapDamage` | 1 |
+| `TargetTauntSelfDefenseBuff` | 1 |
+| `TargetTerrify` | 1 |
+| `TrailblazeGrassyTerrain` | 1 |
+| `TravelingWaveDamage` | 4 |
+| `TravelingWaveDamageChanceFreeze` | 3 |
+| `TravelingWaveDamageInfestation` | 1 |
+| `TravelingWaveDamageParalysis` | 1 |
+| `TravelingWaveDamageSlowBurn` | 1 |
+| `TravelingWaveDamageTerrify` | 1 |
+| `TravelingWavePoisonSlow` | 1 |
+| `TriAttack` | 1 |
+| `TripleArcDamage` | 1 |
+| `TripleAreaDamage` | 1 |
+| `TripleAreaDamagePoison` | 1 |
+| `WeavileAssaultingHunt` | 1 |
+| `WeavilePursuitClaw` | 1 |
+| `WeavileScratchAndShuffle` | 1 |
+| `WeezingBodyOdor` | 1 |
+| `WeezingSludgeWhirlpool` | 1 |
+| `WhirlpoolField` | 1 |
+| `WishChannel` | 1 |
+| `WishiwashiCowardice` | 1 |
+| `WishiwashiMassiveCatch` | 1 |
+| `WishiwashiWaveSplash` | 1 |
+| `XatuMindBend` | 1 |
+| `XatuPainAmplifier` | 1 |
+| `XatuSuperPsy` | 1 |
+| `YanmegaBuzzingBoost` | 1 |
+| `YanmegaGigaDrain` | 1 |
+| `YanmegaTintedLens` | 1 |
+| `ZeraoraThunderCage` | 1 |
+| `ZeraoraWildCharge` | 1 |
+| `ZeraoraZingZap` | 1 |
+
+## No Staged VFX Bindings
+
+Emboar, Blissey, Kleavor, Sawk & Throh, Hitmonchan, Hitmonlee, Hitmontop, Skarmory, Pyukumuku, Ambipom, Audino, Pangoro, Kommo-o, Bouffalant, Grapploct, Snorlax, Weavile, Smeargle, Torterra
+
+No staged binding does not imply a broken skill: some moves have no separate VFX artwork. Smeargle reuses the copied move's assets.

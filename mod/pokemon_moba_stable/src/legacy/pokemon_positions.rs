@@ -9,6 +9,12 @@ use crate::stable_legacy_api::*;
 
 const VANILLA_CHAMPION_COUNT: usize = 60;
 
+// Internal ids used only by the preserved scoring algorithm, never host roster indices.
+pub fn legacy_score_id(champion_id: &str) -> Option<usize> {
+    POKEMON_POSITIONS.iter().position(|info| info.id == champion_id)
+        .map(|index| VANILLA_CHAMPION_COUNT + index)
+}
+
 const TOP: usize = Position::Top as usize;
 const JUNGLE: usize = Position::Jungle as usize;
 const MID: usize = Position::Mid as usize;
@@ -567,6 +573,27 @@ pub fn lane_label(champion_id: &str) -> Option<&'static str> {
 
 pub fn info_for_champion_id(champion_id: &str) -> Option<&'static PokemonPositionInfo> {
     POKEMON_POSITIONS.iter().find(|info| info.id == champion_id)
+}
+
+/// Initial suitability shares, not hard lane locks. Preserve the authored lane set.
+pub fn lane_weights(champion_id: &str) -> Option<[usize; 5]> {
+    let info = info_for_champion_id(champion_id)?;
+    let shares: &[usize] = match champion_id {
+        "pokemon_moba_skeledirge" => &[50, 25, 25],
+        // Flexible bruisers and control picks with two established homes.
+        "pokemon_moba_feraligatr" | "pokemon_moba_emboar" | "pokemon_moba_kleavor"
+        | "pokemon_moba_sawk_throh" | "pokemon_moba_hitmonchan" | "pokemon_moba_pyukumuku"
+        | "pokemon_moba_kommoo" | "pokemon_moba_grapploct" | "pokemon_moba_sirfetchd"
+        | "pokemon_moba_armarouge" | "pokemon_moba_goodra" | "pokemon_moba_vaporeon"
+        | "pokemon_moba_smeargle" => &[50, 50],
+        _ if info.positions.len() == 1 => &[100],
+        _ if info.positions.len() == 2 => &[75, 25],
+        _ => return None,
+    };
+    if shares.len() != info.positions.len() { return None; }
+    let mut weights = [0; 5];
+    for (&lane, &share) in info.positions.iter().zip(shares) { weights[lane] = share; }
+    Some(weights)
 }
 
 pub fn position_icon_source(position: usize) -> Option<&'static str> {

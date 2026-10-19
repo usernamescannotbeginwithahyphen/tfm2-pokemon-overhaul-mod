@@ -1,6 +1,6 @@
 {
   "anims": {
-    "splash": {
+    "effect": {
       "frames": [
         {
           "duration": 0.0875,

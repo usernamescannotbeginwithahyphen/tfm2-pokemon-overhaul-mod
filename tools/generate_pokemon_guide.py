@@ -12,10 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "scratch" / "pokemon_guide_data.json"
 OUT_DIR = ROOT / "guide"
 HTML_PATH = OUT_DIR / "pokemon_moba_guide.html"
-MOD_GUIDE_DIR = ROOT / "mod" / "pokemon_moba" / "guide"
+MOD_GUIDE_DIR = ROOT / "mod" / "pokemon_moba_stable" / "guide"
 MOD_HTML_PATH = MOD_GUIDE_DIR / "pokemon_moba_guide.html"
-ICON_DIR = ROOT / "mod" / "pokemon_moba" / "icons" / "champions"
-CUSTOM_SPRITE_DIR = ROOT / "mod" / "pokemon_moba" / "champions_custom"
+ICON_DIR = ROOT / "mod" / "pokemon_moba_stable" / "icons" / "champions"
+CUSTOM_SPRITE_DIR = ROOT / "mod" / "pokemon_moba_stable" / "champions_custom"
 
 TYPE_COLORS = {
     "Normal": "#b7b7a8",
@@ -70,7 +70,7 @@ SPECIAL_NOTES = {
     ],
     "pokemon_moba_passimian": [
         "Receiver exclusions: Passimian cannot copy Receiver, Clingy, Flower Veil, or Sketch, so kills on Passimian, Clawitzer, Comfey, and Smeargle do not replace Passimian's current copied passive.",
-        "Receiver note: Noivern's Infiltrator and Octillery's Suction Cups are waiting for future game developer support before their copied effects can fully function.",
+        "Receiver note: Noivern's Infiltrator retains its existing approximation. Copied Octillery Suction Cups permits terrain passage with 15% reduced movement speed.",
     ],
 }
 

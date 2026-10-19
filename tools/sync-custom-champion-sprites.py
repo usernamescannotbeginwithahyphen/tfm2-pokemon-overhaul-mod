@@ -10,10 +10,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC_RS = ROOT / "mod" / "pokemon_moba" / "src" / "pokemon_content.rs"
+SRC_RS = ROOT / "mod" / "pokemon_moba_stable" / "src" / "legacy" / "pokemon_content.rs"
 STAGED_DIR = ROOT / "assets" / "custom_spritework" / "champions"
-RUNTIME_DIR = ROOT / "mod" / "pokemon_moba" / "champions_custom"
-OVERRIDE_INFO = ROOT / "mod" / "pokemon_moba" / "mod.override_info"
+RUNTIME_DIR = ROOT / "mod" / "pokemon_moba_stable" / "champions_custom"
+OVERRIDE_INFO = ROOT / "mod" / "pokemon_moba_stable" / "mod.override_info"
 
 
 def roster_ids() -> list[str]:
@@ -51,7 +51,7 @@ def normalize_overrides(ids: list[str]) -> None:
 
     for short_id in ids:
         base = f"asset/base/aseprite_resources/champions/pokemon_moba_{short_id}"
-        custom = f"asset/pokemon_moba/champions_custom/{short_id}"
+        custom = f"asset/pokemon_moba_stable/champions_custom/{short_id}"
         data[f"{base}#sheet"] = {
             "remapping": f"{custom}#sheet",
             "type": "override",
@@ -66,7 +66,10 @@ def normalize_overrides(ids: list[str]) -> None:
         for key, value in data.items()
         if isinstance(value, dict)
         and isinstance(value.get("remapping"), str)
-        and value["remapping"].startswith("asset/pokemon_moba/champions/")
+        and (
+            value["remapping"].startswith("asset/pokemon_moba/champions/")
+            or value["remapping"].startswith("asset/pokemon_moba/champions_custom/")
+        )
     ]
     if stale:
         details = "\n".join(f"- {key} -> {data[key]['remapping']}" for key in stale)

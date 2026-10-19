@@ -5,10 +5,10 @@ Source docs: https://github.com/teamsamoyed/TeamfightManager2Mod/tree/main
 ## Package Rules
 
 - A mod is a folder under the game's `mods/` directory.
-- The folder name is the mod id. This project uses `pokemon_moba`.
+- The folder name is the mod id. This project uses `pokemon_moba_stable`.
 - Only `mod.mod_info` is required for the mod to appear in the Mods menu.
 - Files inside the mod are referenced as `asset/<mod_id>/<relative_path_without_extension>`.
-- Example: `mods/pokemon_moba/icons/skills/pikachu_skill.png` is referenced as `asset/pokemon_moba/icons/skills/pikachu_skill`.
+- Example: `mods/pokemon_moba_stable/icons/skills/pikachu_skill.png` is referenced as `asset/pokemon_moba_stable/icons/skills/pikachu_skill`.
 
 ## Champion Rules
 
@@ -22,7 +22,7 @@ Source docs: https://github.com/teamsamoyed/TeamfightManager2Mod/tree/main
 ## Text And i18n
 
 - Native champion names are returned directly from the DLL.
-- Champion action descriptions should reference mod-owned text directly, such as `#asset/pokemon_moba/text/champion?description.pokemon_moba_pikachu.skill`.
+- Champion action descriptions should reference mod-owned text directly, such as `#asset/pokemon_moba_stable/text/champion?description.pokemon_moba_pikachu.skill`.
 - Do not merge text into `asset/base/text/champion`, `asset/base/text/object`, or `asset/base/text/ui` for now. The current installed build logs those base text assets as non-mergeable and reports them as failed overrides.
 
 ## Asset Rules
