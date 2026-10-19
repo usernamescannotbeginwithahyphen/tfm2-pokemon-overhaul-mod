@@ -23440,7 +23440,7 @@ fn update_life_dew_pickups(ctx: &mut GameCtx) {
     }
 }
 
-fn update_ai_entity_snapshot(ctx: &GameCtx, player_id: usize, entity_id: usize) {
+pub(crate) fn update_ai_entity_snapshot(ctx: &GameCtx, player_id: usize, entity_id: usize) {
     let Some(entity) = ctx.get_entity(entity_id) else {
         return;
     };
@@ -23663,11 +23663,11 @@ fn life_dew_move_input_for_player(
     })
 }
 
-fn attach_partner_move_input_for_player(
+pub(crate) fn attach_partner_move_input_for_player(
     player_id: usize,
     tick: usize,
     champion_name: &str,
-    _base_input: Option<&Input>,
+    base_input: Option<&Input>,
 ) -> Option<Input> {
     const ATTACH_AI_SEARCH_RADIUS: u64 = 600_000;
 
@@ -23676,6 +23676,7 @@ fn attach_partner_move_input_for_player(
     if !is_clawitzer && !is_comfey {
         return None;
     }
+    if matches!(base_input, Some(Input::Return)) { return None; }
 
     let snapshot = {
         let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
@@ -23687,6 +23688,9 @@ fn attach_partner_move_input_for_player(
             .find(|state| state.player_id == player_id)
     }?;
     if tick.saturating_sub(snapshot.tick) > 30 {
+        return None;
+    }
+    if crate::legacy::pokemon_status::entity_recently_chose_return(snapshot.entity_id, tick) {
         return None;
     }
     if is_clawitzer
@@ -23714,6 +23718,7 @@ fn attach_partner_move_input_for_player(
                 || ally.team != snapshot.team
                 || ally.hp_current == 0
                 || tick.saturating_sub(ally.tick) > 30
+                || !crate::legacy::pokemon_status::attachment_candidate_allowed_at(snapshot.entity_id, ally.entity_id, tick)
             {
                 continue;
             }
@@ -25352,6 +25357,7 @@ impl ModPassive for PokemonPassive {
             ),
             (),
             || {
+                crate::legacy::pokemon_status::reset_attachment_life(_ctx, entity);
                 let life_id = _ctx.get_player(_player).map(|player| player.deaths());
                 crate::legacy::pokemon_status::register_player_entity_life_at_tick(
                     _ctx,
@@ -26076,7 +26082,9 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                                     entity_id, tick,
                                 ));
                         if is_attached_partner {
-                            return Self::block_return_input(ctx);
+                            // A rejected retreat replacement must not pass the original recall
+                            // through while the tether still owns this entity's position.
+                            return PlayerInputDecision::Block;
                         }
                     }
                     crate::legacy::pokemon_status::note_player_return_input(player_id, tick);

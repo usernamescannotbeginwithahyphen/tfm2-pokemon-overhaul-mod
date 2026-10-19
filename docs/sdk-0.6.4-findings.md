@@ -8,6 +8,48 @@ The [whole-mod follow-up](#whole-mod-audit-follow-up) expands this beyond the
 original examples. The [roster inventory](stable-champion-migration-audit.generated.md)
 accounts for all 103 champions, 412 action slots and 103 passive descriptions.
 
+## Build 0.2.13 Attachment Correction
+
+2026-10-19: investigates the reported Comfey/Clawitzer base-to-lane teleport loop.
+The report has not been independently reproduced in a live match. Concrete code
+defects and corrections:
+
+- Both passives applied a four-tick ForceMove with speed 3,600,000 whenever
+  their host was more than 500 units away. This had no endpoint bound. It is now
+  an exact `entity_set_pos` synchronization once per passive refresh, retaining
+  the small deadzone, short root, cast capability and existing stat transfers.
+  No broad CC clear or banish is introduced.
+- Partner-seeking AI ignored its base input and could replace a detached recall
+  with movement. It now preserves Return and ignores recent returning hosts and
+  owners. The passive uses the same return/cycle eligibility rules.
+- The attached-recall blocker could fail open when retreat helpers produced no
+  valid replacement. Attached recall now returns Block, translated by the stable
+  adapter into an explicit hold at the caster position, not SDK None/pass-through.
+- Owner death/respawn resets stale attachment state. Host death/respawn releases
+  dependent attachments with their normal detach cooldown. Circular Comfey and
+  Clawitzer attachment graphs are rejected to avoid position/stat feedback.
+
+SDK 0.6.4 supplies exact position mutation in simulation callbacks and live
+read-only simulation access in AI. No dedicated parent/attach operation or
+authoritative in-progress recall query was found. The retained eight-second
+recent-Return guard can delay reattachment after a canceled recall; do not call it
+an engine recall-state query. This patch does not change detach-on-host-recall
+into shared recall, nor replace the existing third-max-HP Clawitzer detach rule.
+
+Regression cases cover exact following across ordinary and large host movements,
+no repeated jumps when stationary, no tether ForceMove, host/owner recall,
+return-window reattachment rejection, cycles, death/respawn and AI recall holds.
+They use the SDK mock host, not the engine movement/recall implementation. Live
+acceptance must include each champion alone and both together, host recall,
+detached recall, canceled recall, death/respawn, continued skill casting and
+Clawitzer's large-hit detach.
+
+Validation: 91 active debug tests passed, including five attachment regression
+tests; the native-only companion exporter remains intentionally ignored.
+Release build 0.2.13 deployed to the installed `mods/pokemon_moba_stable` package;
+all 1,112 package files matched after deployment. DLL SHA-256:
+`38CCB5BBAF856F874F63E7546D22015F303DAB424AA1C47DE443CF450200C25F`.
+
 ## Build 0.2.10 Roster Review
 
 See [the full review](vfx-roster-review.md) and its generated per-action checklist.

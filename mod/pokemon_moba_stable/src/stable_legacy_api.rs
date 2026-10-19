@@ -3125,6 +3125,177 @@ mod sdk_upgrade_tests {
     }
 
     #[test]
+    fn attachments_follow_exact_positions_without_forced_movement_or_oscillation() {
+        use crate::legacy::pokemon_status as status;
+        for update in [status::update_flower_veil_passive, status::update_clingy_passive] {
+            let mut calls = with_world(Calls { world: true, ally_nine: true, ..Default::default() }, |sim| {
+                update(&mut GameCtx::from_stable(sim), 7);
+            });
+            assert!(calls.teleports.is_empty());
+            calls.tick = 90;
+            calls = with_world(calls, |sim| update(&mut GameCtx::from_stable(sim), 7));
+            assert_eq!(calls.teleports, vec![(7, 140000, 100000)]);
+            // An ordinary step, followed by an instantaneous host relocation to base.
+            for (tick, position) in [(91, (145000, 100000)), (92, (900000, 900000))] {
+                calls.tick = tick;
+                calls.positions.insert(9, position);
+                calls = with_world(calls, |sim| update(&mut GameCtx::from_stable(sim), 7));
+                assert_eq!(calls.positions[&7], position);
+            }
+            for tick in 93..105 {
+                calls.tick = tick;
+                calls = with_world(calls, |sim| update(&mut GameCtx::from_stable(sim), 7));
+            }
+            assert_eq!(calls.teleports.len(), 3, "stationary hosts must not cause repeated jumps");
+            assert!(calls.cc.iter().all(|(_, cc)| cc.kind == CcKindV1::Bind as u32));
+            assert!(calls.clear_cc.is_empty(), "do not erase enemy CC to implement a tether");
+        }
+    }
+
+    #[test]
+    fn attachments_detach_for_recall_and_cannot_reattach_during_return_window() {
+        use crate::legacy::pokemon_status as status;
+        for update in [status::update_flower_veil_passive, status::update_clingy_passive] {
+            for returning_entity in [7, 9] {
+                let mut calls = with_world(Calls { world: true, ally_nine: true, ..Default::default() }, |sim| {
+                    let mut ctx = GameCtx::from_stable(sim);
+                    status::register_player_entity_life_at_tick(&ctx, 1, 7, 0, Some(0));
+                    status::register_player_entity_life_at_tick(&ctx, 2, 9, 0, Some(0));
+                    update(&mut ctx, 7);
+                });
+                calls.tick = 90;
+                calls = with_world(calls, |sim| update(&mut GameCtx::from_stable(sim), 7));
+                calls.tick = 91;
+                calls = with_world(calls, |sim| {
+                    let mut ctx = GameCtx::from_stable(sim);
+                    status::note_player_return_input(if returning_entity == 7 { 1 } else { 2 }, 91);
+                    update(&mut ctx, 7);
+                    assert!(!status::is_comfey_attached_at(7, 91));
+                    assert!(!status::is_clawitzer_attached_at(7, 91));
+                });
+                // Comfey's five-second reattach delay expires before the recall guard.
+                calls.tick = 392;
+                calls = with_world(calls, |sim| {
+                    update(&mut GameCtx::from_stable(sim), 7);
+                    assert!(!status::is_comfey_attached_at(7, 392));
+                    assert!(!status::attachment_candidate_allowed_at(7, 9, 392));
+                });
+                assert_eq!(calls.teleports.len(), 1);
+                calls.tick = 992;
+                with_world(calls, |sim| {
+                    update(&mut GameCtx::from_stable(sim), 7);
+                    assert!(status::is_comfey_attached_at(7, 992) || status::is_clawitzer_attached_at(7, 992));
+                });
+            }
+        }
+    }
+
+    #[test]
+    fn attachments_reject_cycles_and_clear_links_between_lives() {
+        use crate::legacy::pokemon_status as status;
+        let mut calls = with_world(Calls { world: true, ally_nine: true, ..Default::default() }, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            status::update_flower_veil_passive(&mut ctx, 7);
+            status::update_clingy_passive(&mut ctx, 9);
+        });
+        calls.tick = 90;
+        calls = with_world(calls, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            status::update_flower_veil_passive(&mut ctx, 7);
+            status::update_clingy_passive(&mut ctx, 9);
+            assert_eq!(status::comfey_attached_ally(&ctx, 7), Some(9));
+            assert!(!status::is_clawitzer_attached_at(9, 90));
+            assert!(!status::attachment_candidate_allowed_at(9, 7, 90));
+            status::reset_attachment_life(&ctx, 9);
+            assert_eq!(status::comfey_attached_ally(&ctx, 7), None);
+            assert!(!status::is_comfey_attach_ready_at(7, 90));
+        });
+        calls.tick = 400;
+        calls = with_world(calls, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            status::update_flower_veil_passive(&mut ctx, 7);
+            assert_eq!(status::comfey_attached_ally(&ctx, 7), Some(9));
+        });
+        calls.tick = 401;
+        calls.dead.insert(7);
+        calls = with_world(calls, |sim| {
+            status::update_flower_veil_passive(&mut GameCtx::from_stable(sim), 7);
+            assert!(!status::is_comfey_attached_at(7, 401));
+        });
+        calls.dead.clear();
+        calls.positions.insert(7, (900000, 900000));
+        calls.tick = 500;
+        let before = calls.teleports.len();
+        calls = with_world(calls, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            status::reset_attachment_life(&ctx, 7);
+            status::update_flower_veil_passive(&mut ctx, 7);
+            assert!(!status::is_comfey_attached_at(7, 500));
+        });
+        assert_eq!(calls.teleports.len(), before, "respawn must not jump back to the old host");
+    }
+
+    #[test]
+    fn attachment_partner_ai_preserves_recall_and_skips_returning_hosts() {
+        use crate::legacy::{pokemon_content as content, pokemon_status as status};
+        for name in ["Comfey", "Clawitzer"] {
+            let mut initial = Calls { world: true, ally_nine: true, ..Default::default() };
+            initial.positions.insert(9, (400000, 100000));
+            let mut calls = with_world(initial, |sim| {
+                let mut ctx = GameCtx::from_stable(sim);
+                status::register_player_entity_life_at_tick(&ctx, 1, 7, 0, Some(0));
+                status::register_player_entity_life_at_tick(&ctx, 2, 9, 0, Some(0));
+                status::update_flower_veil_passive(&mut ctx, 7);
+                status::update_clingy_passive(&mut ctx, 7);
+            });
+            calls.tick = 90;
+            with_world(calls, |sim| {
+                let ctx = GameCtx::from_stable(sim);
+                content::update_ai_entity_snapshot(&ctx, 1, 7);
+                content::update_ai_entity_snapshot(&ctx, 2, 9);
+                assert!(matches!(content::attach_partner_move_input_for_player(1, 90, name, None), Some(Input::Move { .. })));
+                assert!(content::attach_partner_move_input_for_player(1, 90, name, Some(&Input::Return)).is_none());
+                status::note_player_return_input(2, 90);
+                assert!(content::attach_partner_move_input_for_player(1, 90, name, None).is_none());
+            });
+        }
+    }
+
+    #[test]
+    fn attached_recall_is_blocked_even_when_retreat_helpers_have_no_valid_input() {
+        use crate::legacy::{pokemon_content as content, pokemon_status as status};
+        unsafe extern "C" fn player(_: *const c_void) -> usize { 1 }
+        unsafe extern "C" fn tick(_: *const c_void) -> usize { 90 }
+        for (name, update) in [("Comfey", status::update_flower_veil_passive as fn(&mut GameCtx, usize)),
+            ("Clawitzer", status::update_clingy_passive as fn(&mut GameCtx, usize))] {
+            let mut calls = with_world(Calls { world: true, ally_nine: true, ..Default::default() }, |sim| {
+                let mut ctx = GameCtx::from_stable(sim);
+                status::register_player_entity_life_at_tick(&ctx, 1, 7, 0, Some(0));
+                update(&mut ctx, 7);
+            });
+            calls.tick = 90;
+            with_world(calls, |sim| {
+                update(&mut GameCtx::from_stable(sim), 7);
+                let world = crate::ai_world::World::capture(sim, 7);
+                let mut table: mod_api_stable::AiVtableV1 = unsafe { std::mem::zeroed() };
+                table.size = size_of::<mod_api_stable::AiVtableV1>();
+                table.player_id = Some(player);
+                table.tick = Some(tick);
+                let mut raw: mod_api_stable::AiCtxV1 = unsafe { std::mem::zeroed() };
+                raw.size = size_of::<mod_api_stable::AiCtxV1>();
+                raw.vtable = &table;
+                let mut inner = unsafe { StableAiContext::from_raw(&mut raw) }.unwrap();
+                let mut ctx = PlayerAiContext { inner: &mut inner, champion_name: name.into(),
+                    world: Some(world.clone()), _scope: None, _marker: std::marker::PhantomData };
+                let decision = content::PokemonMobaInputAi.think(&mut ctx, Some(Input::Return));
+                assert!(matches!(decision, PlayerInputDecision::Block));
+                let output = finish_ai_decision(Some(&world), name, Some(Input::Return.to_stable()), decision).unwrap();
+                assert_eq!(output.kind, InputKindV1::Move.code(), "None would preserve the built-in recall");
+            });
+        }
+    }
+
+    #[test]
     fn intended_teleports_use_positions_and_normal_dashes_do_not() {
         let mut registration = ModRegistration::new("pokemon_moba_stable");
         crate::legacy::pokemon_content::register_champions(&mut registration);

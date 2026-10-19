@@ -2,9 +2,9 @@
 
 This file is the compact memory anchor for the Teamfight Manager 2 Pokemon MOBA overhaul. Read it at the start of future content work, especially after context compaction.
 
-## Current SDK Status (2026-10-18)
+## Current SDK Status (2026-10-19)
 
-Active SDK: **0.6.4 / ABI 10**, mod build **0.2.12**. Read
+Active SDK: **0.6.4 / ABI 10**, mod build **0.2.13**. Read
 `docs/stable-sdk-migration.md` and `docs/sdk-0.6.4-findings.md` before using
 older capability notes below. Native damage now enters the engine statistics
 pipeline. Native VFX/SFX, standalone `.view_effects`, item inventory reads,
@@ -27,6 +27,14 @@ Build 0.2.12 renders Toxic Chain with individually positioned, pre-rotated links
 between its actual caster and victim, plus a separate victim impact. Poison and
 execution are unchanged. It is a brief cast visual, not a sustained poison link;
 link spacing and scale remain subject to live testing.
+Build 0.2.13 replaces Clawitzer/Comfey's unbounded, repeated ForceMove tether
+with exact host-position synchronization through `entity_set_pos`. Recall guards
+now exclude returning owners/hosts from attachment and partner-seeking AI; an
+attached recall explicitly holds instead of falling through to engine recall.
+Respawn/death clears old attachment links, and circular attachments are rejected.
+Casting and existing stat-sharing/detach rules remain. No native parent/attachment
+or authoritative recall-progress API was found; the existing eight-second return
+intent window is still a heuristic. Live recall/respawn testing remains required.
 Gholdengo uses duplicate-guarded credited-CS callbacks for a flat +10, with old
 polling compiled out and his description unchanged. All 103 champions have
 weighted lane priors preserving their authored allowed lanes. Plain basic crits

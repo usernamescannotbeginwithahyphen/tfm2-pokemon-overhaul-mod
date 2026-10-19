@@ -1,6 +1,6 @@
 [package]
 name = "pokemon_moba_stable"
-version = "0.2.12"
+version = "0.2.13"
 edition = "2021"
 
 # Stable-ABI port of Pokemon MOBA.

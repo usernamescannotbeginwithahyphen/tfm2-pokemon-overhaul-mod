@@ -60,8 +60,6 @@ const COMFEY_INITIAL_ATTACH_DELAY_TICKS: usize = 90;
 const COMFEY_REATTACH_TICKS: usize = 5 * 60;
 const COMFEY_REATTACH_RADIUS: u64 = 100000;
 const ATTACH_TETHER_DEADZONE: u64 = 500;
-const ATTACH_TETHER_SPEED: u64 = 3_600_000;
-const ATTACH_TETHER_TICKS: u64 = 4;
 const ATTACH_RETURN_DETACH_WINDOW_TICKS: usize = 8 * 60;
 const WISH_MOVE_THRESHOLD: u64 = 2500;
 const EEVEELUTION_INTERVAL_TICKS: usize = 30;
@@ -5931,7 +5929,7 @@ pub fn note_player_return_input(player_id: usize, tick: usize) {
     });
 }
 
-fn entity_recently_chose_return(entity_id: usize, tick: usize) -> bool {
+pub(crate) fn entity_recently_chose_return(entity_id: usize, tick: usize) -> bool {
     let player_id = player_for_entity(entity_id);
     PLAYER_RETURN_INTENTS
         .get_or_init(|| Mutex::new(Vec::new()))
@@ -8110,12 +8108,15 @@ pub fn update_flower_veil_passive(ctx: &mut GameCtx, comfey_id: usize) {
         return;
     };
     if !comfey.is_alive() {
+        reset_attachment_life(ctx, comfey_id);
         return;
     }
     let comfey_team = comfey.team();
     let comfey_pos = comfey.pos();
     let comfey_stat = comfey.stat();
     drop(comfey);
+
+    let links = attachment_links();
 
     let states = COMFEY_ATTACHES.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states.lock().expect("comfey attach state poisoned");
@@ -8140,19 +8141,22 @@ pub fn update_flower_veil_passive(ctx: &mut GameCtx, comfey_id: usize) {
             .get_entity(ally_id)
             .map(|ally| ally.is_alive() && ally.hp().current > 0)
             .unwrap_or(false);
-        if !ally_alive || entity_recently_chose_return(ally_id, tick) {
+        if !ally_alive || entity_recently_chose_return(ally_id, tick)
+            || entity_recently_chose_return(comfey_id, tick)
+            || attachment_would_cycle(&links, comfey_id, ally_id) {
             detach = true;
         } else if tick.saturating_sub(states[index].last_tick) >= COMFEY_ATTACH_INTERVAL_TICKS {
             states[index].last_tick = tick;
             should_refresh = true;
         }
-    } else if tick >= states[index].detached_until {
+    } else if tick >= states[index].detached_until && !entity_recently_chose_return(comfey_id, tick) {
         attach_target = nearest_ally_champion(
             ctx,
             comfey_id,
             comfey_team,
             comfey_pos,
             COMFEY_REATTACH_RADIUS,
+            &links,
         );
     }
 
@@ -8211,12 +8215,15 @@ pub fn update_clingy_passive(ctx: &mut GameCtx, clawitzer_id: usize) {
         return;
     };
     if !clawitzer.is_alive() {
+        reset_attachment_life(ctx, clawitzer_id);
         return;
     }
     let claw_team = clawitzer.team();
     let claw_pos = clawitzer.pos();
     let claw_stat = clawitzer.stat();
     drop(clawitzer);
+
+    let links = attachment_links();
 
     let states = CLAWITZER_CLINGS.get_or_init(|| Mutex::new(Vec::new()));
     let mut states = states.lock().expect("clawitzer cling state poisoned");
@@ -8241,11 +8248,13 @@ pub fn update_clingy_passive(ctx: &mut GameCtx, clawitzer_id: usize) {
     let mut should_refresh = false;
 
     if let Some(ally_id) = states[index].attached_ally {
-        let ally_hp = ctx.get_entity(ally_id).map(|ally| ally.hp());
+        let ally_hp = ctx.get_entity(ally_id).filter(|ally| ally.is_alive()).map(|ally| ally.hp());
         if let Some(ally_hp) = ally_hp {
             let hp_drop = states[index].last_ally_hp.saturating_sub(ally_hp.current);
             if ally_hp.current == 0
                 || entity_recently_chose_return(ally_id, tick)
+                || entity_recently_chose_return(clawitzer_id, tick)
+                || attachment_would_cycle(&links, clawitzer_id, ally_id)
                 || hp_drop.saturating_mul(3) >= ally_hp.max
             {
                 detach = true;
@@ -8258,13 +8267,14 @@ pub fn update_clingy_passive(ctx: &mut GameCtx, clawitzer_id: usize) {
         } else {
             detach = true;
         }
-    } else if tick >= states[index].detached_until {
+    } else if tick >= states[index].detached_until && !entity_recently_chose_return(clawitzer_id, tick) {
         attach_target = nearest_ally_champion(
             ctx,
             clawitzer_id,
             claw_team,
             claw_pos,
             CLAWITZER_REATTACH_RADIUS,
+            &links,
         );
     }
 
@@ -8332,12 +8342,70 @@ pub fn update_clingy_passive(ctx: &mut GameCtx, clawitzer_id: usize) {
     }
 }
 
+fn attachment_links() -> Vec<(usize, usize)> {
+    // Snapshot before taking an individual attachment store's update lock.
+    let mut links: Vec<_> = COMFEY_ATTACHES.get_or_init(Default::default).lock()
+        .expect("comfey attach state poisoned").iter()
+        .filter_map(|s| s.attached_ally.map(|host| (s.entity_id, host))).collect();
+    links.extend(CLAWITZER_CLINGS.get_or_init(Default::default).lock()
+        .expect("clawitzer cling state poisoned").iter()
+        .filter_map(|s| s.attached_ally.map(|host| (s.entity_id, host))));
+    links
+}
+
+fn attachment_would_cycle(links: &[(usize, usize)], entity: usize, mut host: usize) -> bool {
+    for _ in 0..=links.len() {
+        if host == entity { return true; }
+        match links.iter().find(|(owner, _)| *owner == host) {
+            Some((_, next)) => host = *next,
+            None => return false,
+        }
+    }
+    true
+}
+
+pub(crate) fn attachment_candidate_allowed_at(entity: usize, host: usize, tick: usize) -> bool {
+    !entity_recently_chose_return(entity, tick)
+        && !entity_recently_chose_return(host, tick)
+        && !attachment_would_cycle(&attachment_links(), entity, host)
+}
+
+pub fn reset_attachment_life(ctx: &GameCtx, entity: usize) {
+    let tick = ctx.tick();
+    let mut comfeys = COMFEY_ATTACHES.get_or_init(Default::default).lock().expect("comfey attach state poisoned");
+    comfeys.retain(|s| s.entity_id != entity);
+    for state in comfeys.iter_mut().filter(|s| s.attached_ally == Some(entity)) {
+        state.attached_ally = None;
+        state.detached_until = tick.saturating_add(COMFEY_REATTACH_TICKS);
+        state.last_tick = tick;
+    }
+    drop(comfeys);
+    let mut claws = CLAWITZER_CLINGS.get_or_init(Default::default).lock().expect("clawitzer cling state poisoned");
+    claws.retain(|s| s.entity_id != entity);
+    let mut detached_claws = Vec::new();
+    for state in claws.iter_mut().filter(|s| s.attached_ally == Some(entity)) {
+        state.attached_ally = None;
+        state.detached_until = tick.saturating_add(CLAWITZER_REATTACH_TICKS);
+        state.last_tick = tick;
+        state.last_ally_hp = 0;
+        detached_claws.push(state.entity_id);
+    }
+    drop(claws);
+    for claw in detached_claws {
+        ctx.refresh_periodic_buff("pm_clingy_passive_0", claw, BuffState {
+            duration: BuffType::Time { tick: CLAWITZER_REATTACH_TICKS }, move_speed_mult: 45,
+            ..Default::default()
+        });
+    }
+}
+
 fn nearest_ally_champion(
     ctx: &GameCtx,
     entity_id: usize,
     team: usize,
     pos: EntityPos,
     radius: u64,
+    links: &[(usize, usize)],
 ) -> Option<usize> {
     let tick = ctx.tick();
     let mut best = None;
@@ -8353,6 +8421,8 @@ fn nearest_ally_champion(
             || entity.team() != team
             || !is_player_pokemon
             || !entity.is_alive()
+            || entity_recently_chose_return(candidate_id, tick)
+            || attachment_would_cycle(links, entity_id, candidate_id)
         {
             continue;
         }
@@ -8393,19 +8463,8 @@ fn apply_attach_tether(
         return;
     }
 
-    let dx = ally_pos.x as i64 - entity_pos.x as i64;
-    let dy = ally_pos.y as i64 - entity_pos.y as i64;
-    apply_pokemon_cc(
-        ctx,
-        entity_id,
-        entity_id,
-        CCState::ForceMove {
-            tick: ATTACH_TETHER_TICKS,
-            dx,
-            dy,
-            speed: ATTACH_TETHER_SPEED,
-        },
-    );
+    // Attachments need the host's exact position, not an unbounded four-tick dash.
+    ctx.entity_set_pos(entity_id, ally_pos.x, ally_pos.y);
     draw_status_marker(ctx, ally_pos, marker_radius, marker_color);
 }
 
