@@ -6,6 +6,7 @@ assets/generated/
 logs/
 scratch/
 *.workshop_id
+!mod/pokemon_moba_stable/mod.workshop_id
 *.log
 *.tmp
 *.rlib

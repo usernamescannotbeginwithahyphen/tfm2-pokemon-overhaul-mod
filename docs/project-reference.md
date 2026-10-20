@@ -4,6 +4,20 @@ This file is the compact memory anchor for the Teamfight Manager 2 Pokemon MOBA 
 
 ## Current SDK Status (2026-10-19)
 
+Canonical Steam Workshop item: **3744254195**. Keep
+`mod/pokemon_moba_stable/mod.workshop_id` in version control (explicit exception
+to the generic ignore rule). `tools/deploy.ps1` uses an explicit `-WorkshopId`
+first, otherwise the source package's ID, otherwise preserves the installed ID.
+Never discard the Workshop identity when refreshing an installed package.
+Regression check: `tools/test-deploy.ps1`, using isolated fixtures only.
+
+Packaging: ship only runtime `*#sheet.png` and `*#anim.fanim` VFX files, not
+development-only `*_cleaned.png` intermediates. Removed 128 intermediates
+(93.75 MiB); the installed package is about 64.87 MiB instead of 158.62 MiB.
+The VFX packer no longer emits cleaned intermediates beside runtime sheets,
+and deployment rejects packages containing them before touching installed files.
+Runtime VFX, guides and DLL are unchanged by this packaging cleanup.
+
 Active SDK: **0.6.4 / ABI 10**, installed mod build **0.2.23**.
 Read-only champion/minion/tower AI snapshot scans now use callback-borrowed SDK
 views instead of eagerly copying complete entity stats, buffs, CC and names.

@@ -160,15 +160,12 @@ def pack_vfx(args: argparse.Namespace) -> None:
 
     sheet_path = output_base.with_name(output_base.name + "#sheet.png")
     anim_path = output_base.with_name(output_base.name + "#anim.fanim")
-    cleaned_path = output_base.with_name(output_base.name + "_cleaned.png")
-    source.save(cleaned_path)
     sheet.save(sheet_path)
     with anim_path.open("w", encoding="utf-8") as f:
         json.dump({"anims": {args.tag: {"frames": fanim_frames}}}, f, indent=2)
         f.write("\n")
     print(f"OK   wrote {sheet_path}")
     print(f"OK   wrote {anim_path}")
-    print(f"OK   wrote {cleaned_path}")
 
 
 def main() -> None:

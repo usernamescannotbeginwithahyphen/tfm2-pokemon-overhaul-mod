@@ -6,6 +6,21 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function ConvertTo-WorkshopId {
+  param([string]$Value)
+  $id = [UInt64]0
+  if ($Value -notmatch '^[0-9]+$' -or -not [UInt64]::TryParse($Value, [ref]$id) -or $id -eq 0) {
+    throw "Invalid Workshop published_file_id: $Value"
+  }
+  return $id
+}
+
+function Read-WorkshopIdFile {
+  param([string]$Path)
+  $info = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+  return ConvertTo-WorkshopId -Value ([string]$info.published_file_id)
+}
+
 function Write-WorkshopIdFile {
   param(
     [string]$ModRoot,
@@ -17,11 +32,7 @@ function Write-WorkshopIdFile {
   }
 
   $workshopIdPath = Join-Path $ModRoot "mod.workshop_id"
-  $content = @"
-{
-  "published_file_id": $PublishedFileId
-}
-"@
+  $content = @{ published_file_id = (ConvertTo-WorkshopId -Value $PublishedFileId) } | ConvertTo-Json
   $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
   [System.IO.File]::WriteAllText($workshopIdPath, $content, $utf8NoBom)
 }
@@ -39,7 +50,27 @@ if (-not (Test-Path -LiteralPath $GameRoot)) {
   throw "Game root does not exist: $GameRoot"
 }
 
-Write-WorkshopIdFile -ModRoot $source -PublishedFileId $WorkshopId
+$vfxRoot = Join-Path $source 'vfx'
+if (Test-Path -LiteralPath $vfxRoot) {
+  $intermediates = @(Get-ChildItem -LiteralPath $vfxRoot -File -Recurse -Filter '*_cleaned.png')
+  if ($intermediates.Count -gt 0) {
+    throw "Package contains $($intermediates.Count) development-only *_cleaned.png images. Remove them from vfx before deployment."
+  }
+}
+
+# Capture the selected identity before clearing the installed package. A source
+# ID is authoritative; otherwise preserve an existing installation's ID.
+$sourceWorkshopPath = Join-Path $source "mod.workshop_id"
+$targetWorkshopPath = Join-Path $target "mod.workshop_id"
+$effectiveWorkshopId = $null
+if (-not [string]::IsNullOrWhiteSpace($WorkshopId)) {
+  $effectiveWorkshopId = ConvertTo-WorkshopId -Value $WorkshopId
+  Write-WorkshopIdFile -ModRoot $source -PublishedFileId ([string]$effectiveWorkshopId)
+} elseif (Test-Path -LiteralPath $sourceWorkshopPath) {
+  $effectiveWorkshopId = Read-WorkshopIdFile -Path $sourceWorkshopPath
+} elseif (Test-Path -LiteralPath $targetWorkshopPath) {
+  $effectiveWorkshopId = Read-WorkshopIdFile -Path $targetWorkshopPath
+}
 
 New-Item -ItemType Directory -Force -Path $target | Out-Null
 
@@ -62,5 +93,9 @@ $excludeNames = @(
 Get-ChildItem -LiteralPath $source -Force |
   Where-Object { $excludeNames -notcontains $_.Name } |
   Copy-Item -Destination $target -Recurse -Force
+
+if ($null -ne $effectiveWorkshopId) {
+  Write-WorkshopIdFile -ModRoot $target -PublishedFileId ([string]$effectiveWorkshopId)
+}
 
 Write-Host "Copied $source to $target"
