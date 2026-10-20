@@ -1,6 +1,6 @@
 [package]
 name = "pokemon_moba_stable"
-version = "0.2.13"
+version = "0.2.23"
 edition = "2021"
 
 # Stable-ABI port of Pokemon MOBA.
@@ -12,6 +12,9 @@ crate-type = ["cdylib"]
 [dependencies]
 mod-api-stable = { path = "C:/Program Files (x86)/Steam/steamapps/common/Teamfight Manager2/mod-sdk-stable/mod-api-stable" }
 serde_json = "1"
+
+[features]
+profile-state-access = []
 
 [profile.release]
 debug = 2

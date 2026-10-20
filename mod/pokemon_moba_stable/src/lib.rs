@@ -11,11 +11,16 @@ mod runtime_state;
 mod ai_world;
 mod map_terrain;
 mod shared_detection;
+mod ai_trace;
+mod performance_probe;
+mod sketch_range;
 
 const MOD_ID: &str = "pokemon_moba_stable";
 
 fn init(host: &StableHost) -> StableMod {
     legacy::crash_probe::install_panic_hook();
+    ai_trace::initialize();
+    performance_probe::initialize();
 
     let version = host.game_version();
     host.log(

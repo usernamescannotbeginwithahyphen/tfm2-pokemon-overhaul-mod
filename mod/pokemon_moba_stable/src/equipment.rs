@@ -160,6 +160,7 @@ impl StableMatchHook for EquipmentSettings {
     fn on_match_start(&self, sim: &mut StableSim<'_>) {
         crate::runtime_state::start(sim);
         let _scope = crate::runtime_state::Scope::enter(sim);
+        crate::ai_trace::match_start(sim);
         crate::legacy::pokemon_status::reset_pokemon_status_runtime_state_for_new_match();
         crate::legacy::pokemon_content::reset_pokemon_content_runtime_state_for_new_match();
         crate::map_terrain::on_match_start(sim);
@@ -169,10 +170,12 @@ impl StableMatchHook for EquipmentSettings {
         state.freeze(sim.seed());
     }
     fn on_match_tick(&self, sim: &mut StableSim<'_>, _seed: u64) {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Match);
         crate::runtime_state::retire_finished(sim);
         let mut ctx = GameCtx::from_stable(sim);
         crate::motion::update(&mut ctx, _seed);
         crate::projectiles::update(&mut ctx, _seed);
+        crate::ai_trace::match_tick(sim);
     }
 }
 

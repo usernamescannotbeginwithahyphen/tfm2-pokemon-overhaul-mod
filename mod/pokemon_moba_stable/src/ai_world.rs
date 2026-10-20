@@ -30,37 +30,50 @@ pub struct World {
 
 impl World {
     pub fn capture(sim: &StableSim<'_>, caster: usize) -> Self {
-        Self::capture_members(sim, caster, None, true)
+        Self::capture_members(sim, caster, None, true, None)
+    }
+    // The AI callback already resolved this player's champion from the same sim.
+    pub fn for_player(sim: &StableSim<'_>, caster: usize, player: usize) -> Self {
+        Self::capture_members(sim, caster, None, true, Some(player))
     }
     pub fn for_caster(sim: &StableSim<'_>, caster: usize) -> Self {
-        Self::capture_members(sim, caster, None, false)
+        Self::capture_members(sim, caster, None, false, None)
     }
     pub fn for_target(sim: &StableSim<'_>, caster: usize, target: usize) -> Self {
-        Self::capture_members(sim, caster, Some(target), false)
+        Self::capture_members(sim, caster, Some(target), false, None)
     }
-    fn capture_members(sim: &StableSim<'_>, caster: usize, target: Option<usize>, all: bool) -> Self {
+    fn capture_members(sim: &StableSim<'_>, caster: usize, target: Option<usize>, all: bool, player: Option<usize>) -> Self {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::AiWorld);
         let team = sim.get_entity(caster).map(|unit| unit.team()).unwrap_or(usize::MAX);
         let spots = crate::legacy::pokemon_status::team_spotted_targets(team, sim.tick());
-        let player = (0..sim.player_count()).filter_map(|i| sim.player_at(i))
-            .find(|player| player.champion().map(|unit| unit.id()) == Some(caster)).map(|player| player.id());
-        let units = (0..sim.entity_count()).filter_map(|i| sim.entity_at(i))
+        let player = player.or_else(|| (0..sim.player_count()).filter_map(|i| sim.player_at(i))
+            .find(|player| player.champion().map(|unit| unit.id()) == Some(caster)).map(|player| player.id()));
+        // Activation gates usually need only the caster. Do not enumerate the
+        // whole match for each action's gate; retain full reads for targeting.
+        let caster_only = !all && target.is_none();
+        let count = if caster_only { 1 } else { sim.entity_count() };
+        let units = (0..count).filter_map(|i| {
+            if caster_only { sim.get_entity(caster) } else { sim.entity_at(i) }
+        })
             .filter(|unit| all || unit.id() == caster || Some(unit.id()) == target
                 || (target.is_some() && (unit.is_tower() || unit.is_champion())))
             .filter(|unit| unit.is_alive()).map(|unit| {
+                let id = unit.id();
+                let unit_team = unit.team();
                 let (x, y) = unit.pos();
                 let (hp, max_hp) = unit.hp();
-                let visible = unit.team() == team || sim.is_visible(team, unit.id());
-                let spot = spots.iter().find(|spot| spot.target_id == unit.id());
+                let visible = unit_team == team || sim.is_visible(team, id);
+                let spot = spots.iter().find(|spot| spot.target_id == id);
                 // Hidden enemies only contribute the position our detector actually observed.
                 let pos = if visible { EntityPos { x, y } }
                     else { spot.map(|spot| spot.target_pos).unwrap_or(EntityPos { x, y }) };
-                Unit { id: unit.id(), team: unit.team(), pos, hp, max_hp,
+                Unit { id, team: unit_team, pos, hp, max_hp,
                     champion: unit.is_champion(), tower: unit.is_tower(), targetable: unit.is_targetable(),
                     visible, detected: spot.map_or(false, |spot| sim.tick().saturating_sub(spot.observed_at) <= 8),
                     remembered: spot.is_some(), cc: unit.cc_count(),
-                    stat: if unit.id() == caster { unit.stat() } else { StatV1::default() },
+                    stat: if id == caster { unit.stat() } else { StatV1::default() },
                     cooldowns: [SkillSlotV1::Attack, SkillSlotV1::Skill, SkillSlotV1::Skill2, SkillSlotV1::Ult]
-                        .map(|slot| if unit.id() == caster { unit.cooldown(slot) } else { None }),
+                        .map(|slot| if id == caster { unit.cooldown(slot) } else { None }),
                 }
             }).collect();
         Self { tick: sim.tick(), caster, player, units }

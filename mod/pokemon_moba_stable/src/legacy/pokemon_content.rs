@@ -2422,6 +2422,9 @@ pub(crate) fn ai_target_allowed(world: &crate::ai_world::World, champion: Pokemo
         CastingTarget::BothChampion => target.champion,
     };
     if !eligible || (!ally && (!target.targetable || !(target.visible || target.detected))) { return false; }
+    if let PokemonMoveEffect::StickyWebField { radius, .. } = actual.effect {
+        if !crate::legacy::pokemon_status::sticky_web_placement_useful(caster.id, target.pos, radius) { return false; }
+    }
     if !ally && crate::legacy::pokemon_status::ai_soft_untargetable(world, target.id) { return false; }
     if ally && (ai_heal_only(actual.effect) || matches!(actual.effect, PokemonMoveEffect::PollenPuff { .. }))
         && !matches!(actual.effect, PokemonMoveEffect::GlobalAllyHealPercent { .. } | PokemonMoveEffect::HealAttachedAllyPercent { .. })
@@ -2474,6 +2477,7 @@ fn ai_tower_danger(world: &crate::ai_world::World, action: PokemonMove, input: I
 }
 
 pub(crate) fn ai_input_allowed(world: &crate::ai_world::World, name: &str, input: &Input) -> bool {
+    if PokemonMobaInputAi::slot_for_input(input).is_none() { return true; }
     let Some(champion) = PokemonMobaInputAi::champion_for_ai_name(name) else { return true; };
     let Some(action) = PokemonMobaInputAi::action_for_input(champion, input) else { return true; };
     if !ai_can_activate(world, champion, action) { return false; }
@@ -2481,6 +2485,18 @@ pub(crate) fn ai_input_allowed(world: &crate::ai_world::World, name: &str, input
     let Some(target) = PokemonMobaInputAi::target_for_input(input) else { return true; };
     if let InputTarget::Target { target_id } = target {
         if !ai_target_allowed(world, champion, action, target_id) { return false; }
+    }
+    if let PokemonMoveEffect::StickyWebField { radius, .. } = actual.effect {
+        let Some(caster) = world.caster() else { return false; };
+        let center = match target {
+            InputTarget::Pos { x, y } => EntityPos { x, y },
+            InputTarget::Target { target_id } => match world.get(target_id) {
+                Some(unit) => unit.pos,
+                None => return false,
+            },
+            _ => return false,
+        };
+        if !crate::legacy::pokemon_status::sticky_web_placement_useful(caster.id, center, radius) { return false; }
     }
     !ai_tower_danger(world, actual, target)
 }
@@ -8584,6 +8600,9 @@ impl PokemonEffect {
 
     fn expected_heal_amount(&self, caster_stat: &EntityStat) -> usize {
         match self.action.effect {
+            PokemonMoveEffect::LifeDewPickups { pickup_count, heal_amount, .. } => {
+                pickup_count.saturating_mul(heal_amount)
+            }
             PokemonMoveEffect::DirectDamageDrain { .. } => {
                 let (ad_damage, ap_damage) = self.base_damage(caster_stat);
                 ad_damage.saturating_add(ap_damage)
@@ -9418,12 +9437,12 @@ fn stat_percent_i32(value: usize, percent: usize) -> i32 {
 
 impl ModEffectType for PokemonEffect {
     fn may_adjust_range(&self) -> bool { matches!(self.action.effect, PokemonMoveEffect::Sketch) }
-    fn range_adjust(&self, _caster: &mod_api_stable::StableEntityView<'_>, _target: &mod_api_stable::StableEntityView<'_>) -> u64 {
-        // Sketch has static engine metadata. Give planning enough reach for any
-        // copied move; target_constraint enforces the actual learned move's range.
+    fn range_adjust(&self, caster: &mod_api_stable::StableEntityView<'_>, _target: &mod_api_stable::StableEntityView<'_>) -> u64 {
+        // Opposing AI also reads this range; never advertise unlearned roster moves.
         if self.may_adjust_range() {
-            POKEMON_CHAMPIONS.iter().flat_map(|champion| [Some(champion.attack), Some(champion.skill), Some(champion.skill2), champion.ult])
-                .flatten().map(|action| action.range).max().unwrap_or(self.action.range).saturating_sub(self.action.range)
+            let base = self.action.range.saturating_add(self.action.growth_range
+                .saturating_mul(caster.level().saturating_sub(1) as u64));
+            crate::sketch_range::adjustment(caster, self.action.slot.index(), base)
         } else { 0 }
     }
     fn apply(&self, ctx: &mut GameCtx, _rng_seed: u64, caster_id: usize, input: InputTarget) {
@@ -18361,27 +18380,25 @@ impl ModEffectType for PokemonEffect {
     }
 
     fn expected_damage(&self, caster_stat: &EntityStat) -> (usize, usize) {
-        let detail = self.metadata_detail("expected_damage", Some(caster_stat));
-        crate::legacy::crash_probe::catch_unwind_probe(
+        crate::legacy::crash_probe::catch_unwind_probe_lazy(
             "metadata_expected_damage",
-            detail,
+            || self.metadata_detail("expected_damage", Some(caster_stat)),
             (0, 0),
             || self.expected_damage_for_ai(caster_stat),
         )
     }
 
     fn expected_heal(&self, caster_stat: &EntityStat) -> usize {
-        let detail = self.metadata_detail("expected_heal", Some(caster_stat));
-        crate::legacy::crash_probe::catch_unwind_probe("metadata_expected_heal", detail, 0, || {
+        crate::legacy::crash_probe::catch_unwind_probe_lazy("metadata_expected_heal",
+            || self.metadata_detail("expected_heal", Some(caster_stat)), 0, || {
             self.expected_heal_amount(caster_stat)
         })
     }
 
     fn expected_shield(&self, caster_stat: &EntityStat) -> usize {
-        let detail = self.metadata_detail("expected_shield", Some(caster_stat));
-        crate::legacy::crash_probe::catch_unwind_probe(
+        crate::legacy::crash_probe::catch_unwind_probe_lazy(
             "metadata_expected_shield",
-            detail,
+            || self.metadata_detail("expected_shield", Some(caster_stat)),
             0,
             || match self.action.effect {
                 PokemonMoveEffect::FutureSight { .. } => caster_stat.hp,
@@ -18391,20 +18408,18 @@ impl ModEffectType for PokemonEffect {
     }
 
     fn expected_cc_time(&self) -> Option<usize> {
-        let detail = self.metadata_detail("expected_cc_time", None);
-        crate::legacy::crash_probe::catch_unwind_probe(
+        crate::legacy::crash_probe::catch_unwind_probe_lazy(
             "metadata_expected_cc_time",
-            detail,
+            || self.metadata_detail("expected_cc_time", None),
             None,
             || self.expected_cc_ticks_for_ai().filter(|ticks| *ticks > 0),
         )
     }
 
     fn expected_buff(&self, caster_stat: &EntityStat) -> Option<BuffState> {
-        let detail = self.metadata_detail("expected_buff", Some(caster_stat));
-        crate::legacy::crash_probe::catch_unwind_probe(
+        crate::legacy::crash_probe::catch_unwind_probe_lazy(
             "metadata_expected_buff",
-            detail,
+            || self.metadata_detail("expected_buff", Some(caster_stat)),
             None,
             || {
                 self.expected_buff_state(caster_stat)
@@ -18414,20 +18429,18 @@ impl ModEffectType for PokemonEffect {
     }
 
     fn expected_move_distance(&self) -> Option<(usize, u64)> {
-        let detail = self.metadata_detail("expected_move_distance", None);
-        crate::legacy::crash_probe::catch_unwind_probe(
+        crate::legacy::crash_probe::catch_unwind_probe_lazy(
             "metadata_expected_move_distance",
-            detail,
+            || self.metadata_detail("expected_move_distance", None),
             None,
             || self.expected_movement_for_ai(),
         )
     }
 
     fn expected_rush_effect(&self) -> bool {
-        let detail = self.metadata_detail("expected_rush_effect", None);
-        crate::legacy::crash_probe::catch_unwind_probe(
+        crate::legacy::crash_probe::catch_unwind_probe_lazy(
             "metadata_expected_rush_effect",
-            detail,
+            || self.metadata_detail("expected_rush_effect", None),
             false,
             || {
                 matches!(
@@ -21648,6 +21661,7 @@ struct MagmortarBasicState {
 
 static INSTRUCTS: OnceLock<Mutex<Vec<InstructState>>> = OnceLock::new();
 static INSTRUCT_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
+static SHARED_PASSIVE_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
 static DELAYED_POISON_AREAS: OnceLock<Mutex<Vec<DelayedPoisonAreaState>>> = OnceLock::new();
 static DELAYED_POISON_AREA_LAST_TICK: OnceLock<Mutex<usize>> = OnceLock::new();
 static DISCHARGES: OnceLock<Mutex<Vec<DischargeState>>> = OnceLock::new();
@@ -21701,6 +21715,7 @@ fn reset_usize_store(store: &OnceLock<Mutex<usize>>, value: usize) {
 }
 
 pub(crate) fn reset_pokemon_content_runtime_state_for_new_match() {
+    reset_usize_store(&SHARED_PASSIVE_LAST_TICK, usize::MAX);
     clear_vec_store(&INSTRUCTS);
     clear_vec_store(&DELAYED_POISON_AREAS);
     clear_vec_store(&DISCHARGES);
@@ -21738,8 +21753,7 @@ pub(crate) fn reset_pokemon_content_runtime_state_for_new_match() {
 }
 
 fn begin_instruct(ctx: &GameCtx, oranguru_id: usize, ally_id: usize, delay_ticks: usize) {
-    let states = INSTRUCTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("instruct state poisoned");
+    let mut states = INSTRUCTS.lock_or_init(|| Mutex::new(Vec::new())).expect("instruct state poisoned");
     states.push(InstructState {
         oranguru_id,
         ally_id,
@@ -21750,8 +21764,7 @@ fn begin_instruct(ctx: &GameCtx, oranguru_id: usize, ally_id: usize, delay_ticks
 pub fn update_instructs(ctx: &mut GameCtx, rng_seed: u64) {
     let tick = ctx.tick();
     {
-        let last_tick = INSTRUCT_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
-        let mut last_tick = last_tick.lock().expect("instruct tick state poisoned");
+        let mut last_tick = INSTRUCT_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX)).expect("instruct tick state poisoned");
         if *last_tick == tick {
             return;
         }
@@ -21759,8 +21772,7 @@ pub fn update_instructs(ctx: &mut GameCtx, rng_seed: u64) {
     }
 
     let due = {
-        let states = INSTRUCTS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("instruct state poisoned");
+        let mut states = INSTRUCTS.lock_or_init(|| Mutex::new(Vec::new())).expect("instruct state poisoned");
         let mut due = Vec::new();
         let mut index = 0;
         while index < states.len() {
@@ -21793,8 +21805,7 @@ fn begin_delayed_poison_area_sequence(
     poison_damage: usize,
 ) {
     let tick = ctx.tick();
-    let states = DELAYED_POISON_AREAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("delayed poison area state poisoned");
+    let mut states = DELAYED_POISON_AREAS.lock_or_init(|| Mutex::new(Vec::new())).expect("delayed poison area state poisoned");
     for (index, center) in centers.into_iter().enumerate() {
         states.push(DelayedPoisonAreaState {
             caster_id,
@@ -21816,9 +21827,7 @@ fn begin_delayed_poison_area_sequence(
 pub fn update_delayed_poison_areas(ctx: &mut GameCtx) {
     let tick = ctx.tick();
     {
-        let last_tick = DELAYED_POISON_AREA_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
-        let mut last_tick = last_tick
-            .lock()
+        let mut last_tick = DELAYED_POISON_AREA_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX))
             .expect("delayed poison area tick state poisoned");
         if *last_tick == tick {
             return;
@@ -21827,8 +21836,7 @@ pub fn update_delayed_poison_areas(ctx: &mut GameCtx) {
     }
 
     let due = {
-        let states = DELAYED_POISON_AREAS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("delayed poison area state poisoned");
+        let mut states = DELAYED_POISON_AREAS.lock_or_init(|| Mutex::new(Vec::new())).expect("delayed poison area state poisoned");
         let mut due = Vec::new();
         let mut index = 0;
         while index < states.len() {
@@ -21902,9 +21910,7 @@ fn begin_electrode_self_destruct(
     failure_ticks: usize,
 ) {
     let caster_player = crate::legacy::pokemon_status::player_for_entity(caster_id);
-    let states = ELECTRODE_SELF_DESTRUCTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = ELECTRODE_SELF_DESTRUCTS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("electrode self-destruct state poisoned");
     states.retain(|state| state.caster_id != caster_id);
     states.push(ElectrodeSelfDestructState {
@@ -21925,9 +21931,7 @@ fn begin_electrode_self_destruct(
 fn update_electrode_self_destructs(ctx: &mut GameCtx) {
     let tick = ctx.tick();
     let due = {
-        let states = ELECTRODE_SELF_DESTRUCTS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states
-            .lock()
+        let mut states = ELECTRODE_SELF_DESTRUCTS.lock_or_init(|| Mutex::new(Vec::new()))
             .expect("electrode self-destruct state poisoned");
         let mut due = Vec::new();
         let mut index = 0;
@@ -22023,9 +22027,7 @@ fn resolve_electrode_self_destruct(ctx: &mut GameCtx, state: ElectrodeSelfDestru
     // The bonus belongs to the next life, not to an unrelated later death if
     // protection let Electrode survive this explosion.
     if let Some(player_id) = state.caster_player.filter(|_| ctx.get_entity(state.caster_id).map_or(true, |e| !e.is_alive())) {
-        let outcomes = ELECTRODE_SPAWN_OUTCOMES.get_or_init(|| Mutex::new(Vec::new()));
-        let mut outcomes = outcomes
-            .lock()
+        let mut outcomes = ELECTRODE_SPAWN_OUTCOMES.lock_or_init(|| Mutex::new(Vec::new()))
             .expect("electrode spawn outcome state poisoned");
         outcomes.retain(|outcome| outcome.player_id != player_id);
         outcomes.push(ElectrodeSpawnOutcomeState {
@@ -22054,9 +22056,7 @@ fn resolve_electrode_self_destruct(ctx: &mut GameCtx, state: ElectrodeSelfDestru
 fn apply_electrode_spawn_outcome(ctx: &mut GameCtx, player_id: usize, entity_id: usize) {
     if !ctx.get_entity(entity_id).map_or(false, |e| e.is_alive()) { return; }
     let outcome = {
-        let outcomes = ELECTRODE_SPAWN_OUTCOMES.get_or_init(|| Mutex::new(Vec::new()));
-        let mut outcomes = outcomes
-            .lock()
+        let mut outcomes = ELECTRODE_SPAWN_OUTCOMES.lock_or_init(|| Mutex::new(Vec::new()))
             .expect("electrode spawn outcome state poisoned");
         let Some(index) = outcomes
             .iter()
@@ -22098,8 +22098,7 @@ fn update_discharge_passive(ctx: &mut GameCtx, entity_id: usize) {
     let caster_stat = entity.stat();
     drop(entity);
 
-    let states = DISCHARGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("discharge state poisoned");
+    let mut states = DISCHARGES.lock_or_init(|| Mutex::new(Vec::new())).expect("discharge state poisoned");
     states.retain(|state| {
         ctx.get_entity(state.entity_id)
             .map(|entity| entity.is_alive())
@@ -22168,8 +22167,7 @@ fn begin_magmortar_heat_wave(
     attacker_types: TypeSet,
 ) {
     let tick = ctx.tick();
-    let states = MAGMORTAR_HEAT_WAVES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("magmortar heat wave state poisoned");
+    let mut states = MAGMORTAR_HEAT_WAVES.lock_or_init(|| Mutex::new(Vec::new())).expect("magmortar heat wave state poisoned");
     states.retain(|state| state.caster_id != caster_id && state.expires_at > tick);
     states.push(MagmortarHeatWaveState {
         caster_id,
@@ -22239,8 +22237,7 @@ fn begin_magmortar_eruption(
             ..Default::default()
         },
     );
-    let states = MAGMORTAR_ERUPTIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("magmortar eruption state poisoned");
+    let mut states = MAGMORTAR_ERUPTIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("magmortar eruption state poisoned");
     states.push(MagmortarEruptionState {
         caster_id,
         caster_team,
@@ -22262,8 +22259,7 @@ fn begin_magmortar_eruption(
 fn update_magmortar_states(ctx: &mut GameCtx, rng_seed: u64) {
     let tick = ctx.tick();
     {
-        let last_tick = MAGMORTAR_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
-        let mut last_tick = last_tick.lock().expect("magmortar tick state poisoned");
+        let mut last_tick = MAGMORTAR_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX)).expect("magmortar tick state poisoned");
         if *last_tick == tick {
             return;
         }
@@ -22276,8 +22272,7 @@ fn update_magmortar_states(ctx: &mut GameCtx, rng_seed: u64) {
 }
 
 fn update_magmortar_heat_waves(ctx: &mut GameCtx, tick: usize) {
-    let states = MAGMORTAR_HEAT_WAVES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("magmortar heat wave state poisoned");
+    let mut states = MAGMORTAR_HEAT_WAVES.lock_or_init(|| Mutex::new(Vec::new())).expect("magmortar heat wave state poisoned");
     let mut tick_hits = Vec::new();
     let mut exits = Vec::new();
     states.retain_mut(|state| {
@@ -22388,9 +22383,7 @@ fn update_magmortar_heat_waves(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_magmortar_burning_grounds(ctx: &mut GameCtx, tick: usize) {
-    let states = MAGMORTAR_BURNING_GROUNDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = MAGMORTAR_BURNING_GROUNDS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("magmortar burning ground state poisoned");
     let mut hits = Vec::new();
     states.retain_mut(|state| {
@@ -22443,8 +22436,7 @@ fn update_magmortar_burning_grounds(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_magmortar_eruptions(ctx: &mut GameCtx, rng_seed: u64, tick: usize) {
-    let states = MAGMORTAR_ERUPTIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("magmortar eruption state poisoned");
+    let mut states = MAGMORTAR_ERUPTIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("magmortar eruption state poisoned");
     let mut shots = Vec::new();
     states.retain_mut(|state| {
         if state.expires_at <= tick
@@ -22565,8 +22557,7 @@ fn magmortar_eruption_target(
 
 fn magmortar_heat_wave_basic_bonus(ctx: &GameCtx, caster_id: usize) -> usize {
     let tick = ctx.tick();
-    let states = MAGMORTAR_HEAT_WAVES.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("magmortar heat wave state poisoned");
+    let states = MAGMORTAR_HEAT_WAVES.lock_or_init(|| Mutex::new(Vec::new())).expect("magmortar heat wave state poisoned");
     states
         .iter()
         .find(|state| state.caster_id == caster_id && state.expires_at > tick)
@@ -22668,8 +22659,7 @@ fn note_magmortar_basic_hit(
     attacker_types: TypeSet,
 ) {
     let tick = ctx.tick();
-    let states = MAGMORTAR_BASICS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("magmortar basic state poisoned");
+    let mut states = MAGMORTAR_BASICS.lock_or_init(|| Mutex::new(Vec::new())).expect("magmortar basic state poisoned");
     states.retain(|state| tick.saturating_sub(state.last_hit_at) <= 6 * 60);
     let state = if let Some(index) = states
         .iter()
@@ -22732,9 +22722,7 @@ fn note_magmortar_basic_hit(
         attacker_types,
         defender_types,
     );
-    let grounds = MAGMORTAR_BURNING_GROUNDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut grounds = grounds
-        .lock()
+    let mut grounds = MAGMORTAR_BURNING_GROUNDS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("magmortar burning ground state poisoned");
     grounds.push(MagmortarBurningGroundState {
         caster_id,
@@ -22781,8 +22769,7 @@ fn begin_shell_traps(
     slow_ticks: usize,
 ) {
     let tick = ctx.tick();
-    let traps = SHELL_TRAPS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut traps = traps.lock().expect("shell trap state poisoned");
+    let mut traps = SHELL_TRAPS.lock_or_init(|| Mutex::new(Vec::new())).expect("shell trap state poisoned");
     for center in centers {
         traps.push(ShellTrapState {
             caster_id,
@@ -22800,8 +22787,7 @@ fn begin_shell_traps(
 fn update_shell_traps(ctx: &mut GameCtx) {
     let tick = ctx.tick();
     {
-        let last_tick = SHELL_TRAP_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
-        let mut last_tick = last_tick.lock().expect("shell trap tick state poisoned");
+        let mut last_tick = SHELL_TRAP_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX)).expect("shell trap tick state poisoned");
         if *last_tick == tick {
             return;
         }
@@ -22810,8 +22796,7 @@ fn update_shell_traps(ctx: &mut GameCtx) {
 
     let mut triggered: Vec<(ShellTrapState, usize)> = Vec::new();
     {
-        let traps = SHELL_TRAPS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut traps = traps.lock().expect("shell trap state poisoned");
+        let mut traps = SHELL_TRAPS.lock_or_init(|| Mutex::new(Vec::new())).expect("shell trap state poisoned");
         traps.retain(|trap| {
             trap.expires_at > tick
                 && ctx
@@ -22882,8 +22867,7 @@ fn begin_sunny_day(
     status_bonus_percent: usize,
 ) {
     let tick = ctx.tick();
-    let fields = SUNNY_DAYS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut fields = fields.lock().expect("sunny day state poisoned");
+    let mut fields = SUNNY_DAYS.lock_or_init(|| Mutex::new(Vec::new())).expect("sunny day state poisoned");
     fields.retain(|field| field.caster_id != caster_id);
     fields.push(SunnyDayState {
         caster_id,
@@ -22904,8 +22888,7 @@ fn begin_sunny_day(
 fn update_sunny_days(ctx: &mut GameCtx) {
     let tick = ctx.tick();
     {
-        let last_tick = SUNNY_DAY_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
-        let mut last_tick = last_tick.lock().expect("sunny day tick state poisoned");
+        let mut last_tick = SUNNY_DAY_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX)).expect("sunny day tick state poisoned");
         if *last_tick == tick {
             return;
         }
@@ -22914,8 +22897,7 @@ fn update_sunny_days(ctx: &mut GameCtx) {
 
     let mut slows = Vec::new();
     {
-        let fields = SUNNY_DAYS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut fields = fields.lock().expect("sunny day state poisoned");
+        let mut fields = SUNNY_DAYS.lock_or_init(|| Mutex::new(Vec::new())).expect("sunny day state poisoned");
         fields.retain(|field| {
             field.expires_at > tick
                 && ctx
@@ -22980,8 +22962,7 @@ fn sunny_day_bonus_for_target(
     let target_pos = ctx.get_entity(target_id).map(|target| target.pos())?;
     let tick = ctx.tick();
     SUNNY_DAYS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("sunny day state poisoned")
         .iter()
         .filter(|field| field.expires_at > tick)
@@ -23010,8 +22991,7 @@ fn begin_rain_dance(
     cooldown_mult: i32,
 ) {
     let tick = ctx.tick();
-    let fields = RAIN_DANCES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut fields = fields.lock().expect("rain dance state poisoned");
+    let mut fields = RAIN_DANCES.lock_or_init(|| Mutex::new(Vec::new())).expect("rain dance state poisoned");
     fields.retain(|field| field.caster_id != caster_id);
     fields.push(RainDanceState {
         caster_id,
@@ -23030,8 +23010,7 @@ fn begin_rain_dance(
 fn update_rain_dances(ctx: &mut GameCtx) {
     let tick = ctx.tick();
     {
-        let last_tick = RAIN_DANCE_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
-        let mut last_tick = last_tick.lock().expect("rain dance tick state poisoned");
+        let mut last_tick = RAIN_DANCE_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX)).expect("rain dance tick state poisoned");
         if *last_tick == tick {
             return;
         }
@@ -23040,8 +23019,7 @@ fn update_rain_dances(ctx: &mut GameCtx) {
 
     let mut cooldown_buffs = Vec::new();
     {
-        let fields = RAIN_DANCES.get_or_init(|| Mutex::new(Vec::new()));
-        let mut fields = fields.lock().expect("rain dance state poisoned");
+        let mut fields = RAIN_DANCES.lock_or_init(|| Mutex::new(Vec::new())).expect("rain dance state poisoned");
         fields.retain(|field| {
             field.expires_at > tick
                 && ctx
@@ -23107,8 +23085,7 @@ fn rain_dance_damage_modifier_for_target(
     let target_pos = ctx.get_entity(target_id).map(|target| target.pos())?;
     let tick = ctx.tick();
     RAIN_DANCES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("rain dance state poisoned")
         .iter()
         .filter(|field| field.expires_at > tick)
@@ -23201,8 +23178,7 @@ fn begin_dragon_cheer_aura(
     dragon_crit_chance: i32,
 ) {
     let tick = ctx.tick();
-    let states = DRAGON_CHEERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("dragon cheer state poisoned");
+    let mut states = DRAGON_CHEERS.lock_or_init(|| Mutex::new(Vec::new())).expect("dragon cheer state poisoned");
     states.retain(|state| state.caster_id != caster_id);
     states.push(DragonCheerAuraState {
         caster_id,
@@ -23218,8 +23194,7 @@ fn begin_dragon_cheer_aura(
 fn update_dragon_cheer_auras(ctx: &mut GameCtx) {
     let tick = ctx.tick();
     {
-        let last_tick = DRAGON_CHEER_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
-        let mut last_tick = last_tick.lock().expect("dragon cheer tick state poisoned");
+        let mut last_tick = DRAGON_CHEER_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX)).expect("dragon cheer tick state poisoned");
         if *last_tick == tick {
             return;
         }
@@ -23228,8 +23203,7 @@ fn update_dragon_cheer_auras(ctx: &mut GameCtx) {
 
     let mut buffs = Vec::new();
     {
-        let states = DRAGON_CHEERS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("dragon cheer state poisoned");
+        let mut states = DRAGON_CHEERS.lock_or_init(|| Mutex::new(Vec::new())).expect("dragon cheer state poisoned");
         states.retain(|state| {
             state.expires_at > tick
                 && ctx
@@ -23301,8 +23275,7 @@ fn begin_life_dew_pickups(
     spread: u64,
 ) {
     let tick = ctx.tick();
-    let pickups = LIFE_DEW_PICKUPS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut pickups = pickups.lock().expect("life dew state poisoned");
+    let mut pickups = LIFE_DEW_PICKUPS.lock_or_init(|| Mutex::new(Vec::new())).expect("life dew state poisoned");
     pickups.retain(|pickup| pickup.caster_id != caster_id);
     let count = pickup_count.max(1);
     for index in 0..count {
@@ -23323,6 +23296,18 @@ fn begin_life_dew_pickups(
             heal_amount,
             expires_at: tick.saturating_add(duration_ticks),
         });
+    }
+    let spawned: Vec<_> = pickups.iter().filter(|s| s.caster_id == caster_id).copied().collect();
+    drop(pickups);
+    for s in spawned {
+        crate::native_vfx::field(ctx, "goodra_ult_life_dew_pickup", caster_id, s.center, s.radius);
+    }
+}
+
+pub(crate) fn rebind_life_dew_owner(old: usize, new: usize) {
+    for pickup in LIFE_DEW_PICKUPS.lock_or_init(Default::default)
+        .expect("life dew state poisoned").iter_mut().filter(|s| s.caster_id == old) {
+        pickup.caster_id = new;
     }
 }
 
@@ -23378,8 +23363,7 @@ pub fn update_native_field_visuals(ctx: &GameCtx) {
 fn update_life_dew_pickups(ctx: &mut GameCtx) {
     let tick = ctx.tick();
     {
-        let last_tick = LIFE_DEW_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
-        let mut last_tick = last_tick.lock().expect("life dew tick state poisoned");
+        let mut last_tick = LIFE_DEW_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX)).expect("life dew tick state poisoned");
         if *last_tick == tick {
             return;
         }
@@ -23388,15 +23372,8 @@ fn update_life_dew_pickups(ctx: &mut GameCtx) {
 
     let mut triggered: Vec<(LifeDewPickupState, usize)> = Vec::new();
     {
-        let pickups = LIFE_DEW_PICKUPS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut pickups = pickups.lock().expect("life dew state poisoned");
-        pickups.retain(|pickup| {
-            pickup.expires_at > tick
-                && ctx
-                    .get_entity(pickup.caster_id)
-                    .map(|caster| caster.is_alive())
-                    .unwrap_or(false)
-        });
+        let mut pickups = LIFE_DEW_PICKUPS.lock_or_init(|| Mutex::new(Vec::new())).expect("life dew state poisoned");
+        pickups.retain(|pickup| pickup.expires_at > tick);
         let mut index = 0;
         while index < pickups.len() {
             let pickup = pickups[index];
@@ -23441,30 +23418,31 @@ fn update_life_dew_pickups(ctx: &mut GameCtx) {
 }
 
 pub(crate) fn update_ai_entity_snapshot(ctx: &GameCtx, player_id: usize, entity_id: usize) {
-    let Some(entity) = ctx.get_entity(entity_id) else {
+    let Some(entity) = ctx.live_entity(entity_id) else {
         return;
     };
     if !entity.is_champion() {
         return;
     }
-    let hp = entity.hp();
+    let (hp_current, hp_max) = entity.hp();
+    let (x, y) = entity.pos();
+    let tick = ctx.tick();
     let snapshot = AiEntitySnapshotState {
         player_id,
         entity_id,
         team: entity.team(),
-        pos: entity.pos(),
-        hp_current: hp.current,
-        hp_max: hp.max,
-        tick: ctx.tick(),
+        pos: EntityPos { x, y },
+        hp_current,
+        hp_max,
+        tick,
     };
     drop(entity);
 
-    let snapshots = AI_ENTITY_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut snapshots = snapshots.lock().expect("ai entity snapshot state poisoned");
+    let mut snapshots = AI_ENTITY_SNAPSHOTS.lock_or_init(|| Mutex::new(Vec::new())).expect("ai entity snapshot state poisoned");
     snapshots.retain(|state| {
-        ctx.tick().saturating_sub(state.tick) <= 180
+        tick.saturating_sub(state.tick) <= 180
             && ctx
-                .get_entity(state.entity_id)
+                .live_entity(state.entity_id)
                 .map(|entity| entity.is_alive())
                 .unwrap_or(false)
     });
@@ -23491,31 +23469,30 @@ fn update_ai_attack_target_snapshots(ctx: &GameCtx) {
         *last_tick = tick;
     }
 
-    let snapshots = AI_ATTACK_TARGET_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut snapshots = snapshots
-        .lock()
+    let mut snapshots = AI_ATTACK_TARGET_SNAPSHOTS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("ai attack target snapshot state poisoned");
     snapshots.retain(|state| {
         tick.saturating_sub(state.tick) <= 30
             && ctx
-                .get_entity(state.entity_id)
+                .live_entity(state.entity_id)
                 .map(|entity| entity.is_alive() && !entity.is_tower())
                 .unwrap_or(false)
     });
 
     for index in 0..ctx.entity_count() {
-        let Some(entity) = ctx.entity_at(index) else {
+        let Some(entity) = ctx.live_entity_at(index) else {
             continue;
         };
         if !entity.is_alive() || entity.is_champion() || entity.is_tower() {
             continue;
         }
-        let hp = entity.hp();
+        let (hp_current, _) = entity.hp();
+        let (x, y) = entity.pos();
         let snapshot = AiAttackTargetSnapshotState {
             entity_id: entity.id(),
             team: entity.team(),
-            pos: entity.pos(),
-            hp_current: hp.current,
+            pos: EntityPos { x, y },
+            hp_current,
             tick,
         };
         if let Some(existing) = snapshots
@@ -23542,29 +23519,29 @@ fn update_ai_tower_snapshots(ctx: &GameCtx) {
         *last_tick = tick;
     }
 
-    let snapshots = AI_TOWER_SNAPSHOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut snapshots = snapshots.lock().expect("ai tower snapshot state poisoned");
+    let mut snapshots = AI_TOWER_SNAPSHOTS.lock_or_init(|| Mutex::new(Vec::new())).expect("ai tower snapshot state poisoned");
     snapshots.retain(|state| {
         tick.saturating_sub(state.tick) <= 180
             && ctx
-                .get_entity(state.entity_id)
+                .live_entity(state.entity_id)
                 .map(|entity| entity.is_alive() && entity.is_tower())
                 .unwrap_or(false)
     });
 
     for index in 0..ctx.entity_count() {
-        let Some(entity) = ctx.entity_at(index) else {
+        let Some(entity) = ctx.live_entity_at(index) else {
             continue;
         };
         if !entity.is_alive() || !entity.is_tower() {
             continue;
         }
-        let hp = entity.hp();
+        let (hp_current, _) = entity.hp();
+        let (x, y) = entity.pos();
         let snapshot = AiTowerSnapshotState {
             entity_id: entity.id(),
             team: entity.team(),
-            pos: entity.pos(),
-            hp_current: hp.current,
+            pos: EntityPos { x, y },
+            hp_current,
             tick,
         };
         if let Some(existing) = snapshots
@@ -23576,6 +23553,50 @@ fn update_ai_tower_snapshots(ctx: &GameCtx) {
             snapshots.push(snapshot);
         }
     }
+}
+
+#[cfg(test)]
+pub(crate) fn verify_lightweight_snapshot_refresh(ctx: &GameCtx) {
+    // Reference the original owned-snapshot path, including vector order and expiry.
+    let tick = ctx.tick();
+    let mut champions = AI_ENTITY_SNAPSHOTS.lock_or_init(Default::default).unwrap().clone();
+    if let Some(entity) = ctx.get_entity(7).filter(|e| e.is_champion()) {
+        champions.retain(|s| tick.saturating_sub(s.tick) <= 180
+            && ctx.get_entity(s.entity_id).map_or(false, |e| e.is_alive()));
+        let hp = entity.hp();
+        let snapshot = AiEntitySnapshotState { player_id: 1, entity_id: 7, team: entity.team(),
+            pos: entity.pos(), hp_current: hp.current, hp_max: hp.max, tick };
+        if let Some(old) = champions.iter_mut().find(|s| s.player_id == 1 || s.entity_id == 7) {
+            *old = snapshot;
+        } else { champions.push(snapshot); }
+    }
+    macro_rules! reference {
+        ($store:ident, $state:ident, $ttl:expr, $retain:expr, $include:expr) => {{
+            let mut snapshots = $store.lock_or_init(Default::default).unwrap().clone();
+            snapshots.retain(|s| tick.saturating_sub(s.tick) <= $ttl
+                && ctx.get_entity(s.entity_id).map_or(false, $retain));
+            for unit in (0..ctx.entity_count()).filter_map(|i| ctx.entity_at(i)).filter($include) {
+                let snapshot = $state { entity_id: unit.id(), team: unit.team(), pos: unit.pos(),
+                    hp_current: unit.hp().current, tick };
+                if let Some(old) = snapshots.iter_mut().find(|s| s.entity_id == snapshot.entity_id) {
+                    *old = snapshot;
+                } else { snapshots.push(snapshot); }
+            }
+            snapshots
+        }};
+    }
+    let targets = reference!(AI_ATTACK_TARGET_SNAPSHOTS, AiAttackTargetSnapshotState, 30,
+        |e: EntityRef<'_>| e.is_alive() && !e.is_tower(),
+        |e: &EntityRef<'_>| e.is_alive() && !e.is_champion() && !e.is_tower());
+    let towers = reference!(AI_TOWER_SNAPSHOTS, AiTowerSnapshotState, 180,
+        |e: EntityRef<'_>| e.is_alive() && e.is_tower(),
+        |e: &EntityRef<'_>| e.is_alive() && e.is_tower());
+    update_ai_entity_snapshot(ctx, 1, 7);
+    update_ai_attack_target_snapshots(ctx);
+    update_ai_tower_snapshots(ctx);
+    assert_eq!(format!("{champions:?}"), format!("{:?}", *AI_ENTITY_SNAPSHOTS.lock_or_init(Default::default).unwrap()));
+    assert_eq!(format!("{targets:?}"), format!("{:?}", *AI_ATTACK_TARGET_SNAPSHOTS.lock_or_init(Default::default).unwrap()));
+    assert_eq!(format!("{towers:?}"), format!("{:?}", *AI_TOWER_SNAPSHOTS.lock_or_init(Default::default).unwrap()));
 }
 
 fn life_dew_move_input_for_player(
@@ -23733,6 +23754,26 @@ pub(crate) fn attach_partner_move_input_for_player(
     }
 
     best.map(|(_, pos)| Input::Move { x: pos.x, y: pos.y })
+}
+
+pub(crate) fn smeargle_learning_approach(world: &crate::ai_world::World, base: Option<&Input>, learned: usize) -> Option<Input> {
+    if learned >= 4 || !matches!(base, None | Some(Input::Move { .. })) { return None; }
+    let caster = world.caster()?;
+    if caster.cc > 0 || caster.hp.saturating_mul(100) < caster.max_hp.max(1).saturating_mul(60) { return None; }
+    let target = world.units.iter().filter(|unit| unit.champion && unit.team != caster.team
+        && unit.targetable && unit.visible
+        && crate::ai_world::distance_sq(caster.pos, unit.pos) <= 220_000u128.pow(2))
+        .min_by_key(|unit| (crate::ai_world::distance_sq(caster.pos, unit.pos), unit.id))?;
+    let nearby = |pos, unit: &crate::ai_world::Unit| crate::ai_world::distance_sq(pos, unit.pos) <= 120_000u128.pow(2);
+    let enemies = world.units.iter().filter(|unit| unit.champion && unit.team != caster.team
+        && (unit.visible || unit.detected) && nearby(target.pos, unit)).count();
+    let allies = world.units.iter().filter(|unit| unit.champion && unit.team == caster.team
+        && (unit.id == caster.id || nearby(target.pos, unit))).count();
+    if enemies > allies { return None; }
+    let distance = crate::ai_world::distance_sq(caster.pos, target.pos).isqrt() as u64;
+    if distance <= 36_000 { return None; }
+    let end = crate::ai_world::project(caster.pos, target.pos, (distance - 36_000).min(32_000));
+    crate::shared_detection::safe_step(world, end).then_some(Input::Move { x: end.x, y: end.y })
 }
 
 fn nearest_enemy_target_for_player(
@@ -24040,8 +24081,7 @@ fn update_dedenne_static(ctx: &mut GameCtx, entity_id: usize) {
     let pos = entity.pos();
     drop(entity);
 
-    let states = DEDENNE_STATICS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("dedenne static state poisoned");
+    let mut states = DEDENNE_STATICS.lock_or_init(|| Mutex::new(Vec::new())).expect("dedenne static state poisoned");
     states.retain(|state| {
         ctx.get_entity(state.entity_id)
             .map(|entity| entity.is_alive())
@@ -24087,8 +24127,7 @@ fn update_dedenne_static(ctx: &mut GameCtx, entity_id: usize) {
 
 fn dedenne_static_charges(entity_id: usize) -> usize {
     DEDENNE_STATICS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("dedenne static state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -24097,8 +24136,7 @@ fn dedenne_static_charges(entity_id: usize) -> usize {
 }
 
 fn add_dedenne_static_charges(entity_id: usize, amount: usize) {
-    let states = DEDENNE_STATICS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("dedenne static state poisoned");
+    let mut states = DEDENNE_STATICS.lock_or_init(|| Mutex::new(Vec::new())).expect("dedenne static state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         states.push(DedenneStaticState {
             entity_id,
@@ -24112,8 +24150,7 @@ fn add_dedenne_static_charges(entity_id: usize, amount: usize) {
 }
 
 fn spend_dedenne_static_charges(entity_id: usize, amount: usize) -> usize {
-    let states = DEDENNE_STATICS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("dedenne static state poisoned");
+    let mut states = DEDENNE_STATICS.lock_or_init(|| Mutex::new(Vec::new())).expect("dedenne static state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return 0;
     };
@@ -24184,7 +24221,7 @@ fn enemy_champion_or_jungle_near(ctx: &GameCtx, entity_id: usize, radius: u64) -
 }
 
 fn dedenne_grid_can_cast(caster: usize, tick: usize) -> bool {
-    DEDENNE_GRIDS.get_or_init(|| Mutex::new(Vec::new())).lock().expect("dedenne grid state poisoned")
+    DEDENNE_GRIDS.lock_or_init(|| Mutex::new(Vec::new())).expect("dedenne grid state poisoned")
         .iter().any(|grid| grid.caster_id == caster && grid.expires_at > tick && !grid.overloaded)
         || dedenne_terrain_ready(caster, tick)
 }
@@ -24219,8 +24256,7 @@ fn begin_or_overload_dedenne_grid(
 
     let tick = ctx.tick();
     {
-        let grids = DEDENNE_GRIDS.get_or_init(|| Mutex::new(Vec::new()));
-        let grids = grids.lock().expect("dedenne grid state poisoned");
+        let grids = DEDENNE_GRIDS.lock_or_init(|| Mutex::new(Vec::new())).expect("dedenne grid state poisoned");
         if let Some(grid) = grids
             .iter()
             .find(|grid| grid.caster_id == caster_id && grid.expires_at > tick && !grid.overloaded)
@@ -24242,8 +24278,7 @@ fn begin_or_overload_dedenne_grid(
         node_damage_base_ad + caster_stat.attack.saturating_mul(node_damage_ad_ratio) / 100;
     let overload_damage =
         overload_base_ad + caster_stat.attack.saturating_mul(overload_ad_ratio) / 100;
-    let grids = DEDENNE_GRIDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut grids = grids.lock().expect("dedenne grid state poisoned");
+    let mut grids = DEDENNE_GRIDS.lock_or_init(|| Mutex::new(Vec::new())).expect("dedenne grid state poisoned");
     grids.retain(|grid| grid.caster_id != caster_id);
     grids.push(DedenneGridState {
         caster_id,
@@ -24265,8 +24300,7 @@ fn begin_or_overload_dedenne_grid(
 
 fn dedenne_terrain_ready(entity_id: usize, tick: usize) -> bool {
     DEDENNE_TERRAIN_COOLDOWNS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("dedenne terrain cooldown poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -24275,8 +24309,7 @@ fn dedenne_terrain_ready(entity_id: usize, tick: usize) -> bool {
 }
 
 fn set_dedenne_terrain_cooldown(entity_id: usize, ready_at: usize) {
-    let states = DEDENNE_TERRAIN_COOLDOWNS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("dedenne terrain cooldown poisoned");
+    let mut states = DEDENNE_TERRAIN_COOLDOWNS.lock_or_init(|| Mutex::new(Vec::new())).expect("dedenne terrain cooldown poisoned");
     if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         state.ready_at = ready_at;
     } else {
@@ -24303,8 +24336,7 @@ fn hex_grid_nodes(center: EntityPos, spread: u64) -> Vec<EntityPos> {
 fn update_dedenne_grids(ctx: &mut GameCtx) {
     let tick = ctx.tick();
     {
-        let last_tick = DEDENNE_GRID_LAST_TICK.get_or_init(|| Mutex::new(usize::MAX));
-        let mut last_tick = last_tick.lock().expect("dedenne grid tick poisoned");
+        let mut last_tick = DEDENNE_GRID_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX)).expect("dedenne grid tick poisoned");
         if *last_tick == tick {
             return;
         }
@@ -24313,8 +24345,7 @@ fn update_dedenne_grids(ctx: &mut GameCtx) {
 
     let mut consumed_nodes = Vec::new();
     {
-        let grids = DEDENNE_GRIDS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut grids = grids.lock().expect("dedenne grid state poisoned");
+        let mut grids = DEDENNE_GRIDS.lock_or_init(|| Mutex::new(Vec::new())).expect("dedenne grid state poisoned");
         grids.retain(|grid| {
             grid.expires_at > tick
                 && ctx
@@ -24457,8 +24488,7 @@ fn overload_dedenne_grid(ctx: &mut GameCtx, grid: DedenneGridState) {
         );
     }
 
-    let grids = DEDENNE_GRIDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut grids = grids.lock().expect("dedenne grid state poisoned");
+    let mut grids = DEDENNE_GRIDS.lock_or_init(|| Mutex::new(Vec::new())).expect("dedenne grid state poisoned");
     grids.retain(|candidate| candidate.caster_id != grid.caster_id);
 }
 
@@ -24468,8 +24498,7 @@ fn dedenne_chain_from_nodes(
     caster_team: usize,
 ) {
     let grid = DEDENNE_GRIDS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("dedenne grid state poisoned")
         .iter()
         .find(|grid| grid.caster_id == caster_id && grid.expires_at > ctx.tick())
@@ -24508,8 +24537,7 @@ fn begin_grass_power_aura(
     damage_bonus_percent: usize,
 ) {
     let tick = ctx.tick();
-    let states = GRASS_POWER_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("grass power aura state poisoned");
+    let mut states = GRASS_POWER_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("grass power aura state poisoned");
     states.retain(|state| state.caster_id != caster_id);
     states.push(GrassPowerAuraState {
         caster_id,
@@ -24522,8 +24550,7 @@ fn begin_grass_power_aura(
 
 fn update_grass_power_auras(ctx: &mut GameCtx) {
     let tick = ctx.tick();
-    let states = GRASS_POWER_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("grass power aura state poisoned");
+    let mut states = GRASS_POWER_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("grass power aura state poisoned");
     states.retain(|state| {
         state.expires_at > tick
             && ctx
@@ -24554,8 +24581,7 @@ fn grass_power_bonus_for_caster(
     let caster_pos = ctx.get_entity(caster_id).map(|caster| caster.pos())?;
     let tick = ctx.tick();
     GRASS_POWER_AURAS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("grass power aura state poisoned")
         .iter()
         .filter(|state| state.expires_at > tick)
@@ -24600,8 +24626,7 @@ fn update_burning_jealousy(ctx: &mut GameCtx, turtonator_id: usize) {
     let tick = ctx.tick();
     let mut hits = Vec::new();
     {
-        let states = BURNING_JEALOUSIES.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("burning jealousy state poisoned");
+        let mut states = BURNING_JEALOUSIES.lock_or_init(|| Mutex::new(Vec::new())).expect("burning jealousy state poisoned");
         states.retain(|state| {
             state.turtonator_id == turtonator_id
                 && ctx
@@ -24767,17 +24792,26 @@ impl PokemonPassive {
     }
 }
 
+fn begin_shared_passive_tick(tick: usize) -> bool {
+    let mut last = SHARED_PASSIVE_LAST_TICK.lock_or_init(|| Mutex::new(usize::MAX))
+        .expect("shared passive tick state poisoned");
+    if *last == tick { return false; }
+    *last = tick;
+    true
+}
+
 impl ModPassive for PokemonPassive {
     fn clone_box(&self) -> Box<dyn ModPassive> {
         Box::new(self.clone())
     }
 
     fn on_update(&mut self, ctx: &mut GameCtx, rng_seed: u64, _player: usize, _entity: usize) {
-        crate::legacy::crash_probe::catch_unwind_probe(
+        let champion_id = self.champion.id;
+        crate::legacy::crash_probe::catch_unwind_probe_lazy(
             "passive_on_update",
-            format!(
+            || format!(
                 "champion={} player={} entity={}",
-                self.champion.id, _player, _entity
+                champion_id, _player, _entity
             ),
             (),
             || {
@@ -24795,7 +24829,7 @@ impl ModPassive for PokemonPassive {
                         ));
                     }
                 }
-                let life_id = ctx.get_player(_player).map(|player| player.deaths());
+                let life_id = ctx.live_player(_player).map(|player| player.deaths());
                 crate::legacy::pokemon_status::register_player_entity_life_at_tick(
                     ctx,
                     _player,
@@ -24813,25 +24847,35 @@ impl ModPassive for PokemonPassive {
                     && ctx.tick() >= SMEARGLE_FIRST_MOVE_FALLBACK_TICKS
                     && crate::legacy::pokemon_status::smeargle_learned_count_for_player(_player) == 0
                 {
-                    crate::legacy::pokemon_status::smeargle_force_learn_for_player(_player, SMEARGLE, SMEARGLE_MINION_ATTACK);
+                    crate::legacy::pokemon_status::smeargle_force_learn_for_player(ctx, _player, SMEARGLE, SMEARGLE_MINION_ATTACK);
+                }
+                // Restore engine-side metadata after a respawn or a dispel, without stacking.
+                if self.champion.id == "pokemon_moba_smeargle" && ctx.tick() % 60 == 0 {
+                    crate::legacy::pokemon_status::smeargle_sync_ranges(ctx, _entity);
                 }
                 update_ai_entity_snapshot(ctx, _player, _entity);
-                update_ai_attack_target_snapshots(ctx);
-                update_ai_tower_snapshots(ctx);
-                crate::legacy::pokemon_status::update_statuses(ctx, rng_seed);
-                update_instructs(ctx, rng_seed);
-                update_delayed_poison_areas(ctx);
-                update_shell_traps(ctx);
-                update_sunny_days(ctx);
-                update_rain_dances(ctx);
-                update_dragon_cheer_auras(ctx);
-                update_life_dew_pickups(ctx);
-                update_dedenne_grids(ctx);
+                // These routines already reject repeat calls in the same tick.
+                // Share that check instead of acquiring each store for every player.
+                let shared_tick = begin_shared_passive_tick(ctx.tick());
+                if shared_tick {
+                    update_ai_attack_target_snapshots(ctx);
+                    update_ai_tower_snapshots(ctx);
+                    crate::legacy::pokemon_status::update_statuses(ctx, rng_seed);
+                    update_instructs(ctx, rng_seed);
+                    update_delayed_poison_areas(ctx);
+                    update_shell_traps(ctx);
+                    update_sunny_days(ctx);
+                    update_rain_dances(ctx);
+                    update_dragon_cheer_auras(ctx);
+                    update_life_dew_pickups(ctx);
+                    update_dedenne_grids(ctx);
+                }
                 update_grass_power_auras(ctx);
-                update_magmortar_states(ctx, rng_seed);
+                if shared_tick { update_magmortar_states(ctx, rng_seed); }
                 update_electrode_self_destructs(ctx);
                 apply_electrode_spawn_outcome(ctx, _player, _entity);
-                update_native_field_visuals(ctx);
+                // Creation sites draw immediately; shared lease upkeep needs one pass per tick.
+                if shared_tick { update_native_field_visuals(ctx); }
                 if crate::legacy::pokemon_status::passive_suppressed_by_nullifying_gas(
                     ctx,
                     _entity,
@@ -25550,16 +25594,20 @@ impl PokemonMobaInputAi {
     const DASH_TOWER_DANGER_RADIUS: u64 = 70_000;
 
     fn champion_name_matches(champion_name: &str, display_name: &str) -> bool {
-        let normalize = |name: &str| name.chars().filter(char::is_ascii_alphanumeric).collect::<String>().to_ascii_lowercase();
-        let actual = normalize(champion_name);
-        let expected = normalize(display_name);
-        actual == expected || actual == format!("pokemonmoba{expected}")
+        if let Some(native) = champion_name.strip_prefix("pokemon_moba_") {
+            if native.bytes().all(|c| c.is_ascii_alphanumeric()) && display_name.bytes().all(|c| c.is_ascii_alphanumeric()) {
+                return native.eq_ignore_ascii_case(display_name);
+            }
+        }
+        fn normalized(name: &str) -> impl Iterator<Item = u8> + '_ {
+            name.bytes().filter(u8::is_ascii_alphanumeric).map(|c| c.to_ascii_lowercase())
+        }
+        normalized(champion_name).eq(normalized(display_name))
+            || normalized(champion_name).eq(b"pokemonmoba".iter().copied().chain(normalized(display_name)))
     }
 
     fn is_handled_champion(champion_name: &str) -> bool {
-        POKEMON_CHAMPIONS
-            .iter()
-            .any(|champion| Self::champion_name_matches(champion_name, champion.display_name))
+        Self::champion_for_ai_name(champion_name).is_some()
     }
 
     fn champion_is(ctx: &PlayerAiContext<'_, '_, '_>, display_name: &str) -> bool {
@@ -25579,8 +25627,10 @@ impl PokemonMobaInputAi {
         }
         // Preserve recalls, attacks and specialist cast/channel decisions already selected.
         if !matches!(base, None | Some(Input::Move { .. })) { return None; }
+        let targets = crate::shared_detection::targets(world);
+        if targets.is_empty() { return None; }
         let champion = Self::champion_for_ai_name(ctx.champion_name())?;
-        for id in crate::shared_detection::targets(world) {
+        for id in targets {
             let target = world.get(id)?;
             if target.detected && target.targetable {
                 for action in [Some(champion.skill), Some(champion.skill2), champion.ult, Some(champion.attack)].into_iter().flatten() {
@@ -25707,6 +25757,10 @@ impl PokemonMobaInputAi {
     }
 
     fn champion_for_ai_name(champion_name: &str) -> Option<PokemonChampion> {
+        // Immutable roster definitions, not simulation state. Native IDs are the hot path.
+        static IDS: std::sync::OnceLock<std::collections::BTreeMap<&'static str, usize>> = std::sync::OnceLock::new();
+        let ids = IDS.get_or_init(|| POKEMON_CHAMPIONS.iter().enumerate().map(|(i, c)| (c.id, i)).collect());
+        if let Some(&index) = ids.get(champion_name) { return Some(POKEMON_CHAMPIONS[index]); }
         POKEMON_CHAMPIONS
             .iter()
             .copied()
@@ -25894,6 +25948,7 @@ impl PokemonMobaInputAi {
         ctx: &PlayerAiContext<'_, '_, '_>,
         input: &Input,
     ) -> bool {
+        if Self::slot_for_input(input).is_none() { return false; }
         let Some(champion) = Self::champion_for_ai_name(ctx.champion_name()) else {
             return false;
         };
@@ -26033,15 +26088,12 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
         ctx: &mut PlayerAiContext<'_, '_, '_>,
         base_input: Option<Input>,
     ) -> PlayerInputDecision {
-        let detail = format!(
-            "champion={} player={} tick={}",
-            ctx.champion_name(),
-            ctx.player_id(),
-            ctx.tick()
-        );
-        crate::legacy::crash_probe::catch_unwind_probe(
+        let player = ctx.player_id();
+        let tick = ctx.tick();
+        let champion = Self::champion_for_ai_name(ctx.champion_name()).map(|c| c.id).unwrap_or("unknown");
+        crate::legacy::crash_probe::catch_unwind_probe_lazy(
             "input_ai_think",
-            detail,
+            || format!("champion={champion} player={player} tick={tick}"),
             PlayerInputDecision::Pass,
             || {
                 let player_id = ctx.player_id();
@@ -26186,6 +26238,7 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                 }
 
                 if Self::champion_is(ctx, "Smeargle") {
+                    if matches!(base_input, Some(Input::Return)) { return PlayerInputDecision::Pass; }
                     let base_target = base_input.as_ref().and_then(Self::target_for_input);
                     let preferred_target = base_target
                         .or_else(|| nearest_enemy_target_for_player(player_id, tick, 220_000));
@@ -26269,6 +26322,10 @@ impl ModPlayerInputAi for PokemonMobaInputAi {
                         {
                             return Self::replace_if_valid(ctx, Some(input));
                         }
+                    }
+                    if let Some(input) = ctx.world().and_then(|world|
+                        smeargle_learning_approach(world, base_input.as_ref(), learned_count)) {
+                        if ctx.is_valid_input(&input) { return PlayerInputDecision::Replace(input); }
                     }
                 }
 
@@ -39057,6 +39114,62 @@ mod guide_export_tests {
     use crate::legacy::pokemon_strategy::{strategy_for_champion_id, StrategyTrait};
     use crate::legacy::pokemon_types::{type_modifier_ratio, PokemonType};
     use std::fs;
+
+    #[test]
+    fn shared_passive_gate_resets_and_separates_matches() {
+        use crate::runtime_state::{Scope, Key};
+        let _first = Scope::test_key(Key(5, 90001, 0, 0, 991));
+        assert!(begin_shared_passive_tick(100));
+        assert!(!begin_shared_passive_tick(100));
+        {
+            let _second = Scope::test_key(Key(5, 90002, 0, 0, 991));
+            assert!(begin_shared_passive_tick(100));
+            assert!(!begin_shared_passive_tick(100));
+        }
+        assert!(!begin_shared_passive_tick(100));
+        assert!(begin_shared_passive_tick(101));
+        reset_usize_store(&SHARED_PASSIVE_LAST_TICK, usize::MAX);
+        assert!(begin_shared_passive_tick(101));
+        assert!(begin_shared_passive_tick(1));
+    }
+
+    #[test]
+    #[ignore = "manual lookup timing, not a game performance benchmark"]
+    fn measure_ai_champion_lookup() {
+        let normalize = |s: &str| s.chars().filter(char::is_ascii_alphanumeric).collect::<String>().to_ascii_lowercase();
+        for fast in [false, true] {
+            let start = std::time::Instant::now();
+            for index in 0..20000 {
+                let name = std::hint::black_box(POKEMON_CHAMPIONS[index % POKEMON_CHAMPIONS.len()].id);
+                let found = if fast { PokemonMobaInputAi::champion_for_ai_name(name).map(|c| c.id) }
+                else { POKEMON_CHAMPIONS.iter().find(|c| {
+                    let actual = normalize(name);
+                    let target = normalize(c.display_name);
+                    actual == target || actual == format!("pokemonmoba{target}")
+                }).map(|c| c.id) };
+                assert_eq!(std::hint::black_box(found), Some(name));
+            }
+            eprintln!("ai_lookup fast={fast} calls=20000 elapsed_ms={}", start.elapsed().as_millis());
+        }
+    }
+
+    #[test]
+    fn fast_champion_lookup_preserves_all_roster_names_and_aliases() {
+        for champion in POKEMON_CHAMPIONS {
+            for name in [champion.id.to_string(), champion.display_name.to_string(),
+                champion.display_name.to_ascii_uppercase(),
+                format!("pokemon_moba_{}", champion.display_name)] {
+                let expected = POKEMON_CHAMPIONS.iter().find(|c| {
+                    let normalize = |s: &str| s.chars().filter(char::is_ascii_alphanumeric).collect::<String>().to_ascii_lowercase();
+                    let actual = normalize(&name);
+                    let target = normalize(c.display_name);
+                    actual == target || actual == format!("pokemonmoba{target}")
+                }).map(|c| c.id);
+                assert_eq!(PokemonMobaInputAi::champion_for_ai_name(&name).map(|c| c.id), expected, "{name}");
+            }
+        }
+        assert!(PokemonMobaInputAi::champion_for_ai_name("not_a_champion").is_none());
+    }
 
     #[test]
     fn roster_movement_band_preserves_median_and_speed_order() {

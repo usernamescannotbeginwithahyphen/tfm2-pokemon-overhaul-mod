@@ -5,7 +5,8 @@ use crate::stable_legacy_api::{EntityPos, GameCtx, InputTarget};
 use mod_api_stable::{InputTargetV1, StableEffectType, StableMod, StableSim};
 use std::{collections::BTreeMap, sync::Mutex};
 
-const FIELD_LEASE_TICKS: usize = 30;
+const FIELD_MIN_REFRESH_TICKS: u64 = 30;
+const FIELD_HANDOFF_TICKS: u64 = 2;
 type FieldKey = (String, usize, u64, u64, u64, u64);
 static FIELD_LEASES: SimOnceLock<Mutex<BTreeMap<FieldKey, usize>>> = SimOnceLock::new();
 static ATTACHED_LEASES: SimOnceLock<Mutex<BTreeMap<(usize, &'static str), usize>>> =
@@ -35,6 +36,9 @@ include!("vfx_catalog.rs");
 fn binding(stem: &str) -> Option<&'static Binding> {
     BINDINGS.iter().find(|b| b.stem == stem)
 }
+
+#[cfg(test)]
+pub(crate) fn field_cycle_ticks(stem: &str) -> u64 { binding(stem).unwrap().ticks }
 
 pub fn projectile_name(champion: &str, slot: usize, tick: usize) -> Option<&'static str> {
     BINDINGS
@@ -166,9 +170,8 @@ pub fn traveling_wave(
     }
 }
 
-// Refresh from authoritative state. New fields render immediately; consumed or
-// expired fields leave no more than a thirty-tick visual tail. The public API
-// cannot cancel an emitted animation; do not shorten its playback to one frame.
+// Renew on whole animation cycles, with a small overlap so the outgoing event
+// cannot expire before its replacement is drawn. Removed fields stop renewing.
 pub fn field(ctx: &GameCtx, stem: &str, caster: usize, pos: EntityPos, radius: u64) {
     field_geometry(ctx, stem, caster, pos, radius, radius, None);
 }
@@ -188,23 +191,29 @@ fn field_geometry(
             _ => b.name.to_owned(),
         };
         let tick = ctx.tick();
+        let cycle = b.ticks.max(1);
+        let refresh = cycle.saturating_mul(FIELD_MIN_REFRESH_TICKS.div_ceil(cycle));
+        let key = (name.clone(), caster, pos.x, pos.y, range, radius);
         {
             let mut leases = FIELD_LEASES.get_or_init(Default::default).lock().unwrap();
             leases.retain(|_, until| *until > tick);
-            let key = (name.clone(), caster, pos.x, pos.y, range, radius);
             if leases.contains_key(&key) {
                 return;
             }
-            leases.insert(key, tick.saturating_add(FIELD_LEASE_TICKS));
         }
-        ctx.play_view_effect(
+        let accepted = ctx.play_view_effect(
             &format!("{}_loop", name),
             caster,
             InputTarget::Pos { x: pos.x, y: pos.y },
             range,
             radius,
-            FIELD_LEASE_TICKS as u64,
+            refresh.saturating_add(FIELD_HANDOFF_TICKS),
         );
+        // A rejected event may become available next tick. Do not retry it for
+        // every champion's passive update during this same simulation tick.
+        let retry_after = if accepted { refresh as usize } else { 1 };
+        FIELD_LEASES.get_or_init(Default::default).lock().unwrap()
+            .insert(key, tick.saturating_add(retry_after));
     }
 }
 

@@ -4,7 +4,54 @@ This file is the compact memory anchor for the Teamfight Manager 2 Pokemon MOBA 
 
 ## Current SDK Status (2026-10-19)
 
-Active SDK: **0.6.4 / ABI 10**, mod build **0.2.13**. Read
+Active SDK: **0.6.4 / ABI 10**, installed mod build **0.2.23**.
+Read-only champion/minion/tower AI snapshot scans now use callback-borrowed SDK
+views instead of eagerly copying complete entity stats, buffs, CC and names.
+Player life/slot reads likewise avoid building a full player/champion snapshot.
+Nullifying Gas checks match-local source registrations first; absent Weezing or
+a copied Weezing passive, there is no entity scan. With sources, the original
+live range/team/alive/exemption rules remain. No update cadence, combat, visuals,
+or statistics were disabled. 122 tests pass in debug and release; JSON/build
+checks pass and installed/package DLL hashes match. Live speed is not measured.
+See the 0.2.23 section in `docs/sdk-0.6.4-findings.md` for evidence and scope.
+
+Previous build **0.2.22**: Background
+performance work combines immediate initialize/lock operations at 550 combat
+and status call sites using `SimOnceLock::lock_or_init`, keeping match keys,
+shards, cleanup and synchronization intact. AI snapshots now reuse their known
+player instead of rescanning the roster, with fresh entity facts each callback.
+118 tests pass in debug and release; JSON validation and deployment hashes pass.
+An isolated optimized lock benchmark shows about 26-37% less elapsed time, NOT
+an established end-to-end speedup. The next game run must measure advancing.
+Prefer the combined state accessor for new immediate-use state operations.
+See the 0.2.22 section in `docs/sdk-0.6.4-findings.md` for scope and evidence.
+
+Previous build 0.2.21: User reports the
+0.2.20 range correction appears to fix the tower huddle; continue live testing.
+0.2.21 preserves Smeargle's learned moves/cooldowns across new respawn entity
+handles and adds cautious contact-seeking while slots remain unfilled, including
+after the fallback basic is learned. World traces now identify learned slots.
+It also compiles fine-grained state-access profiling out by default (opt-in Cargo
+feature `profile-state-access`), lazily formats AI/passive panic details, shares
+field-visual upkeep once per tick, avoids unchanged identity metadata rewrites,
+and speeds native-ID comparisons. Combat tick rates remain unchanged. Broader
+callback timing remains enabled with less frequent reports. 115 tests pass;
+release/JSON checks pass and installed/package DLL hashes match. Live speed and
+Smeargle learning/cast acceptance remain pending. Read the latest section in
+`docs/sdk-0.6.4-findings.md` before extending performance work.
+
+Prior tower investigation: looping lineups
+captured so far all have enemy Smeargle. A definite range-metadata defect made
+all four Sketch slots advertise 900000 range even unlearned. The fix exposes
+only each slot's learned range through neutral entity-owned metadata, keeping
+unlearned slots at 42000. This is a strong loop candidate, not live-confirmed.
+Sampled full-health recalls originate in engine decisions and pass unchanged;
+repeated watched segments reproduced the same player snapshots. Do not claim
+playback alone causes the loop or that the loop is fixed before testing.
+The 0.2.20 regression suite passed 113 tests (three intentionally ignored).
+Earlier hot-path optimizations and separate
+foreground/background diagnostic budgets remain. No blanket recall suppression
+was added. Read
 `docs/stable-sdk-migration.md` and `docs/sdk-0.6.4-findings.md` before using
 older capability notes below. Native damage now enters the engine statistics
 pipeline. Native VFX/SFX, standalone `.view_effects`, item inventory reads,
@@ -13,6 +60,16 @@ Native VFX routing and post-draft assignment are now implemented. All 291 staged
 assets (84 of 103 champions) have bindings; visual placement/timing still needs
 in-game testing. Staged projectile damage/statuses now resolve on native impacts;
 ground lobs queue at travel time and Bonemerang has outgoing/returning legs.
+Build 0.2.14 corrects persistent field lifetime/refresh paths. World fields now
+renew on full animation cycles with a two-tick handoff overlap, not arbitrary
+30-tick cutoffs. Webs and grass survive caster death; destruction and field caps
+remain. Web AI rejects nearly identical centers but allows overlapping chains.
+Grass overlap sums its described attack-speed bonus into one refreshed buff;
+Grass damage bonuses require the owner's unexpired fields. Life Dew has actual
+healing metadata, draws on creation and lasts until consumed/expired, including
+after Goodra dies. Salt draws on creation/contact; Blessed Salt's permanent stage
+starts only when the spire ends. These are code/test fixes, not live sign-off for
+flicker, AI cast frequency, scale or the remaining salt-ring footprint mismatch.
 Build 0.2.11 follows the complete roster audit with timing and asset repairs.
 Read `docs/vfx-roster-review.md` and `docs/roster-vfx-audit.generated.md` for fixes
 and outstanding issues. Delayed/conditional event timing, marks, chits and two

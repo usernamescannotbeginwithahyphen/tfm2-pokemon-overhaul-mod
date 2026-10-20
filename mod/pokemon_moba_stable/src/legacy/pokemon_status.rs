@@ -1207,6 +1207,7 @@ struct GarganaclPermanentSaltState {
     center: EntityPos,
     outer_radius: u64,
     inner_radius: u64,
+    activates_at: usize,
     next_tick_at: usize,
     tick_interval: usize,
     damage: usize,
@@ -2111,8 +2112,7 @@ fn clear_vec_store<T>(store: &OnceLock<Mutex<Vec<T>>>) {
 }
 
 pub fn has_status_tick_rolled_back(tick: usize) -> bool {
-    let last_update = LAST_UPDATE_TICK.get_or_init(|| Mutex::new(usize::MAX));
-    let last_update = last_update.lock().expect("status update tick poisoned");
+    let last_update = LAST_UPDATE_TICK.lock_or_init(|| Mutex::new(usize::MAX)).expect("status update tick poisoned");
     *last_update != usize::MAX && tick < *last_update
 }
 
@@ -2374,8 +2374,7 @@ fn write_tracked_buff(
         return;
     }
 
-    let states = TRACKED_BUFFS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("tracked buff ledger poisoned");
+    let mut states = TRACKED_BUFFS.lock_or_init(|| Mutex::new(Vec::new())).expect("tracked buff ledger poisoned");
     if let Some(name) = &refresh_name {
         states.retain(|state| state.target_id != target_id || state.refresh_name.as_ref() != Some(name));
     }
@@ -2423,8 +2422,7 @@ pub fn add_harmful_buff(ctx: &mut GameCtx, source_id: usize, target_id: usize, b
 pub fn tracked_bonus_attack_speed_mult(ctx: &GameCtx, target_id: usize) -> usize {
     prune_tracked_buffs(ctx);
     let tick = ctx.tick();
-    let states = TRACKED_BUFFS.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("tracked buff ledger poisoned");
+    let states = TRACKED_BUFFS.lock_or_init(|| Mutex::new(Vec::new())).expect("tracked buff ledger poisoned");
     states
         .iter()
         .filter(|state| {
@@ -2440,8 +2438,7 @@ pub fn tracked_bonus_attack_speed_mult(ctx: &GameCtx, target_id: usize) -> usize
 pub fn tracked_bonus_move_speed_mult(ctx: &GameCtx, target_id: usize) -> usize {
     prune_tracked_buffs(ctx);
     let tick = ctx.tick();
-    let states = TRACKED_BUFFS.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("tracked buff ledger poisoned");
+    let states = TRACKED_BUFFS.lock_or_init(|| Mutex::new(Vec::new())).expect("tracked buff ledger poisoned");
     states
         .iter()
         .filter(|state| {
@@ -2465,8 +2462,7 @@ pub fn heart_swap_tracked_buffs(
     let mut moved_beneficial = Vec::new();
 
     {
-        let states = TRACKED_BUFFS.get_or_init(|| Mutex::new(Vec::new()));
-        let states = states.lock().expect("tracked buff ledger poisoned");
+        let states = TRACKED_BUFFS.lock_or_init(|| Mutex::new(Vec::new())).expect("tracked buff ledger poisoned");
         for state in states.iter() {
             if !state.transferable || state.expires_at <= tick {
                 continue;
@@ -2547,8 +2543,7 @@ pub fn heart_swap_custom_states(
 }
 
 fn transfer_paralysis(ctx: &mut GameCtx, from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = PARALYSIS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("paralysis state poisoned");
+    let mut states = PARALYSIS.lock_or_init(|| Mutex::new(Vec::new())).expect("paralysis state poisoned");
     let mut moved = 0usize;
     for state in states.iter_mut() {
         if state.entity_id == from_id && state.expires_at > tick {
@@ -2565,8 +2560,7 @@ fn transfer_paralysis(ctx: &mut GameCtx, from_id: usize, to_id: usize, tick: usi
 }
 
 fn transfer_burns(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = BURNS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("burn state poisoned");
+    let mut states = BURNS.lock_or_init(|| Mutex::new(Vec::new())).expect("burn state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2580,8 +2574,7 @@ fn transfer_burns(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_poisons(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = POISONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("poison state poisoned");
+    let mut states = POISONS.lock_or_init(|| Mutex::new(Vec::new())).expect("poison state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2595,8 +2588,7 @@ fn transfer_poisons(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_miasmas(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = MIASMAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("miasma state poisoned");
+    let mut states = MIASMAS.lock_or_init(|| Mutex::new(Vec::new())).expect("miasma state poisoned");
     let mut moved = Vec::new();
     states.retain(|state| {
         if state.expires_at <= tick {
@@ -2631,8 +2623,7 @@ fn transfer_miasmas(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_bleeds(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = BLEEDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("bleed state poisoned");
+    let mut states = BLEEDS.lock_or_init(|| Mutex::new(Vec::new())).expect("bleed state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2646,8 +2637,7 @@ fn transfer_bleeds(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_infestations(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = INFESTATIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("infestation state poisoned");
+    let mut states = INFESTATIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("infestation state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2661,8 +2651,7 @@ fn transfer_infestations(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_frozen(ctx: &mut GameCtx, from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = FROZENS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("frozen state poisoned");
+    let mut states = FROZENS.lock_or_init(|| Mutex::new(Vec::new())).expect("frozen state poisoned");
     let mut max_remaining = 0usize;
     let mut moved = 0usize;
     for state in states.iter_mut() {
@@ -2696,8 +2685,7 @@ fn transfer_frozen(ctx: &mut GameCtx, from_id: usize, to_id: usize, tick: usize)
 }
 
 fn transfer_confusions(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = CONFUSIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("confusion state poisoned");
+    let mut states = CONFUSIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("confusion state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.entity_id == from_id && state.expires_at > tick {
@@ -2719,8 +2707,7 @@ fn transfer_entity_timed_states<T>(
 where
     T: EntityTimedState,
 {
-    let states = store.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("entity timed state poisoned");
+    let mut states = store.lock_or_init(|| Mutex::new(Vec::new())).expect("entity timed state poisoned");
     let mut moved = 0usize;
     for state in states.iter_mut() {
         if state.entity_id() == from_id && state.expires_at() > tick {
@@ -2762,8 +2749,7 @@ impl EntityTimedState for SoakState {
 }
 
 fn transfer_anti_heals(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = ANTI_HEALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("anti-heal state poisoned");
+    let mut states = ANTI_HEALS.lock_or_init(|| Mutex::new(Vec::new())).expect("anti-heal state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2777,8 +2763,7 @@ fn transfer_anti_heals(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_leech_seeds(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = LEECH_SEEDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("leech seed state poisoned");
+    let mut states = LEECH_SEEDS.lock_or_init(|| Mutex::new(Vec::new())).expect("leech seed state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2792,8 +2777,7 @@ fn transfer_leech_seeds(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_octillery_lock_ons(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = OCTILLERY_LOCK_ONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("octillery lock-on state poisoned");
+    let mut states = OCTILLERY_LOCK_ONS.lock_or_init(|| Mutex::new(Vec::new())).expect("octillery lock-on state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2807,8 +2791,7 @@ fn transfer_octillery_lock_ons(from_id: usize, to_id: usize, tick: usize) -> usi
 }
 
 fn transfer_nasty_plots(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = NASTY_PLOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("nasty plot state poisoned");
+    let mut states = NASTY_PLOTS.lock_or_init(|| Mutex::new(Vec::new())).expect("nasty plot state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.resolves_at > tick {
@@ -2822,8 +2805,7 @@ fn transfer_nasty_plots(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_reversals(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = REVERSALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("reversal state poisoned");
+    let mut states = REVERSALS.lock_or_init(|| Mutex::new(Vec::new())).expect("reversal state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.entity_id == from_id && state.expires_at > tick {
@@ -2837,8 +2819,7 @@ fn transfer_reversals(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_endures(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = ENDURES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("endure state poisoned");
+    let mut states = ENDURES.lock_or_init(|| Mutex::new(Vec::new())).expect("endure state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2852,8 +2833,7 @@ fn transfer_endures(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_audino_protects(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = AUDINO_PROTECTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("audino protect state poisoned");
+    let mut states = AUDINO_PROTECTS.lock_or_init(|| Mutex::new(Vec::new())).expect("audino protect state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2867,8 +2847,7 @@ fn transfer_audino_protects(from_id: usize, to_id: usize, tick: usize) -> usize 
 }
 
 fn transfer_soft_untargetables(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = SOFT_UNTARGETABLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("soft untargetable state poisoned");
+    let mut states = SOFT_UNTARGETABLES.lock_or_init(|| Mutex::new(Vec::new())).expect("soft untargetable state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.entity_id == from_id && state.expires_at > tick {
@@ -2882,8 +2861,7 @@ fn transfer_soft_untargetables(from_id: usize, to_id: usize, tick: usize) -> usi
 }
 
 fn transfer_hawlucha_counters(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = HAWLUCHA_COUNTERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("hawlucha counter state poisoned");
+    let mut states = HAWLUCHA_COUNTERS.lock_or_init(|| Mutex::new(Vec::new())).expect("hawlucha counter state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.entity_id == from_id && state.expires_at > tick {
@@ -2897,8 +2875,7 @@ fn transfer_hawlucha_counters(from_id: usize, to_id: usize, tick: usize) -> usiz
 }
 
 fn transfer_detect_guards(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = DETECT_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("detect guard state poisoned");
+    let mut states = DETECT_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("detect guard state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.entity_id == from_id && state.expires_at > tick {
@@ -2912,8 +2889,7 @@ fn transfer_detect_guards(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_charm_heals(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = CHARM_HEALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("charm heal state poisoned");
+    let mut states = CHARM_HEALS.lock_or_init(|| Mutex::new(Vec::new())).expect("charm heal state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.target_id == from_id && state.expires_at > tick {
@@ -2927,8 +2903,7 @@ fn transfer_charm_heals(from_id: usize, to_id: usize, tick: usize) -> usize {
 }
 
 fn transfer_gallade_predictions(from_id: usize, to_id: usize, tick: usize) -> usize {
-    let states = GALLADE_PREDICTIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("gallade prediction state poisoned");
+    let mut states = GALLADE_PREDICTIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("gallade prediction state poisoned");
     rekey_target_states(
         states.iter_mut().filter_map(|state| {
             if state.gallade_id == from_id && state.expires_at > tick {
@@ -2965,8 +2940,7 @@ fn remove_transferred_entries(
     }
 
     let tick = ctx.tick();
-    let states = TRACKED_BUFFS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("tracked buff ledger poisoned");
+    let mut states = TRACKED_BUFFS.lock_or_init(|| Mutex::new(Vec::new())).expect("tracked buff ledger poisoned");
     states.retain(|state| {
         if state.expires_at <= tick {
             return false;
@@ -2994,8 +2968,7 @@ fn tracked_buff_matches(left: &TrackedBuffState, right: &TrackedBuffState) -> bo
 
 fn prune_tracked_buffs(ctx: &GameCtx) {
     let tick = ctx.tick();
-    let states = TRACKED_BUFFS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("tracked buff ledger poisoned");
+    let mut states = TRACKED_BUFFS.lock_or_init(|| Mutex::new(Vec::new())).expect("tracked buff ledger poisoned");
     states.retain(|state| {
         state.expires_at > tick
             && ctx
@@ -3079,8 +3052,7 @@ fn has_transferable_numeric_effect(buff: &BuffState) -> bool {
 }
 
 pub fn register_entity_types(entity_id: usize, types: TypeSet) {
-    let states = ENTITY_TYPES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("entity type state poisoned");
+    let mut states = ENTITY_TYPES.lock_or_init(|| Mutex::new(Vec::new())).expect("entity type state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.types = types;
         return;
@@ -3090,12 +3062,12 @@ pub fn register_entity_types(entity_id: usize, types: TypeSet) {
 
 pub fn register_entity_champion(ctx: &GameCtx, entity_id: usize, champion_id: &'static str) {
     let ctx_id = combat_ctx_id(ctx);
-    let states = ENTITY_CHAMPIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("entity champion state poisoned");
+    let mut states = ENTITY_CHAMPIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("entity champion state poisoned");
     if let Some(existing) = states
         .iter_mut()
         .find(|state| state.ctx_id == ctx_id && state.entity_id == entity_id)
     {
+        if existing.champion_id == champion_id { return; }
         existing.champion_id = champion_id;
         drop(states);
         refresh_pokemon_combat_stat_champion(ctx, entity_id, champion_id);
@@ -3151,8 +3123,7 @@ fn refresh_entity_owner_champion(ctx: &GameCtx, entity_id: usize, champion_id: &
 
 pub fn champion_id_for_entity(entity_id: usize) -> Option<&'static str> {
     ENTITY_CHAMPIONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("entity champion state poisoned")
         .iter()
         .rev()
@@ -3163,8 +3134,7 @@ pub fn champion_id_for_entity(entity_id: usize) -> Option<&'static str> {
 fn champion_id_for_entity_in_ctx(ctx: &GameCtx, entity_id: usize) -> Option<&'static str> {
     let ctx_id = combat_ctx_id(ctx);
     ENTITY_CHAMPIONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("entity champion state poisoned")
         .iter()
         .rev()
@@ -3184,8 +3154,7 @@ pub fn is_shedinja_entity(entity_id: usize) -> bool {
 }
 
 pub fn register_wonder_guard(entity_id: usize) {
-    let states = WONDER_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("wonder guard state poisoned");
+    let mut states = WONDER_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("wonder guard state poisoned");
     if states.iter().any(|state| state.shedinja_id == entity_id) {
         return;
     }
@@ -3200,8 +3169,7 @@ pub fn register_wonder_guard(entity_id: usize) {
 pub fn update_wonder_guard(ctx: &mut GameCtx, entity_id: usize) {
     register_wonder_guard(entity_id);
     let tick = ctx.tick();
-    let states = WONDER_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("wonder guard state poisoned");
+    let mut states = WONDER_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("wonder guard state poisoned");
     let Some(state) = states
         .iter_mut()
         .find(|state| state.shedinja_id == entity_id)
@@ -3276,8 +3244,7 @@ pub fn grudge_kill_count(ctx: &GameCtx, shedinja_id: usize, target_id: usize) ->
     let shedinja_player_id = shedinja_kill_player_key(ctx, shedinja_id);
     let killer_player_id = shedinja_kill_player_key(ctx, target_id);
     SHEDINJA_KILLS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("shedinja kill state poisoned")
         .iter()
         .find(|state| {
@@ -3308,8 +3275,7 @@ pub fn try_wonder_guard_damage(
     register_wonder_guard(target_id);
 
     let tick = ctx.tick();
-    let states = WONDER_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("wonder guard state poisoned");
+    let mut states = WONDER_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("wonder guard state poisoned");
     let Some(state) = states
         .iter_mut()
         .find(|state| state.shedinja_id == target_id)
@@ -3375,8 +3341,7 @@ pub fn try_wonder_guard_dot_tick(
         crate::legacy::neutral_objectives::defender_types_for_target(ctx, target_id);
     if is_shedinja_entity(target_id) && move_type != PokemonType::Fire {
         let tick = ctx.tick();
-        let states = WONDER_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-        let states = states.lock().expect("wonder guard state poisoned");
+        let states = WONDER_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("wonder guard state poisoned");
         if states
             .iter()
             .find(|state| state.shedinja_id == target_id)
@@ -3400,8 +3365,7 @@ fn note_shedinja_killed_by(ctx: &GameCtx, shedinja_id: usize, killer_id: usize) 
     let ctx_id = combat_ctx_id(ctx);
     let shedinja_player_id = shedinja_kill_player_key(ctx, shedinja_id);
     let killer_player_id = shedinja_kill_player_key(ctx, killer_id);
-    let states = SHEDINJA_KILLS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("shedinja kill state poisoned");
+    let mut states = SHEDINJA_KILLS.lock_or_init(|| Mutex::new(Vec::new())).expect("shedinja kill state poisoned");
     if let Some(state) = states.iter_mut().find(|state| {
         shedinja_kill_state_matches(
             state,
@@ -3428,8 +3392,7 @@ fn note_shedinja_killed_by(ctx: &GameCtx, shedinja_id: usize, killer_id: usize) 
 }
 
 pub fn register_receiver(entity_id: usize) {
-    let states = RECEIVERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("receiver state poisoned");
+    let mut states = RECEIVERS.lock_or_init(|| Mutex::new(Vec::new())).expect("receiver state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.copied_champion_id = None;
         return;
@@ -3441,8 +3404,7 @@ pub fn register_receiver(entity_id: usize) {
 }
 
 pub fn register_honey_gatherer(ctx: &GameCtx, entity_id: usize) {
-    let states = HONEY_GATHERERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("honey gatherer state poisoned");
+    let mut states = HONEY_GATHERERS.lock_or_init(|| Mutex::new(Vec::new())).expect("honey gatherer state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.stacks = 0;
         existing.next_stack_at = ctx.tick().saturating_add(HONEY_GATHER_INTERVAL_TICKS);
@@ -3465,8 +3427,7 @@ pub fn update_honey_gatherer(ctx: &GameCtx, entity_id: usize) {
     drop(entity);
 
     let tick = ctx.tick();
-    let states = HONEY_GATHERERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("honey gatherer state poisoned");
+    let mut states = HONEY_GATHERERS.lock_or_init(|| Mutex::new(Vec::new())).expect("honey gatherer state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         states.push(HoneyGathererState {
             entity_id,
@@ -3484,8 +3445,7 @@ pub fn update_honey_gatherer(ctx: &GameCtx, entity_id: usize) {
 }
 
 pub fn consume_honey_stacks(entity_id: usize) -> usize {
-    let states = HONEY_GATHERERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("honey gatherer state poisoned");
+    let mut states = HONEY_GATHERERS.lock_or_init(|| Mutex::new(Vec::new())).expect("honey gatherer state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return 0;
     };
@@ -3504,8 +3464,7 @@ pub fn update_starmie_illuminate_passive(ctx: &GameCtx, entity_id: usize) {
     drop(entity);
 
     let tick = ctx.tick();
-    let states = STARMIE_ILLUMINATES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("starmie illuminate state poisoned");
+    let mut states = STARMIE_ILLUMINATES.lock_or_init(|| Mutex::new(Vec::new())).expect("starmie illuminate state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         states.push(StarmieIlluminateState {
             entity_id,
@@ -3531,8 +3490,7 @@ pub fn note_starmie_damage_hit(ctx: &GameCtx, attacker_id: usize, target_id: usi
         return;
     }
 
-    let charges = STARMIE_ILLUMINATES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut charges = charges.lock().expect("starmie illuminate state poisoned");
+    let mut charges = STARMIE_ILLUMINATES.lock_or_init(|| Mutex::new(Vec::new())).expect("starmie illuminate state poisoned");
     let Some(charge_state) = charges
         .iter_mut()
         .find(|state| state.entity_id == attacker_id)
@@ -3546,9 +3504,7 @@ pub fn note_starmie_damage_hit(ctx: &GameCtx, attacker_id: usize, target_id: usi
     drop(charges);
 
     let tick = ctx.tick();
-    let marks = STARMIE_ILLUMINATE_MARKS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut marks = marks
-        .lock()
+    let mut marks = STARMIE_ILLUMINATE_MARKS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("starmie illuminate mark state poisoned");
     if let Some(existing) = marks
         .iter_mut()
@@ -3567,8 +3523,7 @@ pub fn note_starmie_damage_hit(ctx: &GameCtx, attacker_id: usize, target_id: usi
 pub fn is_illuminated_by(ctx: &GameCtx, caster_id: usize, target_id: usize) -> bool {
     let tick = ctx.tick();
     STARMIE_ILLUMINATE_MARKS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("starmie illuminate mark state poisoned")
         .iter()
         .any(|state| {
@@ -3584,8 +3539,7 @@ pub fn schedule_force_away_from_pos(
     speed: u64,
     ticks: u64,
 ) {
-    let states = SCHEDULED_FORCE_AWAYS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("scheduled force-away state poisoned");
+    let mut states = SCHEDULED_FORCE_AWAYS.lock_or_init(|| Mutex::new(Vec::new())).expect("scheduled force-away state poisoned");
     states.retain(|state| state.entity_id != entity_id);
     states.push(ScheduledForceAwayState {
         entity_id,
@@ -3598,8 +3552,7 @@ pub fn schedule_force_away_from_pos(
 
 pub fn receiver_copied_champion_id(entity_id: usize) -> Option<&'static str> {
     RECEIVERS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("receiver state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -3631,8 +3584,7 @@ pub fn kingdra_focus_crit_bonus(ctx: &GameCtx, caster_id: usize, target_id: usiz
         return 0;
     }
     let tick = ctx.tick();
-    let states = KINGDRA_FOCUSES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kingdra focus state poisoned");
+    let mut states = KINGDRA_FOCUSES.lock_or_init(|| Mutex::new(Vec::new())).expect("kingdra focus state poisoned");
     states.retain(|state| state.expires_at > tick);
     states
         .iter()
@@ -3701,8 +3653,7 @@ fn kingdra_attack_speed_bonus_for_level(level: usize) -> i32 {
 
 pub fn note_kingdra_ability_used(ctx: &GameCtx, entity_id: usize) {
     let tick = ctx.tick();
-    let states = KINGDRA_DRAGON_DANCES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kingdra dragon dance state poisoned");
+    let mut states = KINGDRA_DRAGON_DANCES.lock_or_init(|| Mutex::new(Vec::new())).expect("kingdra dragon dance state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.boosted_until = tick.saturating_add(KINGDRA_DRAGON_DANCE_BOOST_TICKS);
     } else {
@@ -3717,8 +3668,7 @@ pub fn note_kingdra_ability_used(ctx: &GameCtx, entity_id: usize) {
 
 pub fn prime_kingdra_dragon_dance_basic(ctx: &GameCtx, entity_id: usize, ticks: usize) {
     let tick = ctx.tick();
-    let states = KINGDRA_DRAGON_DANCES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kingdra dragon dance state poisoned");
+    let mut states = KINGDRA_DRAGON_DANCES.lock_or_init(|| Mutex::new(Vec::new())).expect("kingdra dragon dance state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.primed_until = tick.saturating_add(ticks);
     } else {
@@ -3733,8 +3683,7 @@ pub fn prime_kingdra_dragon_dance_basic(ctx: &GameCtx, entity_id: usize, ticks: 
 
 pub fn note_kingdra_dragon_pulse_cast(ctx: &GameCtx, entity_id: usize, cooldown_ticks: usize) {
     let tick = ctx.tick();
-    let states = KINGDRA_DRAGON_DANCES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kingdra dragon dance state poisoned");
+    let mut states = KINGDRA_DRAGON_DANCES.lock_or_init(|| Mutex::new(Vec::new())).expect("kingdra dragon dance state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.dragon_pulse_cooldown_until = tick.saturating_add(cooldown_ticks);
     } else {
@@ -3764,8 +3713,7 @@ pub fn kingdra_kings_rock_bonus_percent(ctx: &GameCtx, entity_id: usize) -> usiz
     };
     let tick = ctx.tick();
     let dragon_pulse_ready = KINGDRA_DRAGON_DANCES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("kingdra dragon dance state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -3785,8 +3733,7 @@ pub fn kingdra_kings_rock_bonus_percent(ctx: &GameCtx, entity_id: usize) -> usiz
 
 pub fn consume_kingdra_dragon_dance_basic(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
-    let states = KINGDRA_DRAGON_DANCES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kingdra dragon dance state poisoned");
+    let mut states = KINGDRA_DRAGON_DANCES.lock_or_init(|| Mutex::new(Vec::new())).expect("kingdra dragon dance state poisoned");
     let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return false;
     };
@@ -3809,8 +3756,7 @@ pub fn update_kingdra_dragon_dance_passive(ctx: &mut GameCtx, entity_id: usize) 
 
     let tick = ctx.tick();
     let boosted = KINGDRA_DRAGON_DANCES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("kingdra dragon dance state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -3844,8 +3790,7 @@ pub fn register_delibird_present(ctx: &GameCtx, entity_id: usize) {
     let tick = ctx.tick();
     drop(entity);
 
-    let states = DELIBIRD_PRESENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("delibird present state poisoned");
+    let mut states = DELIBIRD_PRESENTS.lock_or_init(|| Mutex::new(Vec::new())).expect("delibird present state poisoned");
     if states.iter().any(|state| state.entity_id == entity_id) {
         return;
     }
@@ -3871,8 +3816,7 @@ pub fn update_delibird_hustle(ctx: &GameCtx, entity_id: usize) {
     let tick = ctx.tick();
     drop(entity);
 
-    let states = DELIBIRD_PRESENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("delibird present state poisoned");
+    let mut states = DELIBIRD_PRESENTS.lock_or_init(|| Mutex::new(Vec::new())).expect("delibird present state poisoned");
     states.retain(|state| {
         ctx.get_entity(state.entity_id)
             .map(|entity| entity.is_alive())
@@ -3910,8 +3854,7 @@ pub fn delibird_hustle_crit_bonus(ctx: &GameCtx, entity_id: usize) -> usize {
     }
     let tick = ctx.tick();
     DELIBIRD_PRESENTS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("delibird present state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -3982,8 +3925,7 @@ pub fn note_delibird_present_basic(ctx: &GameCtx, entity_id: usize) {
     if champion_id != "pokemon_moba_delibird" {
         return;
     }
-    let states = DELIBIRD_PRESENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("delibird present state poisoned");
+    let mut states = DELIBIRD_PRESENTS.lock_or_init(|| Mutex::new(Vec::new())).expect("delibird present state poisoned");
     let Some(entity) = ctx.get_entity(entity_id) else {
         return;
     };
@@ -4009,8 +3951,7 @@ pub fn delibird_present_heal_ready_for_player(
         return false;
     };
     DELIBIRD_PRESENTS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("delibird present state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -4029,8 +3970,7 @@ pub fn consume_delibird_present_heal_charge(
     if champion_id != "pokemon_moba_delibird" {
         return false;
     }
-    let states = DELIBIRD_PRESENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("delibird present state poisoned");
+    let mut states = DELIBIRD_PRESENTS.lock_or_init(|| Mutex::new(Vec::new())).expect("delibird present state poisoned");
     let Some(entity) = ctx.get_entity(entity_id) else {
         return false;
     };
@@ -4074,8 +4014,7 @@ pub fn copy_receiver_passive(ctx: &mut GameCtx, receiver_id: usize, killed_entit
         return;
     }
 
-    let states = RECEIVERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("receiver state poisoned");
+    let mut states = RECEIVERS.lock_or_init(|| Mutex::new(Vec::new())).expect("receiver state poisoned");
     let Some(state) = states
         .iter_mut()
         .find(|state| state.entity_id == receiver_id)
@@ -4119,8 +4058,7 @@ pub fn begin_reversal(
     retaliation_damage: usize,
 ) {
     let tick = ctx.tick();
-    let states = REVERSALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("reversal state poisoned");
+    let mut states = REVERSALS.lock_or_init(|| Mutex::new(Vec::new())).expect("reversal state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.expires_at = tick.saturating_add(duration_ticks);
         existing.retaliation_damage = retaliation_damage;
@@ -4138,8 +4076,7 @@ pub fn try_consume_reversal(ctx: &GameCtx, entity_id: usize, attacker_id: usize)
         return None;
     }
     let tick = ctx.tick();
-    let states = REVERSALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("reversal state poisoned");
+    let mut states = REVERSALS.lock_or_init(|| Mutex::new(Vec::new())).expect("reversal state poisoned");
     let mut consumed_damage = None;
     states.retain(|state| {
         if state.expires_at <= tick {
@@ -4155,24 +4092,21 @@ pub fn try_consume_reversal(ctx: &GameCtx, entity_id: usize, attacker_id: usize)
 }
 
 pub fn register_shell_armor(entity_id: usize) {
-    let states = SHELL_ARMORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("shell armor state poisoned");
+    let mut states = SHELL_ARMORS.lock_or_init(|| Mutex::new(Vec::new())).expect("shell armor state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
 }
 
 pub fn register_scrappy(entity_id: usize) {
-    let states = SCRAPPYS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("scrappy state poisoned");
+    let mut states = SCRAPPYS.lock_or_init(|| Mutex::new(Vec::new())).expect("scrappy state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
 }
 
 pub fn register_sturdy(entity_id: usize) {
-    let states = STURDIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sturdy state poisoned");
+    let mut states = STURDIES.lock_or_init(|| Mutex::new(Vec::new())).expect("sturdy state poisoned");
     if !states.iter().any(|state| state.entity_id == entity_id) {
         states.push(SturdyState {
             entity_id,
@@ -4182,8 +4116,7 @@ pub fn register_sturdy(entity_id: usize) {
 }
 
 pub fn register_justified(entity_id: usize) {
-    let states = JUSTIFIED_ENTITIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("justified state poisoned");
+    let mut states = JUSTIFIED_ENTITIES.lock_or_init(|| Mutex::new(Vec::new())).expect("justified state poisoned");
     if !states.iter().any(|state| state.entity_id == entity_id) {
         states.push(JustifiedState { entity_id });
     }
@@ -4197,8 +4130,7 @@ pub fn apply_gallade_prediction(
     ticks: usize,
 ) {
     let expires_at = ctx.tick().saturating_add(ticks);
-    let states = GALLADE_PREDICTIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("gallade prediction state poisoned");
+    let mut states = GALLADE_PREDICTIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("gallade prediction state poisoned");
     states.retain(|state| {
         state.expires_at > ctx.tick()
             && !(state.gallade_id == gallade_id && state.enemy_id == enemy_id)
@@ -4217,8 +4149,7 @@ pub fn gallade_prediction_reduce_percent(
     attacker_id: usize,
 ) -> usize {
     let tick = ctx.tick();
-    let states = GALLADE_PREDICTIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("gallade prediction state poisoned");
+    let mut states = GALLADE_PREDICTIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("gallade prediction state poisoned");
     states.retain(|state| state.expires_at > tick);
     states
         .iter()
@@ -4237,8 +4168,7 @@ pub fn trigger_justified_if_dark_damage(
         return;
     }
     let has_justified = JUSTIFIED_ENTITIES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("justified state poisoned")
         .iter()
         .any(|state| {
@@ -4260,8 +4190,7 @@ pub fn trigger_justified_if_dark_damage(
 }
 
 pub fn register_audino(ctx: &GameCtx, audino_id: usize) {
-    let states = AUDINO_REGENERATORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("audino regenerator state poisoned");
+    let mut states = AUDINO_REGENERATORS.lock_or_init(|| Mutex::new(Vec::new())).expect("audino regenerator state poisoned");
     if !states.iter().any(|state| state.audino_id == audino_id) {
         states.push(AudinoRegeneratorState {
             audino_id,
@@ -4272,17 +4201,15 @@ pub fn register_audino(ctx: &GameCtx, audino_id: usize) {
 }
 
 pub fn note_audino_damaged(ctx: &GameCtx, audino_id: usize) {
-    let states = AUDINO_REGENERATORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("audino regenerator state poisoned");
+    let mut states = AUDINO_REGENERATORS.lock_or_init(|| Mutex::new(Vec::new())).expect("audino regenerator state poisoned");
     if let Some(state) = states.iter_mut().find(|state| state.audino_id == audino_id) {
         state.last_damaged_tick = ctx.tick();
         state.next_heal_tick = ctx.tick().saturating_add(2 * 60);
     }
 }
 
-pub fn register_smeargle(_ctx: &GameCtx, entity_id: usize) {
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("smeargle state poisoned");
+pub fn register_smeargle(ctx: &GameCtx, entity_id: usize) {
+    let mut states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     if !states.iter().any(|state| state.entity_id == entity_id) {
         states.push(SmeargleState {
             entity_id,
@@ -4291,6 +4218,16 @@ pub fn register_smeargle(_ctx: &GameCtx, entity_id: usize) {
             ready_at: [0, 0, 0, 0],
         });
     }
+    drop(states);
+    smeargle_sync_ranges(ctx, entity_id);
+}
+
+pub fn smeargle_sync_ranges(ctx: &GameCtx, entity_id: usize) {
+    let ranges = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new()))
+        .expect("smeargle state poisoned").iter().find(|state| state.entity_id == entity_id)
+        .map(|state| state.learned.map(|copied| copied.map(|copied| (copied.action.range, copied.action.growth_range))))
+        .unwrap_or([None; 4]);
+    ctx.sync_sketch_ranges(entity_id, ranges);
 }
 
 pub fn note_smeargle_affected(
@@ -4304,8 +4241,7 @@ pub fn note_smeargle_affected(
         return;
     }
 
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("smeargle state poisoned");
+    let mut states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == target_id) else {
         return;
     };
@@ -4337,8 +4273,7 @@ pub fn smeargle_learned_action(
     slot: ActionSlot,
 ) -> Option<SmeargleCopiedMove> {
     let tick = ctx.tick();
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("smeargle state poisoned");
+    let mut states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     let state = states
         .iter_mut()
         .find(|state| state.entity_id == entity_id)?;
@@ -4353,8 +4288,7 @@ pub fn smeargle_learned_action(
 }
 
 pub fn smeargle_slot_is_active_sketch(_ctx: &GameCtx, entity_id: usize, slot: ActionSlot) -> bool {
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("smeargle state poisoned");
+    let states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     let Some(state) = states.iter().find(|state| state.entity_id == entity_id) else {
         return matches!(slot, ActionSlot::Attack);
     };
@@ -4369,8 +4303,7 @@ pub fn smeargle_slot_is_active_sketch_for_player(
     let Some(entity_id) = entity_for_player(player_id) else {
         return false;
     };
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("smeargle state poisoned");
+    let states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     let Some(state) = states.iter().find(|state| state.entity_id == entity_id) else {
         return matches!(slot, ActionSlot::Attack);
     };
@@ -4385,8 +4318,7 @@ pub fn smeargle_has_valid_candidate_for_active_slot_for_player(
     let Some(entity_id) = entity_for_player(player_id) else {
         return false;
     };
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("smeargle state poisoned");
+    let states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     let Some(state) = states.iter().find(|state| state.entity_id == entity_id) else {
         return false;
     };
@@ -4408,8 +4340,7 @@ pub fn smeargle_active_sketch_slot_with_valid_candidate_for_player(
     tick: usize,
 ) -> Option<ActionSlot> {
     let entity_id = entity_for_player(player_id)?;
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("smeargle state poisoned");
+    let states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     let state = states.iter().find(|state| state.entity_id == entity_id)?;
     let open_slot = smeargle_next_open_slot(state)?;
     let candidate = state.last_candidate?;
@@ -4475,6 +4406,7 @@ pub fn smeargle_learned_count_for_player(player_id: usize) -> usize {
 }
 
 pub fn smeargle_force_learn_for_player(
+    ctx: &GameCtx,
     player_id: usize,
     source_champion: PokemonChampion,
     action: PokemonMove,
@@ -4485,8 +4417,7 @@ pub fn smeargle_force_learn_for_player(
     let Some(entity_id) = entity_for_player(player_id) else {
         return false;
     };
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("smeargle state poisoned");
+    let mut states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return false;
     };
@@ -4502,13 +4433,14 @@ pub fn smeargle_force_learn_for_player(
     };
     state.learned[open_slot] = Some(copied);
     state.last_candidate = None;
+    drop(states);
+    smeargle_sync_ranges(ctx, entity_id);
     true
 }
 
 pub fn smeargle_try_sketch(ctx: &GameCtx, entity_id: usize, slot: ActionSlot) -> bool {
     let tick = ctx.tick();
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("smeargle state poisoned");
+    let mut states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return false;
     };
@@ -4527,6 +4459,8 @@ pub fn smeargle_try_sketch(ctx: &GameCtx, entity_id: usize, slot: ActionSlot) ->
     }
     state.learned[open_slot] = Some(candidate.copied);
     state.last_candidate = None;
+    drop(states);
+    smeargle_sync_ranges(ctx, entity_id);
     true
 }
 
@@ -4543,8 +4477,7 @@ pub fn smeargle_copied_slot_ready(ctx: &GameCtx, entity_id: usize, slot: ActionS
 }
 
 pub fn smeargle_start_copied_slot_cooldown(ctx: &GameCtx, entity_id: usize, slot: ActionSlot) {
-    let states = SMEARGLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("smeargle state poisoned");
+    let mut states = SMEARGLES.lock_or_init(|| Mutex::new(Vec::new())).expect("smeargle state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return;
     };
@@ -4634,8 +4567,7 @@ pub fn begin_audino_protect(ctx: &GameCtx, audino_id: usize, target_id: usize, t
         return;
     }
     let expires_at = ctx.tick().saturating_add(ticks);
-    let states = AUDINO_PROTECTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("audino protect state poisoned");
+    let mut states = AUDINO_PROTECTS.lock_or_init(|| Mutex::new(Vec::new())).expect("audino protect state poisoned");
     states.retain(|state| {
         state.expires_at > ctx.tick()
             && !(state.audino_id == audino_id && state.target_id == target_id)
@@ -4649,8 +4581,7 @@ pub fn begin_audino_protect(ctx: &GameCtx, audino_id: usize, target_id: usize, t
 
 pub fn audino_protect_redirect(ctx: &GameCtx, target_id: usize) -> Option<usize> {
     let tick = ctx.tick();
-    let states = AUDINO_PROTECTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("audino protect state poisoned");
+    let mut states = AUDINO_PROTECTS.lock_or_init(|| Mutex::new(Vec::new())).expect("audino protect state poisoned");
     states.retain(|state| state.expires_at > tick);
 
     let candidates: Vec<usize> = states
@@ -4694,8 +4625,7 @@ pub fn begin_endure(ctx: &GameCtx, target_id: usize, ticks: usize) {
         return;
     }
     let expires_at = ctx.tick().saturating_add(ticks);
-    let states = ENDURES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("endure state poisoned");
+    let mut states = ENDURES.lock_or_init(|| Mutex::new(Vec::new())).expect("endure state poisoned");
     states.retain(|state| state.expires_at > ctx.tick() && state.target_id != target_id);
     states.push(EndureState {
         target_id,
@@ -4764,8 +4694,7 @@ pub fn handle_audino_protect_damage(ctx: &mut GameCtx, target_id: usize, damage:
         return;
     }
     let tick = ctx.tick();
-    let states = AUDINO_PROTECTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("audino protect state poisoned");
+    let mut states = AUDINO_PROTECTS.lock_or_init(|| Mutex::new(Vec::new())).expect("audino protect state poisoned");
     states.retain(|state| state.expires_at > tick);
     let Some(audino_id) = states
         .iter()
@@ -4801,8 +4730,7 @@ pub fn handle_audino_protect_damage(ctx: &mut GameCtx, target_id: usize, damage:
 
 fn consume_endure(ctx: &GameCtx, target_id: usize) -> bool {
     let tick = ctx.tick();
-    let states = ENDURES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("endure state poisoned");
+    let mut states = ENDURES.lock_or_init(|| Mutex::new(Vec::new())).expect("endure state poisoned");
     let mut consumed = false;
     states.retain(|state| {
         if state.expires_at <= tick {
@@ -4850,8 +4778,7 @@ pub fn adjust_sturdy_damage(
     }
 
     let tick = ctx.tick();
-    let states = STURDIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sturdy state poisoned");
+    let mut states = STURDIES.lock_or_init(|| Mutex::new(Vec::new())).expect("sturdy state poisoned");
     let Some(state) = states
         .iter_mut()
         .find(|state| state.entity_id == target_id && state.ready_at <= tick)
@@ -4869,8 +4796,7 @@ pub fn adjust_sturdy_damage(
 }
 
 pub fn register_limber(entity_id: usize) {
-    let states = LIMBERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("limber state poisoned");
+    let mut states = LIMBERS.lock_or_init(|| Mutex::new(Vec::new())).expect("limber state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
@@ -4878,8 +4804,7 @@ pub fn register_limber(entity_id: usize) {
 
 pub fn is_limber(ctx: &GameCtx, entity_id: usize) -> bool {
     let explicit = LIMBERS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("limber state poisoned")
         .iter()
         .any(|id| {
@@ -4917,8 +4842,7 @@ fn apply_steadfast_buff(ctx: &mut GameCtx, entity_id: usize, stacks: usize) {
 }
 
 pub fn register_hitmontop(ctx: &mut GameCtx, player_id: usize, entity_id: usize) {
-    let states = HITMONTOPS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("hitmontop state poisoned");
+    let mut states = HITMONTOPS.lock_or_init(|| Mutex::new(Vec::new())).expect("hitmontop state poisoned");
     let ctx_id = combat_ctx_id(ctx);
     if let Some(existing) = states
         .iter_mut()
@@ -4941,8 +4865,7 @@ pub fn register_hitmontop(ctx: &mut GameCtx, player_id: usize, entity_id: usize)
 pub fn note_steadfast_cc(ctx: &mut GameCtx, entity_id: usize) {
     let owner_key = persistent_owner_key(ctx, entity_id);
     let is_registered_hitmontop = HITMONTOPS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("hitmontop state poisoned")
         .iter()
         .any(|state| {
@@ -4961,8 +4884,7 @@ pub fn note_steadfast_cc(ctx: &mut GameCtx, entity_id: usize) {
     }
 
     if let Some((ctx_id, player_id)) = owner_key {
-        let states = HITMONTOPS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("hitmontop state poisoned");
+        let mut states = HITMONTOPS.lock_or_init(|| Mutex::new(Vec::new())).expect("hitmontop state poisoned");
         if let Some(existing) = states
             .iter_mut()
             .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -4982,16 +4904,14 @@ pub fn note_steadfast_cc(ctx: &mut GameCtx, entity_id: usize) {
 }
 
 pub fn register_kilowattrel(entity_id: usize) {
-    let states = KILOWATTRELS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kilowattrel state poisoned");
+    let mut states = KILOWATTRELS.lock_or_init(|| Mutex::new(Vec::new())).expect("kilowattrel state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
 }
 
 pub fn register_beeheeyem(entity_id: usize) {
-    let states = BEEHEEYEMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("beeheeyem state poisoned");
+    let mut states = BEEHEEYEMS.lock_or_init(|| Mutex::new(Vec::new())).expect("beeheeyem state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
@@ -4999,8 +4919,7 @@ pub fn register_beeheeyem(entity_id: usize) {
 
 fn is_beeheeyem(ctx: &GameCtx, entity_id: usize) -> bool {
     let explicit = BEEHEEYEMS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("beeheeyem state poisoned")
         .iter()
         .any(|id| {
@@ -5015,8 +4934,7 @@ fn is_beeheeyem(ctx: &GameCtx, entity_id: usize) -> bool {
 }
 
 pub fn register_technician(entity_id: usize) {
-    let states = TECHNICIANS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("technician state poisoned");
+    let mut states = TECHNICIANS.lock_or_init(|| Mutex::new(Vec::new())).expect("technician state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
@@ -5032,8 +4950,7 @@ pub fn note_ally_buff_received(
         return;
     }
     let is_technician = TECHNICIANS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("technician state poisoned")
         .iter()
         .any(|id| {
@@ -5059,16 +4976,14 @@ pub fn note_ally_buff_received(
 }
 
 pub fn register_dot_immunity(entity_id: usize) {
-    let states = DOT_IMMUNES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("dot immunity state poisoned");
+    let mut states = DOT_IMMUNES.lock_or_init(|| Mutex::new(Vec::new())).expect("dot immunity state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
 }
 
 pub fn register_dot_absorb(entity_id: usize) {
-    let states = DOT_ABSORBERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("dot absorb state poisoned");
+    let mut states = DOT_ABSORBERS.lock_or_init(|| Mutex::new(Vec::new())).expect("dot absorb state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
@@ -5076,8 +4991,7 @@ pub fn register_dot_absorb(entity_id: usize) {
 
 fn has_dot_immunity(ctx: &GameCtx, entity_id: usize) -> bool {
     let explicit = DOT_IMMUNES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("dot immunity state poisoned")
         .iter()
         .any(|id| {
@@ -5136,8 +5050,7 @@ pub fn begin_kommoo_duel(
         caster_attack_speed_mult,
     };
 
-    let states = KOMMOO_DUELS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kommo-o duel state poisoned");
+    let mut states = KOMMOO_DUELS.lock_or_init(|| Mutex::new(Vec::new())).expect("kommo-o duel state poisoned");
     states.retain(|existing| {
         existing.caster_id != caster_id
             && existing.target_id != target_id
@@ -5243,8 +5156,7 @@ fn apply_kommoo_duel_pulse(ctx: &mut GameCtx, state: KommooDuelState) {
 }
 
 fn update_kommoo_duels(ctx: &mut GameCtx, tick: usize) {
-    let states = KOMMOO_DUELS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kommo-o duel state poisoned");
+    let mut states = KOMMOO_DUELS.lock_or_init(|| Mutex::new(Vec::new())).expect("kommo-o duel state poisoned");
     let mut pulses = Vec::new();
     states.retain_mut(|state| {
         if state.expires_at <= tick {
@@ -5292,8 +5204,7 @@ pub fn break_kommoo_duel_on_hard_cc(ctx: &GameCtx, source_id: usize, target_id: 
         return;
     }
 
-    let states = KOMMOO_DUELS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kommo-o duel state poisoned");
+    let mut states = KOMMOO_DUELS.lock_or_init(|| Mutex::new(Vec::new())).expect("kommo-o duel state poisoned");
     states.retain(|state| {
         if state.caster_id != target_id {
             return true;
@@ -5306,8 +5217,7 @@ pub fn break_kommoo_duel_on_hard_cc(ctx: &GameCtx, source_id: usize, target_id: 
 
 fn has_dot_absorb(ctx: &GameCtx, entity_id: usize) -> bool {
     let explicit = DOT_ABSORBERS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("dot absorb state poisoned")
         .iter()
         .any(|id| {
@@ -5323,8 +5233,7 @@ fn has_dot_absorb(ctx: &GameCtx, entity_id: usize) -> bool {
 
 pub fn can_volt_absorb(ctx: &GameCtx, entity_id: usize) -> bool {
     let explicit = KILOWATTRELS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("kilowattrel state poisoned")
         .iter()
         .any(|id| {
@@ -5340,24 +5249,21 @@ pub fn can_volt_absorb(ctx: &GameCtx, entity_id: usize) -> bool {
 }
 
 pub fn register_blissey(entity_id: usize) {
-    let states = BLISSEYS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("blissey state poisoned");
+    let mut states = BLISSEYS.lock_or_init(|| Mutex::new(Vec::new())).expect("blissey state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
 }
 
 pub fn register_scizor(entity_id: usize) {
-    let states = SCIZORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("scizor state poisoned");
+    let mut states = SCIZORS.lock_or_init(|| Mutex::new(Vec::new())).expect("scizor state poisoned");
     if !states.iter().any(|id| *id == entity_id) {
         states.push(entity_id);
     }
 }
 
 pub fn register_sawk_throh(entity_id: usize) {
-    let states = SAWK_THROH_FORMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sawk/throh stance state poisoned");
+    let mut states = SAWK_THROH_FORMS.lock_or_init(|| Mutex::new(Vec::new())).expect("sawk/throh stance state poisoned");
     if states.iter().any(|state| state.entity_id == entity_id) {
         return;
     }
@@ -5370,8 +5276,7 @@ pub fn register_sawk_throh(entity_id: usize) {
 
 pub fn sawk_throh_form(ctx: &GameCtx, entity_id: usize) -> SawkThrohForm {
     SAWK_THROH_FORMS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("sawk/throh stance state poisoned")
         .iter()
         .find(|state| {
@@ -5390,7 +5295,7 @@ pub fn is_sawk_form(ctx: &GameCtx, entity_id: usize) -> bool {
 }
 
 pub(crate) fn ai_is_sawk_form(entity_id: usize) -> bool {
-    SAWK_THROH_FORMS.get_or_init(|| Mutex::new(Vec::new())).lock()
+    SAWK_THROH_FORMS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("sawk/throh stance state poisoned").iter()
         .find(|state| state.entity_id == entity_id)
         .map_or(true, |state| state.form == SawkThrohForm::Sawk)
@@ -5398,8 +5303,7 @@ pub(crate) fn ai_is_sawk_form(entity_id: usize) -> bool {
 
 pub fn toggle_sawk_throh_form(ctx: &mut GameCtx, entity_id: usize) -> SawkThrohForm {
     register_sawk_throh(entity_id);
-    let states = SAWK_THROH_FORMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sawk/throh stance state poisoned");
+    let mut states = SAWK_THROH_FORMS.lock_or_init(|| Mutex::new(Vec::new())).expect("sawk/throh stance state poisoned");
     let tick = ctx.tick();
     let mut next_form = SawkThrohForm::Sawk;
 
@@ -5422,8 +5326,7 @@ pub fn should_sawk_throh_switch_for_player(player_id: usize, hp_ratio: usize) ->
         return false;
     };
     let form = SAWK_THROH_FORMS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("sawk/throh stance state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -5441,8 +5344,7 @@ pub fn adjusted_cc_ticks(ctx: &GameCtx, entity_id: usize, ticks: usize) -> usize
         return 0;
     }
     let has_inner_focus = SAWK_THROH_FORMS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("sawk/throh stance state poisoned")
         .iter()
         .any(|state| {
@@ -5495,8 +5397,7 @@ pub fn register_player_entity_life_at_tick(
 ) {
     let ctx_id = combat_ctx_id(ctx);
     let life_id = life_id.unwrap_or(0);
-    let states = PLAYER_ENTITIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("player entity state poisoned");
+    let mut states = PLAYER_ENTITIES.lock_or_init(|| Mutex::new(Vec::new())).expect("player entity state poisoned");
 
     if let Some(existing) = states.iter_mut().find(|state| {
         state.ctx_id == ctx_id
@@ -5511,6 +5412,9 @@ pub fn register_player_entity_life_at_tick(
         return;
     }
 
+    let previous_entity = states.iter().rev()
+        .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
+        .map(|state| state.entity_id).filter(|old| *old != entity_id);
     states.push(PlayerEntityState {
         ctx_id,
         player_id,
@@ -5523,6 +5427,25 @@ pub fn register_player_entity_life_at_tick(
     }
     drop(states);
 
+    if let Some(old) = previous_entity {
+        // Engine respawns allocate a new handle; Sketch memory belongs to the player.
+        if let Some(states) = SMEARGLES.get() {
+            let mut states = states.lock().expect("smeargle state poisoned");
+            if let Some(state) = states.iter_mut().find(|state| state.entity_id == old) {
+                state.entity_id = entity_id;
+            }
+        }
+        // Permanent field ownership follows the player across fresh respawn handles.
+        for field in GRASSY_TERRAINS.lock_or_init(Default::default)
+            .expect("grassy terrain state poisoned").iter_mut().filter(|s| s.caster_id == old) {
+            field.caster_id = entity_id;
+        }
+        for field in STICKY_WEBS.lock_or_init(Default::default)
+            .expect("sticky web state poisoned").iter_mut().filter(|s| s.caster_id == old) {
+            field.caster_id = entity_id;
+        }
+        crate::legacy::pokemon_content::rebind_life_dew_owner(old, entity_id);
+    }
     register_entity_owner_snapshot(ctx, player_id, entity_id, Some(life_id), tick);
     reset_pokemon_combat_stats_for_spawn(ctx, player_id, entity_id, tick);
 }
@@ -5538,9 +5461,7 @@ pub fn register_player_identity_from_ai(
         return;
     };
 
-    let identities = POKEMON_PLAYER_IDENTITIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut identities = identities
-        .lock()
+    let mut identities = POKEMON_PLAYER_IDENTITIES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon player identity state poisoned");
 
     if let Some(existing) = identities.iter_mut().find(|state| {
@@ -5577,8 +5498,7 @@ fn reliable_athlete_id(athlete_id: usize) -> Option<usize> {
 
 pub fn pokemon_player_identity_snapshots() -> Vec<PokemonPlayerIdentitySnapshot> {
     let identities = POKEMON_PLAYER_IDENTITIES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon player identity state poisoned");
 
     identities
@@ -5610,8 +5530,7 @@ fn athlete_id_for_player_identity_with_source(
     champion_id: Option<&str>,
 ) -> (Option<usize>, &'static str) {
     let identities = POKEMON_PLAYER_IDENTITIES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon player identity state poisoned");
 
     if let Some(champion_id) = champion_id {
@@ -5663,8 +5582,7 @@ fn register_entity_owner_snapshot(
     let ctx_id = combat_ctx_id(ctx);
     let champion_id = champion_id_for_entity_in_ctx(ctx, entity_id);
     let life_id = life_id.unwrap_or(0);
-    let owners = ENTITY_OWNERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut owners = owners.lock().expect("entity owner state poisoned");
+    let mut owners = ENTITY_OWNERS.lock_or_init(|| Mutex::new(Vec::new())).expect("entity owner state poisoned");
     if let Some(existing) = owners.iter_mut().find(|state| {
         state.ctx_id == ctx_id
             && state.entity_id == entity_id
@@ -5697,12 +5615,10 @@ fn reset_pokemon_combat_stats_for_spawn(
     let ctx_id = combat_ctx_id(ctx);
     let champion_id = champion_id_for_entity_in_ctx(ctx, entity_id);
     let (team, position) = ctx
-        .get_player(player_id)
-        .map(|player| (player.team(), player.position()))
+        .player_team_position(player_id)
         .unwrap_or((usize::MAX, Position::Top));
     let athlete_id = athlete_id_for_player_identity(player_id, team, position, champion_id);
-    let states = POKEMON_COMBAT_STATS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("pokemon combat stat state poisoned");
+    let mut states = POKEMON_COMBAT_STATS.lock_or_init(|| Mutex::new(Vec::new())).expect("pokemon combat stat state poisoned");
     if let Some(state) = states
         .iter_mut()
         .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -5744,8 +5660,7 @@ fn reset_pokemon_combat_stats_for_spawn(
 
 pub fn player_for_entity(entity_id: usize) -> Option<usize> {
     PLAYER_ENTITIES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("player entity state poisoned")
         .iter()
         .rev()
@@ -5776,8 +5691,7 @@ fn player_life_for_entity_at_tick_on_team(
 
     let ctx_id = combat_ctx_id(ctx);
     PLAYER_ENTITIES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("player entity state poisoned")
         .iter()
         .rev()
@@ -5820,8 +5734,7 @@ fn owner_for_entity_at_tick_in_ctx(
 
     let ctx_id = combat_ctx_id(ctx);
     ENTITY_OWNERS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("entity owner state poisoned")
         .iter()
         .rev()
@@ -5864,8 +5777,7 @@ fn owner_for_entity_at_tick_on_team(
 
     let ctx_id = combat_ctx_id(ctx);
     ENTITY_OWNERS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("entity owner state poisoned")
         .iter()
         .rev()
@@ -5884,8 +5796,7 @@ fn owner_for_entity_at_tick_on_team(
 
 pub fn entity_for_player(player_id: usize) -> Option<usize> {
     PLAYER_ENTITIES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("player entity state poisoned")
         .iter()
         .rev()
@@ -5903,8 +5814,7 @@ pub fn entity_for_player_in_ctx(ctx: &GameCtx, player_id: usize) -> Option<usize
 
     let ctx_id = combat_ctx_id(ctx);
     PLAYER_ENTITIES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("player entity state poisoned")
         .iter()
         .rev()
@@ -5914,8 +5824,7 @@ pub fn entity_for_player_in_ctx(ctx: &GameCtx, player_id: usize) -> Option<usize
 
 pub fn note_player_return_input(player_id: usize, tick: usize) {
     let entity_id = entity_for_player(player_id);
-    let states = PLAYER_RETURN_INTENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("player return intent state poisoned");
+    let mut states = PLAYER_RETURN_INTENTS.lock_or_init(|| Mutex::new(Vec::new())).expect("player return intent state poisoned");
     states.retain(|state| tick.saturating_sub(state.tick) <= ATTACH_RETURN_DETACH_WINDOW_TICKS);
     if let Some(existing) = states.iter_mut().find(|state| state.player_id == player_id) {
         existing.entity_id = entity_id;
@@ -5932,8 +5841,7 @@ pub fn note_player_return_input(player_id: usize, tick: usize) {
 pub(crate) fn entity_recently_chose_return(entity_id: usize, tick: usize) -> bool {
     let player_id = player_for_entity(entity_id);
     PLAYER_RETURN_INTENTS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("player return intent state poisoned")
         .iter()
         .any(|state| {
@@ -5962,8 +5870,7 @@ pub fn update_gholdengo_gold_passive(ctx: &GameCtx, entity_id: usize) {
     let tick = ctx.tick();
     let visible_cs = player.cs();
     let position = player.position();
-    let states = GHOLDENGO_GOLD.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("gholdengo gold state poisoned");
+    let mut states = GHOLDENGO_GOLD.lock_or_init(|| Mutex::new(Vec::new())).expect("gholdengo gold state poisoned");
     states.retain(|state| {
         state.ctx_id == ctx_id || tick.saturating_sub(state.last_seen_tick) <= 30 * 60 * 60
     });
@@ -6084,9 +5991,7 @@ pub fn has_shell_armor(ctx: &GameCtx, entity_id: usize) -> bool {
 
 pub fn begin_archaludon_iron_defense(ctx: &GameCtx, entity_id: usize, ticks: usize) {
     let expires_at = ctx.tick().saturating_add(ticks);
-    let states = ARCHALUDON_IRON_DEFENSES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = ARCHALUDON_IRON_DEFENSES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("archaludon iron defense state poisoned");
     if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         state.expires_at = expires_at;
@@ -6100,9 +6005,7 @@ pub fn begin_archaludon_iron_defense(ctx: &GameCtx, entity_id: usize, ticks: usi
 
 pub fn is_archaludon_iron_defense_active(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
-    let states = ARCHALUDON_IRON_DEFENSES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = ARCHALUDON_IRON_DEFENSES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("archaludon iron defense state poisoned");
     states.retain(|state| {
         state.expires_at > tick
@@ -6195,8 +6098,7 @@ pub fn apply_pokemon_cc(ctx: &mut GameCtx, source_id: usize, target_id: usize, c
     let tick = ctx.tick();
     let duration = cc_duration_ticks(&cc).max(1);
     let disruptive = cc_is_disruptive(&cc);
-    let events = POKEMON_CC_EVENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut events = events.lock().expect("pokemon cc event state poisoned");
+    let mut events = POKEMON_CC_EVENTS.lock_or_init(|| Mutex::new(Vec::new())).expect("pokemon cc event state poisoned");
     events.retain(|event| event.expires_at > tick);
     events.push(PokemonCcEvent {
         source_id,
@@ -6215,8 +6117,7 @@ pub fn had_external_disruptive_cc_since(
     since_tick: usize,
 ) -> bool {
     let tick = ctx.tick();
-    let events = POKEMON_CC_EVENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut events = events.lock().expect("pokemon cc event state poisoned");
+    let mut events = POKEMON_CC_EVENTS.lock_or_init(|| Mutex::new(Vec::new())).expect("pokemon cc event state poisoned");
     events.retain(|event| event.expires_at > tick);
     events.iter().any(|event| {
         event.target_id == target_id
@@ -6228,8 +6129,7 @@ pub fn had_external_disruptive_cc_since(
 
 pub fn entity_types(entity_id: usize) -> Option<TypeSet> {
     ENTITY_TYPES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("entity type state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -6256,8 +6156,7 @@ pub fn apply_anti_heal(
 
     let percent = percent.min(100);
     let expires_at = ctx.tick().saturating_add(ticks);
-    let states = ANTI_HEALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("anti-heal state poisoned");
+    let mut states = ANTI_HEALS.lock_or_init(|| Mutex::new(Vec::new())).expect("anti-heal state poisoned");
     if let Some(existing) = states
         .iter_mut()
         .find(|state| state.source_id == source_id && state.target_id == target_id)
@@ -6290,8 +6189,7 @@ pub fn apply_anti_heal(
 
 pub fn anti_heal_percent(ctx: &GameCtx, target_id: usize) -> usize {
     let tick = ctx.tick();
-    let states = ANTI_HEALS.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("anti-heal state poisoned");
+    let states = ANTI_HEALS.lock_or_init(|| Mutex::new(Vec::new())).expect("anti-heal state poisoned");
     states
         .iter()
         .filter(|state| state.target_id == target_id && state.expires_at > tick)
@@ -6303,7 +6201,7 @@ pub fn anti_heal_percent(ctx: &GameCtx, target_id: usize) -> usize {
 fn refresh_native_anti_heal(ctx: &GameCtx) {
     let mut active = std::collections::BTreeMap::<usize, usize>::new();
     let mut expired = Vec::new();
-    let mut states = ANTI_HEALS.get_or_init(|| Mutex::new(Vec::new())).lock().expect("anti-heal state poisoned");
+    let mut states = ANTI_HEALS.lock_or_init(|| Mutex::new(Vec::new())).expect("anti-heal state poisoned");
     states.retain(|state| {
         if state.expires_at <= ctx.tick() { expired.push(state.target_id); return false; }
         active.entry(state.target_id).and_modify(|percent| *percent = (*percent).max(state.percent)).or_insert(state.percent);
@@ -6499,8 +6397,7 @@ fn log_dot_absorb_heal(
 }
 
 pub fn register_snorlax(entity_id: usize) {
-    let states = SNORLAX_GLUTTONIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("snorlax gluttony state poisoned");
+    let mut states = SNORLAX_GLUTTONIES.lock_or_init(|| Mutex::new(Vec::new())).expect("snorlax gluttony state poisoned");
     if states.iter().any(|state| state.entity_id == entity_id) {
         return;
     }
@@ -6534,8 +6431,7 @@ pub fn update_snorlax_gluttony(ctx: &mut GameCtx, entity_id: usize) {
     let mut slow_offset = 0i32;
     let mut draw_full_belly = false;
     {
-        let states = SNORLAX_GLUTTONIES.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("snorlax gluttony state poisoned");
+        let mut states = SNORLAX_GLUTTONIES.lock_or_init(|| Mutex::new(Vec::new())).expect("snorlax gluttony state poisoned");
         states.retain(|state| {
             ctx.get_entity(state.entity_id)
                 .map(|entity| entity.is_alive() && entity.is_champion())
@@ -6628,8 +6524,7 @@ pub fn update_snorlax_gluttony(ctx: &mut GameCtx, entity_id: usize) {
 fn tracked_harmful_move_speed_reduction(ctx: &GameCtx, target_id: usize) -> i32 {
     prune_tracked_buffs(ctx);
     let tick = ctx.tick();
-    let states = TRACKED_BUFFS.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("tracked buff ledger poisoned");
+    let states = TRACKED_BUFFS.lock_or_init(|| Mutex::new(Vec::new())).expect("tracked buff ledger poisoned");
     states
         .iter()
         .filter(|state| {
@@ -6647,8 +6542,7 @@ pub fn add_snorlax_berries(entity_id: usize, amount: usize) {
         return;
     }
     register_snorlax(entity_id);
-    let states = SNORLAX_GLUTTONIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("snorlax gluttony state poisoned");
+    let mut states = SNORLAX_GLUTTONIES.lock_or_init(|| Mutex::new(Vec::new())).expect("snorlax gluttony state poisoned");
     if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         state.berries = state.berries.saturating_add(amount).min(15);
     }
@@ -6659,8 +6553,7 @@ pub fn consume_snorlax_berries(entity_id: usize, max_berries: usize) -> usize {
         return 0;
     }
     register_snorlax(entity_id);
-    let states = SNORLAX_GLUTTONIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("snorlax gluttony state poisoned");
+    let mut states = SNORLAX_GLUTTONIES.lock_or_init(|| Mutex::new(Vec::new())).expect("snorlax gluttony state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return 0;
     };
@@ -6671,8 +6564,7 @@ pub fn consume_snorlax_berries(entity_id: usize, max_berries: usize) -> usize {
 
 pub fn snorlax_is_sleeping(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
-    let states = SNORLAX_GLUTTONIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("snorlax gluttony state poisoned");
+    let mut states = SNORLAX_GLUTTONIES.lock_or_init(|| Mutex::new(Vec::new())).expect("snorlax gluttony state poisoned");
     states
         .retain(|state| state.primed_until > tick || state.berries > 0 || state.last_pos.is_some());
     states
@@ -6687,8 +6579,7 @@ pub fn prime_snorlax_basic(ctx: &GameCtx, entity_id: usize, bonus_percent: usize
         return;
     }
     register_snorlax(entity_id);
-    let states = SNORLAX_GLUTTONIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("snorlax gluttony state poisoned");
+    let mut states = SNORLAX_GLUTTONIES.lock_or_init(|| Mutex::new(Vec::new())).expect("snorlax gluttony state poisoned");
     if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         state.primed_basic_bonus_percent = bonus_percent;
         state.primed_until = ctx.tick().saturating_add(ticks);
@@ -6697,8 +6588,7 @@ pub fn prime_snorlax_basic(ctx: &GameCtx, entity_id: usize, bonus_percent: usize
 
 pub fn consume_snorlax_primed_basic(ctx: &GameCtx, entity_id: usize) -> usize {
     let tick = ctx.tick();
-    let states = SNORLAX_GLUTTONIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("snorlax gluttony state poisoned");
+    let mut states = SNORLAX_GLUTTONIES.lock_or_init(|| Mutex::new(Vec::new())).expect("snorlax gluttony state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return 0;
     };
@@ -6714,8 +6604,7 @@ pub fn consume_snorlax_primed_basic(ctx: &GameCtx, entity_id: usize) -> usize {
 
 pub fn snorlax_full_belly_basic_bonus(ctx: &GameCtx, entity_id: usize) -> usize {
     let _ = ctx;
-    let states = SNORLAX_GLUTTONIES.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("snorlax gluttony state poisoned");
+    let states = SNORLAX_GLUTTONIES.lock_or_init(|| Mutex::new(Vec::new())).expect("snorlax gluttony state poisoned");
     states
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -6725,8 +6614,7 @@ pub fn snorlax_full_belly_basic_bonus(ctx: &GameCtx, entity_id: usize) -> usize 
 }
 
 pub fn snorlax_knockback_percent(target_id: usize) -> usize {
-    let states = SNORLAX_GLUTTONIES.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("snorlax gluttony state poisoned");
+    let states = SNORLAX_GLUTTONIES.lock_or_init(|| Mutex::new(Vec::new())).expect("snorlax gluttony state poisoned");
     if states
         .iter()
         .any(|state| state.entity_id == target_id && state.berries >= 10)
@@ -6745,8 +6633,7 @@ pub fn begin_thievul_hone_claws(
     anti_heal_ticks: usize,
 ) {
     let expires_at = ctx.tick().saturating_add(ticks);
-    let states = THIEVUL_HONE_CLAWS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("thievul hone claws state poisoned");
+    let mut states = THIEVUL_HONE_CLAWS.lock_or_init(|| Mutex::new(Vec::new())).expect("thievul hone claws state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.anti_heal_percent = anti_heal_percent;
         existing.anti_heal_ticks = anti_heal_ticks;
@@ -6764,8 +6651,7 @@ pub fn begin_thievul_hone_claws(
 pub fn apply_thievul_hone_claws_on_basic(ctx: &mut GameCtx, caster_id: usize, target_id: usize) {
     let tick = ctx.tick();
     let state = {
-        let states = THIEVUL_HONE_CLAWS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("thievul hone claws state poisoned");
+        let mut states = THIEVUL_HONE_CLAWS.lock_or_init(|| Mutex::new(Vec::new())).expect("thievul hone claws state poisoned");
         states.retain(|state| state.expires_at > tick);
         states
             .iter()
@@ -6785,8 +6671,7 @@ pub fn apply_thievul_hone_claws_on_basic(ctx: &mut GameCtx, caster_id: usize, ta
 
 pub fn thievul_hone_claws_crit_active(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
-    let states = THIEVUL_HONE_CLAWS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("thievul hone claws state poisoned");
+    let mut states = THIEVUL_HONE_CLAWS.lock_or_init(|| Mutex::new(Vec::new())).expect("thievul hone claws state poisoned");
     states.retain(|state| state.expires_at > tick);
     states.iter().any(|state| state.entity_id == entity_id)
 }
@@ -6815,8 +6700,7 @@ pub fn begin_thievul_stakeout(
         expires_at: ctx.tick().saturating_add(duration_ticks),
         next_tick_at: ctx.tick(),
     };
-    let states = THIEVUL_STAKEOUTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("thievul stakeout state poisoned");
+    let mut states = THIEVUL_STAKEOUTS.lock_or_init(|| Mutex::new(Vec::new())).expect("thievul stakeout state poisoned");
     states.push(state);
     drop(states);
     draw_field_circle(ctx, center, radius, VFX_DARK);
@@ -6827,8 +6711,7 @@ pub fn thievul_stakeout_bonus(ctx: &GameCtx, caster_id: usize, target_id: usize)
     let Some(target_pos) = ctx.get_entity(target_id).map(|target| target.pos()) else {
         return None;
     };
-    let states = THIEVUL_STAKEOUTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("thievul stakeout state poisoned");
+    let mut states = THIEVUL_STAKEOUTS.lock_or_init(|| Mutex::new(Vec::new())).expect("thievul stakeout state poisoned");
     states.retain(|state| state.expires_at > tick);
     states
         .iter()
@@ -6861,9 +6744,7 @@ pub fn update_heal_block_aura(ctx: &mut GameCtx, entity_id: usize) {
 
     let tick = ctx.tick();
     let should_pulse = {
-        let states = THIEVUL_HEAL_BLOCK_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states
-            .lock()
+        let mut states = THIEVUL_HEAL_BLOCK_AURAS.lock_or_init(|| Mutex::new(Vec::new()))
             .expect("thievul heal block aura state poisoned");
         if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
             if existing
@@ -6939,8 +6820,7 @@ fn flower_veil_blocks_status(ctx: &GameCtx, caster_id: usize, target_id: usize) 
     }
 
     COMFEY_ATTACHES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("comfey attach state poisoned")
         .iter()
         .filter_map(|state| ctx.get_entity(state.entity_id))
@@ -7017,8 +6897,7 @@ pub fn apply_paralysis_from(
     }
 
     let tick = ctx.tick();
-    let states = PARALYSIS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("paralysis state poisoned");
+    let mut states = PARALYSIS.lock_or_init(|| Mutex::new(Vec::new())).expect("paralysis state poisoned");
 
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == target_id) {
         existing.caster_id = caster_id;
@@ -7064,8 +6943,7 @@ pub fn apply_soft_untargetable(ctx: &GameCtx, entity_id: usize, ticks: usize) {
 
     let tick = ctx.tick();
     let expires_at = tick.saturating_add(ticks);
-    let states = SOFT_UNTARGETABLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("soft untargetable state poisoned");
+    let mut states = SOFT_UNTARGETABLES.lock_or_init(|| Mutex::new(Vec::new())).expect("soft untargetable state poisoned");
     states.retain(|state| state.expires_at > tick);
 
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
@@ -7091,14 +6969,14 @@ pub(crate) fn ai_soft_untargetable(world: &crate::ai_world::World, entity_id: us
     let tick = world.tick;
     let hidden_by_weavile = is_weavile_hidden_from_pokemon_ai_at(entity_id, tick);
     let revealed = hidden_by_weavile && world.get(entity_id).map_or(false, |target| {
-        target.detected || AMPHAROS_TRUE_SIGHTS.get_or_init(|| Mutex::new(Vec::new())).lock()
+        target.detected || AMPHAROS_TRUE_SIGHTS.lock_or_init(|| Mutex::new(Vec::new()))
             .expect("ampharos true sight state poisoned").iter().any(|state| {
                 state.expires_at > tick && state.team != target.team
                     && world.get(state.source_id).map_or(false, |source|
                         crate::ai_world::distance_sq(source.pos, target.pos) <= u128::from(state.radius).pow(2))
             })
     });
-    SOFT_UNTARGETABLES.get_or_init(|| Mutex::new(Vec::new())).lock()
+    SOFT_UNTARGETABLES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("soft untargetable state poisoned").iter()
         .any(|state| state.entity_id == entity_id && state.expires_at > tick && !revealed)
 }
@@ -7114,8 +6992,7 @@ pub fn is_soft_untargetable(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
     let hidden_by_weavile = is_weavile_hidden_from_pokemon_ai_at(entity_id, tick);
     SOFT_UNTARGETABLES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("soft untargetable state poisoned")
         .iter()
         .any(|state| {
@@ -7137,8 +7014,7 @@ pub fn begin_weavile_hunt_stealth(ctx: &GameCtx, entity_id: usize, stealth_ticks
     }
 
     let expires_at = ctx.tick().saturating_add(stealth_ticks);
-    let states = WEAVILE_HUNTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("weavile hunt state poisoned");
+    let mut states = WEAVILE_HUNTS.lock_or_init(|| Mutex::new(Vec::new())).expect("weavile hunt state poisoned");
     states.retain(|state| state.stealth_expires_at > ctx.tick());
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.stealth_expires_at = existing.stealth_expires_at.max(expires_at);
@@ -7158,7 +7034,7 @@ pub fn begin_weavile_hunt_stealth(ctx: &GameCtx, entity_id: usize, stealth_ticks
 
 fn refresh_native_stealth(ctx: &GameCtx) {
     let hunts = {
-        let mut states = WEAVILE_HUNTS.get_or_init(|| Mutex::new(Vec::new())).lock()
+        let mut states = WEAVILE_HUNTS.lock_or_init(|| Mutex::new(Vec::new()))
             .expect("weavile hunt state poisoned");
         let hunts = states.clone();
         states.retain(|hunt| hunt.stealth_expires_at > ctx.tick());
@@ -7173,8 +7049,7 @@ fn refresh_native_stealth(ctx: &GameCtx) {
 
 pub fn break_weavile_hunt_stealth(ctx: &GameCtx, entity_id: usize) {
     WEAVILE_HUNTS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("weavile hunt state poisoned")
         .retain(|state| state.entity_id != entity_id);
     clear_soft_untargetable(entity_id);
@@ -7183,8 +7058,7 @@ pub fn break_weavile_hunt_stealth(ctx: &GameCtx, entity_id: usize) {
 
 pub fn is_weavile_hidden_from_pokemon_ai_at(entity_id: usize, tick: usize) -> bool {
     WEAVILE_HUNTS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("weavile hunt state poisoned")
         .iter()
         .any(|state| state.entity_id == entity_id && state.stealth_expires_at > tick)
@@ -7203,7 +7077,7 @@ fn shared_detection_reveals_stealth(ctx: &GameCtx, entity_id: usize) -> bool {
     if ampharos_true_sight_reveals(ctx, entity_id) { return true; }
     let Some(target) = ctx.get_entity(entity_id) else { return false; };
     let tick = ctx.tick();
-    WEB_WALKER_SPOTS.get_or_init(|| Mutex::new(Vec::new())).lock()
+    WEB_WALKER_SPOTS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("web walker spot state poisoned").iter().any(|spot|
             spot.target_id == entity_id && spot.team != target.team() && spot.expires_at > tick
                 && spot.observed_at <= tick && tick - spot.observed_at <= 8)
@@ -7226,8 +7100,7 @@ pub fn ampharos_true_sight_reveals(ctx: &GameCtx, target_id: usize) -> bool {
     drop(target);
 
     let tick = ctx.tick();
-    let states = AMPHAROS_TRUE_SIGHTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("ampharos true sight state poisoned");
+    let mut states = AMPHAROS_TRUE_SIGHTS.lock_or_init(|| Mutex::new(Vec::new())).expect("ampharos true sight state poisoned");
     states.retain(|state| state.expires_at > tick);
     states.iter().any(|state| {
         if state.team == target_team {
@@ -7253,8 +7126,7 @@ fn refresh_ampharos_true_sight(ctx: &GameCtx, entity_id: usize) {
     drop(entity);
 
     let tick = ctx.tick();
-    let states = AMPHAROS_TRUE_SIGHTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("ampharos true sight state poisoned");
+    let mut states = AMPHAROS_TRUE_SIGHTS.lock_or_init(|| Mutex::new(Vec::new())).expect("ampharos true sight state poisoned");
     states.retain(|state| state.expires_at > tick && state.source_id != entity_id);
     states.push(AmpharosTrueSightState {
         source_id: entity_id,
@@ -7274,9 +7146,7 @@ fn refresh_ampharos_true_sight(ctx: &GameCtx, entity_id: usize) {
 }
 
 fn active_searchlight_tail(entity_id: usize, tick: usize) -> Option<AmpharosSearchlightTailState> {
-    let states = AMPHAROS_SEARCHLIGHT_TAILS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = AMPHAROS_SEARCHLIGHT_TAILS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("ampharos searchlight tail state poisoned");
     states.retain(|state| state.expires_at > tick);
     states
@@ -7296,9 +7166,7 @@ fn extend_searchlight_tail(
         return;
     }
     let mut move_speed_mult = 0;
-    let states = AMPHAROS_SEARCHLIGHT_TAILS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = AMPHAROS_SEARCHLIGHT_TAILS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("ampharos searchlight tail state poisoned");
     if let Some(state) = states
         .iter_mut()
@@ -7347,9 +7215,7 @@ pub fn begin_ampharos_searchlight_tail(
 
     let tick = ctx.tick();
     let expires_at = tick.saturating_add(duration_ticks);
-    let states = AMPHAROS_SEARCHLIGHT_TAILS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = AMPHAROS_SEARCHLIGHT_TAILS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("ampharos searchlight tail state poisoned");
     states.retain(|state| state.entity_id != entity_id && state.expires_at > tick);
     states.push(AmpharosSearchlightTailState {
@@ -7455,9 +7321,7 @@ pub fn update_ampharos_luminous_pulse(ctx: &mut GameCtx, entity_id: usize) {
     refresh_ampharos_true_sight(ctx, entity_id);
 
     let tick = ctx.tick();
-    let states = AMPHAROS_LUMINOUS_PULSES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = AMPHAROS_LUMINOUS_PULSES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("ampharos luminous pulse state poisoned");
     states.retain(|state| {
         state.entity_id == entity_id
@@ -7590,8 +7454,7 @@ pub fn begin_ampharos_gigavolt(
     attacker_types: TypeSet,
 ) {
     let tick = ctx.tick();
-    let states = AMPHAROS_GIGAVOLTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("ampharos gigavolt state poisoned");
+    let mut states = AMPHAROS_GIGAVOLTS.lock_or_init(|| Mutex::new(Vec::new())).expect("ampharos gigavolt state poisoned");
     states.push(AmpharosGigavoltState {
         caster_id,
         caster_team,
@@ -7684,8 +7547,7 @@ pub fn apply_confusion_from(
 
     let tick = ctx.tick();
     let expires_at = tick.saturating_add(ticks);
-    let states = CONFUSIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("confusion state poisoned");
+    let mut states = CONFUSIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("confusion state poisoned");
     states.retain(|state| state.expires_at > tick && state.stacks > 0);
 
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
@@ -7728,8 +7590,7 @@ pub fn schedule_confusion_from(
     drop(target);
 
     let trigger_at = ctx.tick().saturating_add(delay_ticks);
-    let states = DELAYED_CONFUSIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("delayed confusion state poisoned");
+    let mut states = DELAYED_CONFUSIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("delayed confusion state poisoned");
     states.retain(|state| state.trigger_at > ctx.tick());
     states.push(DelayedConfusionState {
         caster_id,
@@ -7749,8 +7610,7 @@ pub fn consume_confusion(ctx: &GameCtx, entity_id: usize) -> bool {
     }
 
     let tick = ctx.tick();
-    let states = CONFUSIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("confusion state poisoned");
+    let mut states = CONFUSIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("confusion state poisoned");
     let mut consumed = false;
     states.retain_mut(|state| {
         if state.expires_at <= tick || state.stacks == 0 {
@@ -7767,8 +7627,7 @@ pub fn consume_confusion(ctx: &GameCtx, entity_id: usize) -> bool {
 
 pub fn note_mega_launcher_hit(ctx: &GameCtx, caster_id: usize, target_id: usize) -> usize {
     let tick = ctx.tick();
-    let states = MEGA_LAUNCHER.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("mega launcher state poisoned");
+    let mut states = MEGA_LAUNCHER.lock_or_init(|| Mutex::new(Vec::new())).expect("mega launcher state poisoned");
     if let Some(existing) = states
         .iter_mut()
         .find(|state| state.caster_id == caster_id && state.target_id == target_id)
@@ -7956,8 +7815,7 @@ pub fn update_helping_hand_aura(ctx: &mut GameCtx, eevee_id: usize) {
 }
 
 pub fn note_houndoom_damaged(ctx: &GameCtx, houndoom_id: usize) {
-    let states = HOUNDOOM_DAMAGE.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("houndoom damage state poisoned");
+    let mut states = HOUNDOOM_DAMAGE.lock_or_init(|| Mutex::new(Vec::new())).expect("houndoom damage state poisoned");
     if let Some(state) = states
         .iter_mut()
         .find(|state| state.entity_id == houndoom_id)
@@ -7972,8 +7830,7 @@ pub fn note_houndoom_damaged(ctx: &GameCtx, houndoom_id: usize) {
 }
 
 pub fn houndoom_foul_play_bonus(ctx: &GameCtx, houndoom_id: usize) -> usize {
-    let states = HOUNDOOM_DAMAGE.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("houndoom damage state poisoned");
+    let states = HOUNDOOM_DAMAGE.lock_or_init(|| Mutex::new(Vec::new())).expect("houndoom damage state poisoned");
     let recently_damaged = states
         .iter()
         .find(|state| state.entity_id == houndoom_id)
@@ -8047,8 +7904,7 @@ pub fn is_clawitzer_clinging(ctx: &GameCtx, entity_id: usize) -> bool {
 
 pub fn is_clawitzer_attached_at(entity_id: usize, tick: usize) -> bool {
     CLAWITZER_CLINGS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("clawitzer cling state poisoned")
         .iter()
         .any(|state| {
@@ -8060,8 +7916,7 @@ pub fn is_clawitzer_attached_at(entity_id: usize, tick: usize) -> bool {
 
 pub fn is_clawitzer_attach_ready_at(entity_id: usize, tick: usize) -> bool {
     CLAWITZER_CLINGS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("clawitzer cling state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -8079,8 +7934,7 @@ pub fn is_comfey_attached_at(entity_id: usize, tick: usize) -> bool {
 
 pub fn comfey_attached_ally_at(entity_id: usize, tick: usize) -> Option<usize> {
     COMFEY_ATTACHES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("comfey attach state poisoned")
         .iter()
         .find(|state| {
@@ -8093,8 +7947,7 @@ pub fn comfey_attached_ally_at(entity_id: usize, tick: usize) -> Option<usize> {
 
 pub fn is_comfey_attach_ready_at(entity_id: usize, tick: usize) -> bool {
     COMFEY_ATTACHES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("comfey attach state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -8118,8 +7971,7 @@ pub fn update_flower_veil_passive(ctx: &mut GameCtx, comfey_id: usize) {
 
     let links = attachment_links();
 
-    let states = COMFEY_ATTACHES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("comfey attach state poisoned");
+    let mut states = COMFEY_ATTACHES.lock_or_init(|| Mutex::new(Vec::new())).expect("comfey attach state poisoned");
     let index = if let Some(index) = states.iter().position(|state| state.entity_id == comfey_id) {
         index
     } else {
@@ -8225,8 +8077,7 @@ pub fn update_clingy_passive(ctx: &mut GameCtx, clawitzer_id: usize) {
 
     let links = attachment_links();
 
-    let states = CLAWITZER_CLINGS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("clawitzer cling state poisoned");
+    let mut states = CLAWITZER_CLINGS.lock_or_init(|| Mutex::new(Vec::new())).expect("clawitzer cling state poisoned");
     let index = if let Some(index) = states
         .iter()
         .position(|state| state.entity_id == clawitzer_id)
@@ -8344,10 +8195,10 @@ pub fn update_clingy_passive(ctx: &mut GameCtx, clawitzer_id: usize) {
 
 fn attachment_links() -> Vec<(usize, usize)> {
     // Snapshot before taking an individual attachment store's update lock.
-    let mut links: Vec<_> = COMFEY_ATTACHES.get_or_init(Default::default).lock()
+    let mut links: Vec<_> = COMFEY_ATTACHES.lock_or_init(Default::default)
         .expect("comfey attach state poisoned").iter()
         .filter_map(|s| s.attached_ally.map(|host| (s.entity_id, host))).collect();
-    links.extend(CLAWITZER_CLINGS.get_or_init(Default::default).lock()
+    links.extend(CLAWITZER_CLINGS.lock_or_init(Default::default)
         .expect("clawitzer cling state poisoned").iter()
         .filter_map(|s| s.attached_ally.map(|host| (s.entity_id, host))));
     links
@@ -8372,7 +8223,7 @@ pub(crate) fn attachment_candidate_allowed_at(entity: usize, host: usize, tick: 
 
 pub fn reset_attachment_life(ctx: &GameCtx, entity: usize) {
     let tick = ctx.tick();
-    let mut comfeys = COMFEY_ATTACHES.get_or_init(Default::default).lock().expect("comfey attach state poisoned");
+    let mut comfeys = COMFEY_ATTACHES.lock_or_init(Default::default).expect("comfey attach state poisoned");
     comfeys.retain(|s| s.entity_id != entity);
     for state in comfeys.iter_mut().filter(|s| s.attached_ally == Some(entity)) {
         state.attached_ally = None;
@@ -8380,7 +8231,7 @@ pub fn reset_attachment_life(ctx: &GameCtx, entity: usize) {
         state.last_tick = tick;
     }
     drop(comfeys);
-    let mut claws = CLAWITZER_CLINGS.get_or_init(Default::default).lock().expect("clawitzer cling state poisoned");
+    let mut claws = CLAWITZER_CLINGS.lock_or_init(Default::default).expect("clawitzer cling state poisoned");
     claws.retain(|s| s.entity_id != entity);
     let mut detached_claws = Vec::new();
     for state in claws.iter_mut().filter(|s| s.attached_ally == Some(entity)) {
@@ -8491,8 +8342,7 @@ pub fn apply_octillery_lock_on(
     drop(target);
 
     let expires_at = ctx.tick().saturating_add(ticks);
-    let states = OCTILLERY_LOCK_ONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("octillery lock-on state poisoned");
+    let mut states = OCTILLERY_LOCK_ONS.lock_or_init(|| Mutex::new(Vec::new())).expect("octillery lock-on state poisoned");
     if let Some(state) = states
         .iter_mut()
         .find(|state| state.caster_id == caster_id && state.target_id == target_id)
@@ -8512,8 +8362,7 @@ pub fn apply_octillery_lock_on(
 pub fn octillery_lock_on_bonus(ctx: &GameCtx, caster_id: usize, target_id: usize) -> usize {
     let tick = ctx.tick();
     OCTILLERY_LOCK_ONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("octillery lock-on state poisoned")
         .iter()
         .find(|state| {
@@ -8525,8 +8374,7 @@ pub fn octillery_lock_on_bonus(ctx: &GameCtx, caster_id: usize, target_id: usize
 
 pub fn update_eeveelution_passive(ctx: &mut GameCtx, entity_id: usize) {
     if !eeveelution_identity_active_in_ctx(ctx, entity_id) {
-        let states = EEVEELUTIONS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("eeveelution state poisoned");
+        let mut states = EEVEELUTIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("eeveelution state poisoned");
         let removed = states
             .iter()
             .position(|state| state.entity_id == entity_id)
@@ -8741,8 +8589,7 @@ pub fn note_blaze_contact(
     }
 
     let tick = ctx.tick();
-    let contacts = BLAZE_CONTACTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut contacts = contacts.lock().expect("blaze contact state poisoned");
+    let mut contacts = BLAZE_CONTACTS.lock_or_init(|| Mutex::new(Vec::new())).expect("blaze contact state poisoned");
 
     let contact = contacts
         .iter_mut()
@@ -8864,8 +8711,7 @@ pub fn apply_burn_for_unchecked(
 pub fn is_burned(ctx: &GameCtx, target_id: usize) -> bool {
     let tick = ctx.tick();
     BURNS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("burn state poisoned")
         .iter()
         .any(|state| state.target_id == target_id && state.expires_at > tick)
@@ -8895,8 +8741,7 @@ fn synchronize_burn(
     };
     let tick = ctx.tick();
     BURNS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("burn state poisoned")
         .push(BurnState {
             caster_id: target_id,
@@ -8919,8 +8764,7 @@ fn synchronize_poison(
     };
     let tick = ctx.tick();
     let mut poisons = POISONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("poison state poisoned");
     for _ in 0..stacks {
         poisons.push(PoisonState {
@@ -8945,8 +8789,7 @@ fn synchronize_poison_for(
     };
     let tick = ctx.tick();
     POISONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("poison state poisoned")
         .push(PoisonState {
             caster_id: target_id,
@@ -8963,8 +8806,7 @@ fn synchronize_paralysis(ctx: &GameCtx, caster_id: usize, target_id: usize, dura
     };
     let tick = ctx.tick();
     let mut states = PARALYSIS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("paralysis state poisoned");
     if let Some(existing) = states
         .iter_mut()
@@ -8995,8 +8837,7 @@ fn synchronize_confusion(
     let tick = ctx.tick();
     let expires_at = tick.saturating_add(ticks);
     let mut states = CONFUSIONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("confusion state poisoned");
     states.retain(|state| state.expires_at > tick && state.stacks > 0);
     if let Some(existing) = states
@@ -9021,8 +8862,7 @@ fn synchronize_frozen(ctx: &mut GameCtx, caster_id: usize, target_id: usize, tic
     let tick = ctx.tick();
     let expires_at = tick.saturating_add(ticks);
     let mut states = FROZENS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("frozen state poisoned");
     states.retain(|state| state.expires_at > tick);
     if let Some(existing) = states
@@ -9054,8 +8894,7 @@ fn synchronize_frozen(ctx: &mut GameCtx, caster_id: usize, target_id: usize, tic
 }
 
 pub fn register_will_o_wisp_charges(entity_id: usize) {
-    let states = WILL_O_WISP_CHARGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("will-o-wisp charge state poisoned");
+    let mut states = WILL_O_WISP_CHARGES.lock_or_init(|| Mutex::new(Vec::new())).expect("will-o-wisp charge state poisoned");
     if states.iter().any(|state| state.entity_id == entity_id) {
         return;
     }
@@ -9070,8 +8909,7 @@ pub fn register_porygon_type(ctx: &GameCtx, entity_id: usize) {
     let Some((ctx_id, player_id)) = persistent_owner_key(ctx, entity_id) else {
         return;
     };
-    let states = PORYGON_TYPES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("porygon type state poisoned");
+    let mut states = PORYGON_TYPES.lock_or_init(|| Mutex::new(Vec::new())).expect("porygon type state poisoned");
     if let Some(existing) = states
         .iter_mut()
         .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -9095,8 +8933,7 @@ pub fn register_porygon_type(ctx: &GameCtx, entity_id: usize) {
 pub fn porygon_type(ctx: &GameCtx, entity_id: usize) -> PokemonType {
     let owner_key = persistent_owner_key(ctx, entity_id);
     PORYGON_TYPES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("porygon type state poisoned")
         .iter()
         .find(|state| {
@@ -9115,8 +8952,7 @@ pub fn porygon_type(ctx: &GameCtx, entity_id: usize) -> PokemonType {
 pub fn porygon_seen_type_count(ctx: &GameCtx, entity_id: usize) -> usize {
     let owner_key = persistent_owner_key(ctx, entity_id);
     PORYGON_TYPES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("porygon type state poisoned")
         .iter()
         .find(|state| {
@@ -9142,8 +8978,7 @@ pub fn set_porygon_type(ctx: &GameCtx, entity_id: usize, new_type: PokemonType) 
             register_entity_types(entity_id, TypeSet::single(new_type));
             return;
         };
-        let states = PORYGON_TYPES.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("porygon type state poisoned");
+        let mut states = PORYGON_TYPES.lock_or_init(|| Mutex::new(Vec::new())).expect("porygon type state poisoned");
         if let Some(state) = states
             .iter_mut()
             .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -9168,8 +9003,7 @@ pub fn register_kecleon_type(ctx: &GameCtx, entity_id: usize) {
     let Some((ctx_id, player_id)) = persistent_owner_key(ctx, entity_id) else {
         return;
     };
-    let states = KECLEON_TYPES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kecleon type state poisoned");
+    let mut states = KECLEON_TYPES.lock_or_init(|| Mutex::new(Vec::new())).expect("kecleon type state poisoned");
     if let Some(existing) = states
         .iter_mut()
         .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -9193,8 +9027,7 @@ pub fn register_kecleon_type(ctx: &GameCtx, entity_id: usize) {
 pub fn kecleon_type(ctx: &GameCtx, entity_id: usize) -> PokemonType {
     let owner_key = persistent_owner_key(ctx, entity_id);
     KECLEON_TYPES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("kecleon type state poisoned")
         .iter()
         .find(|state| {
@@ -9213,8 +9046,7 @@ pub fn kecleon_type(ctx: &GameCtx, entity_id: usize) -> PokemonType {
 pub fn kecleon_has_seen_type(ctx: &GameCtx, entity_id: usize, pokemon_type: PokemonType) -> bool {
     let owner_key = persistent_owner_key(ctx, entity_id);
     KECLEON_TYPES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("kecleon type state poisoned")
         .iter()
         .find(|state| {
@@ -9240,8 +9072,7 @@ pub fn set_kecleon_type(ctx: &GameCtx, entity_id: usize, new_type: PokemonType) 
             register_entity_types(entity_id, TypeSet::single(new_type));
             return;
         };
-        let states = KECLEON_TYPES.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("kecleon type state poisoned");
+        let mut states = KECLEON_TYPES.lock_or_init(|| Mutex::new(Vec::new())).expect("kecleon type state poisoned");
         if let Some(state) = states
             .iter_mut()
             .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -9293,8 +9124,7 @@ pub fn consume_will_o_wisp_charge(
     recharge_ticks: usize,
 ) -> bool {
     refill_will_o_wisp_charge(ctx.tick(), entity_id, max_charges, recharge_ticks);
-    let states = WILL_O_WISP_CHARGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("will-o-wisp charge state poisoned");
+    let mut states = WILL_O_WISP_CHARGES.lock_or_init(|| Mutex::new(Vec::new())).expect("will-o-wisp charge state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return false;
     };
@@ -9318,8 +9148,7 @@ pub fn will_o_wisp_ready_for_player(
         return true;
     };
     WILL_O_WISP_CHARGES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("will-o-wisp charge state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -9328,8 +9157,7 @@ pub fn will_o_wisp_ready_for_player(
 }
 
 pub fn register_sticky_web_charges(entity_id: usize) {
-    let states = STICKY_WEB_CHARGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sticky web charge state poisoned");
+    let mut states = STICKY_WEB_CHARGES.lock_or_init(|| Mutex::new(Vec::new())).expect("sticky web charge state poisoned");
     if states.iter().any(|state| state.entity_id == entity_id) {
         return;
     }
@@ -9347,8 +9175,7 @@ pub fn consume_sticky_web_charge(
     recharge_ticks: usize,
 ) -> bool {
     refill_sticky_web_charge(ctx.tick(), entity_id, max_charges, recharge_ticks);
-    let states = STICKY_WEB_CHARGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sticky web charge state poisoned");
+    let mut states = STICKY_WEB_CHARGES.lock_or_init(|| Mutex::new(Vec::new())).expect("sticky web charge state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return false;
     };
@@ -9372,8 +9199,7 @@ pub fn sticky_web_ready_for_player(
         return true;
     };
     STICKY_WEB_CHARGES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("sticky web charge state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -9387,8 +9213,7 @@ fn refill_sticky_web_charge(
     max_charges: usize,
     recharge_ticks: usize,
 ) {
-    let states = STICKY_WEB_CHARGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sticky web charge state poisoned");
+    let mut states = STICKY_WEB_CHARGES.lock_or_init(|| Mutex::new(Vec::new())).expect("sticky web charge state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return;
     };
@@ -9406,8 +9231,7 @@ fn refill_will_o_wisp_charge(
     max_charges: usize,
     recharge_ticks: usize,
 ) {
-    let states = WILL_O_WISP_CHARGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("will-o-wisp charge state poisoned");
+    let mut states = WILL_O_WISP_CHARGES.lock_or_init(|| Mutex::new(Vec::new())).expect("will-o-wisp charge state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         return;
     };
@@ -9444,8 +9268,7 @@ pub fn begin_flame_trail(
 
     let tick = ctx.tick();
     FLAME_TRAILS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("flame trail state poisoned")
         .push(FlameTrailState {
             caster_id,
@@ -9466,8 +9289,7 @@ pub fn begin_flame_trail(
 
 pub fn reset_speed_boost(ctx: &GameCtx, entity_id: usize) {
     let tick = ctx.tick();
-    let states = SPEED_BOOSTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("speed boost state poisoned");
+    let mut states = SPEED_BOOSTS.lock_or_init(|| Mutex::new(Vec::new())).expect("speed boost state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.last_reset_tick = tick;
         existing.last_buff_tick = tick;
@@ -9490,8 +9312,7 @@ pub fn update_speed_boost_passive(ctx: &mut GameCtx, entity_id: usize) {
     drop(entity);
 
     let tick = ctx.tick();
-    let states = SPEED_BOOSTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("speed boost state poisoned");
+    let mut states = SPEED_BOOSTS.lock_or_init(|| Mutex::new(Vec::new())).expect("speed boost state poisoned");
     states.retain(|state| {
         ctx.get_entity(state.entity_id)
             .map(|entity| entity.is_alive())
@@ -9647,8 +9468,7 @@ pub fn apply_poison_stacks(
     }
 
     let tick = ctx.tick();
-    let poisons = POISONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut poisons = poisons.lock().expect("poison state poisoned");
+    let mut poisons = POISONS.lock_or_init(|| Mutex::new(Vec::new())).expect("poison state poisoned");
     for _ in 0..stacks {
         poisons.push(PoisonState {
             caster_id,
@@ -9699,8 +9519,7 @@ pub fn apply_poison_for(
 
     let tick = ctx.tick();
     POISONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("poison state poisoned")
         .push(PoisonState {
             caster_id,
@@ -9715,8 +9534,7 @@ pub fn apply_poison_for(
 pub fn poison_stack_count(ctx: &GameCtx, target_id: usize) -> usize {
     let tick = ctx.tick();
     POISONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("poison state poisoned")
         .iter()
         .filter(|state| state.target_id == target_id && state.expires_at > tick)
@@ -9729,8 +9547,7 @@ pub fn is_poisoned(ctx: &GameCtx, target_id: usize) -> bool {
 
 pub fn note_arbok_basic_hit(ctx: &GameCtx, entity_id: usize, window_ticks: usize) -> usize {
     let tick = ctx.tick();
-    let states = ARBOK_BASIC_HITS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("arbok basic hit state poisoned");
+    let mut states = ARBOK_BASIC_HITS.lock_or_init(|| Mutex::new(Vec::new())).expect("arbok basic hit state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         states.push(ArbokBasicHitState {
             entity_id,
@@ -9774,8 +9591,7 @@ pub fn add_miasma_stacks(
     let tick = ctx.tick();
     let poison_awards_to_apply;
     {
-        let states = MIASMAS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("miasma state poisoned");
+        let mut states = MIASMAS.lock_or_init(|| Mutex::new(Vec::new())).expect("miasma state poisoned");
         if let Some(state) = states
             .iter_mut()
             .find(|state| state.caster_id == caster_id && state.target_id == target_id)
@@ -9813,8 +9629,7 @@ pub fn add_miasma_stacks(
 
 pub fn miasma_stacks(caster_id: usize, target_id: usize) -> usize {
     MIASMAS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("miasma state poisoned")
         .iter()
         .find(|state| state.caster_id == caster_id && state.target_id == target_id)
@@ -9823,8 +9638,7 @@ pub fn miasma_stacks(caster_id: usize, target_id: usize) -> usize {
 }
 
 pub fn consume_miasma_stacks(caster_id: usize, target_id: usize) -> usize {
-    let states = MIASMAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("miasma state poisoned");
+    let mut states = MIASMAS.lock_or_init(|| Mutex::new(Vec::new())).expect("miasma state poisoned");
     let Some(index) = states
         .iter()
         .position(|state| state.caster_id == caster_id && state.target_id == target_id)
@@ -9899,8 +9713,7 @@ pub fn apply_infestation_for(
 
     let tick = ctx.tick();
     let expires_at = tick.saturating_add(duration_ticks);
-    let infestations = INFESTATIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut infestations = infestations.lock().expect("infestation state poisoned");
+    let mut infestations = INFESTATIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("infestation state poisoned");
     infestations.retain(|state| state.expires_at > tick);
     if let Some(existing) = infestations
         .iter_mut()
@@ -9924,8 +9737,7 @@ pub fn apply_infestation_for(
 pub fn is_infested(ctx: &GameCtx, target_id: usize) -> bool {
     let tick = ctx.tick();
     INFESTATIONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("infestation state poisoned")
         .iter()
         .any(|state| state.target_id == target_id && state.expires_at > tick)
@@ -9961,8 +9773,7 @@ pub fn begin_yanmega_tinted_lens(ctx: &mut GameCtx, entity_id: usize, ticks: usi
     drop(entity);
 
     let expires_at = ctx.tick().saturating_add(ticks);
-    let states = YANMEGA_TINTED_LENSES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("yanmega tinted lens state poisoned");
+    let mut states = YANMEGA_TINTED_LENSES.lock_or_init(|| Mutex::new(Vec::new())).expect("yanmega tinted lens state poisoned");
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         existing.expires_at = existing.expires_at.max(expires_at);
     } else {
@@ -9977,8 +9788,7 @@ pub fn begin_yanmega_tinted_lens(ctx: &mut GameCtx, entity_id: usize, ticks: usi
 pub fn yanmega_tinted_lens_active(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
     YANMEGA_TINTED_LENSES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("yanmega tinted lens state poisoned")
         .iter()
         .any(|state| state.entity_id == entity_id && state.expires_at > tick)
@@ -9986,8 +9796,7 @@ pub fn yanmega_tinted_lens_active(ctx: &GameCtx, entity_id: usize) -> bool {
 
 fn update_yanmega_tinted_lenses(ctx: &GameCtx, tick: usize) {
     YANMEGA_TINTED_LENSES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("yanmega tinted lens state poisoned")
         .retain(|state| {
             state.expires_at > tick
@@ -10064,8 +9873,7 @@ pub fn begin_yanmega_giga_drain(
     drop(target);
 
     let tick = ctx.tick();
-    let states = YANMEGA_GIGA_DRAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("yanmega giga drain state poisoned");
+    let mut states = YANMEGA_GIGA_DRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("yanmega giga drain state poisoned");
     states.retain(|state| state.caster_id != caster_id);
     states.push(YanmegaGigaDrainState {
         caster_id,
@@ -10136,8 +9944,7 @@ fn finalize_yanmega_giga_drain(ctx: &GameCtx, state: YanmegaGigaDrainState) {
 }
 
 fn update_yanmega_giga_drains(ctx: &mut GameCtx, tick: usize) {
-    let states = YANMEGA_GIGA_DRAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("yanmega giga drain state poisoned");
+    let mut states = YANMEGA_GIGA_DRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("yanmega giga drain state poisoned");
     let mut ticks_to_apply = Vec::new();
     let mut finished = Vec::new();
 
@@ -10254,8 +10061,7 @@ fn update_yanmega_giga_drains(ctx: &mut GameCtx, tick: usize) {
             },
         );
 
-        let states = YANMEGA_GIGA_DRAINS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("yanmega giga drain state poisoned");
+        let mut states = YANMEGA_GIGA_DRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("yanmega giga drain state poisoned");
         if let Some(existing) = states.iter_mut().find(|existing| {
             existing.caster_id == state.caster_id && existing.target_id == state.target_id
         }) {
@@ -10293,8 +10099,7 @@ pub fn begin_weezing_body_odor(
     drop(caster);
 
     let tick = ctx.tick();
-    let states = WEEZING_BODY_ODORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("weezing body odor state poisoned");
+    let mut states = WEEZING_BODY_ODORS.lock_or_init(|| Mutex::new(Vec::new())).expect("weezing body odor state poisoned");
     states.retain(|state| state.caster_id != caster_id && state.expires_at > tick);
     states.push(WeezingBodyOdorState {
         caster_id,
@@ -10314,8 +10119,7 @@ pub fn begin_weezing_body_odor(
 }
 
 fn update_weezing_body_odors(ctx: &mut GameCtx, tick: usize) {
-    let states = WEEZING_BODY_ODORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("weezing body odor state poisoned");
+    let mut states = WEEZING_BODY_ODORS.lock_or_init(|| Mutex::new(Vec::new())).expect("weezing body odor state poisoned");
     let mut ticks_to_apply = Vec::new();
     states.retain_mut(|state| {
         let Some(caster) = ctx.get_entity(state.caster_id) else {
@@ -10384,9 +10188,7 @@ fn update_weezing_body_odors(ctx: &mut GameCtx, tick: usize) {
 
             let mut should_confuse = false;
             {
-                let exposures = WEEZING_BODY_ODOR_EXPOSURES.get_or_init(|| Mutex::new(Vec::new()));
-                let mut exposures = exposures
-                    .lock()
+                let mut exposures = WEEZING_BODY_ODOR_EXPOSURES.lock_or_init(|| Mutex::new(Vec::new()))
                     .expect("weezing body odor exposure state poisoned");
                 if let Some(existing) = exposures.iter_mut().find(|existing| {
                     existing.caster_id == state.caster_id && existing.target_id == target_id
@@ -10443,9 +10245,7 @@ pub fn begin_weezing_sludge_whirlpool(
     drop(caster);
 
     let tick = ctx.tick();
-    let states = WEEZING_SLUDGE_WHIRLPOOLS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = WEEZING_SLUDGE_WHIRLPOOLS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("weezing sludge whirlpool state poisoned");
     states.retain(|state| state.caster_id != caster_id && state.expires_at > tick);
     states.push(WeezingSludgeWhirlpoolState {
@@ -10498,9 +10298,7 @@ pub fn begin_weezing_sludge_whirlpool(
 fn update_weezing_sludge_whirlpools(ctx: &mut GameCtx, tick: usize) {
     const CHANNEL_MOVE_TOLERANCE: u64 = 2500;
 
-    let states = WEEZING_SLUDGE_WHIRLPOOLS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = WEEZING_SLUDGE_WHIRLPOOLS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("weezing sludge whirlpool state poisoned");
     let mut ticks_to_apply = Vec::new();
     states.retain_mut(|state| {
@@ -10621,25 +10419,39 @@ pub fn passive_suppressed_by_nullifying_gas(
     ) {
         return false;
     }
-    let Some(entity) = ctx.get_entity(entity_id) else {
+    // Registrations and copied passives are match-local and checked afresh on
+    // every call. No cached answer can survive a copy, death, respawn or movement.
+    let ctx_id = combat_ctx_id(ctx);
+    let mut sources: Vec<usize> = ENTITY_CHAMPIONS.lock_or_init(|| Mutex::new(Vec::new()))
+        .expect("entity champion state poisoned").iter()
+        .filter(|state| state.ctx_id == ctx_id && state.champion_id == "pokemon_moba_weezing")
+        .map(|state| state.entity_id).collect();
+    sources.extend(RECEIVERS.lock_or_init(|| Mutex::new(Vec::new()))
+        .expect("receiver state poisoned").iter()
+        .filter(|state| state.copied_champion_id == Some("pokemon_moba_weezing"))
+        .map(|state| state.entity_id));
+    if sources.is_empty() {
+        return false;
+    }
+    let Some(entity) = ctx.live_entity(entity_id) else {
         return false;
     };
     if !entity.is_alive() || entity.is_tower() {
         return false;
     }
     let entity_team = entity.team();
-    let entity_pos = entity.pos();
+    let (x, y) = entity.pos();
+    let entity_pos = EntityPos { x, y };
     drop(entity);
 
     let radius_sq = NULLIFYING_GAS_RADIUS.saturating_mul(NULLIFYING_GAS_RADIUS);
     (0..ctx.entity_count())
-        .filter_map(|index| ctx.entity_at(index))
+        .filter_map(|index| ctx.live_entity_at(index))
         .any(|entity| {
-            entity.team() != entity_team
+            sources.contains(&entity.id())
+                && entity.team() != entity_team
                 && entity.is_alive()
-                && (champion_id_for_entity_in_ctx(ctx, entity.id()) == Some("pokemon_moba_weezing")
-                    || receiver_has_copied(entity.id(), "pokemon_moba_weezing"))
-                && distance_sq(entity.pos(), entity_pos) <= radius_sq
+                && { let (x, y) = entity.pos(); distance_sq(EntityPos { x, y }, entity_pos) <= radius_sq }
         })
 }
 
@@ -10665,8 +10477,7 @@ pub fn apply_frozen_from(ctx: &mut GameCtx, caster_id: usize, target_id: usize, 
 
     let tick = ctx.tick();
     let expires_at = tick.saturating_add(ticks);
-    let states = FROZENS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("frozen state poisoned");
+    let mut states = FROZENS.lock_or_init(|| Mutex::new(Vec::new())).expect("frozen state poisoned");
     states.retain(|state| state.expires_at > tick);
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == target_id) {
         existing.expires_at = existing.expires_at.max(expires_at);
@@ -10708,8 +10519,7 @@ pub fn is_frozen(ctx: &GameCtx, entity_id: usize) -> bool {
     }
     let tick = ctx.tick();
     FROZENS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("frozen state poisoned")
         .iter()
         .any(|state| state.entity_id == entity_id && state.expires_at > tick)
@@ -10804,8 +10614,7 @@ pub fn begin_wish_channel(
         return;
     }
 
-    let channels = WISH_CHANNELS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut channels = channels.lock().expect("wish channel state poisoned");
+    let mut channels = WISH_CHANNELS.lock_or_init(|| Mutex::new(Vec::new())).expect("wish channel state poisoned");
     channels.retain(|state| state.caster_id != caster_id);
     channels.push(WishChannelState {
         caster_id,
@@ -10885,9 +10694,7 @@ pub fn begin_power_up_punch_channel(
         }
     }
 
-    let channels = POWER_UP_PUNCH_CHANNELS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut channels = channels
-        .lock()
+    let mut channels = POWER_UP_PUNCH_CHANNELS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("power-up punch channel state poisoned");
     channels.retain(|state| state.caster_id != caster_id);
     channels.push(PowerUpPunchChannelState {
@@ -10908,8 +10715,7 @@ pub fn begin_power_up_punch_channel(
 
 pub fn power_up_punch_ready_for_player(player_id: usize, tick: usize) -> bool {
     POWER_UP_PUNCH_COOLDOWNS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("power-up punch cooldown state poisoned")
         .iter()
         .find(|state| state.player_id == player_id)
@@ -10919,8 +10725,7 @@ pub fn power_up_punch_ready_for_player(player_id: usize, tick: usize) -> bool {
 
 pub fn power_up_punch_channel_percent_for_player(player_id: usize, tick: usize) -> Option<usize> {
     POWER_UP_PUNCH_CHANNELS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("power-up punch channel state poisoned")
         .iter()
         .find(|state| state.player_id == player_id)
@@ -10956,8 +10761,7 @@ pub fn schedule_quick_return_dash(
         .map(|entity| entity.is_alive())
         .unwrap_or(false)
     {
-        let states = QUICK_RETURN_DASHES.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states.lock().expect("quick return dash state poisoned");
+        let mut states = QUICK_RETURN_DASHES.lock_or_init(|| Mutex::new(Vec::new())).expect("quick return dash state poisoned");
         states.retain(|state| state.entity_id != entity_id);
         states.push(QuickReturnDashState {
             entity_id,
@@ -10989,8 +10793,7 @@ pub fn begin_orbeetle_agility_chain(
     }
     drop(caster);
 
-    let states = ORBEETLE_AGILITY_CHAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("orbeetle agility state poisoned");
+    let mut states = ORBEETLE_AGILITY_CHAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("orbeetle agility state poisoned");
     states.retain(|state| state.caster_id != caster_id);
     states.push(OrbeetleAgilityChainState {
         caster_id,
@@ -11021,8 +10824,7 @@ fn apply_battle_bond_cooldown_buff(ctx: &mut GameCtx, entity_id: usize, stacks: 
 }
 
 pub fn register_battle_bond(ctx: &mut GameCtx, player_id: usize, entity_id: usize) {
-    let states = BATTLE_BONDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("battle bond state poisoned");
+    let mut states = BATTLE_BONDS.lock_or_init(|| Mutex::new(Vec::new())).expect("battle bond state poisoned");
     let ctx_id = combat_ctx_id(ctx);
     if let Some(existing) = states
         .iter_mut()
@@ -11054,8 +10856,7 @@ pub fn add_battle_bond_stack(ctx: &mut GameCtx, entity_id: usize) {
     let Some((ctx_id, player_id)) = persistent_owner_key(ctx, entity_id) else {
         return;
     };
-    let states = BATTLE_BONDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("battle bond state poisoned");
+    let mut states = BATTLE_BONDS.lock_or_init(|| Mutex::new(Vec::new())).expect("battle bond state poisoned");
     if let Some(existing) = states
         .iter_mut()
         .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -11084,8 +10885,7 @@ pub fn add_battle_bond_stack(ctx: &mut GameCtx, entity_id: usize) {
 pub fn battle_bond_stacks(ctx: &GameCtx, entity_id: usize) -> usize {
     let owner_key = persistent_owner_key(ctx, entity_id);
     BATTLE_BONDS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("battle bond state poisoned")
         .iter()
         .find(|state| {
@@ -11126,8 +10926,7 @@ pub fn apply_spirit_shackle(ctx: &GameCtx, target_id: usize, duration_ticks: usi
         return;
     }
 
-    let states = SPIRIT_SHACKLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("spirit shackle state poisoned");
+    let mut states = SPIRIT_SHACKLES.lock_or_init(|| Mutex::new(Vec::new())).expect("spirit shackle state poisoned");
     let expires_at = ctx.tick().saturating_add(duration_ticks);
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == target_id) {
         existing.expires_at = existing.expires_at.max(expires_at);
@@ -11143,8 +10942,7 @@ pub fn apply_spirit_shackle(ctx: &GameCtx, target_id: usize, duration_ticks: usi
 pub fn is_spirit_shackled(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
     SPIRIT_SHACKLES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("spirit shackle state poisoned")
         .iter()
         .any(|state| {
@@ -11162,8 +10960,7 @@ pub fn is_player_spirit_shackled(player_id: usize, tick: usize) -> bool {
         return false;
     };
     SPIRIT_SHACKLES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("spirit shackle state poisoned")
         .iter()
         .any(|state| state.entity_id == entity_id && state.expires_at > tick)
@@ -11177,8 +10974,7 @@ pub fn apply_soak(ctx: &GameCtx, target_id: usize, duration_ticks: usize) {
         return;
     }
 
-    let states = SOAKS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("soak state poisoned");
+    let mut states = SOAKS.lock_or_init(|| Mutex::new(Vec::new())).expect("soak state poisoned");
     let expires_at = ctx.tick().saturating_add(duration_ticks);
     if let Some(existing) = states.iter_mut().find(|state| state.entity_id == target_id) {
         existing.expires_at = existing.expires_at.max(expires_at);
@@ -11193,8 +10989,7 @@ pub fn apply_soak(ctx: &GameCtx, target_id: usize, duration_ticks: usize) {
 pub fn is_soaked(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
     SOAKS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("soak state poisoned")
         .iter()
         .any(|state| {
@@ -11208,9 +11003,7 @@ pub fn is_soaked(ctx: &GameCtx, entity_id: usize) -> bool {
 }
 
 fn set_power_up_punch_ready_at(player_id: usize, ready_at: usize) {
-    let cooldowns = POWER_UP_PUNCH_COOLDOWNS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut cooldowns = cooldowns
-        .lock()
+    let mut cooldowns = POWER_UP_PUNCH_COOLDOWNS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("power-up punch cooldown state poisoned");
     if let Some(existing) = cooldowns
         .iter_mut()
@@ -11237,8 +11030,7 @@ pub fn begin_aqua_ring(
     let Some(caster) = ctx.get_entity(caster_id) else {
         return;
     };
-    let rings = AQUA_RINGS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut rings = rings.lock().expect("aqua ring state poisoned");
+    let mut rings = AQUA_RINGS.lock_or_init(|| Mutex::new(Vec::new())).expect("aqua ring state poisoned");
     rings.retain(|state| state.caster_id != caster_id);
     let tick = ctx.tick();
     rings.push(AquaRingState {
@@ -11270,8 +11062,7 @@ pub fn begin_misty_terrain(
         return;
     }
 
-    let terrains = MISTY_TERRAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut terrains = terrains.lock().expect("misty terrain state poisoned");
+    let mut terrains = MISTY_TERRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("misty terrain state poisoned");
     terrains.retain(|state| state.caster_id != caster_id);
     let tick = ctx.tick();
     terrains.push(MistyTerrainState {
@@ -11296,8 +11087,7 @@ pub fn begin_brine_field(
     slow_percent: i32,
     slow_ticks: usize,
 ) {
-    let fields = BRINE_FIELDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut fields = fields.lock().expect("brine field state poisoned");
+    let mut fields = BRINE_FIELDS.lock_or_init(|| Mutex::new(Vec::new())).expect("brine field state poisoned");
     let tick = ctx.tick();
     fields.push(BrineFieldState {
         caster_id,
@@ -11396,8 +11186,7 @@ fn spawn_grassy_terrain_at_tick(
     }
     drop(caster);
 
-    let fields = GRASSY_TERRAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut fields = fields.lock().expect("grassy terrain state poisoned");
+    let mut fields = GRASSY_TERRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("grassy terrain state poisoned");
     let latest_for_caster = fields
         .iter()
         .filter(|state| state.caster_id == caster_id)
@@ -11438,6 +11227,8 @@ fn spawn_grassy_terrain_at_tick(
         };
         fields.remove(index);
     }
+    drop(fields);
+    crate::native_vfx::field(ctx, "arboliva_passive_grassy_terrain", caster_id, center, radius);
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -11459,8 +11250,7 @@ pub fn begin_rillaboom_drum_aura(
     if !caster.is_alive() {
         return;
     }
-    let auras = RILLABOOM_DRUM_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("rillaboom drum aura state poisoned");
+    let mut auras = RILLABOOM_DRUM_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("rillaboom drum aura state poisoned");
     auras.retain(|state| {
         !(state.caster_id == caster_id
             && state.enemy_slow_percent == enemy_slow_percent
@@ -11518,9 +11308,7 @@ pub fn begin_rillaboom_grassy_surge(
         );
     }
 
-    let surges = RILLABOOM_GRASSY_SURGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut surges = surges
-        .lock()
+    let mut surges = RILLABOOM_GRASSY_SURGES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("rillaboom grassy surge state poisoned");
     surges.push(RillaboomGrassySurgeState {
         caster_id,
@@ -11808,8 +11596,7 @@ pub fn update_swanna_tailwind(ctx: &mut GameCtx, entity_id: usize) {
     drop(entity);
 
     let tick = ctx.tick();
-    let states = SWANNA_TAILWINDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("swanna tailwind state poisoned");
+    let mut states = SWANNA_TAILWINDS.lock_or_init(|| Mutex::new(Vec::new())).expect("swanna tailwind state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         states.push(SwannaTailwindState {
             entity_id,
@@ -11884,8 +11671,7 @@ pub fn consume_swanna_tailwind_damage_amp(
     caster_ap: usize,
 ) -> Option<(usize, usize)> {
     let tick = ctx.tick();
-    let states = SWANNA_TAILWINDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("swanna tailwind state poisoned");
+    let mut states = SWANNA_TAILWINDS.lock_or_init(|| Mutex::new(Vec::new())).expect("swanna tailwind state poisoned");
     let state = states
         .iter_mut()
         .find(|state| state.entity_id == entity_id)?;
@@ -11897,8 +11683,7 @@ pub fn consume_swanna_tailwind_damage_amp(
 }
 
 fn update_swanna_cyclones(ctx: &mut GameCtx, tick: usize) {
-    let states = SWANNA_CYCLONES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("swanna cyclone state poisoned");
+    let mut states = SWANNA_CYCLONES.lock_or_init(|| Mutex::new(Vec::new())).expect("swanna cyclone state poisoned");
     let mut ticks = Vec::new();
     let mut visuals = Vec::new();
 
@@ -11970,8 +11755,7 @@ fn update_swanna_cyclones(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_swanna_sky_circuses(ctx: &mut GameCtx, tick: usize) {
-    let states = SWANNA_SKY_CIRCUSES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("swanna sky circus state poisoned");
+    let mut states = SWANNA_SKY_CIRCUSES.lock_or_init(|| Mutex::new(Vec::new())).expect("swanna sky circus state poisoned");
     let mut protections = Vec::new();
     let mut force_moves = Vec::new();
     let mut hit_batches = Vec::new();
@@ -12159,9 +11943,7 @@ pub fn begin_marowak_bone_windmill(
 
 pub fn consume_marowak_windmill_bonemerang(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
-    let states = MAROWAK_WINDMILL_BONEMERANGS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = MAROWAK_WINDMILL_BONEMERANGS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("marowak windmill bonemerang state poisoned");
     states.retain(|state| state.expires_at > tick);
     let Some(index) = states
@@ -12175,8 +11957,7 @@ pub fn consume_marowak_windmill_bonemerang(ctx: &GameCtx, entity_id: usize) -> b
 }
 
 fn update_marowak_bone_windmills(ctx: &mut GameCtx, tick: usize) {
-    let states = MAROWAK_BONE_WINDMILLS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("marowak bone windmill state poisoned");
+    let mut states = MAROWAK_BONE_WINDMILLS.lock_or_init(|| Mutex::new(Vec::new())).expect("marowak bone windmill state poisoned");
     let mut protections = Vec::new();
     let mut ticks = Vec::new();
     let mut visuals = Vec::new();
@@ -12284,9 +12065,7 @@ fn update_marowak_bone_windmills(ctx: &mut GameCtx, tick: usize) {
         }
     }
     if !empowered.is_empty() {
-        let states = MAROWAK_WINDMILL_BONEMERANGS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut states = states
-            .lock()
+        let mut states = MAROWAK_WINDMILL_BONEMERANGS.lock_or_init(|| Mutex::new(Vec::new()))
             .expect("marowak windmill bonemerang state poisoned");
         for (entity_id, empowered_ticks) in empowered {
             states.retain(|state| state.entity_id != entity_id && state.expires_at > tick);
@@ -12320,8 +12099,7 @@ pub fn garganacl_spawn_passive_salt(
     drop(caster);
 
     let tick = ctx.tick();
-    let patches = GARGANACL_SALT_PATCHES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut patches = patches.lock().expect("garganacl salt patch state poisoned");
+    let mut patches = GARGANACL_SALT_PATCHES.lock_or_init(|| Mutex::new(Vec::new())).expect("garganacl salt patch state poisoned");
     patches.retain(|state| state.expires_at > tick);
     patches.push(GarganaclSaltPatchState {
         caster_id,
@@ -12353,6 +12131,8 @@ pub fn garganacl_spawn_passive_salt(
         };
         patches.remove(index);
     }
+    drop(patches);
+    crate::native_vfx::field(ctx, "garganacl_passive_salt_cure_patch", caster_id, center, radius);
 }
 
 pub fn trigger_garganacl_salt_cure_from_physical_damage(
@@ -12438,6 +12218,7 @@ pub fn begin_garganacl_blessed_salt(
             center,
             outer_radius,
             inner_radius,
+            activates_at: tick.saturating_add(duration_ticks),
             next_tick_at: tick.saturating_add(duration_ticks),
             tick_interval: permanent_tick_interval.max(1),
             damage: permanent_damage.max(1),
@@ -12445,6 +12226,7 @@ pub fn begin_garganacl_blessed_salt(
             slow_ticks,
             water_steel_bonus_percent,
         });
+    crate::native_vfx::field(ctx, "garganacl_ult_blessed_salt_spire_ring", caster_id, center, outer_radius);
 }
 
 pub fn garganacl_entity_in_salt(ctx: &GameCtx, entity_id: usize) -> bool {
@@ -12456,8 +12238,7 @@ pub fn garganacl_entity_in_salt(ctx: &GameCtx, entity_id: usize) -> bool {
 
     let tick = ctx.tick();
     if GARGANACL_SALT_PATCHES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("garganacl salt patch state poisoned")
         .iter()
         .any(|state| {
@@ -12469,13 +12250,13 @@ pub fn garganacl_entity_in_salt(ctx: &GameCtx, entity_id: usize) -> bool {
     }
 
     GARGANACL_PERMANENT_SALTS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("garganacl permanent salt state poisoned")
         .iter()
         .any(|state| {
             let dist = distance_sq(pos, state.center);
-            dist <= state.outer_radius.saturating_mul(state.outer_radius)
+            state.activates_at <= tick
+                && dist <= state.outer_radius.saturating_mul(state.outer_radius)
                 && dist >= state.inner_radius.saturating_mul(state.inner_radius)
         })
 }
@@ -12501,8 +12282,8 @@ fn salt_damage_for_target(
 fn update_garganacl_salt(ctx: &mut GameCtx, tick: usize) {
     let mut patch_hits = Vec::new();
     let mut patch_visuals = Vec::new();
-    let patches = GARGANACL_SALT_PATCHES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut patches = patches.lock().expect("garganacl salt patch state poisoned");
+    let mut triggered_patches = Vec::new();
+    let mut patches = GARGANACL_SALT_PATCHES.lock_or_init(|| Mutex::new(Vec::new())).expect("garganacl salt patch state poisoned");
     patches.retain_mut(|state| {
         if state.expires_at <= tick {
             return false;
@@ -12533,16 +12314,19 @@ fn update_garganacl_salt(ctx: &mut GameCtx, tick: usize) {
                 state.slow_ticks,
                 state.water_steel_bonus_percent,
             ));
+            triggered_patches.push((state.caster_id, state.center, state.radius));
             return false;
         }
         true
     });
     drop(patches);
+    for (caster, center, radius) in triggered_patches {
+        crate::native_vfx::burst(ctx, "garganacl_passive_salt_cure_patch", caster,
+            InputTarget::Pos { x: center.x, y: center.y }, radius);
+    }
 
     let mut pulse_hits = Vec::new();
-    let blessed = GARGANACL_BLESSED_SALTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut blessed = blessed
-        .lock()
+    let mut blessed = GARGANACL_BLESSED_SALTS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("garganacl blessed salt state poisoned");
     blessed.retain_mut(|state| {
         if state.expires_at <= tick {
@@ -12580,9 +12364,7 @@ fn update_garganacl_salt(ctx: &mut GameCtx, tick: usize) {
     drop(blessed);
 
     let mut permanent_hits = Vec::new();
-    let permanent = GARGANACL_PERMANENT_SALTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut permanent = permanent
-        .lock()
+    let mut permanent = GARGANACL_PERMANENT_SALTS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("garganacl permanent salt state poisoned");
     permanent.retain_mut(|state| {
         patch_visuals.push((state.center, state.outer_radius));
@@ -12685,8 +12467,7 @@ fn update_garganacl_salt(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_ampharos_gigavolts(ctx: &mut GameCtx, tick: usize) {
-    let states = AMPHAROS_GIGAVOLTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("ampharos gigavolt state poisoned");
+    let mut states = AMPHAROS_GIGAVOLTS.lock_or_init(|| Mutex::new(Vec::new())).expect("ampharos gigavolt state poisoned");
     states.retain(|state| {
         state.expires_at > tick
             && ctx
@@ -12809,8 +12590,7 @@ pub fn update_xatu_stillness(ctx: &mut GameCtx, entity_id: usize) {
     let pos = entity.pos();
     drop(entity);
 
-    let states = XATU_STILLNESSES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("xatu stillness state poisoned");
+    let mut states = XATU_STILLNESSES.lock_or_init(|| Mutex::new(Vec::new())).expect("xatu stillness state poisoned");
     states.retain(|state| {
         ctx.get_entity(state.entity_id)
             .map(|entity| entity.is_alive() && entity.is_champion())
@@ -12906,8 +12686,7 @@ pub fn apply_xatu_pain_amplifier(
     drop(target);
 
     let tick = ctx.tick();
-    let states = XATU_PAIN_AMPLIFIERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("xatu pain amplifier state poisoned");
+    let mut states = XATU_PAIN_AMPLIFIERS.lock_or_init(|| Mutex::new(Vec::new())).expect("xatu pain amplifier state poisoned");
     states.retain(|state| state.expires_at > tick && state.target_id != target_id);
     states.push(XatuPainAmplifierState {
         target_id,
@@ -12950,8 +12729,7 @@ pub fn apply_xatu_pain_amplifier(
 
 pub fn xatu_pain_amplifier_bonus_percent(ctx: &GameCtx, target_id: usize) -> usize {
     let tick = ctx.tick();
-    let states = XATU_PAIN_AMPLIFIERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("xatu pain amplifier state poisoned");
+    let mut states = XATU_PAIN_AMPLIFIERS.lock_or_init(|| Mutex::new(Vec::new())).expect("xatu pain amplifier state poisoned");
     states.retain(|state| {
         state.expires_at > tick
             && ctx
@@ -13041,8 +12819,7 @@ pub fn begin_xatu_super_psy(
     drop(caster);
 
     let tick = ctx.tick();
-    let states = XATU_SUPER_PSYS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("xatu super psy state poisoned");
+    let mut states = XATU_SUPER_PSYS.lock_or_init(|| Mutex::new(Vec::new())).expect("xatu super psy state poisoned");
     states.retain(|state| state.caster_id != caster_id && state.expires_at > tick);
     states.push(XatuSuperPsyState {
         caster_id,
@@ -13129,8 +12906,7 @@ fn xatu_super_psy_aim_end(
 }
 
 fn update_xatu_super_psys(ctx: &mut GameCtx, tick: usize) {
-    let states = XATU_SUPER_PSYS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("xatu super psy state poisoned");
+    let mut states = XATU_SUPER_PSYS.lock_or_init(|| Mutex::new(Vec::new())).expect("xatu super psy state poisoned");
     let mut tick_states = Vec::new();
     let mut active_states = Vec::new();
     states.retain_mut(|state| {
@@ -13255,9 +13031,7 @@ pub fn begin_quaquaval_exciting_dance(
     drop(entity);
 
     let tick = ctx.tick();
-    let states = QUAQUAVAL_EXCITING_DANCES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = QUAQUAVAL_EXCITING_DANCES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("quaquaval exciting dance state poisoned");
     states.retain(|state| state.entity_id != entity_id && state.expires_at > tick);
     states.push(QuaquavalExcitingDanceState {
@@ -13284,9 +13058,7 @@ pub fn begin_quaquaval_exciting_dance(
 
 fn quaquaval_exciting_dance_active(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
-    let states = QUAQUAVAL_EXCITING_DANCES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = QUAQUAVAL_EXCITING_DANCES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("quaquaval exciting dance state poisoned");
     states.retain(|state| {
         state
@@ -13318,9 +13090,7 @@ pub fn update_quaquaval_aqua_step(ctx: &mut GameCtx, entity_id: usize) {
     drop(entity);
 
     let tick = ctx.tick();
-    let emitters = QUAQUAVAL_AQUA_STEP_EMITTERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut emitters = emitters
-        .lock()
+    let mut emitters = QUAQUAVAL_AQUA_STEP_EMITTERS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("quaquaval aqua step emitter state poisoned");
     emitters.retain(|state| {
         ctx.get_entity(state.entity_id)
@@ -13356,9 +13126,7 @@ pub fn update_quaquaval_aqua_step(ctx: &mut GameCtx, entity_id: usize) {
     drop(emitters);
 
     let empowered = quaquaval_exciting_dance_active(ctx, entity_id);
-    let segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut segments = segments
-        .lock()
+    let mut segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("quaquaval aqua step segment state poisoned");
     segments.retain(|segment| {
         segment.expires_at > tick
@@ -13397,9 +13165,7 @@ pub fn update_quaquaval_aqua_step(ctx: &mut GameCtx, entity_id: usize) {
 }
 
 fn update_quaquaval_aqua_step_segments(ctx: &mut GameCtx, tick: usize) {
-    let segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut segments = segments
-        .lock()
+    let mut segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("quaquaval aqua step segment state poisoned");
     let mut visuals = Vec::new();
     let mut ally_buffs = Vec::new();
@@ -13535,8 +13301,7 @@ pub fn quaquaval_water_damage_bonus_percent(ctx: &GameCtx, caster_id: usize) -> 
 
 pub fn quaquaval_recently_hit_by_spiral_shot(ctx: &GameCtx, target_id: usize) -> bool {
     let tick = ctx.tick();
-    let states = QUAQUAVAL_SPIRAL_SHOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("quaquaval spiral shot state poisoned");
+    let mut states = QUAQUAVAL_SPIRAL_SHOTS.lock_or_init(|| Mutex::new(Vec::new())).expect("quaquaval spiral shot state poisoned");
     states.retain(|state| {
         state.expires_at > tick
             && ctx
@@ -13588,8 +13353,7 @@ pub fn apply_quaquaval_spiral_shot(
             ..Default::default()
         },
     );
-    let states = QUAQUAVAL_SPIRAL_SHOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("quaquaval spiral shot state poisoned");
+    let mut states = QUAQUAVAL_SPIRAL_SHOTS.lock_or_init(|| Mutex::new(Vec::new())).expect("quaquaval spiral shot state poisoned");
     let expires_at = ctx.tick().saturating_add(slow_ticks);
     states.retain(|state| state.target_id != target_id && state.expires_at > ctx.tick());
     states.push(QuaquavalSpiralShotState {
@@ -13607,9 +13371,7 @@ fn quaquaval_path_crosses_own_aqua_step(
     check_width: u64,
 ) -> bool {
     let tick = ctx.tick();
-    let segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.get_or_init(|| Mutex::new(Vec::new()));
-    let segments = segments
-        .lock()
+    let segments = QUAQUAVAL_AQUA_STEP_SEGMENTS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("quaquaval aqua step segment state poisoned");
     segments
         .iter()
@@ -13790,9 +13552,7 @@ pub fn apply_arcanine_extremespeed(
                     ..Default::default()
                 },
             );
-            let states = ARCANINE_EXTREMESPEED_SHIELDS.get_or_init(|| Mutex::new(Vec::new()));
-            let mut states = states
-                .lock()
+            let mut states = ARCANINE_EXTREMESPEED_SHIELDS.lock_or_init(|| Mutex::new(Vec::new()))
                 .expect("arcanine extremespeed shield state poisoned");
             let expires_at = ctx.tick().saturating_add(shield_ticks);
             states.retain(|state| state.entity_id != caster_id && state.expires_at > ctx.tick());
@@ -14037,9 +13797,7 @@ fn handle_arcanine_extremespeed_shield_hit(
     shield_after: usize,
 ) {
     let tick = ctx.tick();
-    let states = ARCANINE_EXTREMESPEED_SHIELDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = ARCANINE_EXTREMESPEED_SHIELDS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("arcanine extremespeed shield state poisoned");
     let mut speed_buff = None;
     states.retain(|state| {
@@ -14071,8 +13829,7 @@ fn handle_arcanine_extremespeed_shield_hit(
 fn apply_arcanine_blazing_mane_stack(ctx: &mut GameCtx, arcanine_id: usize, attacker_id: usize) {
     let tick = ctx.tick();
     let expires_at = tick.saturating_add(ARCANINE_BLAZING_MANE_TICKS);
-    let states = ARCANINE_BLAZING_MANES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("arcanine blazing mane state poisoned");
+    let mut states = ARCANINE_BLAZING_MANES.lock_or_init(|| Mutex::new(Vec::new())).expect("arcanine blazing mane state poisoned");
     states.retain(|state| {
         state.expires_at > tick
             && ctx
@@ -14148,8 +13905,7 @@ fn wishiwashi_nearby_ally_count(ctx: &GameCtx, entity_id: usize, radius: u64) ->
 
 pub fn force_wishiwashi_schooling(ctx: &GameCtx, entity_id: usize, ticks: usize) {
     let until = ctx.tick().saturating_add(ticks);
-    let states = WISHIWASHI_SCHOOLINGS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("wishiwashi schooling state poisoned");
+    let mut states = WISHIWASHI_SCHOOLINGS.lock_or_init(|| Mutex::new(Vec::new())).expect("wishiwashi schooling state poisoned");
     states.retain(|state| {
         state.entity_id == entity_id
             || ctx
@@ -14170,8 +13926,7 @@ pub fn force_wishiwashi_schooling(ctx: &GameCtx, entity_id: usize, ticks: usize)
 pub fn wishiwashi_is_schooling(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
     let forced = WISHIWASHI_SCHOOLINGS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("wishiwashi schooling state poisoned")
         .iter()
         .any(|state| state.entity_id == entity_id && state.force_school_until > tick);
@@ -14460,9 +14215,7 @@ pub fn begin_wishiwashi_massive_catch(
 
     let spit_pos = wishiwashi_spit_pos(start_pos, target_pos, 26000);
     let tick = ctx.tick();
-    let states = WISHIWASHI_MASSIVE_CATCHES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = WISHIWASHI_MASSIVE_CATCHES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("wishiwashi massive catch state poisoned");
     states.retain(|state| state.caster_id != caster_id && state.target_id != target_id);
     states.push(WishiwashiMassiveCatchState {
@@ -14512,9 +14265,7 @@ pub fn begin_wishiwashi_massive_catch(
 }
 
 fn update_wishiwashi_massive_catches(ctx: &mut GameCtx, tick: usize) {
-    let states = WISHIWASHI_MASSIVE_CATCHES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = WISHIWASHI_MASSIVE_CATCHES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("wishiwashi massive catch state poisoned");
 
     let mut outbound = Vec::new();
@@ -14867,8 +14618,7 @@ pub fn begin_missingno_glitch_storm(
     drop(caster);
 
     let seed = ctx.seed() ^ ((caster_id as u64) << 32) ^ ctx.tick() as u64 ^ 0x4d5f3030_u64;
-    let states = MISSINGNO_GLITCH_STORMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("missingno storm state poisoned");
+    let mut states = MISSINGNO_GLITCH_STORMS.lock_or_init(|| Mutex::new(Vec::new())).expect("missingno storm state poisoned");
     states.retain(|state| state.caster_id != caster_id);
     states.push(MissingNoGlitchStormState {
         caster_id,
@@ -14917,8 +14667,7 @@ pub fn begin_missingno_trick_room(
     drop(caster);
 
     let end = point_at_distance(caster_pos, target_pos, length);
-    let states = MISSINGNO_TRICK_ROOMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("missingno trick room state poisoned");
+    let mut states = MISSINGNO_TRICK_ROOMS.lock_or_init(|| Mutex::new(Vec::new())).expect("missingno trick room state poisoned");
     states.retain(|state| state.caster_id != caster_id);
     states.push(MissingNoTrickRoomState {
         caster_id,
@@ -14948,8 +14697,7 @@ pub fn begin_missingno_trick_room(
 }
 
 fn update_missingno_glitch_storms(ctx: &mut GameCtx, tick: usize) {
-    let states = MISSINGNO_GLITCH_STORMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("missingno storm state poisoned");
+    let mut states = MISSINGNO_GLITCH_STORMS.lock_or_init(|| Mutex::new(Vec::new())).expect("missingno storm state poisoned");
     let mut sparks = Vec::new();
     let mut visuals = Vec::new();
 
@@ -15004,8 +14752,7 @@ fn update_missingno_glitch_storms(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_missingno_trick_rooms(ctx: &mut GameCtx, tick: usize) {
-    let states = MISSINGNO_TRICK_ROOMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("missingno trick room state poisoned");
+    let mut states = MISSINGNO_TRICK_ROOMS.lock_or_init(|| Mutex::new(Vec::new())).expect("missingno trick room state poisoned");
     let mut applications = Vec::new();
     let mut visuals = Vec::new();
 
@@ -15183,9 +14930,7 @@ fn maybe_trigger_missingno_negative_glitch(
     ) {
         return;
     }
-    let states = MISSINGNO_PENDING_DEBUFFS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = MISSINGNO_PENDING_DEBUFFS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("missingno pending debuff state poisoned");
     states.push(MissingNoPendingDebuffState {
         source_id: missingno_id,
@@ -15195,9 +14940,7 @@ fn maybe_trigger_missingno_negative_glitch(
 }
 
 fn update_missingno_pending_debuffs(ctx: &mut GameCtx, tick: usize) {
-    let states = MISSINGNO_PENDING_DEBUFFS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = MISSINGNO_PENDING_DEBUFFS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("missingno pending debuff state poisoned");
     let mut pending = Vec::new();
     states.retain(|state| {
@@ -15606,9 +15349,7 @@ fn shiftry_in_bush(ctx: &GameCtx, entity_id: usize) -> bool {
 pub fn update_shiftry_forest_camouflage(ctx: &mut GameCtx, entity_id: usize) {
     let tick = ctx.tick();
     let in_bush = shiftry_in_bush(ctx, entity_id);
-    let states = SHIFTRY_FOREST_CAMOUFLAGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = SHIFTRY_FOREST_CAMOUFLAGES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("shiftry forest camouflage state poisoned");
     let state = if let Some(existing) = states.iter_mut().find(|state| state.entity_id == entity_id)
     {
@@ -15679,8 +15420,7 @@ pub fn note_rillaboom_skill_cast(ctx: &mut GameCtx, entity_id: usize) {
     const ALLY_SPEED_TICKS: usize = 2 * 60;
 
     let tick = ctx.tick();
-    let solos = RILLABOOM_DRUM_SOLOS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut solos = solos.lock().expect("rillaboom drum solo state poisoned");
+    let mut solos = RILLABOOM_DRUM_SOLOS.lock_or_init(|| Mutex::new(Vec::new())).expect("rillaboom drum solo state poisoned");
     let Some(state) = solos.iter_mut().find(|state| state.entity_id == entity_id) else {
         solos.push(RillaboomDrumSoloState {
             entity_id,
@@ -15741,8 +15481,7 @@ pub fn note_rillaboom_skill_cast(ctx: &mut GameCtx, entity_id: usize) {
 }
 
 pub fn clear_grassy_terrains_at(center: EntityPos, radius: u64) {
-    let fields = GRASSY_TERRAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut fields = fields.lock().expect("grassy terrain state poisoned");
+    let mut fields = GRASSY_TERRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("grassy terrain state poisoned");
     let radius_sq = radius.saturating_mul(radius);
     fields.retain(|state| distance_sq(state.center, center) > radius_sq);
 }
@@ -15759,12 +15498,12 @@ pub fn grassy_terrain_damage_bonus_for_caster(
         return 0;
     };
     GRASSY_TERRAINS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("grassy terrain state poisoned")
         .iter()
         .filter(|state| {
-            distance_sq(caster_pos, state.center) <= state.radius.saturating_mul(state.radius)
+            state.caster_id == caster_id && state.expires_at > ctx.tick()
+                && distance_sq(caster_pos, state.center) <= state.radius.saturating_mul(state.radius)
         })
         .map(|state| state.damage_bonus_percent)
         .sum()
@@ -15786,8 +15525,7 @@ pub fn grassy_terrain_trailblaze_targets(
     drop(caster);
 
     let search_radius_sq = search_radius.saturating_mul(search_radius);
-    let fields = GRASSY_TERRAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let fields = fields.lock().expect("grassy terrain state poisoned");
+    let fields = GRASSY_TERRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("grassy terrain state poisoned");
     let candidate_fields: Vec<GrassyTerrainState> = fields
         .iter()
         .copied()
@@ -15837,8 +15575,7 @@ pub fn detonate_grassy_terrains_near(
     drop(caster);
 
     let search_radius_sq = search_radius.saturating_mul(search_radius);
-    let fields = GRASSY_TERRAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut fields = fields.lock().expect("grassy terrain state poisoned");
+    let mut fields = GRASSY_TERRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("grassy terrain state poisoned");
     let mut detonated = Vec::new();
     fields.retain(|state| {
         let should_detonate = state.caster_id == caster_id
@@ -15916,6 +15653,14 @@ pub fn detonate_grassy_terrains_near(
     }
 }
 
+pub(crate) fn sticky_web_placement_useful(caster: usize, center: EntityPos, radius: u64) -> bool {
+    // Preserve overlapping chains; avoid spending the next charge on the same center.
+    let separation = (radius / 3).max(1);
+    !STICKY_WEBS.lock_or_init(Default::default).expect("sticky web state poisoned")
+        .iter().any(|web| web.caster_id == caster
+            && distance_sq(web.center, center) < separation.saturating_mul(separation))
+}
+
 pub fn begin_sticky_web(
     ctx: &GameCtx,
     caster_id: usize,
@@ -15933,8 +15678,7 @@ pub fn begin_sticky_web(
         return;
     }
 
-    let webs = STICKY_WEBS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut webs = webs.lock().expect("sticky web state poisoned");
+    let mut webs = STICKY_WEBS.lock_or_init(|| Mutex::new(Vec::new())).expect("sticky web state poisoned");
     let tick = ctx.tick();
     webs.push(StickyWebState {
         caster_id,
@@ -15964,11 +15708,12 @@ pub fn begin_sticky_web(
         };
         webs.remove(index);
     }
+    drop(webs);
+    crate::native_vfx::field(ctx, "kricketune_skill1_sticky_web_deployable", caster_id, center, radius);
 }
 
 pub fn burn_sticky_webs_at(center: EntityPos, radius: u64) {
-    let webs = STICKY_WEBS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut webs = webs.lock().expect("sticky web state poisoned");
+    let mut webs = STICKY_WEBS.lock_or_init(|| Mutex::new(Vec::new())).expect("sticky web state poisoned");
     let radius_sq = radius.saturating_mul(radius);
     webs.retain(|state| distance_sq(state.center, center) > radius_sq);
 }
@@ -16040,8 +15785,7 @@ fn note_team_spot_for_ticks(
     target_pos: EntityPos,
     duration_ticks: usize,
 ) {
-    let spots = WEB_WALKER_SPOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut spots = spots.lock().expect("web walker spot state poisoned");
+    let mut spots = WEB_WALKER_SPOTS.lock_or_init(|| Mutex::new(Vec::new())).expect("web walker spot state poisoned");
     spots.retain(|spot| spot.expires_at > tick);
     let expires_at = tick.saturating_add(duration_ticks);
     if let Some(existing) = spots
@@ -16136,8 +15880,7 @@ fn update_web_walker_spots(ctx: &GameCtx, tick: usize, webs: &[StickyWebState]) 
 }
 
 pub fn team_spotted_targets(team: usize, tick: usize) -> Vec<WebWalkerSpot> {
-    let spots = WEB_WALKER_SPOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut spots = spots.lock().expect("web walker spot state poisoned");
+    let mut spots = WEB_WALKER_SPOTS.lock_or_init(|| Mutex::new(Vec::new())).expect("web walker spot state poisoned");
     spots.retain(|spot| spot.expires_at > tick);
 
     spots.iter().filter(|spot| spot.team == team && spot.observed_at <= tick).copied().collect()
@@ -16156,8 +15899,7 @@ pub fn begin_sing_aura(
     if !caster.is_alive() {
         return;
     }
-    let auras = SING_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("sing aura state poisoned");
+    let mut auras = SING_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("sing aura state poisoned");
     auras.retain(|state| state.caster_id != caster_id);
     let tick = ctx.tick();
     auras.push(SingAuraState {
@@ -16190,8 +15932,7 @@ pub fn begin_frosmoth_sleep_circle(
     let caster_team = caster.team();
     drop(caster);
 
-    let circles = FROSMOTH_SLEEP_CIRCLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut circles = circles.lock().expect("frosmoth sleep state poisoned");
+    let mut circles = FROSMOTH_SLEEP_CIRCLES.lock_or_init(|| Mutex::new(Vec::new())).expect("frosmoth sleep state poisoned");
     circles.retain(|state| state.caster_id != caster_id);
     let tick = ctx.tick();
     circles.push(FrosmothSleepCircleState {
@@ -16226,8 +15967,7 @@ pub fn begin_bug_buzz_aura(
     if !caster.is_alive() {
         return;
     }
-    let auras = BUG_BUZZ_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("bug buzz aura state poisoned");
+    let mut auras = BUG_BUZZ_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("bug buzz aura state poisoned");
     auras.retain(|state| state.caster_id != caster_id);
     let tick = ctx.tick();
     auras.push(BugBuzzAuraState {
@@ -16269,9 +16009,7 @@ pub fn begin_armarouge_mystical_fire_aura(
     drop(caster);
 
     let tick = ctx.tick();
-    let auras = ARMAROUGE_MYSTICAL_FIRE_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras
-        .lock()
+    let mut auras = ARMAROUGE_MYSTICAL_FIRE_AURAS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("armarouge mystical fire state poisoned");
     auras.retain(|state| state.caster_id != caster_id && state.expires_at > tick);
     auras.push(ArmarougeMysticalFireAuraState {
@@ -16308,8 +16046,7 @@ pub fn begin_alluring_voice_aura(
     if !caster.is_alive() {
         return;
     }
-    let auras = ALLURING_VOICE_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("alluring voice aura state poisoned");
+    let mut auras = ALLURING_VOICE_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("alluring voice aura state poisoned");
     auras.retain(|state| state.caster_id != caster_id);
     let tick = ctx.tick();
     auras.push(AlluringVoiceAuraState {
@@ -16346,8 +16083,7 @@ pub fn begin_whirlpool(
         return;
     }
 
-    let whirlpools = WHIRLPOOLS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut whirlpools = whirlpools.lock().expect("whirlpool state poisoned");
+    let mut whirlpools = WHIRLPOOLS.lock_or_init(|| Mutex::new(Vec::new())).expect("whirlpool state poisoned");
     let tick = ctx.tick();
     whirlpools.push(WhirlpoolState {
         caster_id,
@@ -16387,8 +16123,7 @@ pub fn begin_charm_heal(
         return;
     }
 
-    let heals = CHARM_HEALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut heals = heals.lock().expect("charm heal state poisoned");
+    let mut heals = CHARM_HEALS.lock_or_init(|| Mutex::new(Vec::new())).expect("charm heal state poisoned");
     heals.retain(|state| !(state.caster_id == caster_id && state.target_id == target_id));
     let tick = ctx.tick();
     heals.push(CharmHealState {
@@ -16413,8 +16148,7 @@ pub fn begin_blissey_heal_aura(
     if !caster.is_alive() {
         return;
     }
-    let auras = BLISSEY_HEAL_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("blissey heal aura state poisoned");
+    let mut auras = BLISSEY_HEAL_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("blissey heal aura state poisoned");
     auras.retain(|state| state.caster_id != caster_id);
     let tick = ctx.tick();
     auras.push(BlisseyHealAuraState {
@@ -16442,8 +16176,7 @@ fn note_kleavor_hit_in(
     store: &OnceLock<Mutex<Vec<KleavorHitState>>>,
 ) -> usize {
     let tick = ctx.tick();
-    let states = store.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("kleavor hit state poisoned");
+    let mut states = store.lock_or_init(|| Mutex::new(Vec::new())).expect("kleavor hit state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         states.push(KleavorHitState {
             entity_id,
@@ -16472,8 +16205,7 @@ pub fn begin_stealth_rock(
     if !entity.is_alive() {
         return;
     }
-    let states = STEALTH_ROCKS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("stealth rock state poisoned");
+    let mut states = STEALTH_ROCKS.lock_or_init(|| Mutex::new(Vec::new())).expect("stealth rock state poisoned");
     states.retain(|state| state.entity_id != entity_id);
     let tick = ctx.tick();
     states.push(StealthRockState {
@@ -16502,8 +16234,7 @@ pub fn update_light_metal_passive(ctx: &mut GameCtx, entity_id: usize) {
     let move_speed = entity.stat().move_speed;
     drop(entity);
 
-    let states = LIGHT_METALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("light metal state poisoned");
+    let mut states = LIGHT_METALS.lock_or_init(|| Mutex::new(Vec::new())).expect("light metal state poisoned");
     states.retain(|state| {
         ctx.get_entity(state.entity_id)
             .map(|entity| entity.is_alive())
@@ -16581,8 +16312,7 @@ pub fn update_wide_guard_passive(ctx: &GameCtx, entity_id: usize) {
     let pos = entity.pos();
     drop(entity);
 
-    let states = WIDE_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("wide guard state poisoned");
+    let mut states = WIDE_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("wide guard state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         states.push(WideGuardState {
             entity_id,
@@ -16636,8 +16366,7 @@ pub fn wide_guard_reduce_percent(ctx: &GameCtx, target_id: usize, attacker_id: u
     let attacker_pos = attacker.pos();
     drop(attacker);
 
-    let states = WIDE_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("wide guard state poisoned");
+    let states = WIDE_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("wide guard state poisoned");
     let Some(state) = states.iter().find(|state| state.entity_id == target_id) else {
         return 0;
     };
@@ -16681,8 +16410,7 @@ pub fn afro_reduce_percent(ctx: &GameCtx, target_id: usize, attacker_id: usize) 
     let attacker_pos = attacker.pos();
     drop(attacker);
 
-    let states = WIDE_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("wide guard state poisoned");
+    let states = WIDE_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("wide guard state poisoned");
     let Some(state) = states.iter().find(|state| state.entity_id == target_id) else {
         return 0;
     };
@@ -16706,8 +16434,7 @@ pub fn afro_reduce_percent(ctx: &GameCtx, target_id: usize, attacker_id: usize) 
 
 pub fn update_audino_regenerator(ctx: &mut GameCtx, audino_id: usize) {
     let tick = ctx.tick();
-    let states = AUDINO_REGENERATORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("audino regenerator state poisoned");
+    let mut states = AUDINO_REGENERATORS.lock_or_init(|| Mutex::new(Vec::new())).expect("audino regenerator state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.audino_id == audino_id) else {
         return;
     };
@@ -16773,8 +16500,7 @@ pub fn update_audino_regenerator(ctx: &mut GameCtx, audino_id: usize) {
 fn is_in_water_aoe(ctx: &GameCtx, pos: EntityPos) -> bool {
     let tick = ctx.tick();
     if BRINE_FIELDS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("brine field state poisoned")
         .iter()
         .any(|state| {
@@ -16786,8 +16512,7 @@ fn is_in_water_aoe(ctx: &GameCtx, pos: EntityPos) -> bool {
     }
 
     if WHIRLPOOLS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("whirlpool state poisoned")
         .iter()
         .any(|state| {
@@ -16799,8 +16524,7 @@ fn is_in_water_aoe(ctx: &GameCtx, pos: EntityPos) -> bool {
     }
 
     AQUA_RINGS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("aqua ring state poisoned")
         .iter()
         .any(|state| {
@@ -16824,8 +16548,7 @@ pub fn reset_light_metal(ctx: &GameCtx, entity_id: usize) {
     let tick = ctx.tick();
     drop(entity);
 
-    let states = LIGHT_METALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("light metal state poisoned");
+    let mut states = LIGHT_METALS.lock_or_init(|| Mutex::new(Vec::new())).expect("light metal state poisoned");
     if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         state.last_pos = pos;
         state.distance_without_damage = 0;
@@ -16855,8 +16578,7 @@ pub fn absorb_light_metal_damage(
 
 pub fn note_light_metal_dealt_damage(ctx: &GameCtx, entity_id: usize) {
     let is_scizor = SCIZORS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("scizor state poisoned")
         .iter()
         .any(|id| *id == entity_id && entity_is_champion_id(entity_id, "pokemon_moba_scizor"))
@@ -16867,8 +16589,7 @@ pub fn note_light_metal_dealt_damage(ctx: &GameCtx, entity_id: usize) {
 }
 
 pub fn register_armarouge_weak_armor(entity_id: usize) {
-    let states = ARMAROUGE_WEAK_ARMORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("armarouge weak armor state poisoned");
+    let mut states = ARMAROUGE_WEAK_ARMORS.lock_or_init(|| Mutex::new(Vec::new())).expect("armarouge weak armor state poisoned");
     if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         state.weak_stacks = 0;
         state.armor_cannon_until = 0;
@@ -16887,8 +16608,7 @@ pub fn register_armarouge_weak_armor(entity_id: usize) {
 
 pub fn note_armarouge_landed_attack(ctx: &GameCtx, entity_id: usize) {
     let tick = ctx.tick();
-    let states = ARMAROUGE_WEAK_ARMORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("armarouge weak armor state poisoned");
+    let mut states = ARMAROUGE_WEAK_ARMORS.lock_or_init(|| Mutex::new(Vec::new())).expect("armarouge weak armor state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         if champion_id_for_entity(entity_id)
             .map(|champion_id| champion_id == "pokemon_moba_armarouge")
@@ -16919,8 +16639,7 @@ pub fn begin_armarouge_armor_cannon(
     magic_resistance_mult: i32,
 ) {
     let until = ctx.tick().saturating_add(ticks);
-    let states = ARMAROUGE_WEAK_ARMORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("armarouge weak armor state poisoned");
+    let mut states = ARMAROUGE_WEAK_ARMORS.lock_or_init(|| Mutex::new(Vec::new())).expect("armarouge weak armor state poisoned");
     if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         state.weak_stacks = 0;
         state.armor_cannon_until = until;
@@ -16950,8 +16669,7 @@ pub fn update_armarouge_weak_armor(ctx: &mut GameCtx, entity_id: usize) {
     drop(entity);
 
     let tick = ctx.tick();
-    let states = ARMAROUGE_WEAK_ARMORS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("armarouge weak armor state poisoned");
+    let mut states = ARMAROUGE_WEAK_ARMORS.lock_or_init(|| Mutex::new(Vec::new())).expect("armarouge weak armor state poisoned");
     let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) else {
         states.push(ArmarougeWeakArmorState {
             entity_id,
@@ -17118,8 +16836,7 @@ pub fn ludicolo_rain_dish_damage_modifier(
     };
     let radius_sq = LUDICOLO_RAIN_DISH_RADIUS.saturating_mul(LUDICOLO_RAIN_DISH_RADIUS);
     let in_rain = LUDICOLO_RAIN_DISHES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("ludicolo rain dish state poisoned")
         .iter()
         .filter_map(|state| ctx.get_entity(state.entity_id))
@@ -17324,8 +17041,7 @@ pub fn begin_nasty_plot(
     drop(caster);
     drop(target);
 
-    let states = NASTY_PLOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("nasty plot state poisoned");
+    let mut states = NASTY_PLOTS.lock_or_init(|| Mutex::new(Vec::new())).expect("nasty plot state poisoned");
     states.retain(|state| !(state.caster_id == caster_id && state.target_id == target_id));
     states.push(NastyPlotState {
         caster_id,
@@ -17353,8 +17069,7 @@ pub fn begin_stored_power(
     let caster_team = caster.team();
     drop(caster);
 
-    let states = STORED_POWERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("stored power state poisoned");
+    let mut states = STORED_POWERS.lock_or_init(|| Mutex::new(Vec::new())).expect("stored power state poisoned");
     states.retain(|state| state.caster_id != caster_id);
     states.push(StoredPowerState {
         caster_id,
@@ -17371,8 +17086,7 @@ pub fn note_stored_power_damage(ctx: &GameCtx, entity_id: usize, damage: usize) 
         return;
     }
     let tick = ctx.tick();
-    let states = STORED_POWERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("stored power state poisoned");
+    let mut states = STORED_POWERS.lock_or_init(|| Mutex::new(Vec::new())).expect("stored power state poisoned");
     // The update loop owns release/removal; a hit on the release tick must not
     // silently discard the stored burst before that loop gets to resolve it.
     if let Some(state) = states.iter_mut().find(|state| state.caster_id == entity_id && state.resolves_at > tick) {
@@ -17401,8 +17115,7 @@ pub fn begin_earthquake(
     drop(caster);
 
     let tick = ctx.tick();
-    let states = EARTHQUAKES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("earthquake state poisoned");
+    let mut states = EARTHQUAKES.lock_or_init(|| Mutex::new(Vec::new())).expect("earthquake state poisoned");
     states.retain(|state| state.caster_id != caster_id);
     states.push(EarthquakeAuraState {
         caster_id,
@@ -17438,8 +17151,7 @@ pub fn begin_blood_moon(
     drop(entity);
 
     let tick = ctx.tick();
-    let states = BLOOD_MOONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("blood moon state poisoned");
+    let mut states = BLOOD_MOONS.lock_or_init(|| Mutex::new(Vec::new())).expect("blood moon state poisoned");
     states.retain(|state| state.entity_id != entity_id);
     states.push(BloodMoonState {
         entity_id,
@@ -17480,8 +17192,7 @@ pub fn begin_roost(ctx: &GameCtx, entity_id: usize, duration_ticks: usize, heal_
     let tick = ctx.tick();
     register_entity_types(entity_id, TypeSet::single(PokemonType::Steel));
 
-    let states = ROOSTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("roost state poisoned");
+    let mut states = ROOSTS.lock_or_init(|| Mutex::new(Vec::new())).expect("roost state poisoned");
     states.retain(|state| state.entity_id != entity_id);
     states.push(RoostState {
         entity_id,
@@ -17501,8 +17212,7 @@ pub fn begin_sigilyph_gravity(ctx: &GameCtx, entity_id: usize, duration_ticks: u
     }
 
     let tick = ctx.tick();
-    let states = SIGILYPH_GRAVITIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sigilyph gravity state poisoned");
+    let mut states = SIGILYPH_GRAVITIES.lock_or_init(|| Mutex::new(Vec::new())).expect("sigilyph gravity state poisoned");
     let original_types = states
         .iter()
         .find(|state| state.entity_id == entity_id)
@@ -17548,8 +17258,7 @@ pub fn apply_sigilyph_glyph(ctx: &GameCtx, caster_id: usize, target_id: usize) {
     drop(target);
 
     let tick = ctx.tick();
-    let states = SIGILYPH_GLYPHS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sigilyph glyph state poisoned");
+    let mut states = SIGILYPH_GLYPHS.lock_or_init(|| Mutex::new(Vec::new())).expect("sigilyph glyph state poisoned");
     if let Some(existing) = states
         .iter_mut()
         .find(|state| state.caster_id == caster_id && state.target_id == target_id)
@@ -17577,8 +17286,7 @@ pub fn sigilyph_glyph_damage_bonus_percent(
         return 0;
     }
     let tick = ctx.tick();
-    let states = SIGILYPH_GLYPHS.get_or_init(|| Mutex::new(Vec::new()));
-    let states = states.lock().expect("sigilyph glyph state poisoned");
+    let states = SIGILYPH_GLYPHS.lock_or_init(|| Mutex::new(Vec::new())).expect("sigilyph glyph state poisoned");
     if states.iter().any(|state| {
         state.caster_id == caster_id && state.target_id == target_id && state.expires_at > tick
     }) {
@@ -17591,8 +17299,7 @@ pub fn sigilyph_glyph_damage_bonus_percent(
 pub fn is_blood_moon_active(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
     BLOOD_MOONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("blood moon state poisoned")
         .iter()
         .any(|state| state.entity_id == entity_id && state.expires_at > tick)
@@ -17624,8 +17331,7 @@ pub fn after_blissey_heal(ctx: &mut GameCtx, caster_id: usize, target_id: usize)
 
 fn is_blissey(entity_id: usize) -> bool {
     BLISSEYS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("blissey state poisoned")
         .iter()
         .any(|id| *id == entity_id && entity_is_champion_id(entity_id, "pokemon_moba_blissey"))
@@ -17634,50 +17340,42 @@ fn is_blissey(entity_id: usize) -> bool {
 
 fn has_harmful_statuses(target_id: usize) -> bool {
     PARALYSIS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("paralysis state poisoned")
         .iter()
         .any(|state| state.entity_id == target_id)
         || BURNS
-            .get_or_init(|| Mutex::new(Vec::new()))
-            .lock()
+            .lock_or_init(|| Mutex::new(Vec::new()))
             .expect("burn state poisoned")
             .iter()
             .any(|state| state.target_id == target_id)
         || POISONS
-            .get_or_init(|| Mutex::new(Vec::new()))
-            .lock()
+            .lock_or_init(|| Mutex::new(Vec::new()))
             .expect("poison state poisoned")
             .iter()
             .any(|state| state.target_id == target_id)
         || MIASMAS
-            .get_or_init(|| Mutex::new(Vec::new()))
-            .lock()
+            .lock_or_init(|| Mutex::new(Vec::new()))
             .expect("miasma state poisoned")
             .iter()
             .any(|state| state.target_id == target_id)
         || BLEEDS
-            .get_or_init(|| Mutex::new(Vec::new()))
-            .lock()
+            .lock_or_init(|| Mutex::new(Vec::new()))
             .expect("bleed state poisoned")
             .iter()
             .any(|state| state.target_id == target_id)
         || CONFUSIONS
-            .get_or_init(|| Mutex::new(Vec::new()))
-            .lock()
+            .lock_or_init(|| Mutex::new(Vec::new()))
             .expect("confusion state poisoned")
             .iter()
             .any(|state| state.entity_id == target_id)
         || SPIRIT_SHACKLES
-            .get_or_init(|| Mutex::new(Vec::new()))
-            .lock()
+            .lock_or_init(|| Mutex::new(Vec::new()))
             .expect("spirit shackle state poisoned")
             .iter()
             .any(|state| state.entity_id == target_id)
         || SOAKS
-            .get_or_init(|| Mutex::new(Vec::new()))
-            .lock()
+            .lock_or_init(|| Mutex::new(Vec::new()))
             .expect("soak state poisoned")
             .iter()
             .any(|state| state.entity_id == target_id)
@@ -17696,63 +17394,52 @@ pub fn cleanse_harmful_statuses(ctx: &mut GameCtx, target_id: usize) {
     }
 
     ctx.entity_clear_cc(target_id);
-    ANTI_HEALS.get_or_init(|| Mutex::new(Vec::new())).lock()
+    ANTI_HEALS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("anti-heal state poisoned").retain(|state| state.target_id != target_id);
     ctx.entity_remove_buff(target_id, "pokemon_moba_anti_heal");
 
     PARALYSIS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("paralysis state poisoned")
         .retain(|state| state.entity_id != target_id);
     BURNS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("burn state poisoned")
         .retain(|state| state.target_id != target_id);
     POISONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("poison state poisoned")
         .retain(|state| state.target_id != target_id);
     MIASMAS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("miasma state poisoned")
         .retain(|state| state.target_id != target_id);
     BLEEDS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("bleed state poisoned")
         .retain(|state| state.target_id != target_id);
     LEECH_SEEDS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("leech seed state poisoned")
         .retain(|state| state.target_id != target_id);
     CONFUSIONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("confusion state poisoned")
         .retain(|state| state.entity_id != target_id);
     SPIRIT_SHACKLES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("spirit shackle state poisoned")
         .retain(|state| state.entity_id != target_id);
     SOAKS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("soak state poisoned")
         .retain(|state| state.entity_id != target_id);
     OCTILLERY_LOCK_ONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("octillery lock-on state poisoned")
         .retain(|state| state.target_id != target_id);
     KOMMOO_DUELS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("kommo-o duel state poisoned")
         .retain(|state| state.target_id != target_id);
 
@@ -17778,8 +17465,7 @@ pub fn try_begin_spiked_hide_reflect(
     }
 
     let tick = ctx.tick();
-    let reflects = SPIKED_HIDE_REFLECTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut reflects = reflects.lock().expect("spiked hide reflect state poisoned");
+    let mut reflects = SPIKED_HIDE_REFLECTS.lock_or_init(|| Mutex::new(Vec::new())).expect("spiked hide reflect state poisoned");
     reflects.retain(|(_, _, reflect_tick)| *reflect_tick == tick);
 
     if reflects.iter().any(|(defender, attacker, _)| {
@@ -17799,8 +17485,7 @@ pub fn note_pyukumuku_barb_hit(ctx: &GameCtx, defender_id: usize, attacker_id: u
     }
 
     let tick = ctx.tick();
-    let states = PYUKUMUKU_BARBS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("pyukumuku barb state poisoned");
+    let mut states = PYUKUMUKU_BARBS.lock_or_init(|| Mutex::new(Vec::new())).expect("pyukumuku barb state poisoned");
     states.retain(|state| {
         tick.saturating_sub(state.last_hit_tick) <= PYUKUMUKU_BARB_STACK_WINDOW_TICKS
             && ctx
@@ -17843,8 +17528,7 @@ pub fn note_direct_pokemon_damage(
     }
 
     let tick = ctx.tick();
-    let ledger = DIRECT_DAMAGE_LEDGER.get_or_init(|| Mutex::new(Vec::new()));
-    let mut ledger = ledger.lock().expect("direct damage ledger poisoned");
+    let mut ledger = DIRECT_DAMAGE_LEDGER.lock_or_init(|| Mutex::new(Vec::new())).expect("direct damage ledger poisoned");
     ledger.retain(|state| tick.saturating_sub(state.tick) <= 2);
     ledger.push(DirectDamageLedgerState {
         attacker_id,
@@ -18499,9 +18183,7 @@ fn record_pokemon_damage_credit(
     };
     let ctx_id = combat_ctx_id(ctx);
     let tick = ctx.tick();
-    let credits = POKEMON_DAMAGE_CREDITS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut credits = credits
-        .lock()
+    let mut credits = POKEMON_DAMAGE_CREDITS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon damage credit state poisoned");
     credits.retain(|state| {
         state.ctx_id != ctx_id || recent_tick(tick, state.tick, POKEMON_DAMAGE_ASSIST_WINDOW_TICKS)
@@ -18598,9 +18280,7 @@ fn record_pokemon_participation(
 ) {
     let ctx_id = combat_ctx_id(ctx);
     let tick = ctx.tick();
-    let participations = POKEMON_PARTICIPATIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut participations = participations
-        .lock()
+    let mut participations = POKEMON_PARTICIPATIONS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon participation state poisoned");
     participations.retain(|state| {
         state.ctx_id != ctx_id
@@ -18642,9 +18322,7 @@ fn recover_recent_damage_target_info(
 ) -> Option<CombatStatEntityInfo> {
     let ctx_id = combat_ctx_id(ctx);
     let tick = ctx.tick();
-    let credits = POKEMON_DAMAGE_CREDITS.get_or_init(|| Mutex::new(Vec::new()));
-    let credits = credits
-        .lock()
+    let credits = POKEMON_DAMAGE_CREDITS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon damage credit state poisoned");
     credits
         .iter()
@@ -18800,8 +18478,7 @@ fn record_pokemon_kill_credit(
     }
     let tick = ctx.tick();
     let ctx_id = combat_ctx_id(ctx);
-    let kills = POKEMON_KILL_CREDITS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut kills = kills.lock().expect("pokemon kill credit state poisoned");
+    let mut kills = POKEMON_KILL_CREDITS.lock_or_init(|| Mutex::new(Vec::new())).expect("pokemon kill credit state poisoned");
     kills.retain(|state| {
         state.ctx_id != ctx_id || recent_tick(tick, state.tick, POKEMON_KILL_CREDIT_HISTORY_TICKS)
     });
@@ -19202,9 +18879,7 @@ fn pokemon_assist_credit_ids(
     tick: usize,
 ) -> Vec<usize> {
     let ctx_id = combat_ctx_id(ctx);
-    let credits = POKEMON_DAMAGE_CREDITS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut credits = credits
-        .lock()
+    let mut credits = POKEMON_DAMAGE_CREDITS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon damage credit state poisoned");
     credits.retain(|state| {
         state.ctx_id != ctx_id || recent_tick(tick, state.tick, POKEMON_DAMAGE_ASSIST_WINDOW_TICKS)
@@ -19236,9 +18911,7 @@ fn pokemon_assist_credit_ids(
     }
     drop(credits);
 
-    let participations = POKEMON_PARTICIPATIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut participations = participations
-        .lock()
+    let mut participations = POKEMON_PARTICIPATIONS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon participation state poisoned");
     participations.retain(|state| {
         state.ctx_id != ctx_id
@@ -19315,8 +18988,7 @@ fn award_pokemon_assist_once(
     tick: usize,
 ) {
     let ctx_id = combat_ctx_id(ctx);
-    let awards = POKEMON_ASSIST_AWARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut awards = awards.lock().expect("pokemon assist award state poisoned");
+    let mut awards = POKEMON_ASSIST_AWARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("pokemon assist award state poisoned");
     awards.retain(|state| {
         state.ctx_id != ctx_id || recent_tick(tick, state.tick, POKEMON_KILL_CREDIT_HISTORY_TICKS)
     });
@@ -19606,9 +19278,7 @@ fn sync_pokemon_player_stats_to_base_player(ctx: &GameCtx, player_id: usize) {
         return;
     };
 
-    let sync_states = POKEMON_BASE_STAT_SYNC.get_or_init(|| Mutex::new(Vec::new()));
-    let mut sync_states = sync_states
-        .lock()
+    let mut sync_states = POKEMON_BASE_STAT_SYNC.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon base stat sync state poisoned");
     let applied_index = sync_states
         .iter()
@@ -19800,8 +19470,7 @@ fn apply_pokemon_stat_deltas_to_base_player(
 }
 
 fn log_pokemon_base_stat_sync_event(message: &str) {
-    let count = POKEMON_BASE_STAT_SYNC_LOG_COUNT.get_or_init(|| Mutex::new(0));
-    let mut count = count.lock().expect("pokemon stat sync log count poisoned");
+    let mut count = POKEMON_BASE_STAT_SYNC_LOG_COUNT.lock_or_init(|| Mutex::new(0)).expect("pokemon stat sync log count poisoned");
     if *count >= POKEMON_BASE_STAT_SYNC_LOG_LIMIT {
         return;
     }
@@ -19816,8 +19485,7 @@ fn refresh_pokemon_combat_stat_identity(
     champion_id: Option<&'static str>,
 ) {
     let ctx_id = combat_ctx_id(ctx);
-    let states = POKEMON_COMBAT_STATS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("pokemon combat stat state poisoned");
+    let mut states = POKEMON_COMBAT_STATS.lock_or_init(|| Mutex::new(Vec::new())).expect("pokemon combat stat state poisoned");
     let Some(state) = states
         .iter_mut()
         .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -19853,8 +19521,7 @@ fn with_pokemon_combat_stat_for_player_mut(
     let live_champion_id = live_entity_id.and_then(|entity_id| {
         champion_id_for_entity_in_ctx(ctx, entity_id).or_else(|| champion_id_for_entity(entity_id))
     });
-    let states = POKEMON_COMBAT_STATS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("pokemon combat stat state poisoned");
+    let mut states = POKEMON_COMBAT_STATS.lock_or_init(|| Mutex::new(Vec::new())).expect("pokemon combat stat state poisoned");
     if let Some(state) = states
         .iter_mut()
         .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -19957,8 +19624,7 @@ pub fn custom_player_healing_done(player_id: usize) -> usize {
 #[allow(dead_code)]
 fn pokemon_combat_stats_for_player(player_id: usize) -> Option<PokemonCombatStatState> {
     POKEMON_COMBAT_STATS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon combat stat state poisoned")
         .iter()
         .rev()
@@ -19971,8 +19637,7 @@ fn pokemon_combat_stats_for_ctx_player(
     player_id: usize,
 ) -> Option<PokemonCombatStatState> {
     POKEMON_COMBAT_STATS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon combat stat state poisoned")
         .iter()
         .rev()
@@ -19982,8 +19647,7 @@ fn pokemon_combat_stats_for_ctx_player(
 
 pub fn pokemon_combat_stat_snapshots() -> Vec<PokemonCombatStatSnapshot> {
     POKEMON_COMBAT_STATS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pokemon combat stat state poisoned")
         .iter()
         .filter(|state| {
@@ -20047,8 +19711,7 @@ pub fn begin_bouffalant_retaliate(
     let caster_team = entity.team();
     drop(entity);
 
-    let states = BOUFFALANT_RETALIATES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("bouffalant retaliate state poisoned");
+    let mut states = BOUFFALANT_RETALIATES.lock_or_init(|| Mutex::new(Vec::new())).expect("bouffalant retaliate state poisoned");
     states.retain(|state| state.entity_id != entity_id);
     states.push(BouffalantRetaliateState {
         entity_id,
@@ -20065,8 +19728,7 @@ pub fn begin_bouffalant_retaliate(
 pub fn bouffalant_retaliate_reduce_percent(ctx: &GameCtx, entity_id: usize) -> usize {
     let tick = ctx.tick();
     BOUFFALANT_RETALIATES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("bouffalant retaliate state poisoned")
         .iter()
         .find(|state| state.entity_id == entity_id && state.expires_at > tick)
@@ -20084,8 +19746,7 @@ fn note_bouffalant_retaliate_damage(
         return;
     }
     let tick = ctx.tick();
-    let states = BOUFFALANT_RETALIATES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("bouffalant retaliate state poisoned");
+    let mut states = BOUFFALANT_RETALIATES.lock_or_init(|| Mutex::new(Vec::new())).expect("bouffalant retaliate state poisoned");
     states.retain(|state| state.expires_at > tick);
     let Some(state) = states
         .iter_mut()
@@ -20105,8 +19766,7 @@ fn note_bouffalant_retaliate_damage(
 }
 
 pub fn note_bouffalant_cc(ctx: &GameCtx, entity_id: usize) {
-    let states = BOUFFALANT_CCS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("bouffalant cc state poisoned");
+    let mut states = BOUFFALANT_CCS.lock_or_init(|| Mutex::new(Vec::new())).expect("bouffalant cc state poisoned");
     if let Some(state) = states.iter_mut().find(|state| state.entity_id == entity_id) {
         state.last_cc_at = ctx.tick();
     } else {
@@ -20120,8 +19780,7 @@ pub fn note_bouffalant_cc(ctx: &GameCtx, entity_id: usize) {
 pub fn bouffalant_recently_cced(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
     BOUFFALANT_CCS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("bouffalant cc state poisoned")
         .iter()
         .any(|state| {
@@ -20131,9 +19790,7 @@ pub fn bouffalant_recently_cced(ctx: &GameCtx, entity_id: usize) -> bool {
 }
 
 pub fn begin_bouffalant_unstoppable(ctx: &GameCtx, entity_id: usize, ticks: usize) {
-    let states = BOUFFALANT_UNSTOPPABLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = BOUFFALANT_UNSTOPPABLES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("bouffalant unstoppable state poisoned");
     states.retain(|state| state.entity_id != entity_id && state.expires_at > ctx.tick());
     states.push(BouffalantUnstoppableState {
@@ -20145,8 +19802,7 @@ pub fn begin_bouffalant_unstoppable(ctx: &GameCtx, entity_id: usize, ticks: usiz
 pub fn is_bouffalant_unstoppable(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
     BOUFFALANT_UNSTOPPABLES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("bouffalant unstoppable state poisoned")
         .iter()
         .any(|state| state.entity_id == entity_id && state.expires_at > tick)
@@ -20159,9 +19815,7 @@ pub fn mark_bouffalant_head_charge_target(
     ticks: usize,
     bonus_max_hp_percent: usize,
 ) {
-    let states = BOUFFALANT_HEAD_CHARGE_MARKS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = BOUFFALANT_HEAD_CHARGE_MARKS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("bouffalant head charge mark state poisoned");
     states.retain(|state| !(state.caster_id == caster_id && state.target_id == target_id));
     states.push(BouffalantHeadChargeMarkState {
@@ -20185,9 +19839,7 @@ pub fn bouffalant_head_charge_bonus_damage(
         return 0;
     }
     let tick = ctx.tick();
-    let states = BOUFFALANT_HEAD_CHARGE_MARKS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = BOUFFALANT_HEAD_CHARGE_MARKS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("bouffalant head charge mark state poisoned");
     states.retain(|state| state.expires_at > tick);
     let Some(state) = states
@@ -20207,8 +19859,7 @@ pub fn consume_direct_pokemon_damage(
     target_id: usize,
 ) -> Option<usize> {
     let tick = ctx.tick();
-    let ledger = DIRECT_DAMAGE_LEDGER.get_or_init(|| Mutex::new(Vec::new()));
-    let mut ledger = ledger.lock().expect("direct damage ledger poisoned");
+    let mut ledger = DIRECT_DAMAGE_LEDGER.lock_or_init(|| Mutex::new(Vec::new())).expect("direct damage ledger poisoned");
     let mut consumed = None;
     ledger.retain(|state| {
         if tick.saturating_sub(state.tick) > 2 {
@@ -20229,16 +19880,14 @@ pub fn note_physical_basic_hit(ctx: &GameCtx, attacker_id: usize, target_id: usi
     }
 
     let tick = ctx.tick();
-    let hits = PHYSICAL_BASIC_HITS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut hits = hits.lock().expect("physical basic hit state poisoned");
+    let mut hits = PHYSICAL_BASIC_HITS.lock_or_init(|| Mutex::new(Vec::new())).expect("physical basic hit state poisoned");
     hits.retain(|(_, _, hit_tick)| tick.saturating_sub(*hit_tick) <= 1);
     hits.push((attacker_id, target_id, tick));
 }
 
 pub fn consume_physical_basic_hit(ctx: &GameCtx, attacker_id: usize, target_id: usize) -> bool {
     let tick = ctx.tick();
-    let hits = PHYSICAL_BASIC_HITS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut hits = hits.lock().expect("physical basic hit state poisoned");
+    let mut hits = PHYSICAL_BASIC_HITS.lock_or_init(|| Mutex::new(Vec::new())).expect("physical basic hit state poisoned");
     let mut consumed = false;
     hits.retain(|(attacker, target, hit_tick)| {
         if tick.saturating_sub(*hit_tick) > 1 {
@@ -20255,8 +19904,7 @@ pub fn consume_physical_basic_hit(ctx: &GameCtx, attacker_id: usize, target_id: 
 
 pub fn recent_physical_basic_hit(ctx: &GameCtx, attacker_id: usize, target_id: usize) -> bool {
     let tick = ctx.tick();
-    let hits = PHYSICAL_BASIC_HITS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut hits = hits.lock().expect("physical basic hit state poisoned");
+    let mut hits = PHYSICAL_BASIC_HITS.lock_or_init(|| Mutex::new(Vec::new())).expect("physical basic hit state poisoned");
     hits.retain(|(_, _, hit_tick)| tick.saturating_sub(*hit_tick) <= 1);
     hits.iter()
         .any(|(attacker, target, _)| *attacker == attacker_id && *target == target_id)
@@ -20275,8 +19923,7 @@ pub fn begin_hawlucha_counter(
     lifesteal_ticks: usize,
 ) {
     let tick = ctx.tick();
-    let counters = HAWLUCHA_COUNTERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut counters = counters.lock().expect("hawlucha counter state poisoned");
+    let mut counters = HAWLUCHA_COUNTERS.lock_or_init(|| Mutex::new(Vec::new())).expect("hawlucha counter state poisoned");
     counters.retain(|state| state.entity_id != entity_id && state.expires_at > tick);
     counters.push(HawluchaCounterState {
         entity_id,
@@ -20301,8 +19948,7 @@ pub fn try_trigger_hawlucha_counter(
         return 0;
     }
     let tick = ctx.tick();
-    let counters = HAWLUCHA_COUNTERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut counters = counters.lock().expect("hawlucha counter state poisoned");
+    let mut counters = HAWLUCHA_COUNTERS.lock_or_init(|| Mutex::new(Vec::new())).expect("hawlucha counter state poisoned");
     let Some(index) = counters
         .iter()
         .position(|state| state.entity_id == entity_id && state.expires_at > tick)
@@ -20393,8 +20039,7 @@ pub fn begin_zeraora_zing_zap(
         return;
     }
     let tick = ctx.tick();
-    let states = ZERAORA_ZING_ZAPS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("zeraora zing zap state poisoned");
+    let mut states = ZERAORA_ZING_ZAPS.lock_or_init(|| Mutex::new(Vec::new())).expect("zeraora zing zap state poisoned");
     states.retain(|state| state.entity_id != entity_id && state.expires_at > tick);
     states.push(ZeraoraZingZapState {
         entity_id,
@@ -20416,8 +20061,7 @@ pub fn try_consume_zeraora_zing_zap(
         return false;
     }
     let tick = ctx.tick();
-    let states = ZERAORA_ZING_ZAPS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("zeraora zing zap state poisoned");
+    let mut states = ZERAORA_ZING_ZAPS.lock_or_init(|| Mutex::new(Vec::new())).expect("zeraora zing zap state poisoned");
     let Some(index) = states
         .iter()
         .position(|state| state.entity_id == entity_id && state.expires_at > tick)
@@ -20509,15 +20153,13 @@ pub fn begin_zeraora_thunder_cage(
         slow_percent: slow_percent.abs(),
         occupants: Vec::new(),
     };
-    let states = ZERAORA_THUNDER_CAGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("zeraora thunder cage state poisoned");
+    let mut states = ZERAORA_THUNDER_CAGES.lock_or_init(|| Mutex::new(Vec::new())).expect("zeraora thunder cage state poisoned");
     states.push(state);
 }
 
 pub fn update_zeraora_thunder_cages(ctx: &mut GameCtx) {
     let tick = ctx.tick();
-    let states = ZERAORA_THUNDER_CAGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("zeraora thunder cage state poisoned");
+    let mut states = ZERAORA_THUNDER_CAGES.lock_or_init(|| Mutex::new(Vec::new())).expect("zeraora thunder cage state poisoned");
     let mut tick_hits = Vec::new();
     let mut exit_hits = Vec::new();
 
@@ -20612,9 +20254,7 @@ pub fn mark_zeraora_wild_charge_target(
     if bonus_percent == 0 || ticks == 0 {
         return;
     }
-    let states = ZERAORA_WILD_CHARGE_MARKS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = ZERAORA_WILD_CHARGE_MARKS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("zeraora wild charge mark state poisoned");
     states.retain(|state| {
         !(state.caster_id == caster_id && state.target_id == target_id)
@@ -20630,9 +20270,7 @@ pub fn mark_zeraora_wild_charge_target(
 
 pub fn zeraora_wild_charge_basic_bonus(ctx: &GameCtx, caster_id: usize, target_id: usize) -> usize {
     let tick = ctx.tick();
-    let states = ZERAORA_WILD_CHARGE_MARKS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states
-        .lock()
+    let mut states = ZERAORA_WILD_CHARGE_MARKS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("zeraora wild charge mark state poisoned");
     states.retain(|state| state.expires_at > tick);
     states
@@ -20662,17 +20300,14 @@ pub fn note_zeraora_ability_hit(
 
     let tick = ctx.tick();
     {
-        let cooldowns = ZERAORA_MERCILESS_COOLDOWNS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut cooldowns = cooldowns
-            .lock()
+        let mut cooldowns = ZERAORA_MERCILESS_COOLDOWNS.lock_or_init(|| Mutex::new(Vec::new()))
             .expect("zeraora merciless cooldown state poisoned");
         cooldowns.retain(|state| state.ready_at > tick);
         if cooldowns
             .iter()
             .any(|state| state.caster_id == caster_id && state.target_id == target_id)
         {
-            let hits = ZERAORA_MERCILESS_HITS.get_or_init(|| Mutex::new(Vec::new()));
-            let mut hits = hits.lock().expect("zeraora merciless hit state poisoned");
+            let mut hits = ZERAORA_MERCILESS_HITS.lock_or_init(|| Mutex::new(Vec::new())).expect("zeraora merciless hit state poisoned");
             hits.retain(|state| state.expires_at > tick);
             hits.push(ZeraoraMercilessHitState {
                 caster_id,
@@ -20685,8 +20320,7 @@ pub fn note_zeraora_ability_hit(
     }
 
     let should_trigger = {
-        let hits = ZERAORA_MERCILESS_HITS.get_or_init(|| Mutex::new(Vec::new()));
-        let mut hits = hits.lock().expect("zeraora merciless hit state poisoned");
+        let mut hits = ZERAORA_MERCILESS_HITS.lock_or_init(|| Mutex::new(Vec::new())).expect("zeraora merciless hit state poisoned");
         hits.retain(|state| state.expires_at > tick);
         let trigger = hits.iter().any(|state| {
             state.caster_id == caster_id && state.target_id == target_id && state.slot != slot
@@ -20703,9 +20337,7 @@ pub fn note_zeraora_ability_hit(
         return;
     }
 
-    let cooldowns = ZERAORA_MERCILESS_COOLDOWNS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut cooldowns = cooldowns
-        .lock()
+    let mut cooldowns = ZERAORA_MERCILESS_COOLDOWNS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("zeraora merciless cooldown state poisoned");
     cooldowns.push(ZeraoraMercilessCooldownState {
         caster_id,
@@ -20814,8 +20446,7 @@ fn apply_hawlucha_unique_ad(ctx: &mut GameCtx, entity_id: usize, stacks: usize) 
 }
 
 pub fn register_hawlucha_momentum(ctx: &mut GameCtx, player_id: usize, entity_id: usize) {
-    let states = HAWLUCHA_MOMENTUMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("hawlucha momentum state poisoned");
+    let mut states = HAWLUCHA_MOMENTUMS.lock_or_init(|| Mutex::new(Vec::new())).expect("hawlucha momentum state poisoned");
     let ctx_id = combat_ctx_id(ctx);
     if let Some(existing) = states
         .iter_mut()
@@ -20851,8 +20482,7 @@ pub fn note_hawlucha_flying_press_target(ctx: &mut GameCtx, entity_id: usize, ta
         return;
     };
     let target_player_id = persistent_owner_key(ctx, target_id).map(|(_, player_id)| player_id);
-    let momentum = HAWLUCHA_MOMENTUMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut momentum = momentum.lock().expect("hawlucha momentum state poisoned");
+    let mut momentum = HAWLUCHA_MOMENTUMS.lock_or_init(|| Mutex::new(Vec::new())).expect("hawlucha momentum state poisoned");
     let Some(state) = momentum
         .iter_mut()
         .find(|state| state.ctx_id == ctx_id && state.player_id == player_id)
@@ -20892,8 +20522,7 @@ pub fn note_hawlucha_flying_press_target(ctx: &mut GameCtx, entity_id: usize, ta
 }
 
 fn update_sigilyph_gravities(ctx: &GameCtx, tick: usize) {
-    let states = SIGILYPH_GRAVITIES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sigilyph gravity state poisoned");
+    let mut states = SIGILYPH_GRAVITIES.lock_or_init(|| Mutex::new(Vec::new())).expect("sigilyph gravity state poisoned");
     let mut restores = Vec::new();
     states.retain(|state| {
         let alive = ctx
@@ -20915,8 +20544,7 @@ fn update_sigilyph_gravities(ctx: &GameCtx, tick: usize) {
 }
 
 fn update_sigilyph_glyphs(ctx: &mut GameCtx, tick: usize) {
-    let states = SIGILYPH_GLYPHS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("sigilyph glyph state poisoned");
+    let mut states = SIGILYPH_GLYPHS.lock_or_init(|| Mutex::new(Vec::new())).expect("sigilyph glyph state poisoned");
     states.retain(|state| {
         if state.expires_at <= tick {
             return false;
@@ -21136,7 +20764,9 @@ fn update_native_status_visuals(ctx: &GameCtx) {
         }
     }
     for s in snapshot!(GARGANACL_PERMANENT_SALTS) {
-        crate::native_vfx::field(ctx, "garganacl_passive_salt_cure_patch", s.caster_id, s.center, s.outer_radius);
+        if s.activates_at <= tick {
+            crate::native_vfx::field(ctx, "garganacl_passive_salt_cure_patch", s.caster_id, s.center, s.outer_radius);
+        }
     }
     for s in snapshot!(STICKY_WEBS) {
         crate::native_vfx::field(ctx, "kricketune_skill1_sticky_web_deployable", s.caster_id, s.center, s.radius);
@@ -21212,9 +20842,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
     update_weezing_body_odors(ctx, tick);
     update_weezing_sludge_whirlpools(ctx, tick);
 
-    let delayed_confusions = DELAYED_CONFUSIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut delayed_confusions = delayed_confusions
-        .lock()
+    let mut delayed_confusions = DELAYED_CONFUSIONS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("delayed confusion state poisoned");
     let mut resolving_confusions = Vec::new();
     delayed_confusions.retain(|state| {
@@ -21235,8 +20863,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         );
     }
 
-    let nasty_plots = NASTY_PLOTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut nasty_plots = nasty_plots.lock().expect("nasty plot state poisoned");
+    let mut nasty_plots = NASTY_PLOTS.lock_or_init(|| Mutex::new(Vec::new())).expect("nasty plot state poisoned");
     let mut resolving_nasty_plots = Vec::new();
     nasty_plots.retain(|state| {
         if state.resolves_at > tick {
@@ -21298,8 +20925,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         }
     }
 
-    let stored_powers = STORED_POWERS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut stored_powers = stored_powers.lock().expect("stored power state poisoned");
+    let mut stored_powers = STORED_POWERS.lock_or_init(|| Mutex::new(Vec::new())).expect("stored power state poisoned");
     let mut resolving_stored_powers = Vec::new();
     stored_powers.retain(|state| {
         if state.resolves_at > tick {
@@ -21356,9 +20982,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         draw_status_marker(ctx, caster_pos, state.radius, VFX_PSYCHIC);
     }
 
-    let retaliates = BOUFFALANT_RETALIATES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut retaliates = retaliates
-        .lock()
+    let mut retaliates = BOUFFALANT_RETALIATES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("bouffalant retaliate state poisoned");
     let mut resolving_retaliates = Vec::new();
     retaliates.retain(|state| {
@@ -21410,8 +21034,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         draw_status_marker(ctx, caster_pos, 30000, VFX_NORMAL);
     }
 
-    let miasmas = MIASMAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut miasmas = miasmas.lock().expect("miasma state poisoned");
+    let mut miasmas = MIASMAS.lock_or_init(|| Mutex::new(Vec::new())).expect("miasma state poisoned");
     let mut miasma_death_spreads = Vec::new();
     miasmas.retain(|state| {
         let Some(target) = ctx.get_entity(state.target_id) else {
@@ -21470,8 +21093,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
 
     update_thievul_stakeouts(ctx, tick);
 
-    let states = PARALYSIS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("paralysis state poisoned");
+    let mut states = PARALYSIS.lock_or_init(|| Mutex::new(Vec::new())).expect("paralysis state poisoned");
     let mut stuns = Vec::new();
 
     states.retain_mut(|state| {
@@ -21512,8 +21134,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         note_steadfast_cc(ctx, target_id);
     }
 
-    let burns = BURNS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut burns = burns.lock().expect("burn state poisoned");
+    let mut burns = BURNS.lock_or_init(|| Mutex::new(Vec::new())).expect("burn state poisoned");
     let mut burn_ticks = Vec::new();
     burns.retain_mut(|state| {
         let Some(target) = ctx.get_entity(state.target_id) else {
@@ -21566,8 +21187,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         }
     }
 
-    let poisons = POISONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut poisons = poisons.lock().expect("poison state poisoned");
+    let mut poisons = POISONS.lock_or_init(|| Mutex::new(Vec::new())).expect("poison state poisoned");
     let mut poison_ticks = Vec::new();
     poisons.retain_mut(|state| {
         let Some(target) = ctx.get_entity(state.target_id) else {
@@ -21619,8 +21239,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         }
     }
 
-    let bleeds = BLEEDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut bleeds = bleeds.lock().expect("bleed state poisoned");
+    let mut bleeds = BLEEDS.lock_or_init(|| Mutex::new(Vec::new())).expect("bleed state poisoned");
     let mut bleed_ticks = Vec::new();
     bleeds.retain_mut(|state| {
         let Some(target) = ctx.get_entity(state.target_id) else {
@@ -21639,8 +21258,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
     drop(bleeds);
 
     FROZENS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("frozen state poisoned")
         .retain(|state| {
             state.expires_at > tick
@@ -21672,8 +21290,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         }
     }
 
-    let infestations = INFESTATIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut infestations = infestations.lock().expect("infestation state poisoned");
+    let mut infestations = INFESTATIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("infestation state poisoned");
     let mut infestation_ticks = Vec::new();
     infestations.retain_mut(|state| {
         let Some(target) = ctx.get_entity(state.target_id) else {
@@ -21757,14 +21374,12 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
     update_coalossal_magma_storms(ctx, tick);
 
     BLAZE_CONTACTS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("blaze contact state poisoned")
         .retain(|state| tick.saturating_sub(state.last_contact_tick) <= BLAZE_CHAIN_WINDOW_TICKS);
 
     ENTITY_TYPES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("entity type state poisoned")
         .retain(|state| {
             ctx.get_entity(state.entity_id)
@@ -21773,8 +21388,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     SHELL_ARMORS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("shell armor state poisoned")
         .retain(|entity_id| {
             ctx.get_entity(*entity_id)
@@ -21783,8 +21397,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     LIMBERS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("limber state poisoned")
         .retain(|entity_id| {
             ctx.get_entity(*entity_id)
@@ -21793,8 +21406,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     KILOWATTRELS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("kilowattrel state poisoned")
         .retain(|entity_id| {
             ctx.get_entity(*entity_id)
@@ -21803,8 +21415,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     DOT_IMMUNES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("dot immunity state poisoned")
         .retain(|entity_id| {
             ctx.get_entity(*entity_id)
@@ -21813,8 +21424,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     DOT_ABSORBERS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("dot absorb state poisoned")
         .retain(|entity_id| {
             ctx.get_entity(*entity_id)
@@ -21823,8 +21433,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     HONEY_GATHERERS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("honey gatherer state poisoned")
         .retain(|state| {
             ctx.get_entity(state.entity_id)
@@ -21833,20 +21442,17 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     DIRECT_DAMAGE_LEDGER
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("direct damage ledger poisoned")
         .retain(|state| tick.saturating_sub(state.tick) <= 2);
 
     MEGA_LAUNCHER
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("mega launcher state poisoned")
         .retain(|state| tick.saturating_sub(state.last_hit_tick) <= MEGA_LAUNCHER_WINDOW_TICKS);
 
     SOFT_UNTARGETABLES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("soft untargetable state poisoned")
         .retain(|state| {
             state.expires_at > tick
@@ -21857,8 +21463,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     WEAVILE_HUNTS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("weavile hunt state poisoned")
         .retain(|state| {
             state.stealth_expires_at > tick
@@ -21869,8 +21474,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     CONFUSIONS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("confusion state poisoned")
         .retain(|state| {
             state.expires_at > tick
@@ -21882,20 +21486,17 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     FLAME_TRAILS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("flame trail state poisoned")
         .retain(|state| state.expires_at > tick);
 
     SPIKED_HIDE_REFLECTS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("spiked hide reflect state poisoned")
         .retain(|(_, _, reflect_tick)| *reflect_tick == tick);
 
     PYUKUMUKU_BARBS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("pyukumuku barb state poisoned")
         .retain(|state| {
             tick.saturating_sub(state.last_hit_tick) <= PYUKUMUKU_BARB_STACK_WINDOW_TICKS
@@ -21910,14 +21511,12 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     PHYSICAL_BASIC_HITS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("physical basic hit state poisoned")
         .retain(|(_, _, hit_tick)| tick.saturating_sub(*hit_tick) <= 1);
 
     STURDIES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("sturdy state poisoned")
         .retain(|state| {
             ctx.get_entity(state.entity_id)
@@ -21926,8 +21525,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     SPIRIT_SHACKLES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("spirit shackle state poisoned")
         .retain(|state| {
             state.expires_at > tick
@@ -21938,8 +21536,7 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     SOAKS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("soak state poisoned")
         .retain(|state| {
             state.expires_at > tick
@@ -21950,14 +21547,12 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     BRINE_FIELDS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("brine field state poisoned")
         .retain(|state| state.expires_at > tick);
 
     WILL_O_WISP_CHARGES
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("will-o-wisp charge state poisoned")
         .retain(|state| {
             ctx.get_entity(state.entity_id)
@@ -21966,16 +21561,14 @@ pub fn update_statuses(ctx: &mut GameCtx, rng_seed: u64) {
         });
 
     WHIRLPOOLS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("whirlpool state poisoned")
         .retain(|state| state.expires_at > tick);
     update_native_status_visuals(ctx);
 }
 
 fn update_whirlpools(ctx: &mut GameCtx, tick: usize) {
-    let whirlpools = WHIRLPOOLS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut whirlpools = whirlpools.lock().expect("whirlpool state poisoned");
+    let mut whirlpools = WHIRLPOOLS.lock_or_init(|| Mutex::new(Vec::new())).expect("whirlpool state poisoned");
     let mut hits = Vec::new();
     let mut self_ticks = Vec::new();
     let mut visuals = Vec::new();
@@ -22100,8 +21693,7 @@ fn update_whirlpools(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_flame_trails(ctx: &mut GameCtx, tick: usize) {
-    let trails = FLAME_TRAILS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut trails = trails.lock().expect("flame trail state poisoned");
+    let mut trails = FLAME_TRAILS.lock_or_init(|| Mutex::new(Vec::new())).expect("flame trail state poisoned");
     let mut hits = Vec::new();
     let mut visuals = Vec::new();
 
@@ -22195,8 +21787,7 @@ fn update_flame_trails(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_charm_heals(ctx: &mut GameCtx, tick: usize) {
-    let heals = CHARM_HEALS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut heals = heals.lock().expect("charm heal state poisoned");
+    let mut heals = CHARM_HEALS.lock_or_init(|| Mutex::new(Vec::new())).expect("charm heal state poisoned");
     let mut heal_ticks = Vec::new();
 
     heals.retain_mut(|state| {
@@ -22232,8 +21823,7 @@ fn update_charm_heals(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_blissey_heal_auras(ctx: &mut GameCtx, tick: usize) {
-    let auras = BLISSEY_HEAL_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("blissey heal aura state poisoned");
+    let mut auras = BLISSEY_HEAL_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("blissey heal aura state poisoned");
     let mut heals = Vec::new();
     let mut visuals = Vec::new();
 
@@ -22282,8 +21872,7 @@ fn update_blissey_heal_auras(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_misty_terrains(ctx: &mut GameCtx, tick: usize) {
-    let terrains = MISTY_TERRAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut terrains = terrains.lock().expect("misty terrain state poisoned");
+    let mut terrains = MISTY_TERRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("misty terrain state poisoned");
     let mut heals = Vec::new();
     let mut slows = Vec::new();
     let mut visuals = Vec::new();
@@ -22350,8 +21939,7 @@ fn update_misty_terrains(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_brine_fields(ctx: &mut GameCtx, tick: usize) {
-    let fields = BRINE_FIELDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut fields = fields.lock().expect("brine field state poisoned");
+    let mut fields = BRINE_FIELDS.lock_or_init(|| Mutex::new(Vec::new())).expect("brine field state poisoned");
     let mut slows = Vec::new();
     let mut visuals = Vec::new();
 
@@ -22400,8 +21988,7 @@ fn update_brine_fields(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_rillaboom_drum_auras(ctx: &mut GameCtx, tick: usize) {
-    let auras = RILLABOOM_DRUM_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("rillaboom drum aura state poisoned");
+    let mut auras = RILLABOOM_DRUM_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("rillaboom drum aura state poisoned");
     let mut ally_heals = Vec::new();
     let mut ally_speeds = Vec::new();
     let mut enemy_slows = Vec::new();
@@ -22530,9 +22117,7 @@ fn update_rillaboom_drum_auras(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_rillaboom_grassy_surges(ctx: &mut GameCtx, tick: usize) {
-    let surges = RILLABOOM_GRASSY_SURGES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut surges = surges
-        .lock()
+    let mut surges = RILLABOOM_GRASSY_SURGES.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("rillaboom grassy surge state poisoned");
     let mut hits = Vec::new();
     let mut visuals = Vec::new();
@@ -22611,8 +22196,7 @@ fn update_rillaboom_grassy_surges(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_shiftry_tornadoes(ctx: &mut GameCtx, tick: usize) {
-    let states = SHIFTRY_TORNADOES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("shiftry tornado state poisoned");
+    let mut states = SHIFTRY_TORNADOES.lock_or_init(|| Mutex::new(Vec::new())).expect("shiftry tornado state poisoned");
     let mut hits = Vec::new();
     let mut visuals = Vec::new();
 
@@ -22689,9 +22273,9 @@ fn update_shiftry_tornadoes(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_grassy_terrains(ctx: &mut GameCtx, tick: usize) {
-    let fields = GRASSY_TERRAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut fields = fields.lock().expect("grassy terrain state poisoned");
-    let mut buffs = Vec::new();
+    let mut fields = GRASSY_TERRAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("grassy terrain state poisoned");
+    let mut buffs = std::collections::BTreeMap::<usize, (i32, usize)>::new();
+    let mut refresh = std::collections::BTreeSet::new();
     let mut visuals = Vec::new();
 
     fields.retain_mut(|state| {
@@ -22699,24 +22283,24 @@ fn update_grassy_terrains(ctx: &mut GameCtx, tick: usize) {
             return false;
         }
         let Some(caster) = ctx.get_entity(state.caster_id) else {
-            return false;
+            return true;
         };
         if !caster.is_alive() {
-            return false;
+            return true;
         }
         let caster_pos = caster.pos();
         drop(caster);
 
         visuals.push((state.center, state.radius));
-        if state.next_tick_at > tick {
-            return true;
-        }
-        while state.next_tick_at <= tick {
-            state.next_tick_at += GRASSY_TERRAIN_INTERVAL_TICKS;
+        if state.next_tick_at <= tick {
+            state.next_tick_at = tick.saturating_add(GRASSY_TERRAIN_INTERVAL_TICKS);
+            refresh.insert(state.caster_id);
         }
 
         if distance_sq(caster_pos, state.center) <= state.radius.saturating_mul(state.radius) {
-            buffs.push((state.caster_id, state.attack_speed_mult, state.buff_ticks));
+            let bonus = buffs.entry(state.caster_id).or_default();
+            bonus.0 = bonus.0.saturating_add(state.attack_speed_mult);
+            bonus.1 = bonus.1.max(state.buff_ticks);
         }
 
         true
@@ -22726,7 +22310,8 @@ fn update_grassy_terrains(ctx: &mut GameCtx, tick: usize) {
     for (center, radius) in visuals {
         draw_field_circle(ctx, center, radius, VFX_GRASS);
     }
-    for (target_id, attack_speed_mult, ticks) in buffs {
+    for (target_id, (attack_speed_mult, ticks)) in buffs {
+        if !refresh.contains(&target_id) { continue; }
         refresh_beneficial_buff("pm_grassy_terrains_0",
             ctx,
             target_id,
@@ -22741,20 +22326,11 @@ fn update_grassy_terrains(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_sticky_webs(ctx: &mut GameCtx, tick: usize) {
-    let webs = STICKY_WEBS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut webs = webs.lock().expect("sticky web state poisoned");
+    let mut webs = STICKY_WEBS.lock_or_init(|| Mutex::new(Vec::new())).expect("sticky web state poisoned");
     let mut buffs = Vec::new();
     let mut visuals = Vec::new();
 
     webs.retain_mut(|state| {
-        let Some(caster) = ctx.get_entity(state.caster_id) else {
-            return false;
-        };
-        if !caster.is_alive() {
-            return false;
-        }
-        drop(caster);
-
         visuals.push((state.center, state.radius));
         if state.next_tick_at > tick {
             return true;
@@ -22807,8 +22383,7 @@ fn update_sticky_webs(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_sing_auras(ctx: &mut GameCtx, tick: usize) {
-    let auras = SING_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("sing aura state poisoned");
+    let mut auras = SING_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("sing aura state poisoned");
     let mut sleeps = Vec::new();
     let mut visuals = Vec::new();
 
@@ -22879,8 +22454,7 @@ fn update_sing_auras(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_frosmoth_sleep_circles(ctx: &mut GameCtx, tick: usize) {
-    let circles = FROSMOTH_SLEEP_CIRCLES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut circles = circles.lock().expect("frosmoth sleep state poisoned");
+    let mut circles = FROSMOTH_SLEEP_CIRCLES.lock_or_init(|| Mutex::new(Vec::new())).expect("frosmoth sleep state poisoned");
     let mut sleeps = Vec::new();
     let mut visuals = Vec::new();
     let mut moves = Vec::new();
@@ -22992,8 +22566,7 @@ fn update_frosmoth_sleep_circles(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_bug_buzz_auras(ctx: &mut GameCtx, tick: usize) {
-    let auras = BUG_BUZZ_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("bug buzz aura state poisoned");
+    let mut auras = BUG_BUZZ_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("bug buzz aura state poisoned");
     let mut hits = Vec::new();
     let mut visuals = Vec::new();
 
@@ -23064,9 +22637,7 @@ fn update_bug_buzz_auras(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_armarouge_mystical_fire_auras(ctx: &mut GameCtx, tick: usize) {
-    let auras = ARMAROUGE_MYSTICAL_FIRE_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras
-        .lock()
+    let mut auras = ARMAROUGE_MYSTICAL_FIRE_AURAS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("armarouge mystical fire state poisoned");
     let mut hits = Vec::new();
     let mut visuals = Vec::new();
@@ -23198,8 +22769,7 @@ fn update_armarouge_mystical_fire_auras(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_alluring_voice_auras(ctx: &mut GameCtx, tick: usize) {
-    let auras = ALLURING_VOICE_AURAS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut auras = auras.lock().expect("alluring voice aura state poisoned");
+    let mut auras = ALLURING_VOICE_AURAS.lock_or_init(|| Mutex::new(Vec::new())).expect("alluring voice aura state poisoned");
     let mut taunts = Vec::new();
     let mut confusions = Vec::new();
     let mut visuals = Vec::new();
@@ -23269,8 +22839,7 @@ fn update_alluring_voice_auras(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_thievul_stakeouts(ctx: &mut GameCtx, tick: usize) {
-    let states = THIEVUL_STAKEOUTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("thievul stakeout state poisoned");
+    let mut states = THIEVUL_STAKEOUTS.lock_or_init(|| Mutex::new(Vec::new())).expect("thievul stakeout state poisoned");
     let mut pulses = Vec::new();
 
     states.retain_mut(|state| {
@@ -23316,8 +22885,7 @@ fn update_thievul_stakeouts(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_aqua_rings(ctx: &mut GameCtx, tick: usize) {
-    let rings = AQUA_RINGS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut rings = rings.lock().expect("aqua ring state poisoned");
+    let mut rings = AQUA_RINGS.lock_or_init(|| Mutex::new(Vec::new())).expect("aqua ring state poisoned");
     let mut heals = Vec::new();
     let mut debuffs = Vec::new();
     let mut visuals = Vec::new();
@@ -23385,8 +22953,7 @@ fn update_aqua_rings(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_quick_return_dashes(ctx: &mut GameCtx, tick: usize) {
-    let states = QUICK_RETURN_DASHES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("quick return dash state poisoned");
+    let mut states = QUICK_RETURN_DASHES.lock_or_init(|| Mutex::new(Vec::new())).expect("quick return dash state poisoned");
     let mut returns = Vec::new();
 
     states.retain(|state| {
@@ -23429,8 +22996,7 @@ fn update_quick_return_dashes(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_scheduled_force_aways(ctx: &mut GameCtx, tick: usize) {
-    let states = SCHEDULED_FORCE_AWAYS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("scheduled force-away state poisoned");
+    let mut states = SCHEDULED_FORCE_AWAYS.lock_or_init(|| Mutex::new(Vec::new())).expect("scheduled force-away state poisoned");
     let mut moves = Vec::new();
 
     states.retain(|state| {
@@ -23473,8 +23039,7 @@ fn update_scheduled_force_aways(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_orbeetle_agility_chains(ctx: &mut GameCtx, tick: usize) {
-    let states = ORBEETLE_AGILITY_CHAINS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("orbeetle agility state poisoned");
+    let mut states = ORBEETLE_AGILITY_CHAINS.lock_or_init(|| Mutex::new(Vec::new())).expect("orbeetle agility state poisoned");
     let mut hops = Vec::new();
 
     states.retain_mut(|state| {
@@ -23573,8 +23138,7 @@ fn update_orbeetle_agility_chains(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_stealth_rocks(ctx: &GameCtx, tick: usize) {
-    let states = STEALTH_ROCKS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("stealth rock state poisoned");
+    let mut states = STEALTH_ROCKS.lock_or_init(|| Mutex::new(Vec::new())).expect("stealth rock state poisoned");
     let mut apply_windows = Vec::new();
 
     states.retain_mut(|state| {
@@ -23602,8 +23166,7 @@ fn update_stealth_rocks(ctx: &GameCtx, tick: usize) {
 }
 
 fn update_earthquakes(ctx: &mut GameCtx, tick: usize) {
-    let states = EARTHQUAKES.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("earthquake state poisoned");
+    let mut states = EARTHQUAKES.lock_or_init(|| Mutex::new(Vec::new())).expect("earthquake state poisoned");
     let mut hits = Vec::new();
     let mut visuals = Vec::new();
 
@@ -23678,8 +23241,7 @@ fn update_earthquakes(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_blood_moons(ctx: &mut GameCtx, tick: usize) {
-    let states = BLOOD_MOONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("blood moon state poisoned");
+    let mut states = BLOOD_MOONS.lock_or_init(|| Mutex::new(Vec::new())).expect("blood moon state poisoned");
     let mut ticks = Vec::new();
     let mut visuals = Vec::new();
 
@@ -23724,8 +23286,7 @@ fn update_blood_moons(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_roosts(ctx: &mut GameCtx, tick: usize) {
-    let states = ROOSTS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("roost state poisoned");
+    let mut states = ROOSTS.lock_or_init(|| Mutex::new(Vec::new())).expect("roost state poisoned");
     let mut heals = Vec::new();
     let mut restores = Vec::new();
 
@@ -23762,8 +23323,7 @@ fn update_roosts(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_ice_fields(ctx: &mut GameCtx, tick: usize, rng_seed: u64) {
-    let fields = ICE_FIELDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut fields = fields.lock().expect("ice field state poisoned");
+    let mut fields = ICE_FIELDS.lock_or_init(|| Mutex::new(Vec::new())).expect("ice field state poisoned");
     let mut hits = Vec::new();
     let mut visuals = Vec::new();
 
@@ -23862,8 +23422,7 @@ fn update_ice_fields(ctx: &mut GameCtx, tick: usize, rng_seed: u64) {
 }
 
 fn update_wish_channels(ctx: &mut GameCtx, tick: usize) {
-    let channels = WISH_CHANNELS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut channels = channels.lock().expect("wish channel state poisoned");
+    let mut channels = WISH_CHANNELS.lock_or_init(|| Mutex::new(Vec::new())).expect("wish channel state poisoned");
     let mut heals = Vec::new();
     let mut visuals = Vec::new();
 
@@ -23907,9 +23466,7 @@ fn update_wish_channels(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_power_up_punch_channels(ctx: &mut GameCtx, tick: usize) {
-    let channels = POWER_UP_PUNCH_CHANNELS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut channels = channels
-        .lock()
+    let mut channels = POWER_UP_PUNCH_CHANNELS.lock_or_init(|| Mutex::new(Vec::new()))
         .expect("power-up punch channel state poisoned");
     let mut resolutions = Vec::new();
     let mut visuals = Vec::new();
@@ -24017,8 +23574,7 @@ fn update_power_up_punch_channels(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_leech_seeds(ctx: &mut GameCtx, tick: usize) {
-    let seeds = LEECH_SEEDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut seeds = seeds.lock().expect("leech seed state poisoned");
+    let mut seeds = LEECH_SEEDS.lock_or_init(|| Mutex::new(Vec::new())).expect("leech seed state poisoned");
     let mut leech_ticks = Vec::new();
     let mut spreads = Vec::new();
     let mut visuals = Vec::new();
@@ -24128,8 +23684,7 @@ struct CoalossalMagmaStormPulse {
 }
 
 fn update_coalossal_magma_storms(ctx: &mut GameCtx, tick: usize) {
-    let states = COALOSSAL_MAGMA_STORMS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("coalossal heat crash state poisoned");
+    let mut states = COALOSSAL_MAGMA_STORMS.lock_or_init(|| Mutex::new(Vec::new())).expect("coalossal heat crash state poisoned");
     let mut pulses = Vec::new();
     states.retain_mut(|state| {
         let caster_alive = ctx
@@ -24208,8 +23763,7 @@ fn update_coalossal_magma_storms(ctx: &mut GameCtx, tick: usize) {
 }
 
 fn update_grapploct_submissions(ctx: &mut GameCtx, tick: usize) {
-    let states = GRAPPLOCT_SUBMISSIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("grapploct submission state poisoned");
+    let mut states = GRAPPLOCT_SUBMISSIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("grapploct submission state poisoned");
     let mut ticks = Vec::new();
     states.retain_mut(|state| {
         let caster_alive = ctx
@@ -24408,8 +23962,7 @@ fn push_leech_seed(
     damage_per_tick: usize,
     break_range: u64,
 ) {
-    let seeds = LEECH_SEEDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut seeds = seeds.lock().expect("leech seed state poisoned");
+    let mut seeds = LEECH_SEEDS.lock_or_init(|| Mutex::new(Vec::new())).expect("leech seed state poisoned");
     if seeds
         .iter()
         .any(|state| state.caster_id == caster_id && state.target_id == target_id)
@@ -24437,8 +23990,7 @@ pub fn begin_light_screen(
     let (start, end) = perpendicular_segment(caster_pos, target_pos, length);
     let tick = ctx.tick();
     let mut screens = LIGHT_SCREENS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("light screen state poisoned");
     screens.retain(|screen| screen.expires_at > tick);
     screens.push(LightScreenState {
@@ -24468,8 +24020,7 @@ pub fn light_screen_blocks(
     };
     let tick = ctx.tick();
     let mut screens = LIGHT_SCREENS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("light screen state poisoned");
     screens.retain(|screen| screen.expires_at > tick);
     screens
@@ -24488,8 +24039,7 @@ pub fn begin_smoke_screen(
     let (start, end) = perpendicular_segment(caster_pos, target_pos, length);
     let tick = ctx.tick();
     let mut screens = SMOKE_SCREENS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("smoke screen state poisoned");
     screens.retain(|screen| screen.expires_at > tick);
     screens.push(SmokeScreenState {
@@ -24515,8 +24065,7 @@ pub fn smoke_screen_blocks(ctx: &GameCtx, attacker_id: usize, target_id: usize) 
 pub fn smoke_screen_blocks_line(ctx: &GameCtx, start: EntityPos, end: EntityPos) -> bool {
     let tick = ctx.tick();
     let mut screens = SMOKE_SCREENS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("smoke screen state poisoned");
     screens.retain(|screen| screen.expires_at > tick);
     screens
@@ -24526,8 +24075,7 @@ pub fn smoke_screen_blocks_line(ctx: &GameCtx, start: EntityPos, end: EntityPos)
 
 pub fn begin_detect_guard(ctx: &GameCtx, entity_id: usize, duration_ticks: usize) {
     let tick = ctx.tick();
-    let states = DETECT_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("detect guard state poisoned");
+    let mut states = DETECT_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("detect guard state poisoned");
     states.retain(|state| state.entity_id != entity_id && state.expires_at > tick);
     states.push(DetectGuardState {
         entity_id,
@@ -24537,8 +24085,7 @@ pub fn begin_detect_guard(ctx: &GameCtx, entity_id: usize, duration_ticks: usize
 
 pub fn consume_detect_guard(ctx: &GameCtx, entity_id: usize) -> bool {
     let tick = ctx.tick();
-    let states = DETECT_GUARDS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("detect guard state poisoned");
+    let mut states = DETECT_GUARDS.lock_or_init(|| Mutex::new(Vec::new())).expect("detect guard state poisoned");
     let mut consumed = false;
     states.retain(|state| {
         if state.expires_at <= tick {
@@ -24620,8 +24167,7 @@ pub fn begin_grapploct_submission(
             tick: duration_ticks as u64,
         },
     );
-    let states = GRAPPLOCT_SUBMISSIONS.get_or_init(|| Mutex::new(Vec::new()));
-    let mut states = states.lock().expect("grapploct submission state poisoned");
+    let mut states = GRAPPLOCT_SUBMISSIONS.lock_or_init(|| Mutex::new(Vec::new())).expect("grapploct submission state poisoned");
     states.push(GrapploctSubmissionState {
         caster_id,
         caster_team,
@@ -24656,8 +24202,7 @@ pub fn begin_coalossal_magma_storm(
     let tick = ctx.tick();
     let stage_interval_ticks = stage_interval_ticks.max(1);
     let mut states = COALOSSAL_MAGMA_STORMS
-        .get_or_init(|| Mutex::new(Vec::new()))
-        .lock()
+        .lock_or_init(|| Mutex::new(Vec::new()))
         .expect("coalossal heat crash state poisoned");
     states.push(CoalossalMagmaStormState {
         caster_id,

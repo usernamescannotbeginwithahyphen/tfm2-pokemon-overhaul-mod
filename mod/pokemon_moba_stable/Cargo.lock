@@ -20,7 +20,7 @@ version = "0.1.0"
 
 [[package]]
 name = "pokemon_moba_stable"
-version = "0.2.13"
+version = "0.2.23"
 dependencies = [
  "mod-api-stable",
  "serde_json",

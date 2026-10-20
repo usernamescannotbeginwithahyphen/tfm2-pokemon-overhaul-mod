@@ -3,7 +3,7 @@ use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::panic::{self, PanicHookInfo};
 use std::path::Path;
-use std::sync::Once;
+use std::sync::{Once, OnceLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const PANIC_LOG_PATH: &str = "C:\\Users\\james\\Documents\\TFT Pokemon Mod\\logs\\panic-probe.log";
@@ -16,6 +16,15 @@ const STAT_PROBE_FLAG_PATH: &str =
 const STAT_PROBE_DAMAGE_FLAG_PATH: &str =
     "C:\\Users\\james\\Documents\\TFT Pokemon Mod\\logs\\enable-stat-probe-damage.txt";
 static PANIC_HOOK_INSTALL: Once = Once::new();
+static STAT_PROBE_FLAGS: OnceLock<(bool, bool)> = OnceLock::new();
+
+fn stat_probe_flags() -> (bool, bool) {
+    // Debug switches are sampled once per DLL load, never from the combat loop.
+    *STAT_PROBE_FLAGS.get_or_init(|| (
+        Path::new(STAT_PROBE_FLAG_PATH).exists(),
+        Path::new(STAT_PROBE_DAMAGE_FLAG_PATH).exists(),
+    ))
+}
 
 pub fn install_panic_hook() {
     PANIC_HOOK_INSTALL.call_once(|| {
@@ -31,6 +40,15 @@ pub fn catch_unwind_probe<T, F>(event: &str, detail: String, fallback: T, f: F) 
 where
     F: FnOnce() -> T,
 {
+    catch_unwind_probe_lazy(event, || detail, fallback, f)
+}
+
+// AI planning repeatedly requests metadata; format diagnostics only on failure.
+pub fn catch_unwind_probe_lazy<T, F, D>(event: &str, detail: D, fallback: T, f: F) -> T
+where
+    F: FnOnce() -> T,
+    D: FnOnce() -> String,
+{
     match panic::catch_unwind(panic::AssertUnwindSafe(f)) {
         Ok(value) => value,
         Err(payload) => {
@@ -40,12 +58,26 @@ where
                     "event={} time_ms={} detail=\"{}\" payload=\"{}\"",
                     sanitize_field(event),
                     timestamp_millis(),
-                    sanitize_field(&detail),
+                    sanitize_field(&detail()),
                     sanitize_field(&panic_payload_to_string(payload.as_ref()))
                 ),
             );
             fallback
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn successful_probe_does_not_format_diagnostics() {
+        let called = std::cell::Cell::new(false);
+        let result = super::catch_unwind_probe_lazy("test", || {
+            called.set(true);
+            "unused".to_string()
+        }, 0, || 42);
+        assert_eq!(result, 42);
+        assert!(!called.get());
     }
 }
 
@@ -59,11 +91,12 @@ pub fn log_damage_probe(_line: &str) {}
 pub fn log_credit_probe(_line: &str) {}
 
 pub fn stat_probe_enabled() -> bool {
-    Path::new(STAT_PROBE_FLAG_PATH).exists() || stat_probe_damage_enabled()
+    let (events, damage) = stat_probe_flags();
+    events || damage
 }
 
 pub fn stat_probe_damage_enabled() -> bool {
-    Path::new(STAT_PROBE_DAMAGE_FLAG_PATH).exists()
+    stat_probe_flags().1
 }
 
 pub fn log_stat_probe(line: &str) {

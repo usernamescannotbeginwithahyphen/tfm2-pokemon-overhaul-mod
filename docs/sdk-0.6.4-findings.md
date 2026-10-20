@@ -8,6 +8,441 @@ The [whole-mod follow-up](#whole-mod-audit-follow-up) expands this beyond the
 original examples. The [roster inventory](stable-champion-migration-audit.generated.md)
 accounts for all 103 champions, 412 action slots and 103 passive descriptions.
 
+## Build 0.2.23 Avoid Unused Entity Snapshot Copies
+
+The user still reports slow background advance on 0.2.22. The 19:09-19:16 logs
+are preserved in `tmp/performance-0.2.22/`. The last performance row (442 wall
+seconds) estimates 53.6M AI/passive calls and 74.4M world snapshots. Inclusive
+sample averages are approximately 30.9 us/AI, 64.6 us/passive and 21.1 us/world.
+Do not sum nested stages or infer a controlled speedup across different runs.
+The game was closed and the log contains no new panic.
+
+Concrete redundant work: `GameCtx::get_entity`/`entity_at` build an owned legacy
+snapshot, including stats, every buff, every CC, and an allocated name, even
+when a caller only checks alive/team/position. `get_player` also eagerly builds
+its champion's complete snapshot. These APIs remain unchanged for combat code
+that relies on an owned snapshot across mutations.
+
+- Add callback-borrowed `live_entity`, `live_entity_at`, and `live_player` reads.
+  Use them in champion, non-champion attack-target, and tower AI snapshots,
+  including alive/expiry pruning. Preserve update frequency, enumeration order,
+  vector order, upsert rules and freshness. No cross-callback cache is added.
+- Passive life registration reads only player deaths. Statistics slot metadata
+  reads only team/lane. Full accounting and identity refreshes still run.
+- Nullifying Gas first reads match-local champion and Receiver registrations.
+  Without a native or copied Weezing source, return the same false result
+  without enumerating units. With a source, keep the original live enumeration,
+  radius, alive/team checks, and Clawitzer/Comfey exemptions, but do not copy
+  unused unit combat payloads or reacquire identity stores for every unit.
+  The source list is rebuilt every call, so a copy change is visible immediately.
+
+Validation: 122 tests passed (four intentionally ignored), JSON validation
+passed. New tests compare AI snapshot contents/order against the original owned
+read algorithm across movement, death, reappearance, tower classification and
+expiry. Other checks compare Gas against the original scan, including exact
+radius boundaries, copied sources, allies, deaths, invalid handles and separate
+matches. SDK-call counters verify zero stat/buff copies on lightweight reads
+and zero entity enumeration on source-free Gas checks. Existing combat, AI,
+projectile, field, attachment, stealth, statistics and match-isolation tests pass.
+Release build and optimized tests also pass (122 passed, four ignored).
+Deployed with the game closed; installed version is 0.2.23 and the DLL matches
+the source package SHA256:
+`8EAF48E911D2A16396A193AB978AC1783DEDA538036B55E369A08DFD2B9626FE`.
+No live speedup is claimed yet; the next background Advance run is required.
+
+## Build 0.2.22 Background Simulation State Access
+
+The 17:31-18:18 session on 0.2.21 contains background matches and only a startup
+record in the foreground AI log. Logs are retained in `tmp/performance-0.2.21/`.
+This is background-advance evidence, not a watched-playback benchmark. At the
+last timing row (2142 wall seconds), estimated calls include 210.8M AI callbacks,
+210.8M passive callbacks and 293.2M world captures. Sample averages are roughly
+55.6 us/AI, 67.9 us/passive and 33.4 us/world. These inclusive timings overlap;
+do not sum them or compare whole-session wall times without matching workloads.
+
+Two redundant operations are removed without lowering update frequency:
+
+- `SimOnceLock::lock_or_init` initializes and returns the guarded state under
+  one shard lock. The prior `get_or_init(...).lock()` acquired the same mutex
+  twice and looked up the same key again. A restricted, idempotent mechanical
+  conversion (`tools/optimize-state-locks.ps1`) updates 550 immediate-use sites:
+  491 in pokemon_status.rs and 59 in pokemon_content.rs. It only combines
+  adjacent operations with simple pure initializers. Existing APIs remain for
+  other callers. Keys, shard count, retirement, mutex protection, and guarded
+  state lifetime are unchanged; no thread-local gameplay copies or unsafe
+  cached references are introduced.
+- Player AI snapshots use the player already resolved by the callback instead
+  of enumerating the player roster again. Other snapshot entry points retain
+  owner discovery. Entity facts are still read freshly on every callback;
+  repeated team/ID reads within a single snapshot are reused locally.
+
+Validation: 118 tests pass, four intentionally ignored, and JSON validation
+passes. New tests cover single initialization, nested simulation identity,
+retirement cleanup, mixed old/new concurrent access, and identical world facts
+with zero player enumeration in the known-player path. Actual advance-time
+improvement must be measured after deployment; isolated lock timings are not
+an end-to-end game speed claim.
+
+The full release-mode suite also passes (118 passed, four ignored). The ignored
+old/new state-lock microbenchmark was run explicitly four times in release
+mode, with 100000 operations per worker. Median elapsed times (old/new): one
+thread 3971/2922.5 us, eight threads 31967.5/20265.5 us, sixteen threads
+37598.5/24633 us. That is roughly 26%, 37%, and 34% less elapsed time in this
+isolated loop. Individual multithread trials vary; it does not establish the
+same gain for background match simulation. No locks were removed from mutable
+state access, and the old/new implementations remain interoperable.
+Release build succeeded and was deployed with the game closed. Installed
+0.2.22 DLL matches the source package:
+`42F2825E168EF42DAB4801E7673D195383E495B84FCB087CE2CB1D0731235DA4`.
+No live background matches were run after this deployment. Preserve the 0.2.21
+logs for comparison; neither combat nor AI tick rates were reduced.
+
+## Build 0.2.21 Smeargle Memory And Low-Risk Performance Work
+
+User reports the 0.2.20 range fix appears to resolve the tower huddle, but
+Smeargle seems not to copy and advance remains too slow. The 16:31-16:53 session
+is retained in `tmp/performance-0.2.20/`. Foreground match 9/set 1 has blue
+Smeargle. Its sampled inputs include some attack/skill/skill2 casts, but the old
+trace does not identify learned moves; do not infer he never learned anything.
+The game log still reports server/live divergence and a 60-second wait limit
+after skipping set 2. No new panic is recorded.
+
+Concrete Smeargle defect: learned slots/cooldowns were attached to entity IDs,
+but actual respawns allocate new IDs. Player-life rebinding now transfers the
+Smeargle state before spawn registration, preserving learned slots and cooldowns
+within that player's simulation. The corrected range metadata is restored on
+the new entity. It does not leak to another player or match. A healthy Smeargle
+with unfilled slots can now approach a nearby visible enemy champion while
+otherwise idle/moving, even after acquiring the fallback basic. The approach
+uses short steps, stops inside ordinary Sketch range, rejects tower entry and
+outnumbered encounters, and preserves recall and action inputs. It does not
+grant moves without being affected. Sampled world logs now include Sketch slots
+with source champion and move name, allowing learning to be distinguished from
+failure to cast learned moves. Full live acceptance remains pending.
+
+The last performance row (841 wall seconds, before later watched gameplay) has
+about 98.5M estimated passive callbacks, 98.5M AI callbacks and 136.6M world
+captures. Sample averages are about 66.7 us/passive, 31.4 us/AI and 21.2 us/world.
+These are inclusive and nested, not a summed CPU profile or a speedup forecast.
+The old log hit its 512 KiB cap; reports now occur every ten seconds rather than
+two to cover more of a session at lower output overhead.
+
+Changes preserve combat tick rates and state isolation:
+- Per-state profiling is now opt-in with Cargo feature `profile-state-access`.
+  The old measurement instruments approximately 28.4 billion state accesses
+  in the retained portion alone, even though timestamps are sampled. Default
+  builds compile those probe calls out; coarse callback profiling remains.
+  Disabled state counters are explicitly labeled, not reported as zero work.
+- Passive-update and AI diagnostic strings are formatted only on panic.
+- Global field-visual lease upkeep runs once per shared passive tick, not once
+  for every champion; field creation still draws immediately. Gameplay field
+  updates, damage, expiry and per-entity passive work keep their schedules.
+- Unchanged champion identities no longer rewrite owner/stat metadata each tick.
+  Initial registration, respawns and actual identity changes retain their paths.
+- Common native-ID AI name checks use a direct case-insensitive comparison,
+  retaining normalized fallback for names with punctuation/compound names.
+
+Validation before release: 115 tests pass, three intentionally ignored. New
+tests cover respawn memory/cooldowns and cross-player/match isolation, learning
+approach after the fallback, recalls, actions, full slots, hidden enemies,
+outnumbered encounters, towers and low HP. Existing field-lease, damage,
+attachment, detection, and roster tests still pass. Performance gains and
+successful copied-move usage must be verified in the next game session.
+Release build and JSON validation succeeded. Deployed with the game closed;
+installed version is 0.2.21 and the DLL matches the package:
+`8D547FFC76A752F7C9240E0EE0AF92B8098EF67EC2A5A63A65BA72ED01060DC6`.
+No new live match was run after deployment.
+
+## Build 0.2.20 Smeargle Range Metadata
+
+2026-10-19, 15:22-15:32 session on 0.2.19: watched set 2 still clusters blue
+near its inner mid tower and repeatedly recalls at full health. Early sampled
+Return inputs pass through unchanged; activation gates are not universally
+blocking casts. Blue has almost no CS for several minutes, then starts fighting.
+Set 2 has red Smeargle. Normally laning watched sets 1 and 3 do not. The two
+looping background matches (689/785) captured on 0.2.18 also have red Smeargle;
+the normally laning background matches (100/592) on 0.2.19 do not.
+
+Concrete metadata defect: every Sketch slot's range_adjust returned the largest
+range in the entire roster minus Sketch's base range. Xatu's Super Psy has
+900000 range, so all four Smeargle slots advertised 900000 even before learning
+anything (Sketch base is 42000). Official traits.rs says every range check,
+including AI checks, reads this adjustment. An own-cast target constraint does
+not justify advertising that range to opponents. This is a strong candidate
+for excessive threat/retreat planning, not a live-confirmed cause of the loop.
+
+0.2.20 removes the roster-wide maximum. Each learned slot publishes only its
+own base/growth range through a permanent, stat-neutral engine buff marker.
+range_adjust reads the caster view, never a process-wide entity-id lookup or
+unscoped SimOnceLock: the SDK gives this callback no simulation context.
+Unlearned slots add zero range. The SDK adjustment is unsigned, so copied moves
+shorter than Sketch retain a 42000 metadata floor; the existing copied-target
+gate continues enforcing their shorter actual range. Learning (including the
+fallback), spawn, and a once-per-second repair synchronize markers; unchanged
+markers cause no buff writes, and each slot uses at most one marker.
+
+Playback evidence is more limited than the logged server/live divergence:
+repeated watched runs reproduced player snapshots at all 109 shared ticks in
+set 1 and all 134 shared ticks in set 3. Do not blame replay restarts as the
+established loop cause. The game did log precomputed-server versus watched KDA
+differences in sets 1 and 2; the loaded save records 0.2.18 while the running
+DLL was 0.2.19, so that comparison is not a controlled same-build replay test.
+Captured logs are retained locally in `tmp/performance-0.2.19/` (not for git).
+
+The sampled inclusive AI callback average fell from about 81.5 us to 47.5 us
+between these sessions; this is not an end-to-end speedup claim. Match durations,
+lineups, background workload, and user wait time differ. Overall simulation
+speed and tower-loop resolution still require a new live run.
+
+Validation: 113 tests passed, three intentionally ignored; JSON validation
+passed. New tests cover unlearned and learned ranges without a simulation
+context, per-slot/entity isolation, all 103 registered champions' adjustments,
+neutral marker payloads, both learning paths, respawn restoration, no stacking,
+and stale-marker removal without disturbing other buffs.
+Release build succeeded and was deployed with the game closed. Installed
+0.2.20 DLL matches the package:
+`9FF19D8F920604C81E33700E259A6457A7E350BDE2E186A8307E968EA72DE421`.
+No live match was run after this installation. Next acceptance: a newly simulated
+match with opposing Smeargle, checking early lane/CS progression and full-health
+recalls against the retained 0.2.19 trace. Also retain a non-Smeargle control.
+
+## Build 0.2.19 Measured Hot Paths And Recall Evidence
+
+2026-10-19, 14:22-14:36 session on 0.2.18. The user observed normal behavior in
+watched game one and the tower/recall loop in game two, with near-identical teams.
+The AI trace filled its shared 4 MiB cap after about 74 seconds, before watched
+games were captured. It cannot compare those two watched games directly.
+
+Nevertheless, background matches 689 and 785 captured a matching pattern: blue
+Skeledirge/Shiftry/Ampharos/Decidueye/Ludicolo cluster near (240000, 750000),
+with full-health recalls. In match 689, Ampharos at tick 601, position
+(219168, 740832), HP 560/560, receives base input kind 1 (Return), with identical
+selected/final inputs and disposition pass. Ludicolo at tick 721 is similar.
+Match 785 has full-health Ampharos recall at tick 1201 and Decidueye at 1561.
+No detection memory appears in these samples. This rules out the final input
+override directly inventing those particular recalls, not all possible mod
+influence: cast gates, effect estimates, or macro strategy may still contribute.
+Do not suppress recalls globally or claim this is an engine bug without more
+evidence. The game also logged server/live KDA divergence for all ten players in
+set 1; the reason is not established.
+
+The final performance row spans 807 wall seconds. Estimated counts: 63.28M AI
+think callbacks, 63.28M passive updates, 86.54M world captures, 7.04M match ticks,
+and 21.49B state accesses. Sampled inclusive totals: AI think 40318.8 ms, passive
+updates 34540.8 ms, world capture 15090.9 ms, state access 13319.0 ms (stride 128).
+These overlap and include waiting; do not sum them or present them as an exact
+CPU profile. They demonstrate hot-path work independently of match duration.
+Raw logs are preserved locally under `tmp/performance-0.2.18/` (not for git).
+
+0.2.19 preserves decision/combat semantics while reducing repeated work:
+- Native champion IDs use an immutable lookup; alias comparisons no longer
+  allocate normalized strings for each roster candidate. Empty detection and
+  non-action input paths avoid unneeded roster lookup.
+- Twelve already tick-gated shared routines use a common per-simulation guard
+  before visiting their individual guards for each of ten players. Per-entity
+  registration, ungated cleanup, field refresh and Electrode work retain their
+  original scheduling/order; each inner tick guard remains intact.
+- State timing is sampled once per 4096 calls instead of 128 to reduce observer
+  cost on this exceptionally busy path. Other stages stay at 128.
+
+Foreground traces now have an independent 32 MiB `pokemon_moba_stable-ai.log`;
+the first two background matches have a separate 4 MiB
+`pokemon_moba_stable-ai-background.log`. Decisions/world samples are spaced
+60/120 ticks for foreground and 240/240 for background. Sampled activation and
+target gates include caster/target validity, visibility and cooldown facts.
+World rows add gold, level, CS and items; strategy/structure snapshots are read
+every 600 ticks. No strategy or recall commands are changed by diagnostics.
+
+Validation so far: 109 tests pass, three intentionally ignored. The manual
+lookup benchmark also passes: 20,000 lookups in the debug build took 1685 ms
+with the previous normalization search versus 75 ms with the new lookup. This
+is not an end-to-end game benchmark. Live speed and loop resolution are pending.
+JSON validation and release build succeeded; deployed with the game closed.
+Installed 0.2.19 DLL matches the package:
+`8918D5F007EB029D7D69934500422AFA90A7E4B77775A591A63D4A749053E9DA`.
+
+## Build 0.2.18 Background Advance Investigation
+
+2026-10-19: the subsequent 12:45-12:51 session produced only ServerPresim map
+records and no AI diagnostic file. Build 0.2.17 excluded those origins, so it
+could not establish whether the reported base/tower/recall loop continued.
+Do not present the absence of an error as a performance diagnosis. The loop
+could extend match duration, while expensive callbacks could independently make
+each simulation tick slow; both require measurements.
+
+The AI trace now selects the first two distinct background simulation keys,
+sampling decisions and world state every 120 ticks. Foreground sampling remains
+unchanged. Startup records create the file at mod initialization even if no
+eligible match runs. Records include elapsed wall time and final match tick when
+the end callback is observed. The 4 MiB cap disables further AI tracing once
+reached. Full simulation identity still separates matches and replays.
+
+`pokemon_moba_stable-performance.log` in the same game data directory samples
+one in 128 calls per thread/stage: AI think/world capture, activation and target
+gates, effect application/metadata, passive updates, match updates and runtime
+state access. Reports are cumulative, at most every two wall seconds, capped at
+512 KiB. Times are inclusive: nested stages must not be added together. State
+access measures lookup/lock acquisition, not the full returned guard lifetime.
+Counts are sample-based estimates and maxima are sampled, not exhaustive.
+These diagnostics do not change gameplay decisions and need removal once the
+performance/recall issue is understood.
+
+One verified hot-path waste was removed: seven effect metadata callbacks
+eagerly constructed detailed panic descriptions on every successful AI estimate.
+They now format the same diagnostic only on failure. Return values and panic
+fallbacks are unchanged. This is not proof of the primary slowdown cause or a
+claim that the recall loop is fixed. Live timings remain pending.
+
+Validation: 106 tests passed, two intentionally ignored; JSON validation and
+release build succeeded. Deployed while the game was closed. Installed version
+is 0.2.18 and the DLL matches the source package:
+`4D0291914572DE480C44C17ADDDC1B8E7F1265945260A62E378C8C288605D191`.
+Next step: run advance for roughly 30-60 seconds, close the game and inspect both
+new logs. If the foreground loop is reproduced, that view is traced as well.
+
+## Build 0.2.17 Recall-Loop Diagnostic
+
+2026-10-19: the user reports blue repeatedly running from base to the first mid
+tower, circling/grouping, and teleporting home. Current game log has no panic.
+The roster, match circumstances, and cause have not yet been established. Do not
+label this as fixed or blame old saves, shared detection, or lock sharding without
+an input trace. No movement/recall behavior was changed in this diagnostic build.
+
+Temporary trace: `%APPDATA%/TeamSamoyed/TeamfightManager2/data/pokemon_moba_stable-ai.log`.
+Only ClientMatchView/ClientSpectate/ClientReplay origins are recorded; background
+presimulation, tool and unknown origins are skipped. Logs contain origin/match/
+replay/set/seed and build identity, sampled base/selected/final AI commands, HP,
+positions, charges, detection memory and pass/block/replace disposition. World
+samples include team/lane/roster, speed and CC count. Explicit mod teleports are
+logged independently to distinguish attachment/ability moves from engine recall.
+Decision samples are at most one per entity per 30 ticks; world samples once per
+60 ticks. The file is capped at 4 MiB and resets on first foreground trace in each
+DLL load. Logging never selects inputs or changes simulation state. If the view
+replays recorded inputs without invoking AI, the world/start markers still show
+which callbacks ran; missing decision rows must not be interpreted as passing AI.
+Remove/disable this temporary trace after resolving the loop.
+
+Validation: 104 active tests passed, two intentionally ignored. Release build
+completed and was deployed while the game was closed. Installed DLL hash matches
+the package: `DA7EAA87C635FB84DF361E45ED39CEEDAE5394F77B048D0C33BAAAE2B5658889`.
+Next step: reproduce one or two loops in a foreground match/view and inspect the
+new trace before choosing a behavioral patch. No live reproduction was captured
+during this source investigation.
+
+## Build 0.2.16 Parallel Simulation Locks
+
+2026-10-19: the user confirmed advance was already slow before 0.2.14. Installed
+0.2.15 first, then found that each SimOnceLock held one mutex for all matches.
+Callers held that mutex throughout their state update, including some entity
+scans. Distinct background matches therefore serialized on unrelated payloads.
+
+Runtime stores now use 64 lock shards selected by the full simulation key. The
+shard index is calculated on scope entry, not for every store access. Full keys
+still identify payloads within each shard; collisions do not mix data. Same-match
+callbacks remain serialized, and nested scopes restore both key and shard.
+Retirement remains lazy: finished payloads are reclaimed when their shard is next
+accessed. An idle shard can retain its final retired payloads until reuse/process
+exit. No engine pointers or new unsafe code were introduced.
+
+Isolated debug timing probe, each worker doing 20,000 updates to a 64-value store:
+
+| Workers | Single shared lock | Sharded locks |
+| --- | --- | --- |
+| 1 | 10 ms | 11 ms |
+| 8 | 226 ms | 21 ms |
+| 16 | 623 ms | 40 ms |
+
+These are synthetic state-access timings, not an in-game speedup measurement.
+The manually runnable ignored probe is `measure_parallel_state_access`. Full
+suite: 102 passed, two intentionally ignored (companion exporter and timing
+probe). Added checks cover unrelated-shard progress while another guard is held,
+same-match concurrent increments, and separate payloads for colliding keys;
+existing replay/nested-callback and retirement tests also pass.
+
+Release 0.2.16 deployed to the installed `mods/pokemon_moba_stable` after checking
+the game was closed. All 1,112 installed files match the package and 417 JSON/
+animation documents validate. DLL SHA-256:
+`1C31ED323BFF20F2D2D3D1FCAB78A7D1DBE3D1E85CCF2F24FC23472C2EA6F60F`.
+Live advance-time acceptance is still pending. No combat rules or tick rates
+were changed, and no VFX, statistics, or AI checks were disabled.
+
+## Build 0.2.15 Performance Follow-Up
+
+2026-10-19: advance initially appeared hung, but the user confirmed it progresses
+very slowly and that this predates 0.2.14. The inspected log had no current panic;
+the July panic-probe files are historical. The running process has busy worker
+threads. Windows denied WPR CPU profiling, so no dominant bottleneck has been
+measured and this patch must not be presented as a proven fix for advance time.
+
+- Caster-only AI activation snapshots now look up the caster directly instead
+  of enumerating every entity. Full-world/target snapshots remain unchanged.
+  A regression test checks 1,000 caster-only snapshots perform zero entity
+  enumerations, while full snapshots still include every unit. Dead/invalid
+  casters remain absent.
+- Legacy diagnostic flag files are read once per DLL load, not repeatedly from
+  combat callbacks. Changing those flags now requires restarting the game.
+- Rejected persistent-field VFX requests retry next simulation tick, not once
+  per champion callback within the same tick. Successful animation leases and
+  field gameplay remain unchanged; a rejection never suppresses a full cycle.
+
+Validation: 99 active tests passed, one companion exporter intentionally ignored.
+Live advance-time comparison remains required. The running game cannot pick up
+the new DLL until it is closed, the package is deployed, and the game restarted.
+0.2.15 was subsequently deployed after the user closed the game; installed DLL
+SHA-256 matched `66E45699402660A00943B60B1E7854C4CD28E2C91334B55857B6CB0BF2D54865`.
+
+## Build 0.2.14 Persistent Fields
+
+2026-10-19: user saw overlapping web clumps blinking rather than persisting,
+similar grass behavior, and no obvious Life Dew or Salt Cure visuals.
+
+- Shared field leases previously expired/restarted every 30 ticks, even when a
+  source animation was longer. Renewals now align to whole source cycles (at
+  least 30 ticks) and play for two extra ticks to cover the handoff. Failed host
+  calls do not reserve a lease. Fixed world positions and per-location dedupe
+  remain. This applies to all callers, including Misty Terrain, Brine, smoke,
+  Dedenne nodes, rain/sun rectangles and salt. Actual engine flicker still needs
+  live confirmation; mock tests prove event coverage, not renderer behavior.
+- Webs and permanent grass were deleted on caster death. They now retain their
+  map state. Existing five-web/three-grass caps and explicit destruction still
+  apply. Kricketune starts with five charges, a 40-tick cast cooldown and a
+  30-second charge recharge: repeated casts at the same target could dump them
+  in a clump. AI gates now reject centers closer than one-third web radius to
+  an existing own web, allowing substantial overlap and connected chains. The
+  gameplay action itself still permits deliberate overlapping casts.
+- Surviving webs, grass and Life Dew rebind ownership when a player's respawn
+  uses a different entity handle. This preserves field caps and later recast
+  replacement without moving the stored field centers.
+- Grass's intended overlapping attack-speed bonuses were overwritten by named
+  refresh. Sum active own fields into one buff at the existing refresh cadence,
+  avoiding both lost overlap and unlimited per-tick stacking. Grass damage bonus
+  now excludes expired fields and other casters' terrain.
+- Life Dew's expected healing was zero. It now reports its real total potential
+  healing, and its 14 pickups render immediately at creation. They retain their
+  60-second lifetime after Goodra dies, or disappear on injured-ally collection.
+  Full-health allies still do not consume them. Real AI selection remains a live
+  test; metadata is not proof that the engine will prioritize every useful cast.
+- Salt patches could be consumed by nearby enemies during the same update that
+  would have first drawn them. Emit a creation field immediately and a one-shot
+  contact visual when consumed; damage still resolves once. Blessed Salt no
+  longer displays/enables the permanent salt stage before the spire expires.
+
+No art was regenerated. The salt terrain still reuses patch artwork, which does
+not show the permanent stage's annular inner exclusion exactly. Field event
+cancellation is still unavailable: after destruction the final event can linger
+for its cycle-aligned lease plus two ticks, rather than the previous fixed 30.
+Arboliva's Trailblaze, fire/ice destruction, web burning and oldest-field eviction
+are legitimate removals, not visual flicker. Match state remains simulation-scoped.
+
+Validation: 98 active debug tests pass, one native companion exporter intentionally
+ignored. New coverage checks uninterrupted lease event coverage, dedupe/retry,
+fixed centers, death persistence/destruction, grass overlap/ownership/expiry,
+web AI overlap spacing, respawn ownership/caps, Life Dew metadata/lifetime and
+salt creation/contact/stages.
+Release 0.2.14 deployed to the installed `mods/pokemon_moba_stable`; all 1,112
+files match the package, and 417 JSON/animation documents validate. DLL SHA-256:
+`0455498BDAB08B22E80FCC80D70998263EF1DEC178977DBA229B277B7AF4049C`.
+
 ## Build 0.2.13 Attachment Correction
 
 2026-10-19: investigates the reported Comfey/Clawitzer base-to-lane teleport loop.

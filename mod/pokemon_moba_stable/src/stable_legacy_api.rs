@@ -539,7 +539,7 @@ impl<'a, 'b, 'c> PlayerAiContext<'a, 'b, 'c> {
         let (world, scope) = if let Some(sim) = inner.sim() {
             let scope = crate::runtime_state::Scope::enter(&sim);
             let world = sim.get_player(player).and_then(|player| player.champion())
-                .map(|caster| crate::ai_world::World::capture(&sim, caster.id()));
+                .map(|caster| crate::ai_world::World::for_player(&sim, caster.id(), player));
             (world, Some(scope))
         } else { (None, None) };
         Self {
@@ -649,6 +649,7 @@ impl StablePlayerAi for LegacyPlayerAi {
         ctx: &mut StableAiContext<'_>,
         base_input: Option<InputV1>,
     ) -> Option<InputV1> {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::AiThink);
         let mut legacy_ctx = PlayerAiContext::from_stable(ctx);
         let decision = self
             .inner
@@ -662,16 +663,23 @@ fn finish_ai_decision(world: Option<&crate::ai_world::World>, name: &str,
     // SDK None keeps the built-in input. Use an explicit hold command to cancel.
     let hold = world.and_then(|world| world.caster())
         .map(|caster| InputV1::move_to(caster.pos.x, caster.pos.y));
+    let disposition = match &decision {
+        PlayerInputDecision::Pass => "pass",
+        PlayerInputDecision::Block => "block",
+        PlayerInputDecision::Replace(_) => "replace",
+    };
     let selected = match decision {
         PlayerInputDecision::Pass => base,
         PlayerInputDecision::Block => hold,
         PlayerInputDecision::Replace(input) => Some(input.to_stable()),
     };
-    match selected {
+    let final_input = match selected {
         Some(input) if world.map_or(false, |world|
             !crate::legacy::pokemon_content::ai_input_allowed(world, name, &Input::from_stable(input))) => hold,
         _ => selected,
-    }
+    };
+    crate::ai_trace::decision(world, name, base, selected, final_input, disposition);
+    final_input
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -1078,14 +1086,21 @@ struct LegacyAction {
 
 impl StableAction for LegacyAction {
     fn can_activate(&self, sim: &StableSim<'_>, caster: usize) -> bool {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Activation);
         let _scope = crate::runtime_state::Scope::enter(sim);
         let world = if self.inner.needs_ai_neighbours() { crate::ai_world::World::capture(sim, caster) }
             else { crate::ai_world::World::for_caster(sim, caster) };
-        self.inner.can_activate(&world)
+        let allowed = self.inner.can_activate(&world);
+        crate::ai_trace::gate(&world, self.inner.action_name(), None, allowed);
+        allowed
     }
     fn target_constraint(&self, sim: &StableSim<'_>, caster: usize, target: usize) -> bool {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Target);
         let _scope = crate::runtime_state::Scope::enter(sim);
-        self.inner.target_constraint(&crate::ai_world::World::for_target(sim, caster, target), target)
+        let world = crate::ai_world::World::for_target(sim, caster, target);
+        let allowed = self.inner.target_constraint(&world, target);
+        crate::ai_trace::gate(&world, self.inner.action_name(), Some(target), allowed);
+        allowed
     }
     fn can_use_with_move_by(&self, caster: &mod_api_stable::StableEntityView<'_>) -> bool {
         self.inner.can_use_with_move_by(caster)
@@ -1160,6 +1175,7 @@ impl StableEffectType for LegacyEffect {
         caster_id: usize,
         input: InputTargetV1,
     ) {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Effect);
         let mut ctx = GameCtx::from_stable(sim);
         self.inner.apply(
             &mut ctx,
@@ -1170,32 +1186,39 @@ impl StableEffectType for LegacyEffect {
     }
 
     fn expected_damage(&self, caster_stat: &StatV1) -> (usize, usize) {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Metadata);
         self.inner.expected_damage(caster_stat)
     }
 
     fn expected_heal(&self, caster_stat: &StatV1) -> usize {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Metadata);
         self.inner.expected_heal(caster_stat)
     }
 
     fn expected_shield(&self, caster_stat: &StatV1) -> usize {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Metadata);
         self.inner.expected_shield(caster_stat)
     }
 
     fn expected_cc_time(&self) -> Option<usize> {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Metadata);
         self.inner.expected_cc_time()
     }
 
     fn expected_buff(&self, caster_stat: &StatV1) -> Option<BuffV1> {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Metadata);
         self.inner
             .expected_buff(caster_stat)
             .map(|buff| buff.to_stable())
     }
 
     fn expected_move_distance(&self) -> Option<(usize, u64)> {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Metadata);
         self.inner.expected_move_distance()
     }
 
     fn expected_rush_effect(&self) -> bool {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Metadata);
         self.inner.expected_rush_effect()
     }
 
@@ -1276,6 +1299,7 @@ impl StablePassive for LegacyPassive {
     }
 
     fn on_update(&mut self, sim: &mut StableSim<'_>, rng_seed: u64, player: usize, entity: usize) {
+        let _timing = crate::performance_probe::measure(crate::performance_probe::Stage::Passive);
         let mut ctx = GameCtx::from_stable(sim);
         self.inner.on_update(&mut ctx, rng_seed, player, entity);
     }
@@ -1342,6 +1366,25 @@ impl GameCtx {
 
     pub fn get_entity(&self, entity_id: usize) -> Option<EntityRef<'_>> {
         self.sim().get_entity(entity_id).map(EntityRef::from_stable)
+    }
+
+    // Read-only scans do not need the owned legacy snapshot's stats/buff/CC/name copies.
+    // These views borrow this context; do not retain them across a simulation mutation.
+    pub(crate) fn live_entity(&self, entity_id: usize) -> Option<mod_api_stable::StableEntity<'_, 'static>> {
+        self.sim().get_entity(entity_id)
+    }
+
+    pub(crate) fn live_entity_at(&self, index: usize) -> Option<mod_api_stable::StableEntity<'_, 'static>> {
+        self.sim().entity_at(index)
+    }
+
+    pub(crate) fn live_player(&self, player_id: usize) -> Option<mod_api_stable::StablePlayer<'_, 'static>> {
+        self.sim().get_player(player_id)
+    }
+
+    pub(crate) fn player_team_position(&self, player_id: usize) -> Option<(usize, Position)> {
+        self.live_player(player_id)
+            .map(|player| (player.team(), player.lane().map(Position::from_stable).unwrap_or(Position::Top)))
     }
 
     pub fn player_count(&self) -> usize {
@@ -1445,6 +1488,10 @@ impl GameCtx {
         self.sim_mut().entity_stack_buff(target, &buff, 1, true);
     }
 
+    pub fn sync_sketch_ranges(&self, target: usize, ranges: crate::sketch_range::Ranges) {
+        crate::sketch_range::sync(self.sim_mut(), target, ranges);
+    }
+
     pub fn refresh_stat_buff(&self, target: usize, name: &str, buff: BuffState) {
         if name.len() > mod_api_stable::BUFF_NAME_CAP { return; }
         let mut desired = buff.to_stable();
@@ -1513,7 +1560,9 @@ impl GameCtx {
     }
 
     pub fn entity_set_pos(&self, entity_id: usize, x: u64, y: u64) -> bool {
-        self.sim_mut().entity_set_pos(entity_id, x, y)
+        let accepted = self.sim_mut().entity_set_pos(entity_id, x, y);
+        crate::ai_trace::teleport(self.tick(), entity_id, x, y, accepted);
+        accepted
     }
 
     pub fn entity_set_invisible(&self, entity_id: usize, ticks: usize) -> bool {
@@ -1982,6 +2031,11 @@ mod sdk_upgrade_tests {
     #[derive(Default)]
     struct Calls {
         world: bool,
+        entity_enumerations: std::cell::Cell<usize>,
+        player_enumerations: std::cell::Cell<usize>,
+        stat_reads: std::cell::Cell<usize>,
+        buff_reads: std::cell::Cell<usize>,
+        towers: std::collections::HashSet<usize>,
         tick: usize,
         seed: u64,
         hp_current: Option<usize>,
@@ -2005,6 +2059,7 @@ mod sdk_upgrade_tests {
         shields: Vec<(usize, usize, usize)>,
         buffs: usize,
         visuals: Vec<(String, usize, InputTargetV1, u64, u64, u64)>,
+        reject_visuals: bool,
         projectiles: Vec<(String, String, mod_api_stable::ProjectileSpawnV1)>,
         queued: Vec<(String, usize, InputTargetV1, usize)>,
         visual_buffs: Vec<(usize, String, usize, u32)>,
@@ -2054,6 +2109,8 @@ mod sdk_upgrade_tests {
         (*(state as *mut Calls)).active_buffs.remove(&(target.id().unwrap(), name.to_owned())).map_or(0, |buffs| buffs.len())
     }
     unsafe extern "C" fn buff_count(state: *const c_void, target: EntityHandleV1) -> usize {
+        let reads = &(*(state as *const Calls)).buff_reads;
+        reads.set(reads.get() + 1);
         (*(state as *const Calls)).active_buffs.iter().filter(|((id, _), _)| Some(*id) == target.id()).map(|(_, buffs)| buffs.len()).sum()
     }
     unsafe extern "C" fn buff_at(state: *const c_void, target: EntityHandleV1, index: usize, out: *mut BuffV1) -> bool {
@@ -2081,10 +2138,14 @@ mod sdk_upgrade_tests {
     unsafe extern "C" fn entity_count(state: *const c_void) -> usize {
         if (*(state as *const Calls)).world { 3 } else { 0 }
     }
-    unsafe extern "C" fn entity_at(_: *const c_void, index: usize) -> EntityHandleV1 {
+    unsafe extern "C" fn entity_at(state: *const c_void, index: usize) -> EntityHandleV1 {
+        let count = &(*(state as *const Calls)).entity_enumerations;
+        count.set(count.get() + 1);
         EntityHandleV1::from_id(7 + index)
     }
     unsafe extern "C" fn stat(state: *const c_void, entity: EntityHandleV1, out: *mut StatV1) -> bool {
+        let reads = &(*(state as *const Calls)).stat_reads;
+        reads.set(reads.get() + 1);
         *out = StatV1 { attack: 100, magic_power: 100, hp: 10000, move_speed: 5000,
             crit_chance: current_crit(&*(state as *const Calls), entity.id().unwrap()), ..Default::default() };
         true
@@ -2103,12 +2164,19 @@ mod sdk_upgrade_tests {
     }
     unsafe extern "C" fn champion(state: *const c_void, entity: EntityHandleV1) -> bool { entity.id() == Some(7) || ((*(state as *const Calls)).ally_nine && entity.id() == Some(9)) || ((*(state as *const Calls)).enemy_champions && entity.id() == Some(8)) }
     unsafe extern "C" fn minion(_: *const c_void, entity: EntityHandleV1) -> bool { entity.id() != Some(7) }
+    unsafe extern "C" fn tower(state: *const c_void, entity: EntityHandleV1) -> bool {
+        (*(state as *const Calls)).towers.contains(&entity.id().unwrap())
+    }
     unsafe extern "C" fn player_valid(state: *const c_void, player: PlayerHandleV1) -> bool {
         (*(state as *const Calls)).world && player.id() == Some(1)
     }
     unsafe extern "C" fn player_champion(_: *const c_void, _: PlayerHandleV1) -> EntityHandleV1 { EntityHandleV1::from_id(7) }
     unsafe extern "C" fn player_count(_: *const c_void) -> usize { 1 }
-    unsafe extern "C" fn player_at(_: *const c_void, _: usize) -> PlayerHandleV1 { PlayerHandleV1::from_id(1) }
+    unsafe extern "C" fn player_at(state: *const c_void, _: usize) -> PlayerHandleV1 {
+        let count = &(*(state as *const Calls)).player_enumerations;
+        count.set(count.get() + 1);
+        PlayerHandleV1::from_id(1)
+    }
     unsafe extern "C" fn visible(state: *const c_void, _: usize, _: usize) -> bool { !(*(state as *const Calls)).hidden }
     unsafe extern "C" fn gold(state: *mut c_void, player: PlayerHandleV1, delta: i64) -> bool {
         (*(state as *mut Calls)).gold.push((player.id().unwrap(), delta)); true
@@ -2138,7 +2206,7 @@ mod sdk_upgrade_tests {
         caster: usize, input: *const InputTargetV1, range: u64, radius: u64, ticks: u64) -> bool {
         let name = std::str::from_utf8(std::slice::from_raw_parts(name, len)).unwrap().to_owned();
         (*(state as *mut Calls)).visuals.push((name, caster, *input, range, radius, ticks));
-        true
+        !(*(state as *mut Calls)).reject_visuals
     }
 
     unsafe extern "C" fn projectile(state: *mut c_void, name: *const u8, len: usize,
@@ -2163,6 +2231,122 @@ mod sdk_upgrade_tests {
         if buffs.len() < max { buffs.push(*buff); }
         if refresh != 0 { for old in buffs.iter_mut() { old.duration_tick = (*buff).duration_tick; } }
         buffs.len()
+    }
+
+    #[test]
+    fn lightweight_reads_match_owned_snapshots_without_copying_combat_payloads() {
+        let mut expected = Vec::new();
+        let mut expected_player = None;
+        let calls = with_world(Calls { world: true, towers: [9].into(), dead: [8].into(), ..Default::default() }, |sim| {
+            let ctx = GameCtx::from_stable(sim);
+            for index in 0..ctx.entity_count() {
+                let unit = ctx.entity_at(index).unwrap();
+                expected.push((unit.id(), unit.team(), unit.pos(), unit.hp().current, unit.hp().max,
+                    unit.is_alive(), unit.is_champion(), unit.is_tower()));
+            }
+            expected_player = ctx.get_player(1).map(|p| (p.deaths(), p.team(), p.position()));
+        });
+        assert!(calls.stat_reads.get() >= 4);
+        assert!(calls.buff_reads.get() >= 4);
+        calls.stat_reads.set(0);
+        calls.buff_reads.set(0);
+        let calls = with_world(calls, |sim| {
+            let ctx = GameCtx::from_stable(sim);
+            let actual: Vec<_> = (0..ctx.entity_count()).map(|index| {
+                let unit = ctx.live_entity_at(index).unwrap();
+                let (x, y) = unit.pos();
+                let (hp, max) = unit.hp();
+                (unit.id(), unit.team(), EntityPos { x, y }, hp, max,
+                    unit.is_alive(), unit.is_champion(), unit.is_tower())
+            }).collect();
+            assert_eq!(actual, expected);
+            assert_eq!(ctx.live_player(1).map(|p| {
+                let (team, position) = ctx.player_team_position(1).unwrap();
+                (p.deaths(), team, position)
+            }), expected_player);
+            assert!(ctx.live_entity(999).is_none());
+            assert!(ctx.live_player(999).is_none());
+        });
+        assert_eq!(calls.stat_reads.get(), 0);
+        assert_eq!(calls.buff_reads.get(), 0);
+    }
+
+    fn gas_reference(ctx: &GameCtx, id: usize, champion: &str) -> bool {
+        use crate::legacy::pokemon_status as status;
+        if matches!(champion, "pokemon_moba_clawitzer" | "pokemon_moba_comfey") { return false; }
+        let Some(unit) = ctx.get_entity(id) else { return false; };
+        if !unit.is_alive() || unit.is_tower() { return false; }
+        let radius = 42_000u64;
+        (0..ctx.entity_count()).filter_map(|i| ctx.entity_at(i)).any(|source| {
+            source.team() != unit.team() && source.is_alive()
+                && (status::champion_id_for_entity(source.id()) == Some("pokemon_moba_weezing")
+                    || status::receiver_has_copied(source.id(), "pokemon_moba_weezing"))
+                && crate::ai_world::distance_sq(source.pos(), unit.pos()) <= u128::from(radius).pow(2)
+        })
+    }
+
+    #[test]
+    fn lightweight_ai_snapshots_preserve_order_expiry_death_and_respawn() {
+        let mut calls = Calls { world: true, ..Default::default() };
+        for tick in [1, 2, 3, 4, 200, 201] {
+            calls.tick = tick;
+            calls.positions.insert(7, (100000 + tick as u64 * 10, 100000));
+            calls.hp_current = Some(10000 - tick);
+            calls.towers = if tick < 4 { [9].into() } else { [8].into() };
+            calls.dead = if tick == 3 { [7, 8, 9].into() } else { Default::default() };
+            calls = with_world(calls, |sim| {
+                crate::legacy::pokemon_content::verify_lightweight_snapshot_refresh(&GameCtx::from_stable(sim));
+            });
+        }
+    }
+
+    #[test]
+    fn gas_without_sources_skips_all_entity_snapshots_and_enumeration() {
+        use crate::legacy::pokemon_status as status;
+        let calls = with_world(Calls { world: true, ..Default::default() }, |sim| {
+            let ctx = GameCtx::from_stable(sim);
+            status::register_entity_champion(&ctx, 7, "pokemon_moba_pikachu");
+            assert!(!status::passive_suppressed_by_nullifying_gas(&ctx, 7, "pokemon_moba_pikachu"));
+        });
+        assert_eq!(calls.entity_enumerations.get(), 0);
+        assert_eq!(calls.stat_reads.get(), 0);
+        assert_eq!(calls.buff_reads.get(), 0);
+    }
+
+    #[test]
+    fn gas_matches_original_across_copies_deaths_movement_and_match_isolation() {
+        use crate::legacy::pokemon_status as status;
+        let check = |ctx: &GameCtx| {
+            for id in [7, 8, 9, 999] {
+                for name in ["pokemon_moba_pikachu", "pokemon_moba_comfey", "pokemon_moba_clawitzer"] {
+                    assert_eq!(status::passive_suppressed_by_nullifying_gas(ctx, id, name),
+                        gas_reference(ctx, id, name), "entity={id} champion={name}");
+                }
+            }
+        };
+        let mut calls = with_world(Calls { world: true, ally_nine: true, enemy_champions: true, ..Default::default() }, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            check(&ctx);
+            status::register_entity_champion(&ctx, 8, "pokemon_moba_weezing");
+            check(&ctx);
+            status::register_receiver(9);
+            status::copy_receiver_passive(&mut ctx, 9, 8);
+            status::register_entity_champion(&ctx, 8, "pokemon_moba_pikachu");
+            assert!(status::passive_suppressed_by_nullifying_gas(&ctx, 8, "pokemon_moba_pikachu"));
+            check(&ctx);
+        });
+        for (position, dead, tower) in [((200000, 100000), false, false),
+            ((161999, 100000), false, false), ((162000, 100000), false, false), ((162001, 100000), false, false),
+            ((120000, 100000), true, false),
+            ((120000, 100000), false, true), ((120000, 100000), false, false)] {
+            calls.positions.insert(9, position);
+            calls.dead = if dead { [9].into() } else { Default::default() };
+            calls.towers = if tower { [8].into() } else { Default::default() };
+            calls = with_world(calls, |sim| check(&GameCtx::from_stable(sim)));
+        }
+        with_world(Calls { world: true, ..Default::default() }, |sim| {
+            assert!(!status::passive_suppressed_by_nullifying_gas(&GameCtx::from_stable(sim), 7, "pokemon_moba_pikachu"));
+        });
     }
 
     fn with_sim(f: impl FnOnce(&mut StableSim<'_>)) -> Calls {
@@ -2202,6 +2386,7 @@ mod sdk_upgrade_tests {
         table.entity_hp = Some(hp);
         table.entity_team = Some(team);
         table.entity_is_champion = Some(champion);
+        table.entity_is_tower = Some(tower);
         table.entity_is_minion = Some(minion);
         table.player_is_valid = Some(player_valid);
         table.player_champion = Some(player_champion);
@@ -2591,6 +2776,236 @@ mod sdk_upgrade_tests {
     }
 
     #[test]
+    fn field_leases_cover_every_tick_complete_cycles_and_retry_rejected_events() {
+        for stem in ["kricketune_skill1_sticky_web_deployable", "arboliva_passive_grassy_terrain",
+            "goodra_ult_life_dew_pickup", "garganacl_passive_salt_cure_patch",
+            "sylveon_skill1_misty_terrain_field", "dedenne_ult_spark_grid_nodes"] {
+            let mut calls = Calls { world: true, ..Default::default() };
+            let cycle = crate::native_vfx::field_cycle_ticks(stem);
+            let mut ends_at = 0;
+            for tick in 0..180 {
+                calls.tick = tick;
+                calls.positions.insert(7, (100000 + tick as u64 * 1000, 100000));
+                let before = calls.visuals.len();
+                calls = with_world(calls, |sim| {
+                    let ctx = GameCtx::from_stable(sim);
+                    for _ in 0..3 { crate::native_vfx::field(&ctx, stem, 7, EntityPos { x: 140000, y: 100000 }, 32000); }
+                });
+                if calls.visuals.len() != before {
+                    assert_eq!(calls.visuals.len(), before + 1, "deduplicate {stem}");
+                    let v = calls.visuals.last().unwrap();
+                    assert_eq!((v.2.x, v.2.y), (140000, 100000), "fixed map position");
+                    assert_eq!((v.5 - 2) % cycle, 0, "do not cut {stem} mid-cycle");
+                    if tick > 0 { assert!(ends_at > tick, "handoff gap in {stem}"); }
+                    ends_at = tick + v.5 as usize;
+                }
+                assert!(ends_at > tick, "uncovered tick in {stem}");
+            }
+        }
+        let calls = with_world(Calls { world: true, reject_visuals: true, ..Default::default() }, |sim| {
+            let ctx = GameCtx::from_stable(sim);
+            for _ in 0..2 { crate::native_vfx::field(&ctx, "goodra_ult_life_dew_pickup", 7,
+                EntityPos { x: 120000, y: 100000 }, 8500); }
+        });
+        assert_eq!(calls.visuals.len(), 1, "rejected events must not retry in the same tick");
+        let mut calls = calls;
+        calls.tick += 1;
+        calls.reject_visuals = false;
+        let calls = with_world(calls, |sim| {
+            crate::native_vfx::field(&GameCtx::from_stable(sim), "goodra_ult_life_dew_pickup", 7,
+                EntityPos { x: 120000, y: 100000 }, 8500);
+        });
+        assert_eq!(calls.visuals.len(), 2, "retry next tick, not after a full animation lease");
+    }
+
+    #[test]
+    fn ai_known_player_snapshot_skips_owner_scan_without_changing_facts() {
+        let baseline = with_world(Calls { world: true, ..Default::default() }, |sim| {
+            let world = crate::ai_world::World::capture(sim, 7);
+            assert_eq!(world.player, Some(1));
+        });
+        assert_eq!(baseline.player_enumerations.get(), 1);
+        let mut snapshot = None;
+        let calls = with_world(Calls { world: true, ..Default::default() }, |sim| {
+            snapshot = Some(crate::ai_world::World::for_player(sim, 7, 1));
+        });
+        assert_eq!(calls.player_enumerations.get(), 0);
+        assert_eq!(calls.entity_enumerations.get(), 3);
+        with_world(Calls { world: true, ..Default::default() }, |sim| {
+            let old = crate::ai_world::World::capture(sim, 7);
+            assert_eq!(format!("{old:?}"), format!("{:?}", snapshot.unwrap()));
+        });
+    }
+
+    #[test]
+    fn caster_only_ai_reads_do_not_enumerate_the_match() {
+        let calls = with_world(Calls { world: true, ..Default::default() }, |sim| {
+            for _ in 0..1000 {
+                let world = crate::ai_world::World::for_caster(sim, 7);
+                assert_eq!(world.units.len(), 1);
+                assert_eq!(world.caster().unwrap().id, 7);
+                assert_eq!(world.caster().unwrap().hp, 10000);
+            }
+        });
+        assert_eq!(calls.entity_enumerations.get(), 0);
+        let calls = with_world(calls, |sim| {
+            assert_eq!(crate::ai_world::World::capture(sim, 7).units.len(), 3);
+        });
+        assert_eq!(calls.entity_enumerations.get(), 3, "full world still reads all entities");
+        with_world(Calls { world: true, dead: [7].into(), ..Default::default() }, |sim| {
+            assert!(crate::ai_world::World::for_caster(sim, 7).caster().is_none());
+            assert!(crate::ai_world::World::for_caster(sim, 99).caster().is_none());
+        });
+    }
+
+    #[test]
+    fn permanent_webs_and_grass_survive_death_and_stop_refreshing_after_destruction() {
+        use crate::legacy::pokemon_status as status;
+        let center = EntityPos { x: 100000, y: 100000 };
+        let mut calls = with_world(Calls { world: true, ..Default::default() }, |sim| {
+            let ctx = GameCtx::from_stable(sim);
+            status::begin_sticky_web(&ctx, 7, center, 64000, 5, 18, 8, 45);
+            status::maybe_spawn_grassy_terrain(&ctx, 7, 3, 32000, 300, 12, 18, 35);
+        });
+        assert_eq!(calls.visuals.len(), 2, "render on creation");
+        calls.dead.insert(7);
+        calls.positions.insert(7, (800000, 800000));
+        calls.tick = 120;
+        calls = with_world(calls, |sim| status::update_statuses(&mut GameCtx::from_stable(sim), 1));
+        assert_eq!(calls.visuals.len(), 4, "death must not delete permanent fields");
+        assert!(calls.visuals.iter().all(|v| (v.2.x, v.2.y) == (100000, 100000)));
+        calls.tick = 240;
+        calls = with_world(calls, |sim| {
+            status::burn_sticky_webs_at(center, 32000);
+            status::clear_grassy_terrains_at(center, 32000);
+            status::update_statuses(&mut GameCtx::from_stable(sim), 1);
+        });
+        assert_eq!(calls.visuals.len(), 4, "removed fields stop renewing");
+    }
+
+    #[test]
+    fn respawn_handles_keep_permanent_field_caps_and_life_dew_ownership() {
+        use crate::legacy::{pokemon_content as content, pokemon_status as status};
+        let mut calls = with_world(Calls { world: true, ally_nine: true, tick: 1, ..Default::default() }, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            status::register_player_entity_life_at_tick(&ctx, 1, 7, 1, Some(0));
+            for x in [100000, 130000, 160000, 190000, 220000] {
+                status::begin_sticky_web(&ctx, 7, EntityPos { x, y: 100000 }, 64000, 5, 18, 8, 45);
+            }
+            for x in [100000, 130000, 160000] {
+                status::spawn_grassy_terrain_at(&ctx, 7, EntityPos { x, y: 100000 }, 3, 32000, usize::MAX, 12, 18, 35);
+            }
+            let champion = content::champion_by_id("pokemon_moba_goodra").unwrap();
+            content::resolve_projectile_impact(&mut ctx, champion, champion.ult.unwrap(), 1, 7, InputTarget::None);
+        });
+        calls.visuals.clear();
+        calls.tick = 120;
+        calls = with_world(calls, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            status::register_player_entity_life_at_tick(&ctx, 1, 9, 120, Some(1));
+            status::begin_sticky_web(&ctx, 9, EntityPos { x: 250000, y: 100000 }, 64000, 5, 18, 8, 45);
+            status::spawn_grassy_terrain_at(&ctx, 9, EntityPos { x: 250000, y: 100000 }, 3, 32000, usize::MAX, 12, 18, 35);
+            status::update_statuses(&mut ctx, 1);
+            content::update_native_field_visuals(&ctx);
+        });
+        assert!(calls.visuals.iter().all(|v| v.1 == 9));
+        assert_eq!(calls.visuals.iter().filter(|v| v.0.ends_with("sticky_web_deployable_loop")).count(), 5);
+        assert_eq!(calls.visuals.iter().filter(|v| v.0.ends_with("grassy_terrain_loop")).count(), 3);
+        assert_eq!(calls.visuals.iter().filter(|v| v.0.ends_with("life_dew_pickup_loop")).count(), 14);
+    }
+
+    #[test]
+    fn grassy_overlap_aggregates_once_and_does_not_give_foreign_or_expired_damage_bonuses() {
+        use crate::legacy::{pokemon_status as status, pokemon_types::PokemonType};
+        let mut calls = with_world(Calls { world: true, tick: 1, ..Default::default() }, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            for x in [95000, 100000, 105000] {
+                status::spawn_grassy_terrain_at(&ctx, 7, EntityPos { x, y: 100000 }, 3, 32000, 60, 12, 18, 35);
+            }
+            status::update_statuses(&mut ctx, 1);
+            assert_eq!(status::grassy_terrain_damage_bonus_for_caster(&ctx, 7, PokemonType::Grass), 36);
+            assert_eq!(status::grassy_terrain_damage_bonus_for_caster(&ctx, 8, PokemonType::Grass), 0);
+        });
+        let key = (7, "pm_grassy_terrains_0_7".to_owned());
+        assert_eq!(calls.active_buffs[&key].len(), 1);
+        assert_eq!(calls.active_buffs[&key][0].attack_speed_mult, 54);
+        calls.tick = 31;
+        calls = with_world(calls, |sim| status::update_statuses(&mut GameCtx::from_stable(sim), 1));
+        assert_eq!(calls.active_buffs[&key].len(), 1);
+        assert_eq!(calls.active_buffs[&key][0].attack_speed_mult, 54);
+        calls.tick = 61;
+        with_world(calls, |sim| assert_eq!(status::grassy_terrain_damage_bonus_for_caster(
+            &GameCtx::from_stable(sim), 7, PokemonType::Grass), 0));
+    }
+
+    #[test]
+    fn sticky_web_ai_avoids_duplicate_centers_but_allows_overlapping_chains() {
+        use crate::legacy::{pokemon_content as content, pokemon_status as status};
+        with_world(Calls { world: true, ..Default::default() }, |sim| {
+            status::begin_sticky_web(&GameCtx::from_stable(sim), 7,
+                EntityPos { x: 120000, y: 100000 }, 64000, 5, 18, 8, 45);
+            let world = crate::ai_world::World::capture(sim, 7);
+            let champion = content::champion_by_id("pokemon_moba_kricketune").unwrap();
+            assert!(!content::ai_target_allowed(&world, champion, champion.skill, 8));
+            assert!(!content::ai_input_allowed(&world, "Kricketune",
+                &Input::Skill { target: InputTarget::Pos { x: 121000, y: 100000 } }));
+            assert!(content::ai_input_allowed(&world, "Kricketune",
+                &Input::Skill { target: InputTarget::Pos { x: 145000, y: 100000 } }));
+        });
+    }
+
+    #[test]
+    fn life_dew_has_healing_metadata_and_creates_bubbles_before_passive_updates() {
+        use crate::legacy::pokemon_content as content;
+        let mut reg = ModRegistration::new("pokemon_moba_stable"); content::register_champions(&mut reg);
+        let champion = reg.champions.iter().find(|c| c.id() == "pokemon_moba_goodra").unwrap();
+        let mut passive = champion.passive().unwrap();
+        let effect = champion.ult().unwrap().effect().unwrap();
+        assert_eq!(effect.effect.expected_heal(&StatV1::default()), 14 * 175);
+        let mut calls = with_world(Calls { world: true, ally_nine: true, ..Default::default() }, |sim| {
+            effect.effect.apply(sim, 1, 7, InputTarget::None.to_stable());
+        });
+        assert_eq!(calls.visuals.len(), 14);
+        assert!(calls.visuals.iter().all(|v| v.0.ends_with("life_dew_pickup_loop")));
+        calls.tick = 120;
+        calls.dead.insert(7);
+        calls = with_world(calls, |sim| passive.on_update(sim, 1, 1, 7));
+        assert_eq!(calls.visuals.len(), 28, "bubbles retain their lifetime after Goodra dies");
+        calls.tick = 3600;
+        calls = with_world(calls, |sim| passive.on_update(sim, 1, 1, 7));
+        assert_eq!(calls.visuals.len(), 28, "expired bubbles stop rendering");
+        assert!(calls.heals.is_empty(), "full-health allies must not consume bubbles");
+    }
+
+    #[test]
+    fn salt_has_creation_and_contact_visuals_and_permanent_stage_waits_for_spire() {
+        use crate::legacy::pokemon_status as status;
+        let calls = with_world(Calls { world: true, ..Default::default() }, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            status::garganacl_spawn_passive_salt(&ctx, 7, 6, 22000, 300, 40, 20, 90, 50);
+            status::update_statuses(&mut ctx, 1);
+        });
+        assert!(calls.visuals.iter().any(|v| v.0.ends_with("salt_cure_patch_loop")));
+        assert!(calls.visuals.iter().any(|v| v.0.ends_with("salt_cure_patch")));
+        assert_eq!(calls.damage.len(), 1, "visuals must not duplicate salt damage");
+        let mut calls = with_world(Calls { world: true, ..Default::default() }, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            status::begin_garganacl_blessed_salt(&ctx, 7, EntityPos { x: 120000, y: 100000 },
+                60, 30000, 10000, 30, 10, 20, 30, 25, 30, 30, 5, 50);
+            status::update_statuses(&mut ctx, 1);
+            assert!(!status::garganacl_entity_in_salt(&ctx, 7));
+        });
+        assert!(!calls.visuals.iter().any(|v| v.0.ends_with("salt_cure_patch_loop")));
+        calls.tick = 60;
+        calls = with_world(calls, |sim| {
+            let mut ctx = GameCtx::from_stable(sim);
+            status::update_statuses(&mut ctx, 1);
+            assert!(status::garganacl_entity_in_salt(&ctx, 7));
+        });
+        assert!(calls.visuals.iter().any(|v| v.0.ends_with("salt_cure_patch_loop")));
+    }
+
+    #[test]
     fn fields_render_immediately_refresh_once_and_rectangles_use_their_center() {
         let calls=with_world(Calls {world:true,tick:7,..Default::default()},|sim| {
             let ctx=GameCtx::from_stable(sim);
@@ -2599,7 +3014,9 @@ mod sdk_upgrade_tests {
         });
         assert_eq!(calls.visuals.len(),1);
         assert_eq!((calls.visuals[0].2.x,calls.visuals[0].2.y),(100000,140000));
-        assert_eq!((calls.visuals[0].3,calls.visuals[0].4,calls.visuals[0].5),(80000,10000,30));
+        assert_eq!((calls.visuals[0].3,calls.visuals[0].4),(80000,10000));
+        let cycle = crate::native_vfx::field_cycle_ticks("goodra_skill1_rain_dance_field");
+        assert_eq!(calls.visuals[0].5, cycle * 30u64.div_ceil(cycle) + 2);
     }
 
     #[test]
@@ -2722,7 +3139,7 @@ mod sdk_upgrade_tests {
                 EntityPos { x:100000,y:100000 }, EntityPos { x:140000,y:100000 }, 100, 60000);
             status::update_statuses(&mut GameCtx::from_stable(sim), 1);
         });
-        calls.tick = 37;
+        calls.tick = 7 + (calls.visuals[0].5 - 2) as usize;
         calls.positions.insert(7,(500000,500000)); calls.positions.insert(8,(600000,600000));
         let calls = with_world(calls, |sim| status::update_statuses(&mut GameCtx::from_stable(sim),1));
         let smoke: Vec<_> = calls.visuals.iter().filter(|v| v.0.contains("smokescreen")).collect();
@@ -3383,6 +3800,127 @@ mod sdk_upgrade_tests {
     }
 
     #[test]
+    fn sketch_memory_and_cooldowns_follow_respawn_but_not_other_players_or_matches() {
+        use crate::legacy::{pokemon_content as content, pokemon_status as status};
+        with_world(Calls { world: true, tick: 100, ..Default::default() }, |sim| {
+            let ctx = GameCtx::from_stable(sim);
+            status::register_player_entity_life_at_tick(&ctx, 1, 7, 100, Some(0));
+            status::register_smeargle(&ctx, 7);
+            let source = content::champion_by_id("pokemon_moba_xatu").unwrap();
+            assert!(status::smeargle_force_learn_for_player(&ctx, 1, source, source.ult.unwrap()));
+            status::smeargle_start_copied_slot_cooldown(&ctx, 7, content::ActionSlot::Attack);
+            status::register_player_entity_life_at_tick(&ctx, 1, 9, 200, Some(1));
+            status::register_smeargle(&ctx, 9);
+            assert_eq!(status::smeargle_learned_count_for_player(1), 1);
+            assert_eq!(status::smeargle_learned_action(&ctx, 9, content::ActionSlot::Attack).unwrap().source_champion.id, source.id);
+            assert!(status::smeargle_learned_action(&ctx, 7, content::ActionSlot::Attack).is_none());
+            assert!(!status::smeargle_copied_slot_ready(&ctx, 9, content::ActionSlot::Attack));
+            assert_eq!(ctx.get_entity(9).unwrap().buff_count(), 1);
+            status::register_player_entity_life_at_tick(&ctx, 2, 8, 200, Some(0));
+            status::register_smeargle(&ctx, 8);
+            assert_eq!(status::smeargle_learned_count_for_player(2), 0);
+        });
+        with_world(Calls { world: true, ..Default::default() }, |sim| {
+            let ctx = GameCtx::from_stable(sim);
+            status::register_player_entity_life_at_tick(&ctx, 1, 9, 0, Some(0));
+            status::register_smeargle(&ctx, 9);
+            assert_eq!(status::smeargle_learned_count_for_player(1), 0);
+        });
+    }
+
+    #[test]
+    fn sketch_seeks_contact_after_fallback_without_interrupting_recalls_or_diving() {
+        use crate::legacy::pokemon_content::smeargle_learning_approach as approach;
+        with_world(Calls { world: true, ..Default::default() }, |sim| {
+            let mut world = crate::ai_world::World::capture(sim, 7);
+            world.units.retain(|unit| unit.id != 9);
+            let enemy = world.units.iter_mut().find(|unit| unit.id == 8).unwrap();
+            enemy.champion = true;
+            enemy.pos = EntityPos { x: 180000, y: 100000 };
+            assert!(matches!(approach(&world, None, 1), Some(Input::Move { x: 132000, y: 100000 })));
+            assert!(approach(&world, Some(&Input::Return), 1).is_none());
+            assert!(approach(&world, Some(&Input::Attack { target: InputTarget::Target { target_id: 8 } }), 1).is_none());
+            assert!(approach(&world, None, 4).is_none());
+            world.units.iter_mut().find(|unit| unit.id == 8).unwrap().visible = false;
+            assert!(approach(&world, None, 1).is_none());
+            world.units.iter_mut().find(|unit| unit.id == 8).unwrap().visible = true;
+            let mut extra = world.get(8).unwrap().clone();
+            extra.id = 10;
+            world.units.push(extra);
+            assert!(approach(&world, None, 1).is_none());
+            let extra = world.units.last_mut().unwrap();
+            extra.champion = false; extra.tower = true;
+            assert!(approach(&world, None, 1).is_none());
+            world.units.pop();
+            world.units.iter_mut().find(|unit| unit.id == 7).unwrap().hp = 1;
+            assert!(approach(&world, None, 1).is_none());
+        });
+    }
+
+    #[test]
+    fn sketch_range_tracks_learning_and_restores_metadata_without_stacking() {
+        use crate::legacy::{pokemon_content as content, pokemon_status as status};
+        let calls = with_world(Calls { world: true, ..Default::default() }, |sim| {
+            let xatu = content::champion_by_id("pokemon_moba_xatu").unwrap();
+            let move_data = xatu.ult.unwrap();
+            assert_eq!(move_data.range, 900000);
+            {
+                let ctx = GameCtx::from_stable(sim);
+                status::register_player_entity_life_at_tick(&ctx, 1, 7, 0, Some(0));
+                status::register_smeargle(&ctx, 7);
+                assert!(status::smeargle_force_learn_for_player(&ctx, 1, xatu, move_data));
+                assert!(!status::smeargle_force_learn_for_player(&ctx, 1, xatu, move_data));
+            }
+            let marker = sim.get_entity(7).unwrap().buff_at(0).unwrap();
+            assert_eq!(sim.get_entity(7).unwrap().buff_count(), 1);
+            crate::sketch_range::tests::with_view(vec![marker], 1, |view| {
+                let mut registration = ModRegistration::new("pokemon_moba_stable");
+                content::register_champions(&mut registration);
+                for champion in &registration.champions {
+                    for (slot, action) in [Some(champion.attack()), Some(champion.skill()), Some(champion.skill2()), champion.ult()].into_iter().enumerate() {
+                        let Some(action) = action else { continue; };
+                        let spec = action.effect().unwrap();
+                        let expected = if champion.id() == "pokemon_moba_smeargle" && slot == 0 { 858000 } else { 0 };
+                        assert_eq!(spec.effect.range_adjust(view, view), expected, "{} slot {slot}", champion.id());
+                    }
+                }
+            });
+            // Respawn/cleanse can remove engine buffs; learned moves survive and restore them.
+            sim.entity_remove_buff(7, marker.name());
+            assert_eq!(sim.get_entity(7).unwrap().buff_count(), 0);
+            {
+                let ctx = GameCtx::from_stable(sim);
+                status::register_smeargle(&ctx, 7);
+                for _ in 0..100 { status::smeargle_sync_ranges(&ctx, 7); }
+                let source = content::champion_by_id("pokemon_moba_audino").unwrap();
+                status::note_smeargle_affected(&ctx, 7, source, source.skill2);
+                assert!(status::smeargle_try_sketch(&ctx, 7, content::ActionSlot::Skill));
+            }
+            assert_eq!(sim.get_entity(7).unwrap().buff_count(), 2);
+            assert_eq!(sim.get_entity(8).unwrap().buff_count(), 0);
+        });
+        // First learning, restoring a removed marker, second learning. No tick-refresh writes.
+        assert_eq!(calls.visual_buffs.len(), 3);
+        assert!(calls.damage.is_empty());
+        assert!(calls.visuals.is_empty());
+    }
+
+    #[test]
+    fn sketch_range_metadata_replaces_stale_entries_and_keeps_other_buffs() {
+        let calls = with_world(Calls { world: true, ..Default::default() }, |sim| {
+            sim.add_buff(7, &BuffV1::named("unrelated_passive"));
+            crate::sketch_range::sync(sim, 7, [Some((80000, 0)), None, None, None]);
+            crate::sketch_range::sync(sim, 7, [Some((60000, 0)), None, None, None]);
+            assert_eq!(sim.get_entity(7).unwrap().buff_count(), 2);
+            crate::sketch_range::sync(sim, 7, [None; 4]);
+            let entity = sim.get_entity(7).unwrap();
+            assert_eq!(entity.buff_count(), 1);
+            assert_eq!(entity.buff_at(0).unwrap().name(), "unrelated_passive");
+        });
+        assert_eq!(calls.visual_buffs.len(), 2);
+    }
+
+    #[test]
     fn copied_heals_use_ally_eligibility_and_real_range_without_changing_smeargles_body() {
         use crate::legacy::{pokemon_content as content, pokemon_status as status};
         with_world(Calls { world: true, ally_nine: true, hp_current: Some(9000), ..Default::default() }, |sim| {
@@ -3391,7 +3929,7 @@ mod sdk_upgrade_tests {
                 status::register_player_entity_life_at_tick(&ctx, 1, 7, 0, Some(0));
                 status::register_smeargle(&ctx, 7);
                 let source = content::champion_by_id("pokemon_moba_audino").unwrap();
-                assert!(status::smeargle_force_learn_for_player(1, source, source.skill2));
+                assert!(status::smeargle_force_learn_for_player(&ctx, 1, source, source.skill2));
             }
             let mut world = crate::ai_world::World::capture(sim, 7);
             let smeargle = content::champion_by_id("pokemon_moba_smeargle").unwrap();
